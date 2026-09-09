@@ -1,7 +1,7 @@
 #!/bin/zsh
 # dev/r0-count.sh
 # Diffs the fenced block under the "## R0 counts" heading of SPEC.md
-# against the output of `kanon spec-count`.  Prints R0-COUNT OK and exits 0
+# against the output of `lanyard spec-count`.  Prints R0-COUNT OK and exits 0
 # when the diff is empty, else prints the diff, R0-COUNT FAIL, and exits 1.
 #
 # SA-D7: the root comes from this script's own path, so a copy of the
@@ -14,7 +14,7 @@ unfunction chpwd 2>/dev/null
 
 ROOT=${0:A:h}/..
 SPEC=$ROOT/SPEC.md
-DRIVER=$ROOT/_build/default/bin/kanon.exe
+DRIVER=$ROOT/_build/default/bin/lanyard.exe
 # The work directory sits under the repository root, not under the system
 # temp directory, so the script needs no writable path outside the tree it
 # checks.  .gitignore holds it.

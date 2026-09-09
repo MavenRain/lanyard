@@ -1,18 +1,29 @@
 #!/bin/zsh
 # dev/trusted-lines.sh [ROOT]
-# The TRUSTED-LINES leg of the gate battery (Stage E, brief 3.5.1).
+# The TRUSTED-LINES leg of the gate battery, in its M0 Stage A form.
 # Example:
-#   zsh /Users/oobi/Documents/kanon/dev/trusted-lines.sh
+#   zsh /Users/oobi/Documents/lanyard/dev/trusted-lines.sh
 #
-# The trust base of a checked file is the kernel and the encoder.  The
-# kernel is eight files:  shape.ml, term.ml, rules.ml, check.ml,
-# value.ml, eval.ml, conv.ml and totality.ml.  The encoder is one file,
-# wasm/gc_encode.ml, which writes the bytes of the module.  M0 holds the
-# kernel at 4,000 lines and the encoder at 600, so the base stays small
-# enough for one reader to audit. (ruling round 2026-09-06 (c))
+# The trust base of a checked file is the kernel.  The kernel is the
+# twelve files this script reads:  shape.ml, term.ml, rules.ml, check.ml,
+# value.ml, eval.ml, conv.ml, totality.ml, positivity.ml, global.ml,
+# order.ml and bignum.ml.  M0 holds the kernel at 4,000 lines, so the
+# base stays small enough for one reader to audit. (ruling round
+# 2026-09-06 (c))
 #
-# The line prints the two counts against their bounds:
-#   TRUSTED-LINES kernel=2305/4000 encoder=216/600 OK (ruling round 2026-09-06 (c))
+# SA-D4: the encoder half of the pin script read wasm/gc_encode.ml.  M0
+# Stage A deletes the wasm tree at the fork point, so the encoder bound
+# has no file and the leg drops it.  The M0 ceiling of the whole trusted
+# base is the FORMULA below:  5481 is the twelve kernel files at 3997
+# plus lib/erase.ml at 1484, and A_rir, A_emit and A_sig are the three
+# allowances of the files Stage D, Stage E and Stage B write.  The three
+# allowances are open user rulings (S0-D1, D-M0-3), so this leg prints
+# the formula and NO total, and no agent guesses a number.
+#
+# The leg prints three lines and exits 0:
+#   TRUSTED-LINES kernel=3997/4000
+#   M0 ceiling: 5481 + A_rir + A_emit + A_sig
+#   TRUSTED-LINES OK
 #
 # SA-D7: the root comes from this script's own path when no argument is
 # given, so a copy of the repository under a scratch directory measures
@@ -29,7 +40,11 @@ unfunction chpwd 2>/dev/null
 root=${1:-${0:A:h}/..}
 
 kernel_bound=4000
-encoder_bound=600
+
+# The M0 ceiling of the trusted base, as a formula with no total.  The
+# base is 3997 kernel lines plus lib/erase.ml at 1484.
+ceiling_base=5481
+ceiling_line="M0 ceiling: $ceiling_base + A_rir + A_emit + A_sig"
 
 kernel_files=(
   $root/lib/shape.ml
@@ -41,40 +56,39 @@ kernel_files=(
   $root/lib/conv.ml
   $root/lib/totality.ml
   # M1 Stage G, brief 3.10 and SG-D12:  the two files the mu shape adds
-  # join the believed list and the two budgets above do not move.
+  # join the believed list and the budget above does not move.
   $root/lib/positivity.ml
   $root/lib/global.ml
   # M1 Stage I, brief 3.10 and SI-D15:  the file that holds the
   # structural order and the certificate joins the believed list and the
-  # two budgets above do not move.
+  # budget above does not move.
   $root/lib/order.ml
   # Stage K SK-D1: the arbitrary precision host boundary is believed.
   $root/lib/bignum.ml
 )
-encoder_file=$root/wasm/gc_encode.ml
 
 # wc -l over more than one file ends with a total row, which awk reads.
 kernel_out=$(wc -l $kernel_files)
 kernel_code=$?
 
-encoder_out=$(wc -l < $encoder_file)
-encoder_code=$?
-
-if [[ $kernel_code -ne 0 || $encoder_code -ne 0 ]]; then
+if [[ $kernel_code -ne 0 ]]; then
   print -r -- "trusted-lines: a trusted file is missing under $root"
   print -r -- "TRUSTED-LINES FAIL"
   exit 1
 fi
 
 kernel=$(print -r -- "$kernel_out" | awk 'END { print $1 }')
-encoder=$(print -r -- "$encoder_out" | awk '{ print $1 }')
 
-line="TRUSTED-LINES kernel=$kernel/$kernel_bound encoder=$encoder/$encoder_bound"
+line="TRUSTED-LINES kernel=$kernel/$kernel_bound"
 
-if [[ $kernel -le $kernel_bound && $encoder -le $encoder_bound ]]; then
-  print -r -- "$line OK"
+if [[ $kernel -le $kernel_bound ]]; then
+  print -r -- "$line"
+  print -r -- "$ceiling_line"
+  print -r -- "TRUSTED-LINES OK"
   exit 0
 fi
 
-print -r -- "$line FAIL"
+print -r -- "$line"
+print -r -- "$ceiling_line"
+print -r -- "TRUSTED-LINES FAIL"
 exit 1

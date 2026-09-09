@@ -6,7 +6,7 @@ import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const compiler = resolve(process.argv[2] ?? join(root, '_build/default/bin/kanon.exe'));
+const compiler = resolve(process.argv[2] ?? join(root, '_build/default/bin/lanyard.exe'));
 const scratch = mkdtempSync(join(tmpdir(), 'kanon-reactor-'));
 const fixture = name => join(root, 'test/fixtures/reactor', `${name}.kan`);
 const run = args => spawnSync(compiler, args, { encoding: 'utf8' });

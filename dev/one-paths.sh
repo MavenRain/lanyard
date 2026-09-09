@@ -23,7 +23,7 @@ import subprocess
 import sys
 
 root = Path(sys.argv[1])
-driver = root / '_build/default/bin/kanon.exe'
+driver = root / '_build/default/bin/lanyard.exe'
 positives = ['identity', 'branches', 'fields', 'shadowing', 'recursive', 'unreachable-capture']
 negatives = ['used-twice', 'unused', 'zero-only', 'many-consumer', 'missing-branch',
              'tuple-duplication', 'let-duplication', 'closure-duplication',

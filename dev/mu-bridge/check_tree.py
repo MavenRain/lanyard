@@ -21,7 +21,7 @@ def main():
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=True)
     exporter = ROOT / "_build/default/dev/mu-bridge/export_mu.exe"
-    compiler = ROOT / "_build/default/bin/kanon.exe"
+    compiler = ROOT / "_build/default/bin/lanyard.exe"
     fixture = ROOT / "test/meta/mu-tree-bridge.kan"
     generated = ROOT / "meta/test/GeneratedMuTree.lean"
     expected_extraction = generated.read_bytes()

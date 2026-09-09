@@ -7,7 +7,7 @@ unfunction chpwd 2>/dev/null
 root=${1:-${0:A:h}/..}
 root=${root:A}
 evidence=${2:-$root/.gatework/nat-runtime}
-driver=$root/_build/default/bin/kanon.exe
+driver=$root/_build/default/bin/lanyard.exe
 mkdir -p "$evidence" || exit 1
 
 # SL round 2026-09-07: the validator comes from PATH, the way

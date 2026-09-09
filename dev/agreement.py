@@ -186,7 +186,7 @@ def verify(root, only, mutation, out):
     actual_manifest = json.loads((DATA / "agreement-reference.json").read_text())
     if actual_manifest != manifest(root):
         raise ValueError("reference manifest changed or has incomplete coverage")
-    kanon = root / "_build" / "default" / "bin" / "kanon.exe"
+    kanon = root / "_build" / "default" / "bin" / "lanyard.exe"
     order = {(kind, primitive): index for index, (kind, primitive, _, _, _)
              in enumerate(expected_files(root))}
     # SL round 2026-09-07: one worker per primitive.  The five primitives

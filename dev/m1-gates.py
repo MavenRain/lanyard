@@ -77,7 +77,7 @@ def require(result, description, *, expected=None):
 
 
 def driver(root):
-    return root / "_build/default/bin/kanon.exe"
+    return root / "_build/default/bin/lanyard.exe"
 
 
 def corpus_path(root):

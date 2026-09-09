@@ -53,7 +53,7 @@ report_empty () {
 # Leg 1: no exception, unapproved catch-all, List.nth or unsafe index.
 # SL-D16: allow entries identify a function and exact arm, so line shifts
 # cannot authorize another catch-all or invalidate the two ruled sites.
-leg1=$(scan $pat_house $root/lib $root/surface $root/bin $root/test $root/wasm)
+leg1=$(scan $pat_house $root/lib $root/surface $root/bin $root/test)
 named=$(python3 -P $root/dev/house-catchalls.py $root 2>&1)
 named_code=$?
 if [[ $named_code -ne 0 && -z $named ]]; then
@@ -64,22 +64,14 @@ if [[ -n $named ]]; then
 fi
 report_empty "no-exception" "$leg1"
 
-# Leg 2:  no mutable state in the kernel or the encoder, except the one
-# disclosed SD-D18 buffer site inside wasm/gc_encode.ml.  The rule states
-# the kernel and the encoder, so the leg reads lib and wasm alone and a
-# dev harness stays outside it.
-leg2=$(rg -n -- $pat_state $root/lib $root/wasm)
-marker=$(rg -n -- 'SD-D18\.' $root/wasm/gc_encode.ml | head -1 | awk -F: '{print $1}')
-if [[ -z $leg2 ]]; then
-  leg2_bad=""
-else
-  leg2_bad=$(print -r -- "$leg2" | awk -F: -v f="$root/wasm/gc_encode.ml" -v m="$marker" \
-    'NF && !(m != "" && $1 == f && $2 > m && $2 <= m + 12)')
-fi
-report_empty "no-mutable-state" "$leg2_bad"
+# Leg 2:  no mutable state in the kernel.  M0 Stage A deletes the wasm
+# tree at the fork point, so the encoder half of the rule has no file and
+# the leg reads lib alone.  A dev harness stays outside it.
+leg2=$(rg -n -- $pat_state $root/lib)
+report_empty "no-mutable-state" "$leg2"
 
 # Leg 3:  exactly one catch site in the repository (SD-D14).
-leg3=$(scan '\btry\b' $root/lib $root/surface $root/bin $root/test $root/wasm)
+leg3=$(scan '\btry\b' $root/lib $root/surface $root/bin $root/test)
 leg3_n=$(print -r -- "$leg3" | rg -c -- '.' || true)
 if [[ $leg3_n == 1 ]]; then
   print -r -- "HOUSE one-catch-site OK"
@@ -91,7 +83,7 @@ else
 fi
 
 # Leg 4:  no bool match.
-leg4=$(scan $pat_bool $root/lib $root/surface $root/wasm $root/test $root/bin)
+leg4=$(scan $pat_bool $root/lib $root/surface $root/test $root/bin)
 report_empty "no-bool-match" "$leg4"
 
 # Leg 5:  no em-dash outside the vendor tree and the build tree.

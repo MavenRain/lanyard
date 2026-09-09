@@ -1,0 +1,105 @@
+# Kernel carried files
+
+Each file below comes from kanon at the fork point
+046689a78ef6708404bd190dc86845cbee0bb36f, short form 046689a.  The fork
+carries 27 commits of history, so the fork point is a commit inside this
+repository and `git show 046689a:PATH` reads the kanon bytes here.
+
+The format is D-M0-5: one row per file with the path, the kanon commit,
+VERBATIM or EDITED, and the reason for an EDITED row.  A VERBATIM row
+carries `-` in the reason column, because a file that keeps its bytes
+needs no reason.  dev/kernel-carry.sh reads this table and re-diffs every
+row against the commit the row names.  It fails when a VERBATIM row
+differs by one byte, when an EDITED row is identical to the fork point,
+when an EDITED row gives no reason, or when a file of the trusted kernel
+bucket has no row here.
+
+| file | kanon commit | state | reason |
+| --- | --- | --- | --- |
+| lib/shape.ml | 046689a | VERBATIM | - |
+| lib/term.ml | 046689a | VERBATIM | - |
+| lib/rules.ml | 046689a | VERBATIM | - |
+| lib/check.ml | 046689a | VERBATIM | - |
+| lib/value.ml | 046689a | VERBATIM | - |
+| lib/eval.ml | 046689a | VERBATIM | - |
+| lib/conv.ml | 046689a | VERBATIM | - |
+| lib/totality.ml | 046689a | VERBATIM | - |
+| lib/positivity.ml | 046689a | VERBATIM | - |
+| lib/global.ml | 046689a | VERBATIM | - |
+| lib/order.ml | 046689a | VERBATIM | - |
+| lib/bignum.ml | 046689a | VERBATIM | - |
+| lib/erase.ml | 046689a | VERBATIM | - |
+
+## 1 The row set
+
+The first twelve rows are the kernel bucket that dev/trusted-lines.sh
+reads.  Correction S1-F1 of spike S1 gives the count: the bucket holds
+TWELVE files under lib/, not the eight the script header names.  The
+eight named members shape.ml 60, term.ml 133, rules.ml 1481, check.ml
+538, value.ml 137, eval.ml 297, conv.ml 396 and totality.ml 146 sum to
+3188.  The four unnamed members positivity.ml 118, global.ml 130,
+order.ml 510 and bignum.ml 51 add 809.  The total is 3997 of the 4000
+bound, so the headroom is 3 (spikes/dev/SPIKE-TRUSTED.md section 3,
+M0-PLAN.md:243-252).
+
+The thirteenth row is lib/erase.ml at 1484 lines.  The pin gate does not
+count it, and the honest M0 base counts it (S0-D1, RATIFICATIONS.md
+block (e)).  3997 plus 1484 is 5481.
+
+## 2 The state of each row at Stage A
+
+Every one of the thirteen rows is VERBATIM at Stage A.  Stage A writes no
+language code, so no kernel file changes here.  The leg proves the state,
+row by row, against the fork point.
+
+Two rows carry a named invariant of M0-PLAN.md:121-125:
+
+- lib/shape.ml stays at 60 lines, so the shape rows of the R0 fenced
+block keep their bytes.
+- lib/rules.ml keeps `spar_word = "SPar arrives at M1"` at rules.ml:20,
+which the SPar refusal reads at rules.ml:218 and rules.ml:247.
+
+S1-F2 binds lib/order.ml.  Its 510 lines sit INSIDE the 3997, so every
+Order.translate line spends the headroom of 3.  R-Q3 keeps responses
+first order at M0, so the headroom stays unspent and no agent edits
+lib/order.ml.
+
+## 3 The rows that change after Stage A
+
+lib/erase.ml becomes EDITED at Stage D, when it swaps its output IR to
+lib/rir.ml and keeps `quantity_runtime` (M0-PLAN.md section 3).  The
+agent of Stage D moves the row to EDITED and writes the reason in the
+reason column, and the leg then demands a difference against 046689a.
+The other twelve rows stay VERBATIM through M0.
+
+The trusted base is a separate ledger from this one.  The M0
+TRUSTED-LINES ceiling is the formula `5481 + A_rir + A_emit + A_sig`
+with no total, because the three allowances are OPEN user rulings
+(S0-D1, D-M0-3, RATIFICATIONS.md Pending stamps).  A_rir is lib/rir.ml
+at Stage D, A_emit is rust/emit.ml at Stage E and A_sig is the generated
+signature module at Stage B.  The stage that writes each file puts its
+number to the user.  No agent guesses one.
+
+## 4 The source extension
+
+The source extension of lanyard is `.lan` (R-Q1).  It enters the tree at
+Stage A as this written rule and as no file, because the M0 fixture is a
+Stage B to Stage E deliverable.  The carried kanon corpus keeps `.kan`,
+so one glob separates the two.  A `.lan` file at Stage A is a stage
+overrun.
+
+## 5 The other carry ledger
+
+dev/CARRIED.md and dev/carry-check.sh hold the vendored tot pin of the
+fork.  They are carried kanon bytes and Stage A does not edit them.  This
+file and dev/kernel-carry.sh are the kanon carry, and the two ledgers do
+not overlap: CARRIED.md rows carry a tot origin sha and a diff count,
+and the rows here carry the kanon fork point and demand zero difference.
+
+## 6 The leg
+
+`zsh dev/kernel-carry.sh` prints one row per file, then the row count,
+then `KERNEL-CARRY OK` on exit 0, or the differing rows and
+`KERNEL-CARRY FAIL` on exit 1.  The script takes its root from its own
+path, so a copy of this repository under a scratch directory checks
+itself.  It reads with rg and awk, and it calls no grep and no sed.

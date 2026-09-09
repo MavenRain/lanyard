@@ -1,8 +1,8 @@
 (lang dune 3.24)
 
-(name kanon)
+(name lanyard)
 
 (package
- (name kanon)
+ (name lanyard)
  (allow_empty)
  (depends (zarith (= 1.14))))

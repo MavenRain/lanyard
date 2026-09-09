@@ -16,7 +16,7 @@
 #
 # The script also runs one leg alone, which is how the watchdog wraps a
 # leg whose body is a shell function:
-#   zsh dev/gates.sh --leg e2e
+#   zsh dev/gates.sh --leg axioms
 
 set -u
 
@@ -33,7 +33,7 @@ zmodload zsh/datetime
 SELF=${0:A}
 ROOT=${0:A:h}/..
 ROOT=${ROOT:A}
-DRIVER=$ROOT/_build/default/bin/kanon.exe
+DRIVER=$ROOT/_build/default/bin/lanyard.exe
 SPINE=$ROOT/examples/m0-spine.kan
 WORK=$ROOT/.gatework/gates
 MEASURE_FILE=$WORK/measure.txt
@@ -42,12 +42,8 @@ MEASURE_FILE=$WORK/measure.txt
 # by default, and the caller may name another path.
 PIN_WORKTREE=${KANON_PIN_WORKTREE:-/Users/oobi/Documents/kan-lang-tot-pin}
 
-# The M0-TIME bound in milliseconds.  Plan section 9 names the bound and
-# correction C1 ratifies it at 150, with the resolution in milliseconds.
-# No agent moves this number.
-M0_TIME_MS=150
-# D-M1-6 and Stage L section 9: these are binding, never environment overrides.
-M0_RATIO=2.000
+# D-M1-6 and Stage L section 9: this bound is binding, never an
+# environment override.
 M1_CORPUS_MS=713
 
 # The watchdog.  GNU coreutils ships timeout as gtimeout on stock macOS.
@@ -116,63 +112,6 @@ leg_axioms () {
   print -r -- "spine exit=$code2 out=[$out2]"
   print -r -- "FAIL AXIOMS"
   return 1
-}
-
-# M0-E2E.  The spine goes through check, emit, wasm-opt, the kernel and
-# the two hosts, and the three answers must agree with the promise line
-# the spine writes at its top.
-leg_e2e () {
-  local dir=$WORK/e2e
-  rm -rf $dir
-  mkdir -p $dir
-  local out code
-  out=$($DRIVER check $SPINE 2>&1)
-  code=$?
-  if [[ $code -ne 0 ]]; then
-    print -r -- "check exit=$code out=[$out]"
-    print -r -- "FAIL M0-E2E"
-    return 1
-  fi
-  out=$($DRIVER emit $SPINE -o $dir/m0-spine.wasm --export main 2>&1)
-  code=$?
-  if [[ $code -ne 0 ]]; then
-    print -r -- "emit exit=$code out=[$out]"
-    print -r -- "FAIL M0-E2E"
-    return 1
-  fi
-  out=$(wasm-opt $dir/m0-spine.wasm -S -o $dir/m0-spine.wat \
-    --enable-gc --enable-reference-types --enable-tail-call \
-    --enable-exception-handling 2>&1)
-  code=$?
-  if [[ $code -ne 0 ]]; then
-    print -r -- "wasm-opt exit=$code out=[$out]"
-    print -r -- "FAIL M0-E2E"
-    return 1
-  fi
-  local kernel kcode hosts hcode promise lines
-  kernel=$($DRIVER run $SPINE --export main --host kernel 2>&1)
-  kcode=$?
-  hosts=$($DRIVER run $SPINE --export main --host both 2>&1)
-  hcode=$?
-  promise=$(rg -N -o -- '-- main is [0-9]+' $SPINE | head -1 | awk '{ print $4 }')
-  lines=$(wc -l < $SPINE | tr -d ' ')
-  if [[ $kcode -eq 0 && $hcode -eq 0 && -n $promise && $kernel == $hosts \
-    && $kernel == $promise && $lines -ge 200 ]]; then
-    print -r -- "PASS M0-E2E main=$kernel"
-    return 0
-  fi
-  print -r -- "kernel exit=$kcode out=[$kernel]"
-  print -r -- "hosts exit=$hcode out=[$hosts]"
-  print -r -- "promise=[$promise] lines=$lines"
-  print -r -- "FAIL M0-E2E"
-  return 1
-}
-
-# M0-TIME retains the whole driver path and SE-D9's wasm-opt exclusion.
-# SL-D10: force five runs for each of three benches, print their spread,
-# and compare the median of their medians against the unchanged bound.
-leg_time () {
-  python3 -P $ROOT/dev/m1-gates.py time --root $ROOT --bound $M0_TIME_MS
 }
 
 # SL-D11: the binding ratio reads the 1000-line corpus, the frozen
@@ -249,9 +188,6 @@ mkdir -p $WORK || exit 9
 if [[ $# -ge 2 && $1 == "--leg" ]]; then
   case $2 in
     axioms) leg_axioms; exit $? ;;
-    e2e) leg_e2e; exit $? ;;
-    time) leg_time; exit $? ;;
-    ratio) leg_ratio; exit $? ;;
     positivity) leg_positivity; exit $? ;;
     corpus) leg_corpus; exit $? ;;
     m1-suite) leg_m1_suite; exit $? ;;
@@ -319,15 +255,8 @@ leg FAST R0-COUNT '^R0-COUNT OK$' zsh $ROOT/dev/r0-count.sh
 leg FAST R0-AUDIT '^R0-AUDIT OK$' zsh $ROOT/dev/r0-audit.sh
 leg SUITE SUITE-KERNEL '^SUITE-KERNEL OK$' \
   $ROOT/_build/default/test/main.exe $ROOT/test
-leg SUITE SUITE-WASM '^SUITE-WASM OK$' \
-  $ROOT/_build/default/test/wasm.exe $ROOT/test
-leg FAST ENCODER-SUBSET '^ENCODER-SUBSET OK$' \
-  zsh $ROOT/dev/encoder-subset.sh $ROOT
 leg MED AXIOMS SELF zsh $SELF --leg axioms
-leg SLOW M0-E2E SELF zsh $SELF --leg e2e
-leg SLOW M0-TIME SELF zsh $SELF --leg time
-leg SLOW M0-RATIO SELF zsh $SELF --leg ratio
-leg FAST TRUSTED-LINES '^TRUSTED-LINES kernel=[0-9]+/[0-9]+ encoder=[0-9]+/[0-9]+ OK$' \
+leg FAST TRUSTED-LINES '^TRUSTED-LINES OK$' \
   zsh $ROOT/dev/trusted-lines.sh $ROOT
 leg MED DENOMINATORS SELF zsh $SELF --leg denominators
 leg MED HOUSE '^HOUSE OK$' zsh $ROOT/dev/house.sh $ROOT
@@ -336,12 +265,6 @@ leg SUITE POSITIVITY SELF zsh $SELF --leg positivity
 leg SLOW M1-CORPUS SELF zsh $SELF --leg corpus
 leg SUITE M1-SUITE SELF zsh $SELF --leg m1-suite
 leg SUITE AGREEMENT SELF zsh $SELF --leg agreement
-# The reactor slice legs.  REACTOR builds the reactor fixtures through the
-# normal CLI and checks the module in Node.  RUNTIME runs the host runtime
-# suite.  Both fit the MED tier, at about 2 s and about 3 s.
-leg MED REACTOR '^reactor: [0-9]+ checks passed$' \
-  node $ROOT/dev/reactor-test.mjs $ROOT/_build/default/bin/kanon.exe
-leg MED RUNTIME '^# fail 0$' node --test --test-reporter=tap $ROOT/dev/runtime-test.mjs
 
 print -r -- ""
 cat $MEASURE_FILE

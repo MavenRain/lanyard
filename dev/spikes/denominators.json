@@ -1,0 +1,194 @@
+{
+ "artifact": "lanyard M0 Stage 0 spike S4, the Go denominator refit",
+ "date": "2026-09-09",
+ "model": "milliseconds = F + m * kloc, one Go package built by go build",
+ "F_ms": 96.74,
+ "m_ms_per_kloc": 7.24,
+ "r_squared": 0.291,
+ "points": 13,
+ "runs_per_row": 5,
+ "rows": [
+  {
+   "package": "go/token",
+   "status": "ok",
+   "why": "small package, anchors the fixed cost F",
+   "kloc": 1.026,
+   "files": 3,
+   "hidden_deps": 0,
+   "median_ms": 92.8,
+   "min_ms": 77.4,
+   "max_ms": 182.4,
+   "runs": 5
+  },
+  {
+   "package": "net/url",
+   "status": "ok",
+   "why": "small package with a wide import fan",
+   "kloc": 1.309,
+   "files": 1,
+   "hidden_deps": 0,
+   "median_ms": 149.1,
+   "min_ms": 97.7,
+   "max_ms": 317.1,
+   "runs": 5
+  },
+  {
+   "package": "text/template/parse",
+   "status": "ok",
+   "why": "parser sized package near 2.5 kloc",
+   "kloc": 2.529,
+   "files": 3,
+   "hidden_deps": 0,
+   "median_ms": 199.5,
+   "min_ms": 104.1,
+   "max_ms": 372.5,
+   "runs": 5
+  },
+  {
+   "package": "go/ast",
+   "status": "ok",
+   "why": "syntax package near 3.2 kloc",
+   "kloc": 3.202,
+   "files": 8,
+   "hidden_deps": 0,
+   "median_ms": 105.2,
+   "min_ms": 99.0,
+   "max_ms": 116.7,
+   "runs": 5
+  },
+  {
+   "package": "regexp/syntax",
+   "status": "ok",
+   "why": "carried from the original candidate list",
+   "kloc": 3.721,
+   "files": 8,
+   "hidden_deps": 0,
+   "median_ms": 105.0,
+   "min_ms": 86.5,
+   "max_ms": 113.5,
+   "runs": 5
+  },
+  {
+   "package": "encoding/json",
+   "status": "ok",
+   "why": "carried from the original candidate list",
+   "kloc": 4.258,
+   "files": 8,
+   "hidden_deps": 0,
+   "median_ms": 158.0,
+   "min_ms": 98.9,
+   "max_ms": 212.8,
+   "runs": 5
+  },
+  {
+   "package": "encoding/xml",
+   "status": "ok",
+   "why": "carried from the original candidate list",
+   "kloc": 4.353,
+   "files": 4,
+   "hidden_deps": 0,
+   "median_ms": 98.4,
+   "min_ms": 92.7,
+   "max_ms": 125.5,
+   "runs": 5
+  },
+  {
+   "package": "debug/dwarf",
+   "status": "ok",
+   "why": "table heavy package near 4.5 kloc",
+   "kloc": 4.486,
+   "files": 11,
+   "hidden_deps": 0,
+   "median_ms": 128.7,
+   "min_ms": 105.8,
+   "max_ms": 303.1,
+   "runs": 5
+  },
+  {
+   "package": "encoding/gob",
+   "status": "ok",
+   "why": "reflection heavy package near 4.8 kloc",
+   "kloc": 4.845,
+   "files": 9,
+   "hidden_deps": 1,
+   "median_ms": 104.7,
+   "min_ms": 101.3,
+   "max_ms": 105.7,
+   "runs": 5
+  },
+  {
+   "package": "debug/elf",
+   "status": "ok",
+   "why": "package near 5.6 kloc, fills the gap under the 8 kloc anchor",
+   "kloc": 5.648,
+   "files": 3,
+   "hidden_deps": 2,
+   "median_ms": 109.1,
+   "min_ms": 94.8,
+   "max_ms": 117.9,
+   "runs": 5
+  },
+  {
+   "package": "unicode",
+   "status": "ok",
+   "why": "the anchor near 8 kloc",
+   "kloc": 8.945,
+   "files": 5,
+   "hidden_deps": 0,
+   "median_ms": 23.4,
+   "min_ms": 22.5,
+   "max_ms": 23.7,
+   "runs": 5
+  },
+  {
+   "package": "cmd/internal/obj/x86",
+   "status": "ok",
+   "why": "the anchor near 16 kloc",
+   "kloc": 16.139,
+   "files": 10,
+   "hidden_deps": 13,
+   "median_ms": 380.0,
+   "min_ms": 376.0,
+   "max_ms": 627.0,
+   "runs": 5
+  },
+  {
+   "package": "go/types",
+   "status": "ok",
+   "why": "the largest pure Go package, extends the range over 20 kloc",
+   "kloc": 23.4,
+   "files": 71,
+   "hidden_deps": 7,
+   "median_ms": 210.6,
+   "min_ms": 187.9,
+   "max_ms": 432.6,
+   "runs": 5
+  }
+ ],
+ "retired": "40.7 retired",
+ "live_tightest_total_ms": 45.0,
+ "live_tightest_slope_ms_per_kloc": 18.11,
+ "host": {
+  "platform": "macOS-26.4-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "processor": "",
+  "cpu_count": 12
+ },
+ "tools": {
+  "go": "go version go1.24.0 darwin/arm64",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)"
+ },
+ "loadavg_before": [
+  23.89,
+  16.16,
+  15.23
+ ],
+ "loadavg_after": [
+  24.1,
+  16.55,
+  15.38
+ ],
+ "noisy": true,
+ "noisy_rule": "The plan marks a timing spike NOISY above load average 4.",
+ "method": "Every row is one Go package copied out of GOROOT into a scratch module under the S4 directory.  A hidden dependency, an internal package or a cmd package, is copied beside it and its import path is rewritten to a module path, so a package that imports an internal package can be measured without a write inside GOROOT.  GOCACHE, GOPATH and GOMODCACHE all point inside the S4 directory and GOCACHE is deleted once the numbers are recorded.  Each row runs one untimed warm up build, which also builds and caches every dependency, and then five timed builds.  A comment line is appended to the first source file of the package before each timed build, so the package alone is recompiled and the dependencies stay cached.  The time is python perf_counter around the go build call, so it holds the go command overhead and the compile of the one package.  The row keeps the median of the five, with the minimum and the maximum beside it.  kloc is the line count of the GoFiles set, which is the set that compiles on this host.  F and m are fitted by ordinary least squares over the measured points, with R squared reported.  The load average is recorded before and after the run and the fit is marked NOISY above load average 4."
+}
