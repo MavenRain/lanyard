@@ -48,7 +48,7 @@ let no_eta : string list = eta_of false
 let row (label : string) (items : string list) : string =
   Printf.sprintf "%s %d: %s\n" label (List.length items) (String.concat " " items)
 
-let print () : string =
+let print ?(foreign_types : string list = []) () : string =
   String.concat ""
     [
       row "formers" Term.formers;
@@ -59,4 +59,5 @@ let print () : string =
       row "named rules present" rules_present;
       row "eta rows" eta_rows;
       row "no eta" no_eta;
+      Printf.sprintf "foreign type constants: %d\n" (List.length foreign_types);
     ]

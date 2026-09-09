@@ -17,8 +17,21 @@
 # The script also runs one leg alone, which is how the watchdog wraps a
 # leg whose body is a shell function:
 #   zsh dev/gates.sh --leg axioms
+#
+# The fork adds two stage commands, which replace this battery:
+#   zsh dev/gates.sh --stage B
+#   zsh dev/gates.sh --stage C
 
 set -u
+
+# The fork's Stage B command is independent of the carried M1 battery below.
+if [[ $# -eq 2 && $1 == "--stage" && $2 == "C" ]]; then
+  exec zsh ${0:A:h}/stage-c.sh
+fi
+
+if [[ $# -eq 2 && $1 == "--stage" && $2 == "B" ]]; then
+  exec zsh ${0:A:h}/stage-b.sh
+fi
 
 # The user shell startup files add a chpwd hook that reads an unset
 # parameter.  Under set -u that hook fails and cd inherits its non-zero
@@ -199,7 +212,7 @@ if [[ $# -ge 2 && $1 == "--leg" ]]; then
 fi
 
 if [[ $# -ne 0 ]]; then
-  print -r -- "usage: zsh dev/gates.sh [--leg NAME]"
+  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C]"
   exit 64
 fi
 

@@ -81,6 +81,17 @@ kernel=$(print -r -- "$kernel_out" | awk 'END { print $1 }')
 
 line="TRUSTED-LINES kernel=$kernel/$kernel_bound"
 
+# Stage B measures the generated module; S0-D1 leaves its allowance to the user.
+if [[ -d $root/target ]]; then
+  generated=$root/_build/default/target/target_generated.ml
+  if [[ ! -f $generated ]]; then
+    print -r -- "TRUSTED-LINES FAIL: build the Stage B generated module first"
+    exit 1
+  fi
+  signature_lines=$(wc -l < $generated | tr -d ' ')
+  print -r -- "TRUSTED-LINES signature=$signature_lines allowance=A_sig (pending user ruling)"
+fi
+
 if [[ $kernel -le $kernel_bound ]]; then
   print -r -- "$line"
   print -r -- "$ceiling_line"

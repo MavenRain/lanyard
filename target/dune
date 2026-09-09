@@ -1,0 +1,9 @@
+(rule
+ (target target_generated.ml)
+ (deps toasty-7bd502cb.sig topcoat-51caa01.sig ../dev/gen-target.py)
+ (action
+  (run python3 -P %{dep:../dev/gen-target.py} --target . --output %{target})))
+
+(library
+ (name lanyard_target)
+ (modules target_generated))

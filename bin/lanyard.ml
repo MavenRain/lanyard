@@ -33,7 +33,9 @@ let read_file (path : string) : string =
     (brief 3.8). *)
 let checked_in (path : string) :
     Kanon_kernel.Global.t * (string * Kanon_kernel.Global.entry) list =
-  Kanon_surface.Elab.check_in Kanon_kernel.Global.initial (read_file path)
+  (if Filename.check_suffix path ".lan" then
+     Kanon_surface.Elab.check_lanyard_in (read_file path)
+   else Kanon_surface.Elab.check_in Kanon_kernel.Global.initial (read_file path))
   |> Result.fold
        ~ok:
          (fun
@@ -73,6 +75,15 @@ let run_erased (path : string) : unit =
 let run_axioms (path : string) : unit =
   List.iter print_endline (Kanon_surface.Elab.axiom_names (checked path))
 
+let run_spec_count () : unit =
+  Kanon_surface.Elab.target_environment ()
+  |> Result.fold
+       ~ok:(fun (_globals, _rows, foreign_types) ->
+         print_string (Kanon_kernel.Spec_count.print ~foreign_types ()))
+       ~error:(fun error ->
+         prerr_endline (Kanon_kernel.Error.to_string error);
+         exit 1)
+
 (** "check [--print|--erased] FILE".  A flag is read before the path, so
     "check --print F", "check --erased F" and "check F" are the only
     three forms (SC-D1). *)
@@ -102,7 +113,7 @@ let dispatch_axioms (args : string list) : unit =
    binds the unknown command instead of writing a wildcard. *)
 let dispatch (cmd : string) (args : string list) : unit =
   match cmd with
-  | "spec-count" -> print_string (Kanon_kernel.Spec_count.print ())
+  | "spec-count" -> run_spec_count ()
   | "check" -> dispatch_check args
   | "axioms" -> dispatch_axioms args
   | _unknown ->

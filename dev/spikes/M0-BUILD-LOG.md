@@ -363,3 +363,43 @@ stay red until the back end lands;  the library rename of SA-D7 is recorded
 above as Stage D at the earliest and in the builder report as M1, so both
 defer it past M0 and the stage that first edits a library dune file puts it
 to the user.
+
+## Stage C (2026-09-09)
+
+The user requested continued lanyard development and staging all changes.
+Stage C was built in an isolated checkout from 52eb5a7, with the completed
+Stage B changes refreshed from the main index before integration.
+
+Implemented the checked target environment, the derived foreign-type census
+and matching SPEC block, `.lan` model and signature declarations, schema
+specialization, qualified-name resolution, first-order response checks and
+the Todo fixture with a checked byte-list text representation. The carried
+`.kan` entry point is unchanged. See ../STAGE-C.md for grammar and limits.
+
+`zsh dev/gates.sh --stage C` passed with zero build errors and warnings,
+27 target-generator/pin tests, 30 elaboration cases, the carried surface and
+kernel suites, CLI checks and a killed census mutant. R0-COUNT, R0-TARGET,
+TARGET-PIN, KERNEL-CARRY and HOUSE passed. All thirteen carried files remain
+verbatim; kernel=3997/4000 and generated signature=104 lines. Full captures
+and source hashes are in ../validation/stage-c/.
+
+The captures predate the move of the HOUSE step into `dev/stage-b.sh`. In
+`../validation/stage-c/gates.stdout` the HOUSE block sits at lines 275 to
+281, after `LANYARD-CLI` and before `STAGE-C OK`. `dev/stage-b.sh` line 16
+now runs the step, and `dev/stage-c.sh` line 8 runs `dev/stage-b.sh` first,
+so the live command prints the HOUSE block before `STAGE-B OK`.
+
+The manifest `../validation/stage-c/source-sha256.json` also predates the
+review edits. Three of its 40 rows name files the review changed, so those
+recorded digests no longer match the tree: `dev/gates.sh` (the usage line
+and the header), `dev/gen-target.py` (the parenthesized universe result)
+and `dev/stage-c.sh` (the HOUSE call moved into `dev/stage-b.sh`). The
+other 37 rows still match. The manifest keeps the digests of the captured
+run. `shasum -a 256` over the tree prints the live values.
+
+Review corrected operation-response checking to use the argument scope.
+The pre-fix shadowing controls already failed in the kernel, but did not
+produce the required named elaborator refusal. Both now fail at the
+signature boundary. A Python test-helper spelling rejected by HOUSE was
+also corrected; no gate was relaxed. No commit was made. The allowance
+rulings and M0-EXIT remain open, and Rust IR/erasure is the next slice.

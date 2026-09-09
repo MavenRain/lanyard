@@ -1,6 +1,6 @@
 # kanon M0 specification
 
-Date: 2026-09-05.  Status: M0 Stage A.  This file pins the closed grammar
+Date: 2026-09-09.  Status: M0 Stage C.  This file pins the closed grammar
 and the R0 counts.  The gate legs R0-COUNT and R0-AUDIT read it.
 
 ## 1 The claim
@@ -169,7 +169,7 @@ a use of an erased binder is `KErased`.
 
 ## R0 counts
 
-`kanon spec-count` prints this block.  dev/r0-count.sh diffs the two.  A
+`lanyard spec-count` prints this block.  dev/r0-count.sh diffs the two.  A
 count that grows fails the R0-COUNT gate leg.
 
 ```
@@ -181,11 +181,15 @@ named rules declared 3: proof-irrelevance subsingleton-large-elimination literal
 named rules present 3: proof-irrelevance subsingleton-large-elimination literal-fast-path
 eta rows 3: Ran-SPi Lan-SPi Ran-SColl
 no eta 3: Lan-SColl Ran-SMu Lan-SMu
+foreign type constants: 9
 ```
 
-Every number in the block is the length of the list printed after it.
+Every kernel count is the length of the list printed after it.
 lib/spec_count.ml reads the shape lists from Shape and the former and
-schema lists from Term.
+schema lists from Term. The foreign count is derived from the checked
+target catalog. Its closed atom set is Db, Cx, Uri, Response, SeeOther,
+Deferred, Form, toasty::Error and topcoat::Error. R0-TARGET checks the
+kernel types, including the codomain of each type constructor.
 
 ## 4 The eta table
 

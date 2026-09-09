@@ -1,3 +1,3 @@
 (library
  (name kanon_surface)
- (libraries kanon_kernel))
+ (libraries kanon_kernel lanyard_target))

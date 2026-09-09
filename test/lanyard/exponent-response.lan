@@ -1,0 +1,4 @@
+def Hidden : Type 0 := Nat -> Nat
+signature App : Nat with
+| Bad : Hidden
+end

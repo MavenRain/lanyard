@@ -1,0 +1,29 @@
+OK build: 0 errors, 0 warnings
+TARGET-SIG OK rows=15 foreign_types=9 generated_lines=104
+TARGET-PIN PIN OK libraries=2
+TARGET-PIN ANCHOR OK sites=4
+TARGET-PIN DIFF OK signatures=2 anchors=4
+TARGET-PIN OK
+TARGET-CATALOG OK rows=15 foreign_types=9
+KERNEL-CARRY lib/shape.ml 046689a VERBATIM diff=0 lines=60 OK
+KERNEL-CARRY lib/term.ml 046689a VERBATIM diff=0 lines=133 OK
+KERNEL-CARRY lib/rules.ml 046689a VERBATIM diff=0 lines=1481 OK
+KERNEL-CARRY lib/check.ml 046689a VERBATIM diff=0 lines=538 OK
+KERNEL-CARRY lib/value.ml 046689a VERBATIM diff=0 lines=137 OK
+KERNEL-CARRY lib/eval.ml 046689a VERBATIM diff=0 lines=297 OK
+KERNEL-CARRY lib/conv.ml 046689a VERBATIM diff=0 lines=396 OK
+KERNEL-CARRY lib/totality.ml 046689a VERBATIM diff=0 lines=146 OK
+KERNEL-CARRY lib/positivity.ml 046689a VERBATIM diff=0 lines=118 OK
+KERNEL-CARRY lib/global.ml 046689a VERBATIM diff=0 lines=130 OK
+KERNEL-CARRY lib/order.ml 046689a VERBATIM diff=0 lines=510 OK
+KERNEL-CARRY lib/bignum.ml 046689a VERBATIM diff=0 lines=51 OK
+KERNEL-CARRY lib/erase.ml 046689a VERBATIM diff=0 lines=1484 OK
+KERNEL-CARRY bucket files=12 expected=12 OK
+KERNEL-CARRY rows=13
+KERNEL-CARRY OK
+R0-COUNT OK
+TRUSTED-LINES signature=104 allowance=A_sig (pending user ruling)
+TRUSTED-LINES kernel=3997/4000
+M0 ceiling: 5481 + A_rir + A_emit + A_sig
+TRUSTED-LINES OK
+STAGE-B OK

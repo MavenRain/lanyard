@@ -1,0 +1,23 @@
+-- Text is a checked inductive list, with no additional foreign atom.
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+
+model Todo with
+| id : Nat
+| title : Bytes
+| completed : Bool
+end
+
+signature Cli : Todo with
+| DbExec (db : Db) (row : Todo) : Todo
+end
+
+def item : Todo := tuple (1, b"hi", inj 0 of 2 ())
+
+def main : Db -> Todo := fun (db : Db) => Todo.create item db
+
+def request : Db -> Cli := fun (db : Db) =>
+  Cli.DbExec db item (fun (created : Todo) => Cli.pure created)

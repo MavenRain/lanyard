@@ -316,3 +316,36 @@ three at 2026-09-05 22:03.
   resolves milliseconds, which is what correction C1 asks the mutation
   to prove.  Every other leg still passed, among them
   `PASS M0-E2E main=521` and `PASS M0-RATIO ratio=0.288`.
+
+## Lanyard M0 Stage B (2026-09-09)
+
+`python3 -P test/target.py` passes 27 tests. Mutation source copies hold the
+required upstream file bytes alone. They link no Git metadata, and they live
+under `.gatework/` in the repository root. No test edits Toasty, Topcoat,
+their references, or the committed Lanyard base.
+
+| Mutation | Observed rejection |
+| --- | --- |
+| Flip one byte at each of the four S3 anchor spans, separately | TARGET-PIN DIFF FAIL in all four subtests |
+| Remove an anchor file or truncate a bounded span | TARGET-PIN ANCHOR FAIL |
+| Change Topcoat's inherited workspace version | TARGET-PIN PIN FAIL |
+| Change Toasty's crate-local version | TARGET-PIN PIN FAIL |
+| Change expected HEAD, release tag or peeled release commit | TARGET-PIN PIN FAIL for each identity field |
+| Change a signature print rule without updating its frozen digest | TARGET-PIN DIFF FAIL |
+| Delete a fingerprint line | TARGET-PIN DIFF FAIL |
+| Delete a print field | Signature parser rejects the row; CLI exits 1 and preserves previous output |
+| Add a tenth foreign atom, omit a required atom, or mislabel a universe result | Signature parser rejects the row |
+| Duplicate a constant across files or duplicate a JSON key | Signature parser rejects the row |
+| Remove an argument quantity or a runtime print placeholder | Signature parser rejects the row |
+| Add an unknown or malformed print placeholder | Signature parser rejects the row |
+| Drop the error effect of a question-mark print rule | Signature parser rejects the row |
+| Print a One argument twice | Signature parser rejects the row |
+| Claim PRINTED status before any fixture evidence | Signature parser rejects the row |
+
+Positive controls cover the untouched pins, deterministic generation,
+nine generated type constants, the exclusion of roadmap comments, UTF-8
+and quote escaping, and splitting only outer arrows of a telescope.
+A valid print-rule edit changes both generated metadata and its semantic
+digest. The compiled OCaml client independently checks the create schema
+and total lookup. These tests do not substitute for Stage E's EMIT-DIFF
+mutation, because there is no Rust emitter yet.

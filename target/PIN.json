@@ -1,0 +1,19 @@
+{
+  "format": 1,
+  "libraries": {
+    "toasty": {
+      "commit": "7bd502cbf44cc47f70db9f2b27ab35d77a096364",
+      "crate_version": "0.6.1",
+      "release_tag": "toasty-v0.6.1",
+      "release_commit": "c2e8cfbc163bab76cf27309f1a92eea4eaf91834",
+      "signature_sha256": "9b3a6ec3ad2c365cec6bbdd8767ba144a295bbe60affeb418c42dad65952a7fc"
+    },
+    "topcoat": {
+      "commit": "51caa01dca3a8f20bdacfa771b1b8ac8b6f2668a",
+      "crate_version": "0.6.2",
+      "release_tag": "v0.7.0",
+      "release_commit": "8ef6d803bf8bc4e269c4566a959d190a9ae21896",
+      "signature_sha256": "40ee029ce9885b1402d76cc4d0340545c24b9932649cec031c10075b1a21504d"
+    }
+  }
+}

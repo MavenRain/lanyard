@@ -1177,3 +1177,367 @@ let check_in ?(budget : Budget.t = Budget.unlimited) (globals : Global.t)
 let check_text ?(budget : Budget.t = Budget.unlimited) (globals : Global.t)
     (src : string) : ((string * Global.entry) list, Error.t) result =
   Result.map snd (check_in ~budget globals src)
+
+(** Lanyard M0 lowers target declarations to the carried kernel here. *)
+module Target = Lanyard_target.Target_generated
+
+type operation = { op_name : string; op_args : Syntax.binder list; op_response : Syntax.t }
+type lan_decl =
+  | Core of Syntax.decl
+  | Model of string * (string * Syntax.t) list
+  | Signature of string * Syntax.t * operation list
+
+type foreign_instance = {
+  instance_name : string;
+  schema : Target.entry;
+  type_arguments : (string * Syntax.t) list;
+}
+
+type model_info = { model_name : string; fields : (string * Syntax.t) list }
+type lan_program = {
+  globals : Global.t;
+  rows : (string * Global.entry) list;
+  models : model_info list;
+  instances : foreign_instance list;
+}
+
+let lan_error (message : string) : ('a, Error.t) result =
+  Error (Error.Cannot_infer message)
+
+let target_name (name : string) : string =
+  String.split_on_char ':' name
+  |> List.concat_map (String.split_on_char '.')
+  |> List.filter (fun part -> not (String.equal part ""))
+  |> String.concat "_"
+
+(** Qualified foreign names use one flat kernel namespace. Numeric
+    projections retain their tokens. The explicit w mark is Many. *)
+let rec target_tokens (tokens : Token.t list) : Token.t list =
+  match tokens with
+  | { Token.kind = Token.Ident left; loc }
+    :: { Token.kind = Token.Dot; loc = _ }
+    :: { Token.kind = Token.Ident right; loc = _ } :: rest
+  | { Token.kind = Token.Ident left; loc }
+    :: { Token.kind = Token.Colon; loc = _ }
+    :: { Token.kind = Token.Colon; loc = _ }
+    :: { Token.kind = Token.Ident right; loc = _ } :: rest ->
+      target_tokens ({ Token.kind = Token.Ident (left ^ "_" ^ right); loc } :: rest)
+  | ({ Token.kind = Token.LParen; loc = _ } as first)
+    :: { Token.kind = Token.Ident "w"; loc = _ }
+    :: ({ Token.kind = Token.Ident _; loc = _ } as name)
+    :: ({ Token.kind = Token.Colon; loc = _ } as colon) :: rest ->
+      first :: name :: colon :: target_tokens rest
+  | first :: rest -> first :: target_tokens rest
+  | [] -> []
+
+let target_type (source : string) : (Syntax.t, Error.t) result =
+  let* tokens = Lexer.lex source in
+  let* ty, rest = Parser.parse_term (target_tokens tokens) in
+  match rest with
+  | [ { Token.kind = Token.Eof; loc = _ } ] -> Ok ty
+  | ({ Token.kind = _; loc = _ } :: _ | []) -> Parser.expected "end of type" rest
+
+let name_taken (g : Global.t) (name : string) : bool =
+  Option.is_some (Global.find name g) || Option.is_some (Global.find_family name g)
+  || Option.is_some (find_ctor name g)
+
+let fresh_names (g : Global.t) (names : string list) : (unit, Error.t) result =
+  let* _seen = List.fold_left
+    (fun acc name ->
+      let* seen = acc in
+      if name_taken g name || List.exists (String.equal name) seen then
+        lan_error ("duplicate declaration " ^ name)
+      else Ok (name :: seen))
+    (Ok []) names in
+  Ok ()
+
+let decl_names (decl : Syntax.decl) : string list =
+  match decl with
+  | Syntax.DDef (name, _, _) | Syntax.DAxiom (name, _) -> [ name ]
+  | Syntax.DRec members -> List.map (fun m -> m.Syntax.rd_name) members
+  | Syntax.DMu families -> List.concat_map
+      (fun f -> f.Syntax.fm_name :: List.map (fun c -> c.Syntax.fc_name) f.Syntax.fm_ctors)
+      families
+
+let add_lan_core (budget : Budget.t) (g : Global.t) (decls : Syntax.decl list) :
+    (Global.t * (string * Global.entry) list, Error.t) result =
+  let* () = fresh_names g (List.concat_map decl_names decls) in
+  elab_program_in ~budget g decls
+
+(** Peel the checked telescope, not the catalog's kind label or text. *)
+let rec universe_result (g : Global.t) (depth : int) (ty : Value.t) :
+    (bool, Error.t) result =
+  match ty with
+  | Value.VUniv _ -> Ok true
+  | Value.VRan (shape, codomain, _) ->
+      Rules.as_vpi shape |> Option.fold ~none:(Ok false)
+        ~some:(fun (_q, _name, _domain) ->
+          let* result = Rules.open_closure (Eval.ev g) codomain [ Value.var depth ] in
+          universe_result g (depth + 1) result)
+  | Value.VLan (_, _, _) | Value.VIn (_, _, _) | Value.VSec (_, _)
+  | Value.VLit _ | Value.VNeutral (_, _) -> Ok false
+
+let closed_atoms : string list =
+  [ "Db"; "Cx"; "Uri"; "Response"; "SeeOther"; "Deferred"; "Form";
+    "toasty::Error"; "topcoat::Error" ]
+
+(** Install type rows first, because file order interleaves libraries.
+    Every row is checked as an ordinary postulate before it joins globals. *)
+let target_environment ?(budget : Budget.t = Budget.unlimited)
+    ?(entries : Target.entry list = Target.entries) () :
+    (Global.t * (string * Global.entry) list * string list, Error.t) result =
+  let types, values = List.partition
+    (fun (entry : Target.entry) -> match entry.kind with
+      | Target.Type_constant -> true
+      | Target.Constant | Target.Schema -> false) entries in
+  let* g, rows, atoms = List.fold_left
+    (fun acc (entry : Target.entry) ->
+      let* g, rows, atoms = acc in
+      let* ty = target_type entry.kernel_type in
+      let name = target_name entry.name in
+      let* next, out = add_lan_core budget g [ Syntax.DAxiom (name, ty) ] in
+      let* installed = Global.find name next
+        |> Option.to_result ~none:(Error.Unbound name) in
+      let* value = Eval.eval g [] (Global.entry_ty installed) in
+      let* is_type = universe_result g 0 value in
+      let declared_type = match entry.kind with
+        | Target.Type_constant -> true
+        | Target.Constant | Target.Schema -> false in
+      if not (Bool.equal is_type declared_type) then
+        lan_error ("R0-TARGET: kind disagrees with checked type of " ^ entry.name)
+      else if is_type && not (List.exists (String.equal entry.name) closed_atoms) then
+        lan_error ("R0-TARGET: foreign type constant outside closed atom list: " ^ entry.name)
+      else Ok (next, List.rev_append out rows,
+               if is_type then entry.name :: atoms else atoms))
+    (Ok (Global.initial, [], [])) (types @ values) in
+  if List.sort String.compare atoms <> List.sort String.compare closed_atoms then
+    lan_error "R0-TARGET: foreign atom inventory differs"
+  else Ok (g, List.rev rows, List.rev atoms)
+
+(** Normalize before rejecting exponents, including those inside products,
+    sums, foreign arguments and closed inductive fields. The visited set
+    closes cycles only for families without parameters or indices. *)
+let rec first_order_in (g : Global.t) (seen : string list) (value : Value.t) :
+    (bool, Error.t) result =
+  match value with
+  | Value.VRan (shape, diagram, _) | Value.VLan (shape, diagram, _) ->
+      if Option.is_some (Shape.point_dom shape) then Ok false
+      else if Option.is_some (Rules.as_vcoll shape) then
+        let* legs = Rules.coll_legs_of Check.ops (Check.make g Budget.unlimited) diagram in
+        let* results = Rules.all_ok (List.map (fun (leg : Value.vleg) ->
+          let* field = Rules.open_closure (Eval.ev g) leg.Value.vl_clo [] in
+          first_order_in g seen field) legs) in
+        Ok (List.for_all Fun.id results)
+      else Shape.family shape |> Option.fold ~none:(Ok false) ~some:(fun name ->
+        Global.find_family name g |> Option.fold ~none:(Ok false) ~some:(fun family ->
+          if not (List.is_empty family.Positivity.f_params
+                  && List.is_empty family.Positivity.f_indices) then Ok false
+          else if List.exists (String.equal name) seen then Ok true
+          else
+            let* constructors = Rules.all_ok (List.map (fun ctor ->
+              let* _env, accepted = List.fold_left (fun acc (_q, _field, ty) ->
+                let* env, accepted = acc in
+                let* field = Eval.eval g env ty in
+                let* ok = first_order_in g (name :: seen) field in
+                Ok (Value.var (List.length env) :: env, accepted && ok))
+                (Ok ([], true)) ctor.Positivity.c_args in
+              Ok accepted) family.Positivity.f_ctors) in
+            Ok (List.for_all Fun.id constructors)))
+  | Value.VNeutral (Value.HGlobal name, spine) ->
+      if not (String.equal name "Nat"
+              || List.exists (fun atom -> String.equal name (target_name atom)) closed_atoms)
+      then Ok false
+      else
+        let* args = Rules.all_ok (List.map (fun frame -> match frame with
+          | Value.SOut (_shape, Value.VAPt (_q, arg)) -> first_order_in g seen arg
+          | Value.SOut (_, Value.VALeg _) | Value.SOut (_, Value.VACtor _)
+          | Value.SElim _ -> Ok false) spine) in
+        Ok (List.for_all Fun.id args)
+  | Value.VUniv _ | Value.VIn (_, _, _) | Value.VSec (_, _) | Value.VLit _
+  | Value.VNeutral (Value.HLocal _, _) -> Ok false
+
+let check_first_order_context (c : Check.ctx) (label : string)
+    (ty : Syntax.t) : (unit, Error.t) result =
+  let* term = elab c ~expected:None ty in
+  let* _level = Check.infer_univ c term in
+  let* value = eval_in c term in
+  let* accepted = first_order_in (globals_of c) [] value in
+  if accepted then Ok ()
+  else lan_error (label ^ ": response must be first order through M2 (exponent or unsupported type)")
+
+let check_first_order (budget : Budget.t) (g : Global.t) (label : string)
+    (ty : Syntax.t) : (unit, Error.t) result =
+  check_first_order_context (Check.make g budget) label ty
+
+(** These declaration words are reserved only at the .lan entry point.
+    Core spans retain their original tokens and locations. *)
+let rec core_span (tokens : Token.t list) (acc : Token.t list) :
+    Token.t list * Token.t list =
+  match tokens with
+  | ({ Token.kind = Token.Ident ("model" | "signature"); loc } :: _rest)
+  | ({ Token.kind = Token.Eof; loc } :: _rest) ->
+      (List.rev ({ Token.kind = Token.Eof; loc } :: acc), tokens)
+  | first :: rest -> core_span rest (first :: acc)
+  | [] -> (List.rev ({ Token.kind = Token.Eof; loc = Token.start } :: acc), [])
+
+let rec model_fields (tokens : Token.t list) (acc : (string * Syntax.t) list) :
+    ((string * Syntax.t) list * Token.t list, Error.t) result =
+  match tokens with
+  | { Token.kind = Token.KEnd; loc = _ } :: rest -> Ok (List.rev acc, rest)
+  | { Token.kind = Token.Pipe; loc = _ }
+    :: { Token.kind = Token.Ident name; loc = _ }
+    :: { Token.kind = Token.Colon; loc = _ } :: rest ->
+      let* ty, tail = Parser.parse_term rest in
+      model_fields tail ((name, ty) :: acc)
+  | ({ Token.kind = _; loc = _ } :: _ | []) ->
+      Parser.expected "'| FIELD : TYPE' or 'end'" tokens
+
+let rec signature_ops (tokens : Token.t list) (acc : operation list) :
+    (operation list * Token.t list, Error.t) result =
+  match tokens with
+  | { Token.kind = Token.KEnd; loc = _ } :: rest -> Ok (List.rev acc, rest)
+  | { Token.kind = Token.Pipe; loc = _ }
+    :: { Token.kind = Token.Ident name; loc = _ } :: rest ->
+      let* args, tail = Parser.parse_binders rest [] in
+      (match tail with
+       | { Token.kind = Token.Colon; loc = _ } :: body ->
+           let* response, after = Parser.parse_term body in
+           signature_ops after ({ op_name = name; op_args = args; op_response = response } :: acc)
+       | ({ Token.kind = _; loc = _ } :: _ | []) -> Parser.expected "':'" tail)
+  | ({ Token.kind = _; loc = _ } :: _ | []) ->
+      Parser.expected "'| OPERATION (ARG : TYPE) : RESPONSE' or 'end'" tokens
+
+let rec lan_decls (tokens : Token.t list) (acc : lan_decl list) :
+    (lan_decl list, Error.t) result =
+  match tokens with
+  | [ { Token.kind = Token.Eof; loc = _ } ] | [] -> Ok (List.rev acc)
+  | { Token.kind = Token.Ident "model"; loc = _ }
+    :: { Token.kind = Token.Ident name; loc = _ }
+    :: { Token.kind = Token.KWith; loc = _ } :: rest ->
+      let* fields, tail = model_fields rest [] in
+      lan_decls tail (Model (name, fields) :: acc)
+  | { Token.kind = Token.Ident "signature"; loc = _ }
+    :: { Token.kind = Token.Ident name; loc = _ }
+    :: { Token.kind = Token.Colon; loc = _ } :: rest ->
+      let* result, tail = Parser.parse_term rest in
+      (match tail with
+       | { Token.kind = Token.KWith; loc = _ } :: body ->
+           let* ops, after = signature_ops body [] in
+           lan_decls after (Signature (name, result, ops) :: acc)
+       | ({ Token.kind = _; loc = _ } :: _ | []) -> Parser.expected "'with'" tail)
+  | ({ Token.kind = Token.Ident ("model" | "signature"); loc = _ } :: _rest) ->
+      Parser.expected "a model or signature declaration header" tokens
+  | ({ Token.kind = _; loc = _ } :: _) ->
+      let prefix, tail = core_span tokens [] in
+      let* decls = Parser.parse_decls prefix [] in
+      lan_decls tail (List.rev_append (List.map (fun d -> Core d) decls) acc)
+
+let binder (name : string) (ty : Syntax.t) : Syntax.binder =
+  { Syntax.b_name = name; b_q = Quantity.Many; b_ty = ty }
+
+let arrows (args : Syntax.binder list) (result : Syntax.t) : Syntax.t =
+  List.fold_right (fun arg body -> Syntax.SArrow (arg, body)) args result
+
+let elab_signature (budget : Budget.t) (g : Global.t) (name : string)
+    (result : Syntax.t) (operations : operation list) : (Global.t, Error.t) result =
+  let* () = check_first_order budget g ("signature " ^ name) result in
+  let* () = fresh_names Global.empty (List.map (fun op -> op.op_name) operations) in
+  let* _checks = Rules.all_ok (List.map (fun op ->
+    let* () = fresh_names Global.empty (List.map (fun arg -> arg.Syntax.b_name) op.op_args) in
+    let* context = List.fold_left (fun acc arg ->
+      let* c = acc in
+      if String.equal arg.Syntax.b_name name then
+        lan_error ("operation " ^ op.op_name ^ ": argument shadows signature " ^ name)
+      else
+        let* term = elab c ~expected:None arg.Syntax.b_ty in
+        let* _level = Check.infer_univ c term in
+        let* ty = eval_in c term in
+        Ok (Check.bind arg.Syntax.b_name arg.Syntax.b_q ty c))
+      (Ok (Check.make g budget)) op.op_args in
+    check_first_order_context context ("operation " ^ op.op_name) op.op_response) operations) in
+  let family = Syntax.SVar name in
+  let pure = { Syntax.fc_name = name ^ "_pure";
+               fc_ty = arrows [ binder "value" result ] family } in
+  let ctors = List.map (fun op ->
+    (* Anonymous continuation binders avoid capturing argument names. *)
+    let resume = binder "_" (arrows [ binder "_" op.op_response ] family) in
+    { Syntax.fc_name = name ^ "_" ^ op.op_name;
+      fc_ty = arrows (op.op_args @ [ resume ]) family }) operations in
+  let fm = { Syntax.fm_name = name; fm_params = []; fm_ty = Syntax.SType 0;
+             fm_ctors = pure :: ctors } in
+  let* () = fresh_names g (decl_names (Syntax.DMu [ fm ])) in
+  elab_mu_group ~budget g [ fm ]
+
+(** Specialization asks the kernel for the application type. The instance
+    retains its source row and type arguments for print-rule selection. *)
+let elab_model (budget : Budget.t) (g : Global.t) (name : string)
+    (fields : (string * Syntax.t) list) :
+    (Global.t * (string * Global.entry) list * foreign_instance list, Error.t) result =
+  let* () = fresh_names Global.empty (List.map fst fields) in
+  let* _checks = Rules.all_ok (List.map (fun (field, ty) ->
+    check_first_order budget g ("model field " ^ name ^ "." ^ field) ty) fields) in
+  let* g, rows = add_lan_core budget g
+    [ Syntax.DDef (name, Syntax.SType 0, Syntax.SProd (List.map snd fields)) ] in
+  let schemas = List.filter (fun (row : Target.entry) ->
+    String.starts_with ~prefix:"Model." row.name) Target.entries in
+  List.fold_left (fun acc (schema : Target.entry) ->
+    let* g, rows, instances = acc in
+    let* ty = target_type schema.kernel_type in
+    let rec arguments (body : Syntax.t) (acc : (string * Syntax.t) list) :
+        ((string * Syntax.t) list, Error.t) result =
+      match body with
+      | Syntax.SArrow (arg, rest) when Quantity.equal arg.Syntax.b_q Quantity.Zero ->
+          let* actual =
+            if String.equal arg.Syntax.b_name "M" then Ok (Syntax.SVar name)
+            else if String.equal arg.Syntax.b_name "Key" then
+              List.assoc_opt "id" fields
+              |> Option.to_result ~none:(Error.Cannot_infer ("model " ^ name ^ " needs an id field"))
+            else lan_error ("unsupported model schema parameter " ^ arg.Syntax.b_name) in
+          arguments rest ((arg.Syntax.b_name, actual) :: acc)
+      | Syntax.SArrow (_, _) | Syntax.SVar _ | Syntax.SNat _ | Syntax.SProp | Syntax.SType _
+      | Syntax.SPrim _ | Syntax.SUnit | Syntax.SAuto | Syntax.SPair (_, _) | Syntax.STuple _
+      | Syntax.SSum _ | Syntax.SProd _ | Syntax.SProj (_, _) | Syntax.SInj (_, _, _)
+      | Syntax.SAbsurd _ | Syntax.SApp (_, _) | Syntax.SFun (_, _) | Syntax.SStar (_, _)
+      | Syntax.SLet (_, _, _, _) | Syntax.SAnn (_, _) | Syntax.SCase (_, _, _)
+      | Syntax.SMatch (_, _, _) -> Ok (List.rev acc) in
+    let* args = arguments ty [] in
+    let application = List.fold_left (fun fn (_param, arg) -> Syntax.SApp (fn, arg))
+      (Syntax.SVar (target_name schema.name)) args in
+    let c = Check.make g budget in
+    let* term = elab c ~expected:None application in
+    let* instance_ty = Check.infer c Quantity.Zero term in
+    let* closed_ty = Eval.quote g 0 instance_ty in
+    let suffix = schema.name |> String.to_seq |> Seq.drop 6 |> String.of_seq in
+    let instance_name = name ^ "_" ^ target_name suffix in
+    let* () = fresh_names g [ instance_name ] in
+    let declaration = { Check.d_name = instance_name; d_kind = Check.Postulate;
+                        d_ty = closed_ty; d_body = None } in
+    let* entry = Check.check_decl g budget declaration in
+    Ok (Global.add instance_name entry g, rows @ [ (instance_name, entry) ],
+        instances @ [ { instance_name; schema; type_arguments = args } ]))
+    (Ok (g, rows, [])) schemas
+
+let check_lanyard ?(budget : Budget.t = Budget.unlimited) (source : string) :
+    (lan_program, Error.t) result =
+  let* globals, rows, _atoms = target_environment ~budget () in
+  let* tokens = Lexer.lex source in
+  let* decls = lan_decls (target_tokens tokens) [] in
+  List.fold_left (fun acc decl ->
+    let* program = acc in
+    match decl with
+    | Core core ->
+        let* globals, rows = add_lan_core budget program.globals [ core ] in
+        Ok { program with globals; rows = program.rows @ rows }
+    | Signature (name, result, operations) ->
+        let* globals = elab_signature budget program.globals name result operations in
+        Ok { program with globals }
+    | Model (name, fields) ->
+        let* globals, rows, instances = elab_model budget program.globals name fields in
+        Ok { globals; rows = program.rows @ rows;
+             models = program.models @ [ { model_name = name; fields } ];
+             instances = program.instances @ instances })
+    (Ok { globals; rows; models = []; instances = [] }) decls
+
+let check_lanyard_in ?(budget : Budget.t = Budget.unlimited) (source : string) :
+    (Global.t * (string * Global.entry) list, Error.t) result =
+  check_lanyard ~budget source |> Result.map (fun p -> (p.globals, p.rows))

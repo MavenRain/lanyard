@@ -228,3 +228,25 @@ dev/spikes/SPIKE-TRUSTED.md
 bebfabdfe63325da3e8458e41f1eb8c8e4acf95867ff43726a312bd9b33dc86c, equal to
 the source.  `git diff --stat 046689a -- lib/check.ml SPEC.md` printed
 nothing.  Three mutants KILLED, none survived.
+
+## Stage C (2026-09-09)
+
+The permanent `lan_surface` suite passes all 30 cases, including these
+adversarial controls. The CLI harness also runs the census mutation.
+
+| Control | Outcome |
+| --- | --- |
+| Add Hidden : Type 0 to the checked target catalog | Rejected outside the nine-atom list |
+| Mark Hidden : Type 0 as a value constant | Rejected for kind/type disagreement |
+| Parenthesize the new universe result | Rejected outside the atom list |
+| Add a type constructor ending in Type 0 | Rejected outside the atom list |
+| Hide a response exponent behind a definition or inside a product, Form or recursive family | Rejected with operation Bad named |
+| Shadow Nat in an operation response | Rejected as not first order, with Bad named |
+| Shadow the signature name with an argument | Rejected before family construction |
+| Change the ninth SPEC count from nine to ten in scratch | R0-COUNT exit 1, mutant KILLED |
+
+The response-scope controls were added before the fix. Both returned
+kernel errors rather than the specified named signature errors, causing
+the regression suite to exit 1. After the fix the suite exits 0. The
+census scratch baseline passes before the changed count is tested. Every
+control runs without modifying the pinned libraries or the kernel files.

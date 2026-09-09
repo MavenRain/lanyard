@@ -997,3 +997,71 @@ M0-EXIT RATIFY: 2026-09-06 ratified (the user writes the date and
   quiet machine and above 150 ms when another build holds a core, so M1
   should either bench on an idle machine or make the leg take the
   median of medians.  No agent may move the bound.
+
+## Lanyard M0 Stage B (2026-09-09)
+
+Base: Lanyard `52eb5a7`, the committed Stage A fork. The earlier sections
+of this file are inherited Kanon history. User instruction for this slice:
+"Continue building lanyard. Stage all changes." No commit was made.
+
+Implemented the target layer from lanyard-m0/M0-PLAN.md section 5:
+two `.sig` files, independent library identity tuples in `target/PIN.json`,
+the four frozen S3 anchors in `target/pin.sha256`, deterministic generation
+through `dev/gen-target.py` and `target/dune`, and the PIN/ANCHOR/DIFF gate.
+There are 15 PROPOSED rows, including all nine foreign type constants.
+Six Topcoat roadmap rows remain comments and generate no constants.
+
+The stage command is `zsh dev/gates.sh --stage B`. It adds a stage selector
+without changing the carried no-argument battery. A separate OCaml client
+links the generated library and checks schema metadata and total lookup.
+`test/dune` retains all existing support modules through `:standard` while
+excluding the new client from the old test executables.
+
+Validation on the final source:
+
+- Build: 0 errors, 0 warnings.
+- TARGET-SIG: 15 rows, nine foreign type constants, 104 generated lines.
+- TARGET-PIN: PIN, ANCHOR and DIFF passed for two libraries and four sites.
+- Mutation and regression suite: 27 tests passed, including one-byte
+  changes at each of the four anchors and CLI failure without output damage.
+- TARGET-CATALOG: the compiled OCaml consumer passed.
+- KERNEL-CARRY: all 13 ledger rows and the twelve-file bucket passed.
+- R0-COUNT: the carried eight-line census remains unchanged and passed.
+- TRUSTED-LINES: kernel 3997/4000; generated signature 104 lines measured.
+- Additional regression: `_build/default/test/main.exe test` completed
+  with `SUITE-KERNEL OK`, including PARSE-OK 127/127 and NEG-OK 51/51.
+- `git diff --check` passed.
+- HOUSE: the five house-rule scans passed. `dev/stage-b.sh` line 16 runs them.
+
+Captured output is under `dev/validation/stage-b/`. The build and stage
+checks were run in a local clone of the same base before integration. The
+capture `dev/validation/stage-b/gates.stdout` predates the HOUSE step. It
+ends at `STAGE-B OK` on line 29 and holds no HOUSE row.
+
+Decisions and next work:
+
+- LSB-D1: JSON lines encode the five signature fields plus `kind` and
+  `status`; no additional kernel term constructor is introduced. The
+  generator validates structure, quantities, placeholder coverage and the
+  foreign atom inventory. Kernel checking of instantiated schemas belongs
+  to Stage C, as does the new census line and the full R0-TARGET gate.
+- LSB-D2: the observed Topcoat release tag differs from the plan's
+  "v0.7.0 plus one commit" statement. HEAD stays `51caa01`, crate version
+  stays `0.6.2`, and the explicit `v0.7.0` tag peels to `8ef6d803`.
+  The checkout is shallow and `git describe` reports `v0.6.2-9-g51caa01`.
+  The gate checks the three independent identities, without asserting a
+  tag distance. Full values and source references are in target/README.md.
+- LSB-D3: A_sig is proposed at exactly 104 lines, the generated module's
+  measured size. S0-D1 leaves this number to the user. The ruled total
+  remains the formula `5481 + A_rir + A_emit + A_sig`; no total or allowance
+  has been silently ratified.
+- LSB-D4: the source templates are PROPOSED, with no claim of Rust
+  compilation or fixture coverage. `Model.create` needs model-field
+  instantiation; `Db.connect` needs the model inventory and a checked text
+  representation. The carried checker refuses string literals, so Stage C
+  must address that representation without extending the closed atom list.
+  Type and model parameters are erased schema inputs, not unconstrained
+  user-selectable foreign conversions.
+- Stage C is next: signature and model elaboration, the census extension,
+  and the first-order effect-response refusal. M0 emission and M0-EXIT
+  remain future work. The user retains the numeric A_sig ruling and commit.

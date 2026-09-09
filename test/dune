@@ -1,3 +1,9 @@
 (tests
- (names main sl_surface)
+ (names main sl_surface lan_surface)
+ (modules (:standard \ target_catalog))
  (libraries kanon_kernel kanon_surface))
+
+(test
+ (name target_catalog)
+ (modules target_catalog)
+ (libraries lanyard_target))
