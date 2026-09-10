@@ -1198,3 +1198,52 @@ The exact capture and source hashes are in dev/validation/stage-e-native/.
 The receipt distinguishes the validated implementation from documentation
 and capture files added afterward. TRUSTED-LINES measures emit=335 and
 retains A_emit as a pending user ruling. No allowance is ratified here.
+
+## Lanyard Stage E typed closures (2026-09-10)
+
+Base: ae944d5. The Rust eraser replaces arity-only closure layout names
+with parameter and result representations, sharing the eta-expansion
+signature traversal. The printer now emits boxed Send + Sync callbacks,
+typed capture factories, indirect calls and cloneable closure environments.
+The new fixture covers closures in products and sums, nested captures,
+higher-order calls, One parameters, erased arguments and nullary closures.
+See dev/STAGE-E-CLOSURES.md for the representation and its copy costs.
+
+Validation in /Users/oobi/Documents/gpt5/lanyard:
+`zsh dev/gates.sh --stage E-native` exited 0 with STAGE-E-NATIVE OK.
+The battery retained the target pin, generated metadata, kernel carry,
+R0, HOUSE, kernel suite and prior stages. It passed 29 erasure cases,
+25 malformed-IR refusals, 928 arithmetic observations, 15 closure
+observations, two surface refusals, five CLI usage cases, seven erasure
+mutants, two arithmetic/Boolean mutants and three closure mutants.
+Both Rust goldens matched byte for byte. The prior native golden did not
+change. Rust 1.98.1 (48a229cea), edition 2024, compiled both fixtures.
+
+Evidence: dev/validation/stage-e-closures/ contains the full gate capture
+and a receipt hashing the validated implementation. Documentation was
+completed afterward and checked with HOUSE and KERNEL-CARRY.
+lib/erase.ml measures 1479 lines; rust/emit.ml measures 437 lines.
+The kernel bucket and carried eraser retain their bytes. A_emit remains
+pending the user's numeric ruling. Recursive and foreign layouts, the
+Todo crate printer, deleted-print-rule mutation and Stage F remain ahead.
+
+Review round 1 edits rust/emit.ml, test/lan_emit.ml, test/lan_closures.py,
+README.md, dev/KERNEL-CARRIED.md, dev/MUTATION-LOG.md and this file. The
+receipt rows for rust/emit.ml, test/lan_emit.ml and test/lan_closures.py
+therefore drift from the staged blobs. The other four paths carry no
+receipt row. Read the new bytes with git -C . show :<path> | shasum -a 256. The receipt
+itself stays as the author wrote it. The printer refuses a closure capture
+count with its own diagnostic, and rust/emit.ml still measures 437 lines.
+The refusal list keeps 25 rows and the closure leg keeps 15 observations.
+No allowance is ratified here.
+
+Review round 2 edits test/lan_native.py and this file. The LAN-NATIVE leg
+failed once under machine load. The cause was the 120 s subprocess bound of
+the helper run, which stopped the compiled 928 observation binary. The helper
+now reads the module constant TIMEOUT, and that constant is 600 s. The helper
+bounds every compile and every run at 600 s. The receipt row for
+test/lan_native.py therefore drifts from the
+staged blob. Read the new bytes with git -C . show :test/lan_native.py | shasum -a 256.
+The receipt itself stays as the author wrote it. The counts hold: 928 arithmetic
+observations, two surface refusals, five usage cases and two mutants.
+No allowance is ratified here.

@@ -1,5 +1,5 @@
-(** Native Rust printing with structural layouts and explicit ownership conversions.
-    The arity-only closure layouts and foreign calls need a later target slice. *)
+(** Native Rust printing with typed layouts and explicit ownership conversions.
+    Foreign calls and recursive layouts need a later target slice. *)
 open Kanon_kernel
 open Rir
 let ( let* ) = Result.bind
@@ -7,6 +7,7 @@ let all = Rules.all_ok
 let refuse text = Error (Error.Not_yet ("Rust native emission: " ^ text))
 let invalid text = Error (Error.Mismatch ("Rust native emission: " ^ text))
 type ty = Nat | Unit | Product of ty list | Sum of ty list | Shared of ty
+  | Closure of ty list * ty
 type value = { code : string; ty : ty }
 type signature = { name : string; params : ty list; result : ty; body : rtm }
 let rec key = function
@@ -14,6 +15,8 @@ let rec key = function
   | Product fields -> "product(" ^ String.concat "," (List.map key fields) ^ ")"
   | Sum fields -> "sum(" ^ String.concat "," (List.map key fields) ^ ")"
   | Shared ty -> "shared(" ^ key ty ^ ")"
+  | Closure (params, result) -> "closure(" ^ String.concat "," (List.map key params)
+      ^ ";" ^ key result ^ ")"
 let same a b = String.equal (key a) (key b)
 let identifier prefix text = prefix ^ (String.to_seq text |> Seq.map
   (fun c -> Printf.sprintf "%02x" (Char.code c)) |> List.of_seq |> String.concat "")
@@ -38,6 +41,16 @@ let split delimiter text =
   else Ok (List.map decode (List.rev (current :: chunks)))
 let rec layout text =
   if String.equal text "nat" then Ok Nat
+  else if String.starts_with ~prefix:"fn<" text then
+    let* contents = inside "fn<" text |> Option.to_result
+      ~none:(Error.Mismatch "Rust native emission: malformed closure layout") in
+    let* parts = split ';' contents in
+    (match parts with
+    | [params; result] ->
+        let* params = split ',' params in
+        let* params = all (List.map representation params) in
+        let* result = representation result in Ok (Closure (params, result))
+    | [] | [_] | _ :: _ :: _ :: _ -> invalid "closure layout requires parameters and result")
   else Option.fold ~none:(refuse ("layout " ^ text)) ~some:(fun (prefix, delimiter, make) ->
     let* contents = inside prefix text |> Option.to_result
       ~none:(Error.Mismatch ("Rust native emission: malformed layout: " ^ text)) in
@@ -49,40 +62,51 @@ let rec layout text =
          "sum<", '|', (fun fields -> Sum fields) ])
 and representation text =
   if String.equal text "i31" then Ok Nat
+  else if String.starts_with ~prefix:"Arc<" text then
+    let* contents = inside "Arc<" text |> Option.to_result
+      ~none:(Error.Mismatch "Rust native emission: malformed shared layout") in
+    let* ty = representation contents in Ok (Shared ty)
   else Option.fold ~none:(refuse ("representation " ^ text)) ~some:(fun prefix ->
     layout (drop (String.length prefix) text))
-    (List.find_opt (fun prefix -> String.starts_with ~prefix text) [ "struct "; "union " ])
+    (List.find_opt (fun prefix -> String.starts_with ~prefix text) [ "struct "; "union "; "func " ])
 let rec repr = function
   | TyI31 -> Ok Nat
   | TyStruct tid | TyUnion tid -> layout (tid_text tid)
   | TyArc ty -> let* ty = repr ty in Ok (Shared ty)
-  | TyFunc tid | TyThunk tid -> refuse ("closure signature " ^ tid_text tid)
+  | TyFunc tid ->
+      let* ty = layout (tid_text tid) in
+      (match ty with
+      | Closure _ -> Ok ty
+      | Nat | Unit | Product _ | Sum _ | Shared _ -> invalid "function representation needs closure layout")
+  | TyThunk tid -> refuse ("thunk signature " ^ tid_text tid)
   | TyForeign name -> refuse ("foreign type " ^ name)
 let rec rust_type = function
   | Nat -> "Nat" | Unit -> "()"
   | Product fields -> type_name (Product fields)
   | Sum fields -> type_name (Sum fields)
   | Shared ty -> "Arc<" ^ rust_type ty ^ ">"
+  | Closure _ as ty -> type_name ty
 let rec coerce target value =
   if same target value.ty then Ok value.code
   else match target, value.ty with
-    | Shared target, (Nat | Unit | Product _ | Sum _) ->
+    | Shared target, (Nat | Unit | Product _ | Sum _ | Closure _) ->
         let* code = coerce target value in Ok ("Arc::new(" ^ code ^ ")")
-    | (Nat | Unit | Product _ | Sum _), Shared source ->
+    | (Nat | Unit | Product _ | Sum _ | Closure _), Shared source ->
         coerce target { code = "(*(" ^ value.code ^ ")).clone()"; ty = source }
-    | Shared _, Shared _ | (Nat | Unit | Product _ | Sum _), (Nat | Unit | Product _ | Sum _) ->
+    | Shared _, Shared _
+    | (Nat | Unit | Product _ | Sum _ | Closure _), (Nat | Unit | Product _ | Sum _ | Closure _) ->
         invalid ("conversion from " ^ key value.ty ^ " to " ^ key target)
 let at index values =
   if index < 0 then invalid "negative runtime index"
   else List.to_seq values |> Seq.drop index |> Seq.uncons |> Option.map fst |> Option.to_result
     ~none:(Error.Mismatch ("Rust native emission: runtime index " ^ string_of_int index))
-let rec arguments params values =
+let rec arguments what params values =
   match params, values with
   | [], [] -> Ok []
   | param :: params, value :: values ->
       let* code = coerce param value in
-      let* rest = arguments params values in Ok (code :: rest)
-  | [], _ :: _ | _ :: _, [] -> invalid "argument count"
+      let* rest = arguments what params values in Ok (code :: rest)
+  | [], _ :: _ | _ :: _, [] -> invalid (what ^ " count")
 let bool_ty = Sum [ Unit; Unit ]
 (** Clone uses identify shared local slots even though RLet has no quantity field. *)
 let rec shared_slot index = function
@@ -100,11 +124,22 @@ let rec shared_slot index = function
 let local_value shared value =
   if not shared then value else match value.ty with
   | Shared _ -> value
-  | Nat | Unit | Product _ | Sum _ -> { code = "Arc::new(" ^ value.code ^ ")"; ty = Shared value.ty }
+  | Nat | Unit | Product _ | Sum _ | Closure _ ->
+      { code = "Arc::new(" ^ value.code ^ ")"; ty = Shared value.ty }
+let closure_signature signatures fid arity =
+  let name = fid_text fid in
+  let* signature = List.find_opt (fun signature -> String.equal signature.name name) signatures
+    |> Option.to_result ~none:(Error.Mismatch ("Rust native emission: missing closure function " ^ name)) in
+  if arity < 0 || arity > List.length signature.params then invalid "closure arity"
+  else let count = List.length signature.params - arity in
+    let captures = List.to_seq signature.params |> Seq.take count |> List.of_seq in
+    let params = List.to_seq signature.params |> Seq.drop count |> List.of_seq in
+    Ok (captures, params, signature.result)
+let closure_name fid arity = identifier "c_" (fid_text fid ^ ":" ^ string_of_int arity)
 let primitive name args =
   let* primitive = Prim.of_name name |> Option.to_result
     ~none:(Error.Not_yet ("Rust native emission: native call " ^ name)) in
-  let* args = arguments [Nat; Nat] args in
+  let* args = arguments "argument" [Nat; Nat] args in
   let* left = at 0 args in let* right = at 1 args in
   let call method_name = "(" ^ left ^ ")." ^ method_name ^ "(&(" ^ right ^ "))?" in
   let comparison ordering = { code = "if (" ^ left ^ ").compare(&(" ^ right ^ "))." ^ ordering
@@ -136,13 +171,13 @@ let rec expression signatures env term =
       let* value = walk term in
       (match value.ty with
       | Shared _ -> Ok { value with code = "Arc::clone(&(" ^ value.code ^ "))" }
-      | Nat | Unit | Product _ | Sum _ ->
+      | Nat | Unit | Product _ | Sum _ | Closure _ ->
           Ok { code = "Arc::new((" ^ value.code ^ ").clone())"; ty = Shared value.ty })
   | RCall (name, terms) ->
       let* args = values terms in
       let action = Option.fold ~none:(fun () -> primitive name args)
         ~some:(fun signature () ->
-          let* args = arguments signature.params args in
+          let* args = arguments "argument" signature.params args in
           Ok { code = function_name name ^ "(" ^ String.concat ", " args ^ ")?"; ty = signature.result })
         (List.find_opt (fun signature -> String.equal signature.name name) signatures) in action ()
   | RStruct (tid, terms) ->
@@ -150,10 +185,10 @@ let rec expression signatures env term =
       (match ty with
       | Unit -> if List.is_empty args then Ok { code = "()"; ty } else invalid "unit fields"
       | Product fields ->
-          let* args = arguments fields args in
+          let* args = arguments "argument" fields args in
           Ok { code = rust_type ty ^ " { " ^ String.concat ", "
             (List.mapi (fun i code -> "f" ^ string_of_int i ^ ": " ^ code) args) ^ " }"; ty }
-      | Nat | Sum _ | Shared _ -> invalid "product layout")
+      | Nat | Sum _ | Shared _ | Closure _ -> invalid "product layout")
   | RProj (tid, index, term) ->
       let* ty = layout (tid_text tid) in let* value = walk term in let* code = coerce ty value in
       (match ty with
@@ -164,14 +199,14 @@ let rec expression signatures env term =
           let bindings = List.mapi (fun i name -> "f" ^ string_of_int i ^ ": " ^ name) names in
           Ok { code = "{ let " ^ rust_type ty ^ " { " ^ String.concat ", " bindings ^ " } = "
             ^ code ^ "; " ^ name ^ " }"; ty = field }
-      | Nat | Unit | Sum _ | Shared _ -> invalid "projection layout")
+      | Nat | Unit | Sum _ | Shared _ | Closure _ -> invalid "projection layout")
   | RTag (tid, tag, terms) ->
       let* ty = layout (tid_text tid) in let* args = values terms in
       (match ty with
       | Sum fields ->
-          let* field = at tag fields in let* args = arguments [field] args in
+          let* field = at tag fields in let* args = arguments "argument" [field] args in
           Ok { code = rust_type ty ^ "::V" ^ string_of_int tag ^ "(" ^ String.concat ", " args ^ ")"; ty }
-      | Nat | Unit | Product _ | Shared _ -> invalid "sum layout")
+      | Nat | Unit | Product _ | Shared _ | Closure _ -> invalid "sum layout")
   | RCase (tid, term, branches) ->
       let* ty = layout (tid_text tid) in let* value = walk term in let* code = coerce ty value in
       (match ty with
@@ -191,19 +226,32 @@ let rec expression signatures env term =
             (match arms with
             | [] -> invalid "empty case"
             | (_pattern, first) :: _rest ->
-                let result = match first.ty with Shared ty -> ty | Nat | Unit | Product _ | Sum _ -> first.ty in
+                let result = match first.ty with Shared ty -> ty
+                  | Nat | Unit | Product _ | Sum _ | Closure _ -> first.ty in
                 let* arms = all (List.map (fun (pattern, body) ->
                   let* body = coerce result body in Ok (pattern ^ " => " ^ body)) arms) in
                 Ok { code = "match " ^ code ^ " { " ^ String.concat ", " arms ^ " }"; ty = result })
-      | Nat | Unit | Product _ | Shared _ -> invalid "case layout")
-  | RLam (fid, _arity, _captures) -> refuse ("closure layout for " ^ fid_text fid)
-  | RCallC (_head, _args) -> refuse "closure call without a typed signature"
+      | Nat | Unit | Product _ | Shared _ | Closure _ -> invalid "case layout")
+  | RLam (fid, arity, captures) ->
+      let* capture_types, params, result = closure_signature signatures fid arity in
+      let* captures = values captures in let* captures = arguments "capture" capture_types captures in
+      Ok { code = closure_name fid arity ^ "(" ^ String.concat ", " captures ^ ")";
+           ty = Closure (params, result) }
+  | RCallC (head, args) ->
+      let* head = walk head in let* args = values args in
+      let rec signature = function
+        | Closure (params, result) -> Ok (params, result)
+        | Shared ty -> signature ty
+        | Nat | Unit | Product _ | Sum _ -> invalid "closure call needs a function" in
+      let* params, result = signature head.ty in let* args = arguments "argument" params args in
+      Ok { code = "((" ^ head.code ^ ").call)(" ^ String.concat ", " args ^ ")?"; ty = result }
   | RForeign (row, _args) -> refuse ("foreign call " ^ row.name)
 let rec aggregates ty =
   match ty with
   | Nat | Unit -> []
   | Shared ty -> aggregates ty
   | Product fields | Sum fields -> ty :: List.concat_map aggregates fields
+  | Closure (params, result) -> ty :: List.concat_map aggregates (result :: params)
 let rec term_layouts = function
   | RVar _ | RLit _ | RGlobal _ | RUnit -> Ok []
   | RLet (_name, value, body) -> layouts [ value; body ]
@@ -219,14 +267,62 @@ let rec term_layouts = function
   | RForeign (_row, args) -> layouts args
   | RClone term -> term_layouts term
 and layouts terms = let* rows = all (List.map term_layouts terms) in Ok (List.concat rows)
+let rec closure_sites = function
+  | RVar _ | RLit _ | RGlobal _ | RUnit -> []
+  | RLet (_, value, body) -> closure_sites value @ closure_sites body
+  | RLam (fid, arity, captures) -> (fid, arity) :: List.concat_map closure_sites captures
+  | RCall (_, args) | RStruct (_, args) | RTag (_, _, args) | RForeign (_, args) ->
+      List.concat_map closure_sites args
+  | RCallC (head, args) -> List.concat_map closure_sites (head :: args)
+  | RProj (_, _, term) | RClone term -> closure_sites term
+  | RCase (_, term, branches) -> closure_sites term
+      @ List.concat_map (fun (branch : rbranch) -> closure_sites branch.body) branches
+let rec has_closure = function
+  | Closure _ -> true
+  | Nat | Unit -> false
+  | Shared ty -> has_closure ty
+  | Product fields | Sum fields -> List.exists has_closure fields
+let closure_declaration params result =
+  let name = rust_type (Closure (params, result)) in
+  "struct " ^ name ^ " {\n    call: Box<dyn Fn("
+  ^ String.concat ", " (List.map rust_type params) ^ ") -> Result<" ^ rust_type result
+  ^ ", Error> + Send + Sync>,\n    duplicate: Box<dyn Fn() -> Self + Send + Sync>,\n}\n"
+  ^ "impl Clone for " ^ name ^ " {\n    fn clone(&self) -> Self { (self.duplicate)() }\n}\n"
+  ^ "impl std::fmt::Debug for " ^ name ^ " {\n"
+  ^ "    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { f.write_str(\"Closure\") }\n}\n"
+(* Each factory moves captures into boxed callbacks. The second callback rebuilds
+   an owned closure from explicit copies, including Arc handle clones for Many. *)
+let closure_factory signatures (fid, arity) =
+  let* captures, params, result = closure_signature signatures fid arity in
+  let names prefix types = List.mapi (fun i ty -> (prefix ^ string_of_int i, ty)) types in
+  let captures = names "c" captures and params = names "p" params in
+  let declarations values = String.concat ", " (List.map (fun (name, ty) -> name ^ ": " ^ rust_type ty) values) in
+  let copy (name, ty) = match ty with
+    | Shared _ -> "Arc::clone(&(" ^ name ^ "))"
+    | Nat | Unit | Product _ | Sum _ | Closure _ -> "(" ^ name ^ ").clone()" in
+  let saved = List.map (fun (name, ty) -> ("saved_" ^ name, ty)) captures in
+  let name = closure_name fid arity in let ty = Closure (List.map snd params, result) in
+  let code = "fn " ^ name ^ "(" ^ declarations captures ^ ") -> " ^ rust_type ty ^ " {\n"
+    ^ String.concat "" (List.map (fun ((name, _ty) as value) ->
+        "    let saved_" ^ name ^ " = " ^ copy value ^ ";\n") captures)
+    ^ "    " ^ rust_type ty ^ " {\n        call: Box::new(move |" ^ declarations params ^ "| "
+    ^ function_name (fid_text fid) ^ "("
+    ^ String.concat ", " (List.map copy captures @ List.map fst params) ^ ")),\n"
+    ^ "        duplicate: Box::new(move || " ^ name ^ "(" ^ String.concat ", " (List.map copy saved)
+    ^ ")),\n    }\n}\n" in
+  Ok (ty, code)
 let declaration ty =
+  match ty with
+  | Closure (params, result) -> closure_declaration params result
+  | Nat | Unit | Product _ | Sum _ | Shared _ ->
   let fields = match ty with
     | Product fields -> "struct " ^ rust_type ty ^ " { " ^ String.concat ", "
         (List.mapi (fun i ty -> "f" ^ string_of_int i ^ ": " ^ rust_type ty) fields) ^ " }"
     | Sum fields -> "enum " ^ rust_type ty ^ " { " ^ String.concat ", "
         (List.mapi (fun i ty -> "V" ^ string_of_int i ^ "(" ^ rust_type ty ^ ")") fields) ^ " }"
-    | Nat | Unit | Shared _ -> "" in
-  "#[derive(Clone, Debug, PartialEq, Eq)]\n" ^ fields ^ "\n"
+    | Nat | Unit | Shared _ | Closure _ -> "" in
+  (if has_closure ty then "#[derive(Clone, Debug)]\n"
+   else "#[derive(Clone, Debug, PartialEq, Eq)]\n") ^ fields ^ "\n"
 
 let runtime = {|// Generated by lanyard's native Rust printer.
 use std::sync::Arc;
@@ -330,6 +426,12 @@ let native rows =
       Ok ("fn " ^ function_name signature.name ^ "(" ^ String.concat ", " params ^ ") -> Result<"
         ^ rust_type signature.result ^ ", Error> {\n    " ^ body ^ "\n}\n")) signatures) in
     let* mentioned = layouts (List.map (fun signature -> signature.body) signatures) in
-    let types = bool_ty :: mentioned @ List.concat_map (fun signature -> signature.result :: signature.params) signatures
+    let sites = List.concat_map (fun signature -> closure_sites signature.body) signatures
+      |> List.sort_uniq compare in
+    let* factories = all (List.map (closure_factory signatures) sites) in
+    let types = bool_ty :: List.map fst factories @ mentioned
+      @ List.concat_map (fun signature -> signature.result :: signature.params) signatures
       |> List.concat_map aggregates |> List.sort_uniq (fun a b -> String.compare (key a) (key b)) in
-    Ok (runtime ^ String.concat "\n" (List.map declaration types) ^ "\n" ^ String.concat "\n" bodies)
+    Ok (runtime ^ String.concat "\n" (List.map declaration types) ^ "\n"
+      ^ String.concat "\n" (List.map snd factories) ^ (if List.is_empty factories then "" else "\n")
+      ^ String.concat "\n" bodies)

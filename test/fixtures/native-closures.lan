@@ -1,0 +1,25 @@
+def apply : (Nat -> Nat) -> Nat -> Nat := fun (f : Nat -> Nat) (x : Nat) => f x
+def twice : (Nat -> Nat) -> Nat -> Nat := fun (f : Nat -> Nat) (x : Nat) => f (f x)
+def pack : Nat -> prod (Nat -> Nat) := fun (x : Nat) => tuple (fun (y : Nat) => natAdd x y)
+def captured : Nat := apply ((pack 17).0) 5
+def repeated : Nat := twice ((pack 13).0) 7
+def local : Nat := let f : Nat -> Nat := fun (x : Nat) => natMul x 3 in natAdd (f 11) (f 19)
+def noCapture : Nat := apply (fun (x : Nat) => natAdd x 1) 41
+def ordered : Nat -> Nat -> prod (Nat -> Nat) := fun (x : Nat) (y : Nat) => tuple (fun (z : Nat) => natAdd (natSub x y) z)
+def captureOrder : Nat := apply ((ordered 19 7).0) 2
+def applyOne : (1 f : (1 x : Nat) -> Nat) -> (1 x : Nat) -> Nat := fun (1 f : (1 x : Nat) -> Nat) (1 x : Nat) => f x
+def owned : Nat := applyOne (fun (1 x : Nat) => x) 23
+def oneCapture : (1 x : Nat) -> Nat := fun (1 x : Nat) => let f : Nat -> Nat := fun (y : Nat) => x in f 0
+def eraseArg : ((0 witness : Nat) -> Nat -> Nat) -> Nat := fun (f : (0 witness : Nat) -> Nat -> Nat) => f 999 31
+def erased : Nat := eraseArg (fun (0 witness : Nat) (x : Nat) => natAdd x 2)
+def force : ((0 witness : Nat) -> Nat) -> Nat := fun (f : (0 witness : Nat) -> Nat) => f 999
+def nullary : Nat := force (fun (0 witness : Nat) => 29)
+def nestedPack : (Nat -> Nat) -> prod (Nat -> Nat) := fun (f : Nat -> Nat) => tuple (fun (x : Nat) => f (natAdd x 3))
+def nestedCapture : Nat := apply ((nestedPack (fun (x : Nat) => natMul x 2)).0) 11
+def higher : ((Nat -> Nat) -> Nat) -> Nat := fun (f : (Nat -> Nat) -> Nat) => f (fun (x : Nat) => natAdd x 4)
+def higherOrder : Nat := higher (fun (f : Nat -> Nat) => f 37)
+def Choice : Type 0 := sum (Nat -> Nat, Nat)
+def choose : Choice -> Nat := fun (c : Choice) => case c with
+| 0 (f : Nat -> Nat) => f 8
+| 1 (x : Nat) => x
+def sumClosure : Nat := choose (inj 0 of 2 (fun (x : Nat) => natAdd x 9) : Choice)

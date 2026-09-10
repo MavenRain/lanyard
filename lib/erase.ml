@@ -241,14 +241,35 @@ and ran_repr (ec : ectx) (s : Value.t Shape.t) (d : Value.closure) :
     (Rir.repr, Error.t) result =
   match point_of s with
   | PPoint (_q, _x, _dom) ->
-      let* n = arity_of ec 0 s d in
-      Ok (Rir.TyFunc (Rir.Tid (Printf.sprintf "fn<%d>" n)))
+      let* params, result = function_signature ec s d in
+      Ok (Rir.TyFunc (Rir.Tid ("fn<"
+        ^ String.concat "," (List.map Rir.print_repr params)
+        ^ ";" ^ Rir.print_repr result ^ ">")))
   | PColl n ->
       if Int.equal n 0 then Ok (Rir.TyStruct (Rir.Tid "tuple<>"))
       else
         let* texts = tuple_texts ec n d in
         Ok (Rir.TyStruct (Rir.Tid ("tuple<" ^ String.concat "," texts ^ ">")))
   | POther -> Ok any_repr
+
+(* The same typed chain drives closure layouts and eta expansion. *)
+and function_signature (ec : ectx) (s : Value.t Shape.t) (d : Value.closure) :
+    (Rir.repr list * Rir.repr, Error.t) result =
+  match point_of s with
+  | PPoint (q, x, dom) ->
+      let* keep = point_runtime ec q dom in
+      let* here =
+        if keep then Result.map (fun r -> [ Rir.owned q r ]) (repr_of ec dom)
+        else Ok [] in
+      let* ec', cod = under_point ec x q dom d in
+      let* w = Eval.whnf (globals_of ec') cod in
+      let* rest, ret = match form_of w with
+        | FRan (s', d') -> function_signature ec' s' d'
+        | FLan _ | FUniv | FNat | FOther ->
+            Result.map (fun r -> ([], r)) (repr_of ec' cod) in
+      Ok (here @ rest, ret)
+  | PColl _ | POther ->
+      Result.map (fun r -> ([], r)) (ran_repr ec s d)
 
 and lan_repr (ec : ectx) (s : Value.t Shape.t) (d : Value.closure) :
     (Rir.repr, Error.t) result =
@@ -808,24 +829,7 @@ and eta_chain (ec : ectx) (ac : acc) (params : Rir.repr list) ~(ty : Value.t)
 
 and remaining_signature (ec : ectx) (s : Value.t Shape.t) (d : Value.closure) :
     (Rir.repr list * Rir.repr, Error.t) result =
-  match point_of s with
-  | PPoint (q, x, dom) ->
-      let* keep = point_runtime ec q dom in
-      let* here =
-        if keep then Result.map (fun (r : Rir.repr) -> [ Rir.owned q r ]) (repr_of ec dom)
-        else Ok []
-      in
-      let* ec', cod = under_point ec x q dom d in
-      let* w = Eval.whnf (globals_of ec') cod in
-      let* rest, ret =
-        match form_of w with
-        | FRan (s', d') -> remaining_signature ec' s' d'
-        | FLan (_, _) | FUniv | FNat | FOther ->
-            Result.map (fun (r : Rir.repr) -> ([], r)) (repr_of ec' cod)
-      in
-      Ok (here @ rest, ret)
-  | PColl _ | POther ->
-      Result.map (fun (r : Rir.repr) -> ([], r)) (ran_repr ec s d)
+  function_signature ec s d
 
 and chain_step (ec : ectx) (ac : acc) (params : Rir.repr list)
     ~(stop : unit -> (Rir.repr list * Rir.repr * Rir.rtm * acc, Error.t) result)

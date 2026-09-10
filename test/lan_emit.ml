@@ -40,8 +40,32 @@ let tests = [
   "bad result conversion", mismatch "conversion from unit to nat", term RUnit;
   "duplicate function", mismatch "duplicate function",
     [ function_row "main" [] nat (lit 1); function_row "main" [] nat (lit 2) ];
-  "closure", not_yet "closure layout for unknown", term (RLam (Fid "unknown", 0, []));
-  "closure call", not_yet "closure call without a typed signature", term (RCallC (RUnit, []));
+  "closure", mismatch "missing closure function unknown", term (RLam (Fid "unknown", 0, []));
+  "closure call", mismatch "closure call needs a function", term (RCallC (RUnit, []));
+  "untyped closure", mismatch "closure layout requires parameters and result",
+    [function_row "untyped" [TyFunc (Tid "fn<1>")] nat (lit 1)];
+  "closure result layout", not_yet "representation missing",
+    [function_row "untyped" [TyFunc (Tid "fn<;missing>")] nat (lit 1)];
+  "closure representation", mismatch "function representation needs closure layout",
+    [function_row "untyped" [TyFunc (Tid "nat")] nat (lit 1)];
+  "closure arity", mismatch "closure arity",
+    [function_row "id" [nat] nat (RVar 0);
+     function_row "main" [] nat (RLam (Fid "id", 2, []))];
+  "negative closure arity", mismatch "closure arity",
+    [function_row "id" [nat] nat (RVar 0);
+     function_row "main" [] nat (RLam (Fid "id", -1, []))];
+  "closure capture count", mismatch "capture count",
+    [function_row "id" [nat; nat] nat (RVar 0);
+     function_row "main" [] nat (RCallC (RLam (Fid "id", 1, []), [lit 1]))];
+  "closure capture type", mismatch "conversion from unit to nat",
+    [function_row "id" [nat; nat] nat (RVar 0);
+     function_row "main" [] nat (RCallC (RLam (Fid "id", 1, [RUnit]), [lit 1]))];
+  "closure argument count", mismatch "argument count",
+    [function_row "id" [nat] nat (RVar 0);
+     function_row "main" [] nat (RCallC (RLam (Fid "id", 1, []), []))];
+  "closure argument type", mismatch "conversion from unit to nat",
+    [function_row "id" [nat] nat (RVar 0);
+     function_row "main" [] nat (RCallC (RLam (Fid "id", 1, []), [RUnit]))];
   "foreign call", not_yet "foreign call unknown",
     term (RForeign ({name="unknown"; schema="unknown"; print_rule="";
       effects=[]; type_arguments=[]; arity=0}, []));

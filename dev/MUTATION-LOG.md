@@ -353,9 +353,9 @@ mutation, because there is no Rust emitter yet.
 ## Lanyard Stage E native printer slice (2026-09-10)
 
 The Stage B note above states that no Rust emitter exists. That note was
-true on its date. rust/emit.ml now holds the printer at 335 lines. This
-slice carries the LAN-EMIT and LAN-NATIVE mutants below. The deleted print
-rule mutation of EMIT-DIFF stays open.
+true on its date. rust/emit.ml held the printer at 335 lines on that
+date. This slice carries the LAN-EMIT and LAN-NATIVE mutants below. The
+deleted print rule mutation of EMIT-DIFF stays open.
 
 The native control compiles with Rust 1.98.1 and matches 928 independent
 Python integer observations. Both output mutants compile and run to exit
@@ -367,3 +367,24 @@ Python integer observations. Both output mutants compile and run to exit
 Both are killed by test/lan_native.py. The combined E-native gate also
 retains the seven Stage D erasure mutants. The foreign print-rule deletion
 mutation still belongs to the remaining Todo crate printer slice.
+
+## Lanyard Stage E typed closures (2026-09-10)
+
+test/lan_closures.py runs three mutations after the control compiles and
+matches 15 independent expected observations:
+
+- Swap two captured Nat arguments in a lifted closure call. The mutant
+  compiles and executes but gives the wrong capture-order result.
+- Replace the saved offset in pack's duplication environment with zero.
+  The mutant compiles and executes but calls through the owned clone give
+  the wrong result after the original is dropped.
+- Remove Send from the boxed callback bounds. Rust must reject the
+  program with the thread-safety diagnostic. The control includes both
+  Send + Sync and Future + Send bounds with a closure held across await.
+
+All three were killed in the full Stage E run. The two prior native
+mutants and seven erasure mutants remain green. Nine additional IR
+refusals pin closure layout, lifted function, arity, capture and argument
+diagnostics; the two former unsupported-closure cases now pin typed
+errors. The three added erasure cases pin quantities, nullary signatures
+and nested signatures before Rust printing.

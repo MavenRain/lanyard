@@ -1,6 +1,7 @@
 # Native Rust printer slice
 
-This is the first Stage E slice. `lanyard emit --native FILE.lan` checks,
+This Stage E command includes the native and typed closure slices.
+`lanyard emit --native FILE.lan` checks,
 lowers and prints native Rust source to stdout. An unsupported definition
 fails the whole request before any source is printed. The exact argument
 form and `.lan` extension are required; usage errors exit 64 and compiler
@@ -12,10 +13,11 @@ _build/default/bin/lanyard.exe emit --native test/fixtures/native.lan
 ```
 
 The printer supports naturals, runtime unit, products, projections, sums,
-exhaustive cases, lets and saturated native calls. Every one of the fourteen
-IR nodes has an explicit arm. Recursive family layouts, arity-only closure
-layouts, closure calls, foreign types and foreign calls produce named
-errors. No definition is pruned to hide an unsupported body.
+exhaustive cases, lets, saturated native calls and typed closures. Every one
+of the fourteen IR nodes has an explicit arm. Recursive family layouts,
+foreign types and foreign calls produce named errors. Old arity-only
+closure layouts are rejected. No definition is pruned to hide an
+unsupported body.
 
 Product and sum layouts are decoded with nesting-aware separators.
 Identifiers encode every byte of the source name or structural type key.
@@ -40,7 +42,7 @@ The native fixture and its Rust golden are compared byte for byte. Rust
 1.98.1 with edition 2024 compiles the output. Python integers supply the
 oracle for 928 observations, including 1024-bit boundaries. Tests cover
 quantities, aggregates, calls, branches and all five arithmetic primitives.
-Sixteen invalid IR cases fail with the diagnostic each case names. Three
+Twenty-five invalid IR cases fail with the diagnostic each case names. Two
 checked surface programs refuse emission with empty stdout and five CLI
 forms fail usage. Arithmetic and Boolean mutants must compile and then
 disagree with the same oracle.
@@ -49,7 +51,10 @@ The gate retains every Stage D leg and extends HOUSE to rust/ sources.
 TRUSTED-LINES measures rust/emit.ml as A_emit, still pending the user's
 numeric ruling. It does not ratify a new ceiling or claim M0-EXIT.
 
-Next Stage E work: typed closure and recursive layouts, foreign templates,
+The [typed closure slice](STAGE-E-CLOSURES.md) adds a second golden,
+execution observations and mutation checks to this command.
+
+Next Stage E work: recursive layouts, foreign templates,
 model printing, handler fusion, the CLI main and the Todo crate golden with
 its deleted-print-rule mutation. The Todo fixture is not yet printable.
 `emit FILE.lan` without `--native` remains reserved for the crate command.

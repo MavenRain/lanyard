@@ -28,7 +28,7 @@ bucket has no row here.
 | lib/global.ml | 046689a | VERBATIM | - |
 | lib/order.ml | 046689a | VERBATIM | - |
 | lib/bignum.ml | 046689a | VERBATIM | - |
-| lib/erase.ml | 046689a | EDITED | Stage D: Rust IR, retained binder quantities, explicit runtime unit and foreign type identities. quantity_runtime is unchanged. |
+| lib/erase.ml | 046689a | EDITED | Stage D: Rust IR, retained binder quantities, explicit runtime unit and foreign type identities. Stage E: typed closure signatures. quantity_runtime is unchanged. |
 
 ## 1 The row set
 
@@ -107,7 +107,17 @@ itself.  It reads with rg and awk, and it calls no grep and no sed.
 ## 7 Native printer slice (2026-09-10)
 
 rust/emit.ml is new trusted output code, including its generated Nat runtime.
-It measures 335 lines; A_emit remains pending the user's numeric ruling.
+It measured 335 lines at that slice. Section 8 records the current
+measurement, and A_emit remains pending the user's numeric ruling.
 bin/lanyard.ml adds emit --native and bin/dune links the printer library.
 The kernel, the two erasers, the IR and surface lowering retain their Stage D
 bytes. The native slice does not change the carry bucket or its ceiling.
+
+## 8 Typed closure slice (2026-09-10)
+
+lib/erase.ml now shares its typed function-chain traversal between closure
+layouts and eta expansion. It measures 1479 lines. The twelve-file kernel
+bucket, quantity_runtime, lib/erase_kan.ml and lib/rir.ml keep their bytes.
+rust/emit.ml measures 437 lines with boxed closure and capture printing.
+A_emit remains pending; the symbolic ceiling has not been ratified as a
+numeric total. See STAGE-E-CLOSURES.md for behavior and validation.

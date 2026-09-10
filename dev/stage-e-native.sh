@@ -7,4 +7,5 @@ cd ${0:A:h}/..
 zsh dev/stage-d.sh
 _build/default/test/lan_emit.exe
 python3 -P test/lan_native.py
+python3 -P test/lan_closures.py
 print -r -- 'STAGE-E-NATIVE OK'

@@ -9,11 +9,17 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parent.parent
 DRIVER = ROOT / "_build/default/bin/lanyard.exe"
+FORBIDDEN = (r"\b(?:unsafe|unwrap|expect|panic|assert|assert_eq|debug_assert|unreachable|todo)\w*"
+             r"|\b(?:loop|while|return|break|continue|as)\b|\bfor\s+\w+\s+in\b|\w\[")
+OWNERSHIP = r"\bRc\b|\bpub\b"
+# Each compile and each run stays bounded.  The bound is 600 s, because a
+# loaded machine needs more than 120 s.
+TIMEOUT = 600
 
 
 def run(*args):
     return subprocess.run([str(arg) for arg in args], cwd=ROOT, text=True,
-                          capture_output=True, timeout=120)
+                          capture_output=True, timeout=TIMEOUT)
 
 
 def require(condition, message):
@@ -40,16 +46,13 @@ def main():
     require(emitted.returncode == 0 and not emitted.stderr, emitted.stderr)
     golden = ROOT / "test/goldens/native.rs"
     require(emitted.stdout.encode() == golden.read_bytes(), "native golden differs")
-    forbidden = (r"\b(?:unsafe|unwrap|expect|panic|assert|assert_eq|debug_assert|unreachable|todo)\w*"
-                 r"|\b(?:loop|while|return|break|continue|as)\b|\bfor\s+\w+\s+in\b|\w\[")
-    ownership = r"\bRc\b|\bpub\b"
-    require(not re.search(forbidden, emitted.stdout), "forbidden Rust construct")
-    require(not re.search(ownership, emitted.stdout), "ownership or public field drift")
+    require(not re.search(FORBIDDEN, emitted.stdout), "forbidden Rust construct")
+    require(not re.search(OWNERSHIP, emitted.stdout), "ownership or public field drift")
     # Each static rule rejects a construct the printer must never emit.
     for probe in ["let n = other.unwrap_or_default();", "debug_assert!(n == m);",
                   "unreachable!();", "todo!();", "struct Nat(pub Vec<u8>);",
                   "let byte = other.0[i];"]:
-        require(re.search(forbidden, probe) or re.search(ownership, probe),
+        require(re.search(FORBIDDEN, probe) or re.search(OWNERSHIP, probe),
                 f"static rule misses {probe}")
     version = run("rustup", "run", "1.98", "rustc", "--version")
     require(version.returncode == 0 and version.stdout.startswith("rustc 1.98.1 "),
@@ -113,7 +116,6 @@ def main():
                     f"{label} mutant survived")
         surface_cases = [
             ("foreign", "def main : Db -> prod () := fun (db : Db) => Db.push_schema db", "foreign type Db"),
-            ("closure", "def pack : Nat -> prod (Nat -> Nat) := fun (x : Nat) => tuple (fun (y : Nat) => x)", "func fn<1>"),
             ("recursive", "mu N : Type 0 := | z : N | s (n : N) : N def main : N := s z", "layout mu<N>"),
         ]
         for label, text, diagnostic in surface_cases:

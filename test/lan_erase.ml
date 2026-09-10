@@ -88,7 +88,18 @@ let cases = [
   "eta-one", printed "def identity : (1 x : Nat) -> Nat := fun (1 x : Nat) => x def alias : (1 x : Nat) -> Nat := identity"
     [ "RCall identity [RVar 0]" ] [ "RClone" ];
   "capture", printed "def pack : Nat -> prod (Nat -> Nat) := fun (x : Nat) => tuple (fun (y : Nat) => x)"
-    [ "RLam pack$0 1 [RClone (RVar 0)]"; "fun pack$0 (Arc<union nat>, Arc<union nat>)" ] [];
+    [ "RLam pack$0 1 [RClone (RVar 0)]"; "fun pack$0 (Arc<union nat>, Arc<union nat>)";
+      "struct tuple<func fn<Arc<union nat>;union nat>>" ] [ "fn<1>" ];
+  "typed-closure-quantities", printed
+    "def use : ((0 witness : Nat) -> (1 x : Nat) -> Nat -> Nat) -> Nat := fun (f : (0 witness : Nat) -> (1 x : Nat) -> Nat -> Nat) => f 99 3 4"
+    [ "Arc<func fn<union nat,Arc<union nat>;union nat>>";
+      "RCallC (RClone (RVar 0)) [RLit 3; RLit 4]" ] [ "RLit 99" ];
+  "typed-nullary-closure", printed
+    "def force : ((0 witness : Nat) -> Nat) -> Nat := fun (f : (0 witness : Nat) -> Nat) => f 99"
+    [ "Arc<func fn<;union nat>>"; "RCallC (RClone (RVar 0)) []" ] [ "RLit 99" ];
+  "typed-nested-closure", printed
+    "def use : ((Nat -> Nat) -> Nat) -> Nat := fun (f : (Nat -> Nat) -> Nat) => f (fun (x : Nat) => x)"
+    [ "Arc<func fn<Arc<func fn<Arc<union nat>;union nat>>;union nat>>" ] [];
   "projection", printed "def main : Nat := (tuple (1, 2) : prod (Nat, Nat)).1"
     [ "RProj"; "RStruct" ] [];
   "constructor", printed "mu N : Type 0 := | z : N | s (n : N) : N def main : N := s z"

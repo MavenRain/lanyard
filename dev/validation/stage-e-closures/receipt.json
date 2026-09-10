@@ -1,0 +1,51 @@
+{
+  "recorded_at": "2026-09-10T15:03:32.201527+00:00",
+  "base": "ae944d5b5bbde7c767e973e6e88882e5f80520e5",
+  "checkout": "/Users/oobi/Documents/gpt5/lanyard",
+  "command": [
+    "zsh",
+    "dev/gates.sh",
+    "--stage",
+    "E-native"
+  ],
+  "exit_code": 0,
+  "verdict": "STAGE-E-NATIVE OK",
+  "erasure_cases": 29,
+  "ir_refusals": 25,
+  "native_observations": 928,
+  "closure_observations": 15,
+  "surface_refusals": 2,
+  "usage_refusals": 5,
+  "erasure_mutants_killed": 7,
+  "native_mutants_killed": 2,
+  "closure_mutants_killed": 3,
+  "rustc": "1.98.1 (48a229cea 2026-09-01)",
+  "edition": 2024,
+  "emit_lines": 437,
+  "erase_lines": 1479,
+  "A_emit": "pending user ruling",
+  "snapshot_note": "Hashes cover the implementation tested by the completed full gate. Documentation and evidence were completed afterward. Final HOUSE, KERNEL-CARRY and git diff --check passed.",
+  "sha256": {
+    "lib/erase.ml": "4e083a4b5fc8b41fc57d0556bb4833b7ce2da685ca9fe61c9f84a0a817224822",
+    "lib/rir.ml": "a87e729871ffc53767eae01700a36a2f8a4055ac0702ea99d4c6346082b6ea7d",
+    "rust/emit.ml": "31cf367a8b662aa81118049ad0fe8a98280f174c56c28085571fd74cfa0506a1",
+    "rust/dune": "b0cbf292f9876b5c6f256d3ab9892eac843e4c190eb9108141db6a389b2fbc5c",
+    "surface/lower.ml": "5a4298b34ece07ebec2a8d0a2a92f8d7a26448b43effa0506370cf4e31c0f965",
+    "bin/lanyard.ml": "e3c6445966fc524668f2d37b22ce7dc9bb5674a253cf9ed9bf3abeef811e9ed0",
+    "test/dune": "5eb51640c446c501cb0f5aa808f18aa23a502885c326ef1d9bd36579701e0d34",
+    "test/lan_emit.ml": "5172cd456e5dc1166b712a01a2aec7a5279267d422e5639a72d30a8246a9270f",
+    "test/lan_erase.ml": "268384318c59aba43c4a386620f3c2b57f4004c09a9c17f508c0a5347c97603a",
+    "test/lan_native.py": "123cd75421fe3c69cccc81b42d691b4cd1058d9f1903b410a57864eab0f6ca1a",
+    "test/lan_closures.py": "8ce5cd8a6cd7f5434dc022185bdf5d5144c793ebd6ee599e94349a874122ba73",
+    "test/fixtures/native.lan": "77d454ff7319440c49e86526d5863fb526117fe7db31d3f246f3ca2490b426d5",
+    "test/fixtures/native-closures.lan": "08e56df20b771d6999e257968a439c07493f3ccc53548146f725a56ffd97f6ea",
+    "test/goldens/native.rs": "62b21819b69f3437363a34c622ff4d060a78e195c87860ad209bebbabebd7659",
+    "test/goldens/native-closures.rs": "ab235924ed6f59f574b63c5e08e2eb3ee7cce1b2ef556f54f3bb5f92e47315f5",
+    "dev/gates.sh": "24098b5d200d853493798d6215ddbb598639dc6220085ae896af39eeced95e14",
+    "dev/stage-e-native.sh": "f94359d78c87e3a27b7eacfad13a62790e564194b3716afe0fb62d8df4d13078"
+  },
+  "captures": {
+    "gates.stdout": "9361c1b9b4d084f8e271d564cb305f5565dcc4d79ec0d73df0b4ee9965c1cd34",
+    "gates.stderr": "cc4e3e1dec2cf6ae6c3e4d485ad776cccb9096b36fd35559e20236d4a7e356cd"
+  }
+}
