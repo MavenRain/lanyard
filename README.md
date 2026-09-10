@@ -7,7 +7,8 @@ Stage A is committed at `52eb5a7`. Stage B adds pinned target signatures,
 a generated OCaml metadata library, and source drift checks. Stage C checks
 those signatures, elaborates models and operation families, and derives the
 foreign-type census. Stage D adds Rust IR, quantity-aware erasure and checked
-foreign-call metadata. Rust emission and the complete M0 driver remain ahead.
+foreign-call metadata. The first Stage E slice prints native Rust for pure
+programs. Foreign target printing and the complete M0 driver remain ahead.
 The generated signature allowance is proposed at 104 lines and awaits the
 user's ruling. See [target documentation](target/README.md), the
 [Stage B build log](dev/M0-BUILD-LOG.md#lanyard-m0-stage-b-2026-09-09) and
@@ -21,6 +22,17 @@ Build and validate through Stage D:
 zsh dev/gates.sh --stage D
 _build/default/bin/lanyard.exe check --erased examples/m0-todo.lan
 ```
+
+Validate and use the native Rust printer:
+
+```sh
+zsh dev/gates.sh --stage E-native
+_build/default/bin/lanyard.exe emit --native test/fixtures/native.lan
+```
+
+The [native printer slice](dev/STAGE-E-NATIVE.md) supports arithmetic,
+products, sums and native calls. It reports unsupported foreign and closure
+layouts explicitly. The Todo crate golden is still pending.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current

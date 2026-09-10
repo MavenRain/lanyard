@@ -349,3 +349,21 @@ A valid print-rule edit changes both generated metadata and its semantic
 digest. The compiled OCaml client independently checks the create schema
 and total lookup. These tests do not substitute for Stage E's EMIT-DIFF
 mutation, because there is no Rust emitter yet.
+
+## Lanyard Stage E native printer slice (2026-09-10)
+
+The Stage B note above states that no Rust emitter exists. That note was
+true on its date. rust/emit.ml now holds the printer at 335 lines. This
+slice carries the LAN-EMIT and LAN-NATIVE mutants below. The deleted print
+rule mutation of EMIT-DIFF stays open.
+
+The native control compiles with Rust 1.98.1 and matches 928 independent
+Python integer observations. Both output mutants compile and run to exit
+0, then disagree with that same oracle:
+
+- Native arithmetic: change the emitted add method call to sub.
+- Native Boolean tags: replace the true tag with the false tag.
+
+Both are killed by test/lan_native.py. The combined E-native gate also
+retains the seven Stage D erasure mutants. The foreign print-rule deletion
+mutation still belongs to the remaining Todo crate printer slice.

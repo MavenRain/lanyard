@@ -103,3 +103,11 @@ then `KERNEL-CARRY OK` on exit 0, or the differing rows and
 `KERNEL-CARRY FAIL` on exit 1.  The script takes its root from its own
 path, so a copy of this repository under a scratch directory checks
 itself.  It reads with rg and awk, and it calls no grep and no sed.
+
+## 7 Native printer slice (2026-09-10)
+
+rust/emit.ml is new trusted output code, including its generated Nat runtime.
+It measures 335 lines; A_emit remains pending the user's numeric ruling.
+bin/lanyard.ml adds emit --native and bin/dune links the printer library.
+The kernel, the two erasers, the IR and surface lowering retain their Stage D
+bytes. The native slice does not change the carry bucket or its ceiling.

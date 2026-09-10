@@ -22,8 +22,13 @@
 #   zsh dev/gates.sh --stage B
 #   zsh dev/gates.sh --stage C
 #   zsh dev/gates.sh --stage D
+#   zsh dev/gates.sh --stage E-native
 
 set -u
+
+if [[ $# -eq 2 && $1 == "--stage" && $2 == "E-native" ]]; then
+  exec zsh ${0:A:h}/stage-e-native.sh
+fi
 
 if [[ $# -eq 2 && $1 == "--stage" && $2 == "D" ]]; then
   exec zsh ${0:A:h}/stage-d.sh
@@ -217,7 +222,7 @@ if [[ $# -ge 2 && $1 == "--leg" ]]; then
 fi
 
 if [[ $# -ne 0 ]]; then
-  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C|D]"
+  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C|D|E-native]"
   exit 64
 fi
 

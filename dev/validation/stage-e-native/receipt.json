@@ -1,0 +1,49 @@
+{
+  "date": "2026-09-10T07:55:56.911875+00:00",
+  "base": "54bfbc6796a43ec345771af3e64c139026e26ce1",
+  "checkout": "/Users/oobi/Documents/gpt9/lanyard-stage-e",
+  "command": [
+    "zsh",
+    "dev/gates.sh",
+    "--stage",
+    "E-native"
+  ],
+  "exit_code": 0,
+  "verdict": "STAGE-E-NATIVE OK",
+  "native_observations": 928,
+  "ir_refusals": 16,
+  "surface_refusals": 3,
+  "usage_refusals": 5,
+  "native_mutants_killed": 2,
+  "carried_erasure_mutants_killed": 7,
+  "rustc": "1.98.1 (48a229cea 2026-09-01)",
+  "edition": 2024,
+  "emit_lines": 335,
+  "A_emit": "pending user ruling",
+  "snapshot_note": "Final source snapshot matches the completed full gate. Capture copies and this receipt were generated afterward.",
+  "sha256": {
+    "README.md": "89ab6277f55842bbf3febf9d38677b195d215d6a6b56865ce16c180a1b0389df",
+    "bin/dune": "643e4c866ea543fd54d4b251883af5e695121eedaf4df962e4e3e46551626315",
+    "bin/lanyard.ml": "1f183efa7986c1755c644337cf642217ee559026e2cee20e3f89b051a395f9a1",
+    "dev/KERNEL-CARRIED.md": "f2a4db0151c5ccb1d4104ee36706a058f9bafc975de2cb58c55c7b67c7c64acc",
+    "dev/M0-BUILD-LOG.md": "bdc082dff367da04c08fee6da003f1592d8a7ad6f423e004de09a494cd5a7656",
+    "dev/MUTATION-LOG.md": "88fa23f2184f4cc3d0f99d3216d26596ce516d6bee0a3990e463875095abf1ad",
+    "dev/STAGE-E-NATIVE.md": "39793e975ba895b9acd4d9f7029c796d19f8354000c9197152c1aba12f6bbcd7",
+    "dev/gates.sh": "90656b2b069920039a1f4dff311968ddc8dd38ffff5e3136d8fba316d1dfafa2",
+    "dev/house-catchalls.py": "8b720dffedd5f45149bb659ef603207e3946d41ca639926b973e2fcaff4fd772",
+    "dev/house.sh": "e8711946ec550b6945e980dca845ed1a586b757b8ec3c61373fc32c80cbfefd0",
+    "dev/stage-e-native.sh": "2094c0662931567ca2fbfcee4f44477ad2a26e2eb7931a12f7dace271c40643e",
+    "dev/trusted-lines.sh": "e61659f1f90a86f4cb901b590bf186f20fc988a8458284a2ffd60a376abc5173",
+    "rust/dune": "b0cbf292f9876b5c6f256d3ab9892eac843e4c190eb9108141db6a389b2fbc5c",
+    "rust/emit.ml": "8d4f449ab86cf84c5db087d384c6cc24b8e937caf2a10cac253dbdd7e03f2aa4",
+    "test/dune": "5eb51640c446c501cb0f5aa808f18aa23a502885c326ef1d9bd36579701e0d34",
+    "test/fixtures/native.lan": "77d454ff7319440c49e86526d5863fb526117fe7db31d3f246f3ca2490b426d5",
+    "test/goldens/native.rs": "62b21819b69f3437363a34c622ff4d060a78e195c87860ad209bebbabebd7659",
+    "test/lan_emit.ml": "c16f6909ef9996a8fe22d0b8a53f527174e189ab0b99bb389a928615da0216ed",
+    "test/lan_native.py": "6f28bd02fa0853bb5e8a0c3b34ec1a11f8d674abaa4c4edf057257794143b478"
+  },
+  "captures": {
+    "gates.stderr": "c1a0cb82aa89bdf2ac7c7de55ef1dc7eb51784c37ab9a87e5eeb66c3d20268b8",
+    "gates.stdout": "3d6e9983ae82ffb070153278a241c5cd526e53b79c8e0f234e9648a4ef55e04a"
+  }
+}

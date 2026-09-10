@@ -1,0 +1,3 @@
+(library
+ (name lanyard_rust)
+ (libraries kanon_kernel))

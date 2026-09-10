@@ -1,9 +1,14 @@
 (tests
  (names main sl_surface lan_surface lan_erase)
- (modules (:standard \ target_catalog))
+ (modules (:standard \ target_catalog lan_emit))
  (libraries kanon_kernel kanon_surface))
 
 (test
  (name target_catalog)
  (modules target_catalog)
  (libraries lanyard_target))
+
+(test
+ (name lan_emit)
+ (modules lan_emit)
+ (libraries kanon_kernel lanyard_rust))

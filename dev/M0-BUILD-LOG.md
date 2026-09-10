@@ -1169,3 +1169,32 @@ the author run, not this tree. The capture bytes stay as the author wrote
 them. A rerun of zsh dev/gates.sh --stage D, the command the receipt
 names, with fresh shasum -a 256 digests of the captured files and of each
 source file, would produce the new bytes.
+
+## Lanyard Stage E native printer slice (2026-09-10)
+
+Added rust/emit.ml and emit --native for checked pure programs. Native
+arithmetic preserves arbitrary precision; products, sums, projections,
+cases, calls and ownership conversions produce compiled Rust. The kernel
+and both erasers remain unchanged. Foreign and closure layouts refuse
+emission before stdout is written. Full Stage E and M0-EXIT remain open.
+
+Validation: zsh dev/gates.sh --stage E-native passed in the isolated
+lanyard-stage-e checkout on 54bfbc6. It retains all Stage D legs, including
+seven compiled erasure mutants. The added checks pass 16 IR refusals,
+928 Python integer observations, three surface refusals, five usage cases
+and two compiled native mutants. Rust version: 1.98.1 (48a229cea), edition
+2024. Native source equals test/goldens/native.rs byte for byte.
+
+Review round 1 edits bin/lanyard.ml, rust/emit.ml, test/lan_emit.ml,
+test/lan_native.py, dev/gates.sh, dev/STAGE-E-NATIVE.md, dev/MUTATION-LOG.md
+and this file. The receipt rows for those paths therefore drift from the
+staged blobs. Read the new bytes with
+git -C . show :<path> | shasum -a 256. The receipt itself stays as the
+author wrote it. Round 2 re-hashed the eight paths in the author checkout
+/Users/oobi/Documents/gpt9/lanyard-stage-e. Each one still equals its
+receipt row, so only the review edits moved the bytes.
+
+The exact capture and source hashes are in dev/validation/stage-e-native/.
+The receipt distinguishes the validated implementation from documentation
+and capture files added afterward. TRUSTED-LINES measures emit=335 and
+retains A_emit as a pending user ruling. No allowance is ratified here.

@@ -1,0 +1,19 @@
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+def add : Nat -> Nat -> Nat := fun (x : Nat) (y : Nat) => natAdd x y
+def subtract : Nat -> Nat -> Nat := fun (x : Nat) (y : Nat) => natSub x y
+def multiply : Nat -> Nat -> Nat := fun (x : Nat) (y : Nat) => natMul x y
+def equal : Nat -> Nat -> Bool := fun (x : Nat) (y : Nat) => natEq x y
+def less : Nat -> Nat -> Bool := fun (x : Nat) (y : Nat) => natLt x y
+def many : Nat -> Nat := fun (x : Nat) => x
+def one : (1 x : Nat) -> Nat := fun (1 x : Nat) => x
+def zero : (0 x : Nat) -> Nat := fun (0 x : Nat) => 7
+def pair : prod (Nat, Nat) := tuple (3, 5)
+def projection : Nat := pair.1
+def choose : Bool -> Nat := fun (b : Bool) => case b with
+| 0 (u : prod ()) => 11
+| 1 (u : prod ()) => 29
+def branch : Nat := choose (less 8 13)
+def both : Nat := let x : Nat := 19 in add x x
+def unit : prod () := tuple ()
+def nested : Nat := ((tuple (tuple (1, 2), 3) : prod (prod (Nat, Nat), Nat)).0).1
+def huge : Nat := multiply 340282366920938463463374607431768211456 340282366920938463463374607431768211456

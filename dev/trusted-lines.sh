@@ -115,6 +115,20 @@ if [[ -f $root/lib/rir.ml ]]; then
   print -r -- "TRUSTED-LINES target-bridge=$lower_lines (ceiling treatment pending user ruling)"
 fi
 
+# Stage E measures the printer without assigning its pending allowance.
+if [[ -d $root/rust ]]; then
+  if [[ ! -f $root/rust/emit.ml ]]; then
+    print -r -- 'TRUSTED-LINES FAIL: rust/emit.ml missing'
+    exit 1
+  fi
+  emit_lines=$(wc -l < $root/rust/emit.ml | tr -d ' ')
+  if [[ -z $emit_lines ]]; then
+    print -r -- 'TRUSTED-LINES FAIL: emitter has an empty line count'
+    exit 1
+  fi
+  print -r -- "TRUSTED-LINES emit=$emit_lines allowance=A_emit (pending user ruling)"
+fi
+
 # Stage B measures the generated module; S0-D1 leaves its allowance to the user.
 if [[ -d $root/target ]]; then
   generated=$root/_build/default/target/target_generated.ml

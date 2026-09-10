@@ -53,7 +53,9 @@ report_empty () {
 # Leg 1: no exception, unapproved catch-all, List.nth or unsafe index.
 # SL-D16: allow entries identify a function and exact arm, so line shifts
 # cannot authorize another catch-all or invalidate the two ruled sites.
-leg1=$(scan $pat_house $root/lib $root/surface $root/bin $root/test)
+extra=()
+if [[ -d $root/rust ]]; then extra=($root/rust); fi
+leg1=$(scan $pat_house $root/lib $root/surface $root/bin $root/test $extra)
 named=$(python3 -P $root/dev/house-catchalls.py $root 2>&1)
 named_code=$?
 if [[ $named_code -ne 0 && -z $named ]]; then
@@ -66,12 +68,12 @@ report_empty "no-exception" "$leg1"
 
 # Leg 2:  no mutable state in the kernel.  M0 Stage A deletes the wasm
 # tree at the fork point, so the encoder half of the rule has no file and
-# the leg reads lib alone.  A dev harness stays outside it.
-leg2=$(rg -n -- $pat_state $root/lib)
+# the leg reads lib and the native Rust printer. A dev harness stays outside it.
+leg2=$(rg -n -- $pat_state $root/lib $extra)
 report_empty "no-mutable-state" "$leg2"
 
 # Leg 3:  exactly one catch site in the repository (SD-D14).
-leg3=$(scan '\btry\b' $root/lib $root/surface $root/bin $root/test)
+leg3=$(scan '\btry\b' $root/lib $root/surface $root/bin $root/test $extra)
 leg3_n=$(print -r -- "$leg3" | rg -c -- '.' || true)
 if [[ $leg3_n == 1 ]]; then
   print -r -- "HOUSE one-catch-site OK"
@@ -83,7 +85,7 @@ else
 fi
 
 # Leg 4:  no bool match.
-leg4=$(scan $pat_bool $root/lib $root/surface $root/test $root/bin)
+leg4=$(scan $pat_bool $root/lib $root/surface $root/test $root/bin $extra)
 report_empty "no-bool-match" "$leg4"
 
 # Leg 5:  no em-dash outside the vendor tree and the build tree.

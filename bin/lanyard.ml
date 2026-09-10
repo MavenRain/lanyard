@@ -1,6 +1,7 @@
 (** The lanyard driver.  M0 Stage A deletes the wasm back end at the
-    fork point, so the driver holds check, axioms and spec-count.  The
-    Rust back end and its commands land at a later stage of M0.
+    fork point, so the driver holds check, axioms and spec-count.
+    The first Stage E slice also prints native Rust through emit --native.
+    The foreign target printer and the crate command land at a later slice.
 
     Exit codes.  0 is a file that checks, 1 is a file that does not and
     64 is a usage error or a missing file.  A check failure writes one
@@ -19,7 +20,7 @@
 
 let usage () : unit =
   prerr_endline
-    "usage: lanyard check [--print|--erased] FILE | axioms FILE | spec-count"
+    "usage: lanyard check [--print|--erased] FILE | emit --native FILE.lan | axioms FILE | spec-count"
 
 let read_file (path : string) : string =
   if Sys.file_exists path then In_channel.with_open_bin path In_channel.input_all
@@ -89,6 +90,17 @@ let run_spec_count () : unit =
          prerr_endline (Kanon_kernel.Error.to_string error);
          exit 1)
 
+(** Native source goes to stdout only after the entire module prints. *)
+let dispatch_emit args =
+  match args with
+  | [ "--native"; path ] when Filename.check_suffix path ".lan" ->
+      Kanon_surface.Elab.check_lanyard (read_file path)
+      |> Fun.flip Result.bind Kanon_surface.Lower.program
+      |> Fun.flip Result.bind Lanyard_rust.Emit.native
+      |> Result.fold ~ok:print_string ~error:(fun error ->
+          prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
+  | [] | _ :: _ -> usage (); exit 64
+
 (** "check [--print|--erased] FILE".  A flag is read before the path, so
     "check --print F", "check --erased F" and "check F" are the only
     three forms (SC-D1). *)
@@ -121,6 +133,7 @@ let dispatch (cmd : string) (args : string list) : unit =
   | "spec-count" -> run_spec_count ()
   | "check" -> dispatch_check args
   | "axioms" -> dispatch_axioms args
+  | "emit" -> dispatch_emit args
   | _unknown ->
       usage ();
       exit 64

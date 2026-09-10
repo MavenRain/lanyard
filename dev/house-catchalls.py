@@ -100,6 +100,7 @@ def check(root):
         raise ValueError("HOUSE allowlist must contain exactly the one D-M1-10 site")
     result = subprocess.run(
         ["rg", "--files", "lib", "surface", "bin", "test", "dev",
+         *(["rust"] if (root / "rust").is_dir() else []),
          "--glob", "*.ml", "--glob", "*.mli"], cwd=root,
         capture_output=True, text=True, check=True)
     used = set()
