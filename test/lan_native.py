@@ -116,7 +116,7 @@ def main():
                     f"{label} mutant survived")
         surface_cases = [
             ("foreign", "def main : Db -> prod () := fun (db : Db) => Db.push_schema db", "foreign type Db"),
-            ("recursive", "mu N : Type 0 := | z : N | s (n : N) : N def main : N := s z", "layout mu<N>"),
+            ("parametric", (ROOT / "test/fixtures/mu-parameter-layout.kan").read_text(), "representation foreign #0"),
         ]
         for label, text, diagnostic in surface_cases:
             fixture = directory / f"{label}.lan"

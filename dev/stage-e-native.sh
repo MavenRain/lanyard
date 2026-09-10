@@ -8,4 +8,6 @@ zsh dev/stage-d.sh
 _build/default/test/lan_emit.exe
 python3 -P test/lan_native.py
 python3 -P test/lan_closures.py
+_build/default/test/lan_recursive_emit.exe
+python3 -P test/lan_recursive.py
 print -r -- 'STAGE-E-NATIVE OK'

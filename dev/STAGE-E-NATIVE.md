@@ -1,11 +1,10 @@
 # Native Rust printer slice
 
-This Stage E command includes the native and typed closure slices.
-`lanyard emit --native FILE.lan` checks,
-lowers and prints native Rust source to stdout. An unsupported definition
-fails the whole request before any source is printed. The exact argument
-form and `.lan` extension are required; usage errors exit 64 and compiler
-errors exit 1.
+This Stage E command includes the native, typed closure and recursive data
+slices. `lanyard emit --native FILE.lan` checks, lowers and prints native
+Rust source to stdout. An unsupported definition fails the whole request
+before any source is printed. The exact argument form and `.lan` extension
+are required. Usage errors exit 64 and compiler errors exit 1.
 
 ```sh
 zsh dev/gates.sh --stage E-native
@@ -14,10 +13,10 @@ _build/default/bin/lanyard.exe emit --native test/fixtures/native.lan
 
 The printer supports naturals, runtime unit, products, projections, sums,
 exhaustive cases, lets, saturated native calls and typed closures. Every one
-of the fourteen IR nodes has an explicit arm. Recursive family layouts,
-foreign types and foreign calls produce named errors. Old arity-only
-closure layouts are rejected. No definition is pruned to hide an
-unsupported body.
+of the fourteen IR nodes has an explicit arm. Concrete recursive family
+layouts are supported. Polymorphic field layouts, foreign types and foreign
+calls produce named errors. Old arity-only closure layouts are rejected.
+No definition is pruned to hide an unsupported body.
 
 Product and sum layouts are decoded with nesting-aware separators.
 Identifiers encode every byte of the source name or structural type key.
@@ -43,9 +42,9 @@ The native fixture and its Rust golden are compared byte for byte. Rust
 oracle for 928 observations, including 1024-bit boundaries. Tests cover
 quantities, aggregates, calls, branches and all five arithmetic primitives.
 Twenty-five invalid IR cases fail with the diagnostic each case names. Two
-checked surface programs refuse emission with empty stdout and five CLI
-forms fail usage. Arithmetic and Boolean mutants must compile and then
-disagree with the same oracle.
+checked surface programs refuse emission with empty stdout. Those programs
+use foreign and polymorphic types. Five CLI forms fail usage. Arithmetic and
+Boolean mutants must compile and then disagree with the same oracle.
 
 The gate retains every Stage D leg and extends HOUSE to rust/ sources.
 TRUSTED-LINES measures rust/emit.ml as A_emit, still pending the user's
@@ -54,8 +53,13 @@ numeric ruling. It does not ratify a new ceiling or claim M0-EXIT.
 The [typed closure slice](STAGE-E-CLOSURES.md) adds a second golden,
 execution observations and mutation checks to this command.
 
-Next Stage E work: recursive layouts, foreign templates,
-model printing, handler fusion, the CLI main and the Todo crate golden with
-its deleted-print-rule mutation. The Todo fixture is not yet printable.
+The [recursive family slice](STAGE-E-RECURSIVE.md) adds a third golden,
+nominal metadata validation, execution observations and mutation checks.
+The former concrete-recursion refusal is now covered by successful
+execution. The second refusal pins unsupported polymorphic family fields.
+
+Next Stage E work: foreign templates, model printing, handler fusion, the
+CLI main and the Todo crate golden with its deleted-print-rule mutation.
+The Todo fixture is not yet printable.
 `emit FILE.lan` without `--native` remains reserved for the crate command.
 Stage F still owns the remaining driver instruments and M0 close.

@@ -8,8 +8,8 @@ a generated OCaml metadata library, and source drift checks. Stage C checks
 those signatures, elaborates models and operation families, and derives the
 foreign-type census. Stage D adds Rust IR, quantity-aware erasure and checked
 foreign-call metadata. The Stage E native command prints Rust for pure
-programs, including typed closures and captures. Foreign target printing
-and the complete M0 driver remain ahead.
+programs, including typed closures, captures and recursive data. Foreign
+target printing and the complete M0 driver remain ahead.
 The generated signature allowance is proposed at 104 lines and awaits the
 user's ruling. See [target documentation](target/README.md), the
 [Stage B build log](dev/M0-BUILD-LOG.md#lanyard-m0-stage-b-2026-09-09) and
@@ -32,8 +32,9 @@ _build/default/bin/lanyard.exe emit --native test/fixtures/native.lan
 ```
 
 The [native printer slice](dev/STAGE-E-NATIVE.md) supports arithmetic,
-products, sums, native calls and [typed closures](dev/STAGE-E-CLOSURES.md).
-It reports unsupported foreign and recursive layouts explicitly.
+products, sums, native calls, [typed closures](dev/STAGE-E-CLOSURES.md), and
+[recursive families](dev/STAGE-E-RECURSIVE.md).
+It reports unsupported foreign and polymorphic field layouts explicitly.
 The Todo crate golden is still pending.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked

@@ -1419,6 +1419,26 @@ let dedup_tids (ts : Rir.tid list) : Rir.tid list =
     the emitter can refuse a program that reaches one; a definition at a
     runtime type erases to its rec group, the functions its lambdas lifted
     and its own function, in that order (SC-D29). *)
+(** Close constructor metadata over every named family used by a declaration,
+    including signatures and fields of mutually recursive families. The text
+    channel is the same nominal identity used by mu_group_tids. *)
+let complete_groups (ec : ectx) (tids : Rir.tid list) : (Rir.tid list, Error.t) result =
+  let mentions name tids =
+    let needle = Rir.tid_text (mu_tid name) in
+    List.exists (fun tid ->
+      let text = Rir.tid_text tid in
+      List.init (String.length text + 1) Fun.id |> List.exists (fun offset ->
+        String.starts_with ~prefix:needle (String.to_seq text |> Seq.drop offset |> String.of_seq))) tids in
+  let rec close remaining tids =
+    let needed, rest = List.partition (fun name -> mentions name tids) remaining in
+    if List.is_empty needed then Ok (dedup_tids tids)
+    else
+      let* groups = Rules.all_ok (List.map (fun name ->
+        let* family = Rules.mu_family Check.ops ec.c name in
+        mu_group_tids ec name family) needed) in
+      close rest (tids @ List.concat groups) in
+  close (Global.StringMap.bindings (globals_of ec).Global.families |> List.map fst) tids
+
 let rec decl (g : Global.t) (budget : Budget.t) (name : string) (en : Global.entry) :
     (entry, Error.t) result =
   let ec = { c = Check.make g budget; slots = []; self = name } in
@@ -1444,9 +1464,10 @@ and def_code (ec : ectx) (name : string) (ty_v : Value.t) (body : Term.t) :
   in
   let own = Rir.RFun (Rir.Fid name, params, ret, body') in
   let ds = ac.lifted @ [ own ] in
+  let* groups = complete_groups ec (List.concat_map tids_decl ds @ ac.groups) in
   Ok
     (Code
-       (Rir.RData (dedup_tids (List.concat_map tids_decl ds @ ac.groups)) :: ds))
+       (Rir.RData groups :: ds))
 
 (** The whole program, in declaration order.  Every row extends the
     environment the next row is erased in, exactly as check_decls built

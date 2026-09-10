@@ -388,3 +388,23 @@ refusals pin closure layout, lifted function, arity, capture and argument
 diagnostics; the two former unsupported-closure cases now pin typed
 errors. The three added erasure cases pin quantities, nullary signatures
 and nested signatures before Rust printing.
+
+## Lanyard Stage E recursive families (2026-09-10)
+
+test/lan_recursive.py compares 13 observations against literal expected
+results, then runs three mutations:
+
+- Reverse the two same-typed Tree fields in treeScore's case payload.
+  The mutant must compile and produce a different order-sensitive score.
+- Change choice's constructor tag from first to second, retaining its Nat
+  payload. The mutant must compile and change the observed result.
+- Remove Box from nominal enum payload types. The mutant must fail
+  compilation with the infinite-size diagnostic.
+
+All three were killed in the cumulative Stage E gate. The existing seven
+erasure, two arithmetic and three closure mutants also passed. A separate
+positive probe emits an identity signature whose family references two
+other families without constructing or matching any of them, checking
+transitive metadata completion. Eighteen new malformed-IR refusal rows
+and one duplicate-metadata success row exercise the printer boundary.
+The foreign print-rule deletion mutation remains in the pending Todo slice.

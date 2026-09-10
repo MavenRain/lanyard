@@ -107,7 +107,7 @@ itself.  It reads with rg and awk, and it calls no grep and no sed.
 ## 7 Native printer slice (2026-09-10)
 
 rust/emit.ml is new trusted output code, including its generated Nat runtime.
-It measured 335 lines at that slice. Section 8 records the current
+It measured 335 lines at that slice. Section 9 records the current
 measurement, and A_emit remains pending the user's numeric ruling.
 bin/lanyard.ml adds emit --native and bin/dune links the printer library.
 The kernel, the two erasers, the IR and surface lowering retain their Stage D
@@ -116,8 +116,17 @@ bytes. The native slice does not change the carry bucket or its ceiling.
 ## 8 Typed closure slice (2026-09-10)
 
 lib/erase.ml now shares its typed function-chain traversal between closure
-layouts and eta expansion. It measures 1479 lines. The twelve-file kernel
+layouts and eta expansion. It measured 1479 lines. The twelve-file kernel
 bucket, quantity_runtime, lib/erase_kan.ml and lib/rir.ml keep their bytes.
-rust/emit.ml measures 437 lines with boxed closure and capture printing.
+rust/emit.ml measured 437 lines with boxed closure and capture printing.
 A_emit remains pending; the symbolic ceiling has not been ratified as a
 numeric total. See STAGE-E-CLOSURES.md for behavior and validation.
+
+## 9 Recursive family slice (2026-09-10)
+
+lib/erase.ml measures 1500 lines after completing constructor metadata over
+families referenced in signatures and nested fields. rust/emit.ml measures
+535 lines with nominal enums, boxed payloads and family metadata validation.
+The twelve-file kernel bucket, quantity_runtime, lib/erase_kan.ml, lib/rir.ml
+and surface/lower.ml retain their previous bytes. A_emit remains pending;
+no numeric total is ratified. See STAGE-E-RECURSIVE.md for behavior and tests.

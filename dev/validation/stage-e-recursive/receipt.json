@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "base": "2a87a52f6c60fe102a305313090022faa1857feb",
+  "checkout": "/Users/oobi/Documents/gpt9/lanyard-recursive",
+  "command": "zsh dev/gates.sh --stage E-native",
+  "exit_code": 0,
+  "verdict": "STAGE-E-NATIVE OK",
+  "source_sha256": {
+    "README.md": "8c6f11c15ea3f043b934742b082529aa97bf115142f6f1ab8c197c7e056c37ac",
+    "dev/KERNEL-CARRIED.md": "0d27aed51fb17abbceafa449593c58c2f0efeff684d7e21ab785cbc97e427c33",
+    "dev/M0-BUILD-LOG.md": "e6f041689b1988d3431973d2ed5b68f004aa1daac92b8a848d242a4e9703711d",
+    "dev/MUTATION-LOG.md": "3a824f255c1aa8552d5b4b9495796d8162e028d3d789da052536ea6506462bfd",
+    "dev/STAGE-E-NATIVE.md": "b3523dc0466f481b007933b02670f5e68c6bf985cf9ccc8c1397e1501e064cc4",
+    "dev/STAGE-E-CLOSURES.md": "519fc8cdb6206b7da1453e55c1b154827373bcb65f765c4cce1d67ce7d45cf39",
+    "dev/STAGE-E-RECURSIVE.md": "a6dbfbaeeb79af4973c12a77d5fe7b761364f85d49e07c175a636c2b89fec0e3",
+    "dev/stage-e-native.sh": "b9a675d1543d6ec2416e809b5e1a60e155e07fd80aa685c151f4b331b76c7f84",
+    "lib/erase.ml": "036ebd7b79914591825e674c649c317de1c09808bbe6e4af86a4ddfb86487169",
+    "lib/erase_kan.ml": "a6d03447ab9dfedf8e53bceff26cd7da57f113bb4b5d1453aecd618fac508a88",
+    "lib/rir.ml": "a87e729871ffc53767eae01700a36a2f8a4055ac0702ea99d4c6346082b6ea7d",
+    "surface/lower.ml": "5a4298b34ece07ebec2a8d0a2a92f8d7a26448b43effa0506370cf4e31c0f965",
+    "rust/emit.ml": "43fdc4e95445301e8ab2c108e8c96796ab5d1a0bc9ecb254e40177491033a9ec",
+    "test/dune": "f20d2d509ded258a009321d170a3fda895f1796db1e0cf6089d88dcef5026db4",
+    "test/lan_native.py": "cac01b69f25570baf8d9e42a9656c9e56f0a62e4987621d68472b7f23f2c3462",
+    "test/lan_closures.py": "2b7355366c6e7cc833f8d3a380b89a4188205c24f8e766443920680385266c43",
+    "test/lan_recursive.py": "6371f42f2e2017090fb42600d2f529e0392cc03adf3400c22043347b2960a59c",
+    "test/lan_recursive_emit.ml": "e11b8b2bc0cf70ffc6b1623eab9f3b7d235918175c201d5bb6f4515faa8ac96b",
+    "test/fixtures/native-recursive.lan": "dc96603d9316362a70cb67f9645dfd3e43a92f78656bd09e0ed0d19dc4fd9cc9",
+    "test/goldens/native-recursive.rs": "1f804b7c00cc7db85fac59fac2f2e74a0366ff3a9d2e676cb95931b8658a0a9e",
+    "test/goldens/native.rs": "62b21819b69f3437363a34c622ff4d060a78e195c87860ad209bebbabebd7659",
+    "test/goldens/native-closures.rs": "ab235924ed6f59f574b63c5e08e2eb3ee7cce1b2ef556f54f3bb5f92e47315f5"
+  },
+  "capture_sha256": {
+    "gates.stdout": "d9b5e663d1d37c8d59d35f58ef0d914609bdab7dc3bcb7709563e9949126c0c3",
+    "gates.stderr": "e334da8998682a8a35150a7a3775e951d567b9d11d442dde63c641aec4f63778"
+  },
+  "observations": {
+    "arithmetic": 928,
+    "closures": 15,
+    "recursive": 13
+  },
+  "recursive_refusals": 18,
+  "recursive_mutants_killed": 3,
+  "recursive_signature_probes": 1,
+  "recursive_duplicate_metadata_probes": 1,
+  "erase_lines": 1500,
+  "emit_lines": 535,
+  "A_emit": "pending user ruling"
+}

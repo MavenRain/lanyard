@@ -46,11 +46,13 @@ future holding the closure across await. Three mutations swap captures,
 drop a cloned capture and remove Send. The first two must compile and
 produce different observations; the last must fail for thread safety.
 
-Foreign printing, recursive layouts, polymorphic foreign representations,
-bare named function values and partial applications remain unsupported.
-Explicit lambdas can wrap fully saturated native calls. This slice does
-not add the Todo crate command or claim M0-EXIT. A_emit is measured at
-437 lines and remains pending the user's numeric ruling.
+Foreign printing, polymorphic foreign representations, bare named function
+values and partial applications remain unsupported. Explicit lambdas can
+wrap fully saturated native calls. This slice does not add the Todo crate
+command or claim M0-EXIT. A_emit was measured at 437 lines for this slice
+and remains pending the user's numeric ruling.
+The later [recursive family slice](STAGE-E-RECURSIVE.md) supports nominal
+data containing these typed closures.
 
 The full Stage E command passed on 2026-09-10 with 29 erasure cases,
 25 IR refusals, 928 arithmetic observations, 15 closure observations and

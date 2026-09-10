@@ -1,0 +1,86 @@
+mu List : Type 0 :=
+| nil : List
+| cons (head : Nat) (tail : List) : List
+
+def rec sumList : List -> Nat := fun (xs : List) =>
+  match xs as self in List return Nat with
+  | nil => 0
+  | cons head tail => natAdd head (sumList tail)
+
+def sample : List := cons 7 (cons 11 (cons 13 nil))
+def total : Nat := sumList sample
+def identity : List -> List := fun (xs : List) => xs
+
+mu Tree : Type 0 :=
+| leaf (value : Nat) : Tree
+| fork (left : Tree) (right : Tree) : Tree
+
+def rec sumTree : Tree -> Nat := fun (tree : Tree) =>
+  match tree as self in Tree return Nat with
+  | leaf value => value
+  | fork left right => natAdd (sumTree left) (sumTree right)
+
+def tree : Tree := fork (leaf 17) (fork (leaf 19) (leaf 23))
+def treeTotal : Nat := sumTree tree
+def rec treeScore : Tree -> Nat := fun (t : Tree) =>
+  match t as self in Tree return Nat with
+  | leaf value => value
+  | fork left right => natAdd (natMul 10 (treeScore left)) (treeScore right)
+def orderedTree : Nat := treeScore tree
+
+mu Even : Type 0 :=
+| stop : Even
+| evenStep (next : Odd) : Even
+and Odd : Type 0 :=
+| oddStep (next : Even) : Odd
+
+def rec evenSize : Even -> Nat := fun (e : Even) =>
+  match e as self in Even return Nat with
+  | stop => 0
+  | evenStep next => natAdd 1 (oddSize next)
+and oddSize : Odd -> Nat := fun (o : Odd) =>
+  match o as self in Odd return Nat with
+  | oddStep next => natAdd 1 (evenSize next)
+
+def mutualTotal : Nat := evenSize (evenStep (oddStep (evenStep (oddStep stop))))
+def captured : Nat :=
+  let xs : List := sample in
+  let addList : Nat -> Nat := fun (n : Nat) => natAdd n (sumList xs) in
+  natAdd (addList 3) (addList 5)
+def owned : (1 xs : List) -> List := fun (1 xs : List) => xs
+def paired : prod (List, Nat) := tuple (sample, 41)
+def repeated : Nat := let xs : List := sample in natAdd (sumList xs) (sumList xs)
+
+mu Erased : Type 0 :=
+| hidden (0 ignored : Nat) (value : Nat) : Erased
+def extract : Erased -> Nat := fun (e : Erased) =>
+  match e as self in Erased return Nat with
+  | hidden 0 ignored value => value
+def erasedTotal : Nat := extract (hidden 999 43)
+
+mu Choice : Type 0 :=
+| first (value : Nat) : Choice
+| second (value : Nat) : Choice
+def chooseValue : Choice -> Nat := fun (c : Choice) =>
+  match c as self in Choice return Nat with
+  | first value => value
+  | second value => natMul 3 value
+def choice : Choice := first 47
+def choiceTotal : Nat := chooseValue choice
+
+mu Functions : Type 0 :=
+| noFunctions : Functions
+| moreFunctions (f : Nat -> Nat) (rest : Functions) : Functions
+def rec applyFunctions : Functions -> Nat := fun (fs : Functions) =>
+  match fs as self in Functions return Nat with
+  | noFunctions => 0
+  | moreFunctions f rest => natAdd (f 5) (applyFunctions rest)
+def functions : Functions := moreFunctions (fun (n : Nat) => natAdd n 7) noFunctions
+def functionTotal : Nat := applyFunctions functions
+
+mu Wrapped : Type 0 :=
+| wrapped (pair : prod (List, Nat)) : Wrapped
+def unwrapTotal : Wrapped -> Nat := fun (w : Wrapped) =>
+  match w as self in Wrapped return Nat with
+  | wrapped pair => natAdd (sumList pair.0) pair.1
+def wrappedTotal : Nat := unwrapTotal (wrapped paired)

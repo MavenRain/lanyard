@@ -1247,3 +1247,68 @@ staged blob. Read the new bytes with git -C . show :test/lan_native.py | shasum 
 The receipt itself stays as the author wrote it. The counts hold: 928 arithmetic
 observations, two surface refusals, five usage cases and two mutants.
 No allowance is ratified here.
+
+## Lanyard M0 Stage E recursive families (2026-09-10)
+
+Continued from 2a87a52 in an isolated checkout. The native printer now emits
+nominal enums with boxed constructor tuples. The eraser completes RData
+constructor metadata for signature-only references and transitively referenced
+families. No Rust IR node or kernel constructor was added. The original
+native and closure goldens retain their bytes.
+
+The native-recursive fixture covers lists, asymmetric trees, mutual recursion,
+erased fields, captures, recursive fields containing closures, nested products,
+owned moves, Arc clones, and Send/Sync across await. The new gate runs 13
+execution observations, a transitive signature-only compile probe, 18 malformed
+IR refusals, a duplicate metadata success probe and three killed mutants.
+The former concrete-recursion refusal became a positive suite; the second
+surface refusal now checks a polymorphic family with `foreign #0` fields.
+
+Validation: `zsh dev/gates.sh --stage E-native` exited 0 with
+`STAGE-E-NATIVE OK`. It retained every Stage D check, 25 native IR refusals,
+928 arithmetic observations, two surface refusals, five CLI usage cases,
+15 closure observations, and all seven erasure/two arithmetic/three closure
+mutants. Captures and a source hash receipt are in
+`dev/validation/stage-e-recursive/`. The initial full run stopped on the new
+polymorphic refusal's expected wording; the actual checked diagnostic is
+`representation foreign #0`, now pinned by the test. No timeout or existing
+assertion was weakened. The field-order mutant is scoped to treeScore so its
+same-typed field reversal compiles before its output is compared.
+
+Measured trusted files: lib/erase.ml 1500 lines, rust/emit.ml 535 lines.
+The kernel, carried eraser, Rust IR and lowering bridge retain their bytes.
+A_emit and the symbolic total remain pending the user's numeric ruling.
+This completes the recursive-family slice, not Stage E or M0. Foreign
+printing, model templates, handler fusion, the crate command and Todo golden
+remain ahead. All changes are staged for the user; no commit is made.
+
+Review round 1 (2026-09-10): the printer now reads every `leg<...>` metadata
+row. A row whose family slot is not `mu<NAME>` fails with `constructor family
+layout` instead of vanishing from the catalog. The tag lookup of
+`family_fields` names its family, and the bounds row of
+test/lan_recursive_emit.ml pins `constructor tag 2 of N`. The duplicate
+metadata probe is counted from its own list, so `duplicates=1` follows the
+tree. The refusal count stays 18 and rust/emit.ml stays 535 lines. The prose
+of README.md, dev/STAGE-E-NATIVE.md and dev/STAGE-E-CLOSURES.md is rewrapped
+to the width of each document, and two sentences of dev/STAGE-E-RECURSIVE.md
+now say that test/lan_recursive.py supplies the 13 observations and writes
+the signature-only source in a temporary directory. These edits move the
+bytes of README.md, dev/STAGE-E-CLOSURES.md, dev/STAGE-E-NATIVE.md,
+dev/STAGE-E-RECURSIVE.md, dev/M0-BUILD-LOG.md, rust/emit.ml and
+test/lan_recursive_emit.ml, so the matching source_sha256 rows of
+dev/validation/stage-e-recursive/receipt.json drift. Read the new digests
+with `git -C . show :<path> | shasum -a 256`. The receipt stays as the author
+wrote it. The three goldens were regenerated from the built printer and kept
+their bytes. No allowance is ratified here.
+
+The review closed after one fix round. Six items were fixed: the catalog
+filter of rust/emit.ml, the constructor tag message of the family field
+lookup, the counted duplicate metadata probe of test/lan_recursive_emit.ml,
+the wrap width of README.md, dev/STAGE-E-NATIVE.md and
+dev/STAGE-E-CLOSURES.md, and the two golden sentences of
+dev/STAGE-E-RECURSIVE.md. Three items were refuted and nine were dropped at
+the finding cap. The closing ladder ran with the tag close and its log is
+/Users/oobi/Documents/lanyard-stage-e-recursive-review/gates-LSER-close.log.
+The index holds 19 paths on 2a87a52f6c60fe102a305313090022faa1857feb. The
+allowance A_emit stays PROPOSED at the measured 535 lines and the ceiling
+wording stays 5481 + A_rir + A_emit + A_sig with no total.
