@@ -1065,3 +1065,107 @@ Decisions and next work:
 - Stage C is next: signature and model elaboration, the census extension,
   and the first-order effect-response refusal. M0 emission and M0-EXIT
   remain future work. The user retains the numeric A_sig ruling and commit.
+
+
+## Lanyard M0 Stage D, 2026-09-09
+
+Base: d446efa. Rust IR and erasure continuation, developed in an isolated
+checkout under gpt2/lanyard-stage-d. No commit is made by the builder.
+
+- lib/rir.ml introduces fourteen nodes, including explicit runtime unit.
+- lib/erase.ml retains quantity_runtime and records One versus Many in
+  parameters, captured environments and variable uses.
+- surface/lower.ml carries checked instance metadata to foreign calls and
+  refuses missing metadata or incorrect runtime arity.
+- The .lan erased driver uses Rust IR. The .kan driver and existing
+  erasure goldens use the byte-identical fork copy lib/erase_kan.ml.
+- The M0 Todo fixture checks and erases. Rust printing remains Stage E.
+
+Validation: zsh dev/gates.sh --stage D passed with the root
+/Users/oobi/Documents/lanyard, the path the capture prints at
+dev/validation/stage-d/gates.stdout line 35:
+build 0 errors and 0 warnings; Stage B and C gates; 21 LAN-ERASE cases;
+LAN-ERASE-CLI; clean mutation control and 3/3 compiled mutants killed
+(clone removal, Zero parameter retention and unit-effect deletion).
+The files dev/validation/stage-d/gates.stdout, gates.stderr and
+receipt.json hold that run. The paths inside gates.stdout show the run
+came from this tree, not from the isolated checkout. The three files are
+a recorded run, not a live gate.
+
+Measured by the author before the review: kernel 3997/4000, erase 1475
+(baseline 1484), rir 142, generated signatures 104, target metadata
+bridge 51. The review rows below hold the current rir and bridge
+measurements. A_rir = 142 is
+PROPOSED. A_sig remains pending, and the additional bridge's treatment
+in the symbolic ceiling is also pending. No numeric total is ratified.
+The tree carries two erasers with the second IR. The carried eraser
+lib/erase_kan.ml measures 1484 lines and lib/eterm.ml measures 117
+lines, and only the carried eraser reads lib/eterm.ml. The place of both
+files in the M0 base is an open user ruling.
+See dev/STAGE-D.md for the runtime unit convention and current limits.
+
+Review round 1, 2026-09-09: lib/rir.ml now checks a direct call against
+the emitted parameter count, and refuses a native name in a value
+position unless that name takes no parameter. surface/lower.ml threads
+those counts. test/lan_erase.ml gains the global-value,
+partial-application and function-value cases, so the file then held 24
+cases. test/lan_erase_mutations.py keeps the three author mutants and
+adds the owned and native-arity mutants, so that run printed killed=3/3
+and then REVIEW killed=2/2. dev/trusted-lines.sh gains the erase-kan and
+eterm rows and fails when a measured file is absent. After round 1 the
+measured rir was 152 lines and the measured bridge was 66 lines. A_rir and
+A_sig stay PROPOSED and no total is ratified. The review edits touch
+lib/rir.ml, surface/lower.ml, test/lan_erase.ml, test/lan_erase_cli.py,
+test/lan_erase_mutations.py, dev/trusted-lines.sh, dev/STAGE-D.md and
+this log, so the source_sha256 rows of dev/validation/stage-d/receipt.json
+for those files no longer match the tree. The erasure_cases 21 row and
+the mutants_killed 3 row of that receipt also read the author run, not
+this tree. The capture bytes stay as the author wrote them. A rerun of
+zsh dev/gates.sh --stage D, the command the receipt names, with fresh
+shasum -a 256 digests of the captured files and of each source file,
+would produce the new bytes.
+
+Review round 2, 2026-09-09: surface/lower.ml reads the runtime arity of a
+prim from its type, so a partial prim application no longer prints as a
+saturated call. The command
+`_build/default/bin/lanyard.exe check --erased prim-partial.lan` now
+prints `mismatch: native call arity: natAdd` and exits 1.
+test/lan_erase.ml gains the prim-partial-application and erased-binder
+cases and holds 26 cases. The erased-binder case calls Erase.term with a
+dropped slot and demands the refusal at lib/erase.ml:643.
+test/lan_erase_mutations.py adds the erased-binder and prim-arity
+mutants, so the run prints killed=3/3 and then REVIEW killed=4/4. The
+measured rir stays 152 lines and the measured bridge is 71 lines. A_rir
+and A_sig stay PROPOSED and no total is ratified. Round 2 edits touch
+surface/lower.ml, test/lan_erase.ml, test/lan_erase_mutations.py,
+dev/STAGE-D.md and this log, so the source_sha256 rows of
+dev/validation/stage-d/receipt.json for those files stay out of step with
+the tree. The capture bytes stay as the author wrote them. A rerun of
+zsh dev/gates.sh --stage D, the command the receipt names, with fresh
+shasum -a 256 digests of the captured files and of each source file,
+would produce the new bytes.
+
+Review round 3, 2026-09-09: dev/trusted-lines.sh now quotes each measured
+count in the empty-count guard. An unquoted empty parameter dropped out
+of the word list, so the guard could not fire. The guard now fails the
+leg: a scratch copy with an unreadable lib/eterm.ml prints
+`TRUSTED-LINES FAIL: a measured file has an empty line count` and exits
+1, and the restored copy exits 0. lib/rir.ml restates the doc comment of
+`resolve`. None marks a definition that erased to a dropped item or to a
+postulate. A prim carries Some count from its runtime arity. The code is
+unchanged. The measured rir is 153 lines and the measured bridge is 71
+lines. A_rir and A_sig stay PROPOSED and no total is ratified.
+
+The source_sha256 rows of dev/validation/stage-d/receipt.json describe
+the sources at f0a9975, before the review. Rounds 1 to 3 changed eight of
+those paths: lib/rir.ml, surface/lower.ml, test/lan_erase.ml,
+test/lan_erase_cli.py, test/lan_erase_mutations.py, dev/trusted-lines.sh,
+dev/STAGE-D.md and this log. The receipt rows for those eight paths no
+longer match the tree. The other nine rows of the receipt still match:
+README.md, bin/lanyard.ml, dev/KERNEL-CARRIED.md, dev/gates.sh,
+dev/stage-d.sh, lib/erase.ml, lib/erase_kan.ml, test/dune and
+test/main.ml. The erasure_cases 21 row and the mutants_killed 3 row read
+the author run, not this tree. The capture bytes stay as the author wrote
+them. A rerun of zsh dev/gates.sh --stage D, the command the receipt
+names, with fresh shasum -a 256 digests of the captured files and of each
+source file, would produce the new bytes.

@@ -6,7 +6,8 @@ will emit Rust using Toasty and Topcoat. Its source extension is `.lan`.
 Stage A is committed at `52eb5a7`. Stage B adds pinned target signatures,
 a generated OCaml metadata library, and source drift checks. Stage C checks
 those signatures, elaborates models and operation families, and derives the
-foreign-type census. Rust emission and the complete M0 driver remain ahead.
+foreign-type census. Stage D adds Rust IR, quantity-aware erasure and checked
+foreign-call metadata. Rust emission and the complete M0 driver remain ahead.
 The generated signature allowance is proposed at 104 lines and awaits the
 user's ruling. See [target documentation](target/README.md), the
 [Stage B build log](dev/M0-BUILD-LOG.md#lanyard-m0-stage-b-2026-09-09) and
@@ -14,15 +15,16 @@ the [Stage C build log](dev/spikes/M0-BUILD-LOG.md#stage-c-2026-09-09) with
 its [Stage C mutation log](dev/spikes/MUTATION-LOG.md#stage-c-2026-09-09).
 The two stages record their work in separate log families.
 
-Build and validate through Stage C:
+Build and validate through Stage D:
 
 ```sh
-zsh dev/gates.sh --stage C
-_build/default/bin/lanyard.exe check examples/m0-todo.lan
+zsh dev/gates.sh --stage D
+_build/default/bin/lanyard.exe check --erased examples/m0-todo.lan
 ```
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
-Todo example. The carried `.kan` checker is also available:
+Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current
+limits and the proposed IR allowance. The carried `.kan` checker is also available:
 
 ```sh
 _build/default/bin/lanyard.exe check test/fixtures/b01-function-eta.kan

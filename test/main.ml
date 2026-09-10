@@ -85,10 +85,10 @@ let erase_fixture (root : string) (name : string) : (unit, string) result =
     |> Result.map_error Kanon_kernel.Error.to_string
   in
   let* out =
-    Kanon_kernel.Erase.program globals rows
+    Kanon_kernel.Erase_kan.program globals rows
     |> Result.map_error Kanon_kernel.Error.to_string
   in
-  let printed = Kanon_kernel.Erase.print out in
+  let printed = Kanon_kernel.Erase_kan.print out in
   if String.equal printed golden then Ok ()
   else Error "the erased form is not the golden text"
 
@@ -122,9 +122,9 @@ let erase_negative (root : string) (name : string) : (unit, string) result =
     Kanon_surface.Elab.check_in Kanon_kernel.Global.initial src
     |> Result.map_error Kanon_kernel.Error.to_string
   in
-  Kanon_kernel.Erase.program globals rows
+  Kanon_kernel.Erase_kan.program globals rows
   |> Result.fold
-       ~ok:(fun (_out : (string * Kanon_kernel.Erase.entry) list) ->
+       ~ok:(fun (_out : (string * Kanon_kernel.Erase_kan.entry) list) ->
          Error "the file erases and the negative expects the erasure to fail")
        ~error:(fun (e : Kanon_kernel.Error.t) ->
          let got = Kanon_kernel.Error.message e in

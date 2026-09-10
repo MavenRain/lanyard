@@ -61,11 +61,16 @@ let run_check (print_form : bool) (path : string) : unit =
     declaration prints one error line and exits 1, exactly as a checker
     error does. *)
 let run_erased (path : string) : unit =
-  let globals, rows = checked_in path in
-  Kanon_kernel.Erase.program globals rows
+  (if Filename.check_suffix path ".lan" then
+     Result.bind (Kanon_surface.Elab.check_lanyard (read_file path))
+       Kanon_surface.Lower.program
+     |> Result.map Kanon_kernel.Erase.print
+   else
+     let globals, rows = checked_in path in
+     Kanon_kernel.Erase_kan.program globals rows
+     |> Result.map Kanon_kernel.Erase_kan.print)
   |> Result.fold
-       ~ok:(fun (out : (string * Kanon_kernel.Erase.entry) list) ->
-         print_string (Kanon_kernel.Erase.print out))
+       ~ok:print_string
        ~error:(fun (e : Kanon_kernel.Error.t) ->
          prerr_endline (Kanon_kernel.Error.to_string e);
          exit 1)

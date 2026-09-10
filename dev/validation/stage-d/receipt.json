@@ -1,0 +1,30 @@
+{
+  "base": "d446efa1223e1c955d3c61ef1e91efe026337519",
+  "capture_sha256": {
+    "gates.stderr": "d0999f3f87c0d781afb7c35bb59915e5a7a22aee10d749efd7dcc0d350327862",
+    "gates.stdout": "5b0acbf34a84613926ff47f067721e493beacbc04d7ddc2eaf514fbf1d6a9397"
+  },
+  "command": "zsh dev/gates.sh --stage D",
+  "erasure_cases": 21,
+  "exit_code": 0,
+  "mutants_killed": 3,
+  "source_sha256": {
+    "README.md": "040aae2410bf0c88fcb22e56fe7211eab743627a5970ba0873a0d0963b7920d7",
+    "bin/lanyard.ml": "d274f69a4c30467dd66dd4acb37cb264bc01c79d090100f7b4f6fb041cc749b1",
+    "dev/KERNEL-CARRIED.md": "09088800aaae7649357cc53a6be1f56a4b9c18acf33c2fa68f535020d4ceef48",
+    "dev/M0-BUILD-LOG.md": "8a9260a28c7b956af4aee71230ad8989da99b7580dd2be771e819dc4971d36d6",
+    "dev/STAGE-D.md": "b469198c1e4555a0fc0ac7076f8f73f8d224d5f236d43b43dfdc8804c5e8f54d",
+    "dev/gates.sh": "f53e5286fbcf06a9fe333a81a78cf8d4b0d5bc6218467220f96ca30fbc15697d",
+    "dev/stage-d.sh": "5e4f5efd4fc0117014b67b2818408e44490b703efbd8c4ca68b6571f9accfa7d",
+    "dev/trusted-lines.sh": "43a0a4b80acadc1d4dd86baef74ece986c211875565718fc3762b42759f6a8c2",
+    "lib/erase.ml": "cbe1c9c3e1563fa87cd9fe3ab5767966aeb8c122c9cbc999f64996627c508914",
+    "lib/erase_kan.ml": "a6d03447ab9dfedf8e53bceff26cd7da57f113bb4b5d1453aecd618fac508a88",
+    "lib/rir.ml": "5fadaae61580a65d1b9506e13fc2f8cb624d71fc2c560d97efa1a2628b699a88",
+    "surface/lower.ml": "cc0e4140075982714401cb475ce2bb98264c9c5fb93bd090573db9202c672175",
+    "test/dune": "c585a02ada3fe537d78824251ee800a20fc70745dfabba82bb04930854f3117b",
+    "test/lan_erase.ml": "60c498f82491aceafa8f337afc6843973bb1f5fa1454d250c03bd7edc9d24cb8",
+    "test/lan_erase_cli.py": "778b2c0d57f76d2dcef0bf7cea9fe012e8cc0bed46be775a323463ffe12d472d",
+    "test/lan_erase_mutations.py": "5f236fd709b0f537fc2bba2ce944b8e9f0e543d65a852384196f7e1416ef1ea7",
+    "test/main.ml": "5b37127289ae00938ac7e974654b4117c2b317bb590493d92f310c129d366aa4"
+  }
+}

@@ -28,7 +28,7 @@ bucket has no row here.
 | lib/global.ml | 046689a | VERBATIM | - |
 | lib/order.ml | 046689a | VERBATIM | - |
 | lib/bignum.ml | 046689a | VERBATIM | - |
-| lib/erase.ml | 046689a | VERBATIM | - |
+| lib/erase.ml | 046689a | EDITED | Stage D: Rust IR, retained binder quantities, explicit runtime unit and foreign type identities. quantity_runtime is unchanged. |
 
 ## 1 The row set
 
@@ -66,11 +66,11 @@ lib/order.ml.
 
 ## 3 The rows that change after Stage A
 
-lib/erase.ml becomes EDITED at Stage D, when it swaps its output IR to
-lib/rir.ml and keeps `quantity_runtime` (M0-PLAN.md section 3).  The
-agent of Stage D moves the row to EDITED and writes the reason in the
-reason column, and the leg then demands a difference against 046689a.
-The other twelve rows stay VERBATIM through M0.
+lib/erase.ml is EDITED at Stage D and emits lib/rir.ml while retaining
+`quantity_runtime` (M0-PLAN.md section 3). The other twelve rows stay
+VERBATIM through M0. lib/erase_kan.ml preserves the original eraser for
+the carried `.kan` driver and regression suite. Stage D checks its bytes
+against `046689a:lib/erase.ml`; it is outside the Rust compilation path.
 
 The trusted base is a separate ledger from this one.  The M0
 TRUSTED-LINES ceiling is the formula `5481 + A_rir + A_emit + A_sig`

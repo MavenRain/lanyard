@@ -1,5 +1,5 @@
 (tests
- (names main sl_surface lan_surface)
+ (names main sl_surface lan_surface lan_erase)
  (modules (:standard \ target_catalog))
  (libraries kanon_kernel kanon_surface))
 

@@ -18,11 +18,16 @@
 # leg whose body is a shell function:
 #   zsh dev/gates.sh --leg axioms
 #
-# The fork adds two stage commands, which replace this battery:
+# The fork adds stage commands, which replace this battery:
 #   zsh dev/gates.sh --stage B
 #   zsh dev/gates.sh --stage C
+#   zsh dev/gates.sh --stage D
 
 set -u
+
+if [[ $# -eq 2 && $1 == "--stage" && $2 == "D" ]]; then
+  exec zsh ${0:A:h}/stage-d.sh
+fi
 
 # The fork's Stage B command is independent of the carried M1 battery below.
 if [[ $# -eq 2 && $1 == "--stage" && $2 == "C" ]]; then
@@ -212,7 +217,7 @@ if [[ $# -ge 2 && $1 == "--leg" ]]; then
 fi
 
 if [[ $# -ne 0 ]]; then
-  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C]"
+  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C|D]"
   exit 64
 fi
 

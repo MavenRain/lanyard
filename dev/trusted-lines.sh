@@ -20,10 +20,12 @@
 # allowances are open user rulings (S0-D1, D-M0-3), so this leg prints
 # the formula and NO total, and no agent guesses a number.
 #
-# The leg prints three lines and exits 0:
+# The leg always prints these three lines and exits 0 when the kernel fits:
 #   TRUSTED-LINES kernel=3997/4000
 #   M0 ceiling: 5481 + A_rir + A_emit + A_sig
 #   TRUSTED-LINES OK
+# One measurement row per Stage B and Stage D file joins them when that file
+# is present.  A measured file that is absent fails the leg.
 #
 # SA-D7: the root comes from this script's own path when no argument is
 # given, so a copy of the repository under a scratch directory measures
@@ -80,6 +82,38 @@ fi
 kernel=$(print -r -- "$kernel_out" | awk 'END { print $1 }')
 
 line="TRUSTED-LINES kernel=$kernel/$kernel_bound"
+
+# The measured Rust path remains distinct from the pending numeric allowances.
+# The tree carries two erasers.  lib/erase_kan.ml serves the .kan command and
+# lib/eterm.ml serves only that carried eraser, so both get a measurement row.
+# Their place in the base is an open user ruling, so no row moves a bound.
+if [[ -f $root/lib/rir.ml ]]; then
+  measured_files=(lib/erase.ml lib/erase_kan.ml lib/eterm.ml surface/lower.ml)
+  for measured in $measured_files; do
+    if [[ ! -f $root/$measured ]]; then
+      print -r -- "TRUSTED-LINES FAIL: $measured missing"
+      exit 1
+    fi
+  done
+  rir_lines=$(wc -l < $root/lib/rir.ml | tr -d ' ')
+  erase_lines=$(wc -l < $root/lib/erase.ml | tr -d ' ')
+  erase_kan_lines=$(wc -l < $root/lib/erase_kan.ml | tr -d ' ')
+  eterm_lines=$(wc -l < $root/lib/eterm.ml | tr -d ' ')
+  lower_lines=$(wc -l < $root/surface/lower.ml | tr -d ' ')
+  # Quote each word.  An unquoted empty parameter drops out of the list, so
+  # the guard could not see it.
+  for count in "$rir_lines" "$erase_lines" "$erase_kan_lines" "$eterm_lines" "$lower_lines"; do
+    if [[ -z $count ]]; then
+      print -r -- "TRUSTED-LINES FAIL: a measured file has an empty line count"
+      exit 1
+    fi
+  done
+  print -r -- "TRUSTED-LINES rir=$rir_lines allowance=A_rir (pending user ruling)"
+  print -r -- "TRUSTED-LINES erase=$erase_lines baseline=1484"
+  print -r -- "TRUSTED-LINES erase-kan=$erase_kan_lines (ceiling treatment pending user ruling)"
+  print -r -- "TRUSTED-LINES eterm=$eterm_lines (ceiling treatment pending user ruling)"
+  print -r -- "TRUSTED-LINES target-bridge=$lower_lines (ceiling treatment pending user ruling)"
+fi
 
 # Stage B measures the generated module; S0-D1 leaves its allowance to the user.
 if [[ -d $root/target ]]; then
