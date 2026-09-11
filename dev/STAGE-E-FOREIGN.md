@@ -41,7 +41,7 @@ and foreign fields in products, sums, function signatures or nominal
 families are refused. In particular, the pinned SeeOther type lacks Clone;
 a checked Many identity cannot silently emit a payload clone.
 
-Schemas, parameterized foreign types, model printing, handler fusion and
+Schemas, model printing, handler fusion and
 the crate driver remain ahead. The later async slice adds the effectful
 constant `Db.push_schema`; see STAGE-E-ASYNC.md. Unsupported definitions
 are never pruned to make the rest print. The Todo example still refuses
@@ -65,6 +65,8 @@ with the oracle; the missing borrow must fail the input type check.
 TRUSTED-LINES counted the printer files at that slice: rust/emit.ml at
 575 lines, rust/foreign.ml at 52 and rust/template.ml at 71, totaling 698.
 The async slice measures these files again in STAGE-E-ASYNC.md.
+The later [applied foreign types](STAGE-E-FOREIGN-TYPES.md) slice adds
+`Form T` and `Deferred T`. Shared-to-owned conversion remains a refusal.
 A_emit and the symbolic total still await the user's numeric ruling.
 The existing target and kernel pins retain their bytes.
 

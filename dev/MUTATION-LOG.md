@@ -444,3 +444,42 @@ closures, forged effects and missing async print rules. It also pins the
 printed text of a synchronous call in an async function. Existing Stage E
 native and foreign mutations remain in the cumulative gate. The Todo crate
 EMIT-DIFF mutation remains pending with model printing and handler fusion.
+
+## Lanyard Stage E applied foreign types (2026-09-11)
+
+`python3 -P test/lan_foreign_types.py` compares the emitted bytes to
+`test/goldens/foreign-types.rs`, then compiles and executes 15 runtime
+observations with Rust 1.98.1. It checks these three mutations:
+
+- Copy an owned Deferred instead of moving it. The wrapper double has
+  no Clone implementation, so compilation fails at the copy. The real
+  Toasty Deferred and the real Topcoat Form both derive Clone, so this
+  compile failure is a property of the python doubles. The printer
+  policy itself is pinned by the `clone of an owned foreign value`
+  refusal row of `test/lan_foreign_types_emit.ml`.
+- Change Form Uri to Form Nat. Compilation fails with a type mismatch
+  when the harness supplies the checked URI payload.
+- Replace the moved Deferred payload with an unloaded Deferred. This
+  compiles and execution fails when the oracle reads the lost payload.
+
+All 3 mutations are killed. The 6 positive and 20 negative printer
+cases include catalog quantity, effect, result and placeholder drift,
+bad argument counts, malformed layouts, a closure argument of a foreign
+type and missing family metadata. The 5 source refusal cases add a
+runtime-quantity type application and a runtime index argument, which
+both take the opaque fallback.
+Earlier native, recursive, closure, foreign and async mutations remain
+in the cumulative E-foreign-types gate.
+
+Review round 2 mutated the applied branch of `repr_of` in
+`lib/erase.ml` lines 244 to 249 twice. The first mutant forces the
+universe test to `if true || Option.is_some (Value.as_univ domain)
+then`. It builds and the `index-argument` row kills it with
+`LAN-FOREIGN-TYPES FAIL: index-argument refusal differs: not yet: Rust
+emission: foreign type 3`. The second mutant relaxes the argument
+pattern `Value.VAPt (Quantity.Zero, value)` to `Value.VAPt (_q,
+value)`. It builds and it survives the whole suite. The checker gives
+an application the quantity of its binder, so a Zero `PPoint` never
+meets a non-Zero `VAPt`, and the mutant is unreachable from checked
+source. The code keeps the Zero pattern as a defensive guard. To delete
+the pattern or to keep it is a user ruling.

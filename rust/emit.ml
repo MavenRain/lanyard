@@ -3,8 +3,8 @@
 open Kanon_kernel
 open Rir
 module type Target = sig
-  val foreign_type : string -> (string, Error.t) result
-  val foreign_layout : string -> (string, Error.t) result
+  val foreign_type : string -> string list -> (string, Error.t) result
+  val foreign_layout : string -> string list -> (string, Error.t) result
   val foreign_call : foreign ->
     (repr list * repr * (string list -> (string, Error.t) result) * Effects.t, Error.t) result
 end
@@ -14,14 +14,14 @@ let all = Rules.all_ok
 let refuse text = Error (Error.Not_yet ("Rust emission: " ^ text))
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
 type ty = Nat | Unit | Product of ty list | Sum of ty list | Shared of ty
-  | Closure of ty list * ty | Nominal of string | Foreign of string
+  | Closure of ty list * ty | Nominal of string | Foreign of string * ty list
 type family = { family_name : string; variants : ty list list }
 type value = { code : string; ty : ty }
 type signature = { name : string; params : ty list; result : ty; body : rtm; effect : Effects.t }
 let rec key = function
   | Nat -> "nat" | Unit -> "unit"
   | Nominal name -> "nominal(" ^ string_of_int (String.length name) ^ ":" ^ name ^ ")"
-  | Foreign name -> "foreign(" ^ name ^ ")"
+  | Foreign (name, _) -> "foreign(" ^ name ^ ")"
   | Product fields -> "product(" ^ String.concat "," (List.map key fields) ^ ")"
   | Sum fields -> "sum(" ^ String.concat "," (List.map key fields) ^ ")"
   | Shared ty -> "shared(" ^ key ty ^ ")"
@@ -32,6 +32,13 @@ let identifier prefix text = prefix ^ (String.to_seq text |> Seq.map
   (fun c -> Printf.sprintf "%02x" (Char.code c)) |> List.of_seq |> String.concat "")
 let function_name = identifier "f_"
 let type_name ty = identifier "T" (key ty)
+let rec rust_type = function
+  | Nat -> "Nat" | Unit -> "()"
+  | Foreign (name, _) -> name
+  | Product fields -> type_name (Product fields)
+  | Sum fields -> type_name (Sum fields)
+  | Shared ty -> "Arc<" ^ rust_type ty ^ ">"
+  | (Closure _ | Nominal _) as ty -> type_name ty
 let drop n text = String.to_seq text |> Seq.drop n |> String.of_seq
 let inside prefix text =
   if String.starts_with ~prefix text && String.ends_with ~suffix:">" text then
@@ -83,9 +90,20 @@ and representation text =
     let* ty = representation contents in Ok (Shared ty)
   else Option.fold ~none:(refuse ("representation " ^ text)) ~some:(fun prefix ->
     let name = drop (String.length prefix) text in
-    if String.equal prefix "foreign " then Target.foreign_layout name |> Result.map (fun name -> Foreign name)
+    if String.equal prefix "foreign " then foreign_layout name
     else layout name)
     (List.find_opt (fun prefix -> String.starts_with ~prefix text) [ "struct "; "union "; "func "; "foreign " ])
+and foreign_layout text =
+  let* name, arguments = String.index_opt text '<' |> Option.fold
+    ~none:(Ok (text, [])) ~some:(fun index ->
+      let name = String.to_seq text |> Seq.take index |> String.of_seq in
+      let* contents = inside (name ^ "<") text |> Option.to_result
+        ~none:(Error.Mismatch "Rust emission: malformed foreign layout") in
+      let* arguments = split ',' contents in
+      let* arguments = all (List.map representation arguments) in Ok (name, arguments)) in
+  let* () = if String.equal name "" then invalid "malformed foreign layout" else Ok () in
+  let* name = Target.foreign_layout name (List.map rust_type arguments) in
+  Ok (Foreign (name, arguments))
 let rec repr = function
   | TyI31 -> Ok Nat
   | TyStruct tid | TyUnion tid -> layout (tid_text tid)
@@ -96,14 +114,10 @@ let rec repr = function
       | Closure _ -> Ok ty
       | Nat | Unit | Product _ | Sum _ | Shared _ | Nominal _ | Foreign _ -> invalid "function representation needs closure layout")
   | TyThunk tid -> refuse ("thunk signature " ^ tid_text tid)
-  | TyForeign name -> Target.foreign_type name |> Result.map (fun name -> Foreign name)
-let rec rust_type = function
-  | Nat -> "Nat" | Unit -> "()"
-  | Foreign name -> name
-  | Product fields -> type_name (Product fields)
-  | Sum fields -> type_name (Sum fields)
-  | Shared ty -> "Arc<" ^ rust_type ty ^ ">"
-  | (Closure _ | Nominal _) as ty -> type_name ty
+  | TyForeign (name, arguments) ->
+      let* arguments = all (List.map repr arguments) in
+      let* name = Target.foreign_type name (List.map rust_type arguments) in
+      Ok (Foreign (name, arguments))
 let rec coerce target value =
   if same target value.ty then Ok value.code
   else match target, value.ty with
@@ -320,7 +334,8 @@ let rec expression families signatures env term =
       let* code = render args in Ok { code; ty }
 let rec aggregates ty =
   match ty with
-  | Nat | Unit | Nominal _ | Foreign _ -> []
+  | Nat | Unit | Nominal _ -> []
+  | Foreign (_, arguments) -> List.concat_map aggregates arguments
   | Shared ty -> aggregates ty
   | Product fields | Sum fields -> ty :: List.concat_map aggregates fields
   | Closure (params, result) -> ty :: List.concat_map aggregates (result :: params)
@@ -540,8 +555,17 @@ let rec contains_foreign = function
   | Closure (params, result) -> List.exists contains_foreign (result :: params)
 let aggregate_foreign fields =
   if List.exists contains_foreign fields then refuse "foreign aggregate layout" else Ok ()
+let rec contains_closure = function
+  | Closure _ -> true
+  | Nat | Unit | Nominal _ | Foreign _ -> false
+  | Shared ty -> contains_closure ty
+  | Product fields | Sum fields -> List.exists contains_closure fields
+let foreign_closure arguments =
+  if List.exists contains_closure arguments then refuse "foreign closure argument" else Ok ()
 let rec validate_type families = function
-  | Nat | Unit | Foreign _ -> Ok ()
+  | Nat | Unit -> Ok ()
+  | Foreign (_, arguments) -> let* () = foreign_closure arguments in
+      let* _checked = all (List.map (validate_type families) arguments) in Ok ()
   | Nominal name -> let* _family = find_family families name in Ok ()
   | Shared ty -> validate_type families ty
   | Product fields | Sum fields -> let* () = aggregate_foreign fields in
@@ -598,7 +622,7 @@ let native rows =
       ^ String.concat "\n" bodies)
 end
 include Make (struct
-  let foreign_type name = Error (Error.Not_yet ("Rust emission: foreign type " ^ name))
-  let foreign_layout name = Error (Error.Not_yet ("Rust emission: representation foreign " ^ name))
+  let foreign_type name _arguments = Error (Error.Not_yet ("Rust emission: foreign type " ^ name))
+  let foreign_layout name _arguments = Error (Error.Not_yet ("Rust emission: representation foreign " ^ name))
   let foreign_call row = Error (Error.Not_yet ("Rust emission: foreign call " ^ row.name))
 end)

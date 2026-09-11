@@ -1,0 +1,165 @@
+{
+  "format": 1,
+  "base_commit": "d2c32b499f0f98ee125a4cf86a0ade3e35d01b9b",
+  "checkout": "/Users/oobi/Documents/gpt2/lanyard-schema",
+  "captures": {
+    "stage-gate": {
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "E-foreign-types"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-schema",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-schema/.kanon-exec/run-uJE6FG"
+    },
+    "pinned-build": {
+      "command": [
+        "env",
+        "RUSTC_WRAPPER=",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "CARGO_BUILD_JOBS=2",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_TARGET_DIR=/Users/oobi/Documents/gpt2/lanyard-foreign-pinned/target",
+        "gateledger",
+        "run",
+        "--dir",
+        "/Users/oobi/Documents/gpt2/lanyard-schema/.gatework/foreign-types-pinned",
+        "--scope",
+        "Cargo.toml",
+        "--scope",
+        "Cargo.lock",
+        "--scope",
+        "src",
+        "--toolchain",
+        "1.98",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-schema/.gatework/ledger",
+        "--",
+        "cargocho",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-schema/.gatework/foreign-types-pinned/Cargo.toml"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-schema",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-schema/.kanon-exec/run-hp0NET"
+    },
+    "pinned-run": {
+      "command": [
+        "/Users/oobi/Documents/gpt2/lanyard-foreign-pinned/target/debug/lanyard-foreign-validation"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-schema",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-schema/.kanon-exec/run-oaRG70"
+    },
+    "house": {
+      "command": [
+        "zsh",
+        "dev/house.sh"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-schema",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-schema/.kanon-exec/run-08iDr9"
+    }
+  },
+  "pinned_observations": [
+    "/pinned",
+    "false",
+    "true",
+    "false",
+    "false",
+    "Nat([7]) Nat([11])",
+    "false"
+  ],
+  "async_send_bodies": [
+    "keep",
+    "keepOwned"
+  ],
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "lockfile": {
+    "path": "/Users/oobi/Documents/gpt2/lanyard-schema/.gatework/foreign-types-pinned/Cargo.lock",
+    "sha256": "fd8b8cd03ebff812141431fbf0c0b55edeef454c86a7462aa820e5ce5689ced3"
+  },
+  "source_sha256": {
+    "README.md": "62dfcb5aa6659677bb77720df4c49b5f635d4f6b296f157fbab822b89734293b",
+    "bin/lanyard.ml": "e79e0006f250d7229978018ddf9bebd00ad6cfe426f05f5eac86e857b4718fa4",
+    "dev/KERNEL-CARRIED.md": "80630b2fed1b65be2a9838e17e8fef5f43cc4528fc06e1255417a41216bf5a77",
+    "dev/M0-BUILD-LOG.md": "b8cb9e9041cd3964132396bd7a6e77a0c910c520ba1dab2deb38cf97781ad75c",
+    "dev/MUTATION-LOG.md": "1356bbbdfadb5d62e06ef3a454d0139c24cb2e27ab3ae6b1c9413c313846aef2",
+    "dev/STAGE-E-ASYNC.md": "2b86d7e9b1ce99b007f06427404b987f6231d1379a9e9039e92657a34c4fb2fb",
+    "dev/STAGE-E-FOREIGN-TYPES.md": "f0e540ff148189f1e1fe89f60e72735b84adeb6984aaf2a075d0feacc3e0970b",
+    "dev/STAGE-E-FOREIGN.md": "8480e81f8e373781ee6f562ec2b2b715545201048dcaa7b58f6244aa7c0a7361",
+    "dev/dunecho.sh": "fc1e26cf50034ae7e14e3a553f1f743e4566c020961dc1f3a54e3278685f9c7c",
+    "dev/gates.sh": "8dde0750cbd7b8ae7f8d379f67e7706fb288385a558c1e37d4e9fb2a42cd38fc",
+    "dev/gen-target.py": "8e75b2fe89bfc7c0ab5bc906bcda5d196e19a1da91a96931fb2f5118c5069bd1",
+    "dev/house-catchalls.py": "8b720dffedd5f45149bb659ef603207e3946d41ca639926b973e2fcaff4fd772",
+    "dev/house.sh": "e8711946ec550b6945e980dca845ed1a586b757b8ec3c61373fc32c80cbfefd0",
+    "dev/prepare-foreign-types.py": "382e3c1329a59caafae496fe4f832d9dd4adff08fbe4b33d0bebbca7eb473efd",
+    "dev/stage-b.sh": "4b9eccb94763dec9098a35503e90a2d184838c20f9625b59bc5044eca0413dae",
+    "dev/stage-c.sh": "c04fd3af4da762a92014d6911238f4e7beed6d2595ed184027619875b5ec72fd",
+    "dev/stage-d.sh": "5e4f5efd4fc0117014b67b2818408e44490b703efbd8c4ca68b6571f9accfa7d",
+    "dev/stage-e-async.sh": "5a7ecdd86cd4b95092d0647564f0b381379fe8514b82a32a01fc25856fb4c95e",
+    "dev/stage-e-foreign-types.sh": "ce039f67924e2ce2a71820595665e645f683f577b923eb7a108c793434b2f90b",
+    "dev/stage-e-foreign.sh": "7f0e6a575e2921bd09b68dd165a105a584f4e84aa1379b8eb12aa75faabe634d",
+    "dev/stage-e-native.sh": "b9a675d1543d6ec2416e809b5e1a60e155e07fd80aa685c151f4b331b76c7f84",
+    "dev/trusted-lines.sh": "545a6c762a80df07c5d992c627ac557aece264f842d3fb5621a049be87173f5d",
+    "dune": "a52a26b962f1c151063f898b64225c3c032c0658ef3c8e609b1de25b54db16b8",
+    "dune-project": "e44ffe9a8aedacc32bdaa4762ecfb3f2eba796d582c4c04d33c29381d22c7c87",
+    "lib/dune": "0e60f3ebdbbf7182dba98dd70eb2d494bd83d6e2934dd1f344f98e4b0e392ec0",
+    "lib/erase.ml": "794defe507c4d97910c2d92f925a7efa69433dc2ab67d2085340670886a95986",
+    "lib/rir.ml": "6dbaa88a61863938d62e099a339277ecde0b2cace633fea5912b95bc248a9f1c",
+    "rust/dune": "02599b681a5cc3d65d598f1c403dc6500c6749cbb4f957ad6bd8057c94135bef",
+    "rust/effects.ml": "0cd1e0d6caf5474f7845725341a316b7fc79c8a8ac41bb16d81a4038c7f79d42",
+    "rust/emit.ml": "48c09b839a4bdedff607f28bae30ac16ba36d65e57d9e14a7b130cfd8b4d7b69",
+    "rust/foreign.ml": "f7aaa9fc74478a2488ddd64ddaeb500b4437bde86d1d9f6c537baf2babbbf012",
+    "rust/template.ml": "3a721565fbb8993bd24d55de30d159222af165f4e01f6cd63a570abfafa5ebda",
+    "surface/dune": "9fc6f50502f4042990bbc313fe936a550f93a436d4c892984562af4487ad9d9c",
+    "surface/elab.ml": "14ae994942aa1071339666abb53293d628582b0f0b42de0df2713c5babe40a80",
+    "surface/lower.ml": "5a4298b34ece07ebec2a8d0a2a92f8d7a26448b43effa0506370cf4e31c0f965",
+    "target/PIN.json": "79acb0c0e756de89d15d483abf295cff74e11465b9c1e061e5d25a4041853718",
+    "target/dune": "eb7bc7a593a50aedf9bb55c94d37d5bbf6cbcbbb3f9a4a3bdd92fac52ea5954e",
+    "target/pin.sha256": "bc150e69de798eadf8a6cdeb7be31440c7c544e7e297e531fbb98967ca37287f",
+    "target/toasty-7bd502cb.sig": "9b3a6ec3ad2c365cec6bbdd8767ba144a295bbe60affeb418c42dad65952a7fc",
+    "target/topcoat-51caa01.sig": "40ee029ce9885b1402d76cc4d0340545c24b9932649cec031c10075b1a21504d",
+    "test/dune": "0b2990d877909bc07caade69140ac6addf3b3c1f1fa7bd88f50bc48fd44e9bf9",
+    "test/fixtures/foreign-types.lan": "c25e47624ff344722ea1d81a9dc20b54bc9c238d1e8efadffc4a48133e060b1c",
+    "test/foreign-types-pinned.rs": "a0b3870b5320bb5415f3d81248b933da01abc3876cf8f5009d6eb86fe47bb88f",
+    "test/goldens/foreign-types.rs": "d9fc654574dec3c2deaeb8f8522926455cccf278f4709740bd68820281fd26e0",
+    "test/lan_async.py": "e2b306c007cc267b311447cbfd2923b07c3122a57b4da2f622c80146e0addc42",
+    "test/lan_async_emit.ml": "91b0589a19e5dc00c292ba460ce54f52607cc1ed6fce1db6893b7cc01d180c51",
+    "test/lan_foreign.py": "60a11cc1b58e390964c81c6245ac66dc57c9e09509b05e66f21cc03eece3f169",
+    "test/lan_foreign_emit.ml": "2a064739cabdfb331a568cb3da25116d82bf13af7fcac210710e2061248af41b",
+    "test/lan_foreign_types.py": "aab15a8e84c8a7741a786f56a2b5c97ce50e393621340fc7640e154265f53bb9",
+    "test/lan_foreign_types_emit.ml": "9b2d96ca6d237fcfaa25be39fe8c0e4cd1ba75e3f65bd798ed66384eb3a66b22"
+  },
+  "source_snapshot_note": "Snapshot taken after documentation updates. Compiler and regression-test inputs match the cumulative gate; probe inputs match the pinned build.",
+  "artifact_sha256": {
+    "Cargo.toml": "e393d781946f3fd1cfb3b5601bcde0aa9460c138d2b9f423cc60c137b63c846a",
+    "house.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "house.stdout": "887c377843e7d79198d14355b6402a1c64f3b104d298dba853bf4dfe4f1198a6",
+    "pinned-build.stderr": "9993f1fc97a6beceae8daee4287267d74215f5991a7b8b1819581b682e07ce6b",
+    "pinned-build.stdout": "813ce2cff6ee3ee055cfedbe76a55b744a5854d923b133dc2500800619ed1e03",
+    "pinned-run.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pinned-run.stdout": "ee9cca71651f66e6360b0e68f3a7d119ac3a2ad3dc55a27b4d88096841f953d1",
+    "stage-gate.stderr": "b1e32c847ebbbae9b3259ca6d2953cfd590b565305d215789467216322237a2c",
+    "stage-gate.stdout": "8e811eb0f2b1f8c5fd0fa3f5ac7f676a772bff6ad04548cfe04c53dece0a2109"
+  },
+  "trusted_lines": {
+    "erase": 1519,
+    "rir": 155,
+    "emit": 619,
+    "foreign": 65,
+    "template": 71,
+    "effects": 46,
+    "printer_total": 801,
+    "kernel": 3997,
+    "signature": 104
+  },
+  "allowances": "pending user rulings",
+  "m0_exit": "not claimed"
+}

@@ -5,7 +5,7 @@ module Effects = Lanyard_rust.Effects
 module Catalog = Lanyard_target.Target_generated
 let ( let* ) = Result.bind
 let unit = TyStruct (Tid "tuple<>")
-let db = TyArc (TyForeign "Db")
+let db = TyArc (TyForeign ("Db", []))
 let fn name params result body = name, Erase.Code [RFun (Fid name, params, result, body)]
 let row = let* entry = Foreign.lookup Catalog.entries "Db.push_schema" in
   Ok {name="Db_push_schema"; schema=entry.name; print_rule=entry.print_rule;

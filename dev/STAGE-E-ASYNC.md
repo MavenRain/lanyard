@@ -51,10 +51,14 @@ types. Captures, the validation manifest, the probe and their hashes are in
 
 The source checker, eraser, IR, kernel and target pin bytes stay unchanged.
 Their existing proof and Zero erasure rules still apply. This slice prints
-runtime direct calls; fused handlers, model/schema printing, parameterized
-foreign layouts, the Todo crate golden and the M0 driver remain ahead.
+runtime direct calls; fused handlers, model/schema printing,
+the Todo crate golden and the M0 driver remain ahead.
+The later [applied foreign types](STAGE-E-FOREIGN-TYPES.md) slice adds
+parameterized foreign layouts and retains this slice's async checks.
 Target rows retain PROPOSED status. No complete Stage E or M0 exit is claimed.
 
-TRUSTED-LINES counts emit.ml at 604 lines, foreign.ml at 55, template.ml at
-71 and effects.ml at 46, totaling 776 printer lines. A_emit and the symbolic
-ceiling remain pending the user's numeric ruling.
+TRUSTED-LINES counted the printer files at that slice: emit.ml at 604 lines,
+foreign.ml at 55, template.ml at 71 and effects.ml at 46, totaling 776 printer
+lines. The applied foreign types slice measures these files again in
+STAGE-E-FOREIGN-TYPES.md. A_emit and the symbolic ceiling remain pending the
+user's numeric ruling.

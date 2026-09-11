@@ -1,0 +1,22 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def FormUri : Type 0 := Form Uri
+def moveForm : (1 value : FormUri) -> Form Uri := fun (1 value : FormUri) => value
+def moveDeferred : (1 value : Deferred Uri) -> Deferred Uri := fun (1 value : Deferred Uri) => value
+def moveNested : (1 value : Form (Deferred Uri)) -> Form (Deferred Uri) :=
+  fun (1 value : Form (Deferred Uri)) => value
+def moveReverse : (1 value : Deferred (Form Uri)) -> Deferred (Form Uri) :=
+  fun (1 value : Deferred (Form Uri)) => value
+def movePair : (1 value : Form (prod (Nat, Nat))) -> Form (prod (Nat, Nat)) :=
+  fun (1 value : Form (prod (Nat, Nat))) => value
+def moveBytes : (1 value : Deferred Bytes) -> Deferred Bytes := fun (1 value : Deferred Bytes) => value
+def discard : Form Uri -> prod () := fun (value : Form Uri) => tuple ()
+def reuse : Form Uri -> prod () := fun (value : Form Uri) =>
+  let done : prod () := discard value in discard value
+def keep : Db -> Form Uri -> prod () := fun (db : Db) (value : Form Uri) =>
+  let done : prod () := Db.push_schema db in reuse value
+def keepOwned : Db -> (1 value : Deferred Uri) -> Deferred Uri :=
+  fun (db : Db) (1 value : Deferred Uri) =>
+  let done : prod () := Db.push_schema db in moveDeferred value

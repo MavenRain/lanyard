@@ -5,8 +5,8 @@ module Template = Lanyard_rust.Template
 module Catalog = Lanyard_target.Target_generated
 let ( let* ) = Result.bind
 let call = Template.call
-let uri = TyForeign "Uri"
-let response = TyForeign "SeeOther"
+let uri = TyForeign ("Uri", [])
+let response = TyForeign ("SeeOther", [])
 let fn name params result body = name, Erase.Code [RFun (Fid name, params, result, body)]
 let holds text needle = List.init (String.length text + 1) Fun.id |> List.exists (fun index ->
   String.starts_with ~prefix:needle (String.to_seq text |> Seq.drop index |> String.of_seq))
@@ -72,8 +72,8 @@ let tests = [
     Foreign.source [fn "bad" [] response (RForeign (row, []))]);
   "foreign argument type", "conversion from unit", (let* row = row in
     Foreign.source [fn "bad" [] response (RForeign (row, [RUnit]))]);
-  "unknown foreign type", "Rust emission: foreign type unknown", Foreign.source [fn "id" [TyForeign "unknown"] uri (RVar 0)];
-  "parameterized type", "parameterized foreign type Deferred", Foreign.source [fn "id" [TyForeign "Deferred"] uri (RVar 0)];
+  "unknown foreign type", "Rust emission: foreign type unknown", Foreign.source [fn "id" [TyForeign ("unknown", [])] uri (RVar 0)];
+  "missing type argument", "foreign type argument count: Deferred", Foreign.source [fn "id" [TyForeign ("Deferred", [])] uri (RVar 0)];
   "shared opaque move", "Rust emission: owned copy of a shared foreign value", Foreign.source [fn "id" [TyArc response] response (RVar 0)];
   "owned opaque clone", "clone of an owned foreign value", Foreign.source [fn "copy" [response] (TyArc response) (RClone (RVar 0))];
   "foreign product", "foreign aggregate layout",

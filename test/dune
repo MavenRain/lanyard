@@ -1,6 +1,6 @@
 (tests
  (names main sl_surface lan_surface lan_erase)
- (modules (:standard \ target_catalog lan_emit lan_recursive_emit lan_foreign_emit lan_async_emit))
+ (modules (:standard \ target_catalog lan_emit lan_recursive_emit lan_foreign_emit lan_async_emit lan_foreign_types_emit))
  (libraries kanon_kernel kanon_surface))
 
 (test
@@ -27,3 +27,8 @@
  (name lan_async_emit)
  (modules lan_async_emit)
  (libraries kanon_kernel kanon_surface lanyard_rust lanyard_target))
+
+(test
+ (name lan_foreign_types_emit)
+ (modules lan_foreign_types_emit)
+ (libraries kanon_kernel lanyard_rust lanyard_target))

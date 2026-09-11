@@ -233,7 +233,25 @@ let rec repr_of (ec : ectx) (v : Value.t) : (Rir.repr, Error.t) result =
   | FUniv -> Ok any_repr
   | FOther ->
       let* quoted = Eval.quote (globals_of ec) (size_of ec) w in
-      Ok (Rir.TyForeign (Pp.term [] quoted))
+      let opaque = Rir.TyForeign (Pp.term [] quoted, []) in
+      lazy_fold (Value.as_neutral w) ~none:(fun () -> Ok opaque)
+        ~some:(fun (head, spine) -> match head with
+          | Value.HLocal _ -> Ok opaque
+          | Value.HGlobal name ->
+              let argument = function
+                | Value.SOut (shape, address) ->
+                    (match point_of shape, address with
+                    | PPoint (Quantity.Zero, _, domain), Value.VAPt (Quantity.Zero, value) ->
+                        let* domain = Eval.whnf (globals_of ec) domain in
+                        if Option.is_some (Value.as_univ domain) then
+                          repr_of ec value |> Result.map Option.some
+                        else Ok None
+                    | PPoint _, _ | PColl _, _ | POther, _ -> Ok None)
+                | Value.SElim _ -> Ok None in
+              let* arguments = Rules.all_ok (List.map argument (List.rev spine)) in
+              if List.for_all Option.is_some arguments then
+                Ok (Rir.TyForeign (name, List.filter_map Fun.id arguments))
+              else Ok opaque)
   | FRan (s, d) -> ran_repr ec s d
   | FLan (s, d) -> lan_repr ec s d
 
@@ -1390,7 +1408,8 @@ let rec tids_ktm (t : Rir.rtm) : Rir.tid list =
 
 let rec tids_repr (r : Rir.repr) : Rir.tid list =
   match r with
-  | Rir.TyI31 | Rir.TyForeign _ -> []
+  | Rir.TyI31 -> []
+  | Rir.TyForeign (_, arguments) -> List.concat_map tids_repr arguments
   | Rir.TyArc inner -> tids_repr inner
   | Rir.TyStruct t -> [ t ]
   | Rir.TyUnion t -> [ t ]

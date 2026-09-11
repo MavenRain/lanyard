@@ -9,15 +9,25 @@ let refuse text = Error (Error.Not_yet ("Rust emission: " ^ text))
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
 let lookup entries name = List.find_opt (fun (entry : Catalog.entry) -> String.equal entry.name name) entries
   |> Option.to_result ~none:(Error.Mismatch ("Rust emission: missing print rule " ^ name))
-let foreign_type entries name =
+let rec telescope ty = Elab.arrow_split ty |> Option.fold
+  ~none:([], ty) ~some:(fun (binder, rest) -> let binders, result = telescope rest in binder :: binders, result)
+let foreign_type entries name arguments =
   let* entry = List.find_opt (fun (entry : Catalog.entry) ->
     String.equal (Elab.target_name entry.name) name && match entry.kind with
       | Catalog.Type_constant -> true | Catalog.Constant | Catalog.Schema -> false) entries
     |> Option.to_result ~none:(Error.Not_yet ("Rust emission: foreign type " ^ name)) in
-  if not (List.is_empty entry.quantities) then refuse ("parameterized foreign type " ^ name)
-  else let* template = Template.parse entry.print_rule in Template.render template []
-let rec telescope ty = Elab.arrow_split ty |> Option.fold
-  ~none:([], ty) ~some:(fun (binder, rest) -> let binders, result = telescope rest in binder :: binders, result)
+  let* syntax = Elab.target_type entry.kernel_type in
+  let binders, result = telescope syntax in
+  let* () = if result = Syntax.SType 0 && List.for_all (fun binder ->
+    Quantity.equal binder.Syntax.b_q Quantity.Zero && binder.Syntax.b_ty = Syntax.SType 0) binders
+    && List.map (fun _binder -> Catalog.Zero) binders = entry.quantities
+    && List.is_empty entry.effects then Ok () else invalid ("foreign type metadata: " ^ name) in
+  let* () = if List.length binders = List.length arguments then Ok ()
+    else invalid ("foreign type argument count: " ^ name) in
+  let* template = Template.parse entry.print_rule in
+  let bindings = Seq.zip (List.to_seq binders) (List.to_seq arguments)
+    |> Seq.map (fun (binder, argument) -> binder.Syntax.b_name, argument) |> List.of_seq in
+  Template.render template bindings
 let foreign_call entries (row : Rir.foreign) =
   let* entry = lookup entries row.schema in
   let* () = match entry.kind with
@@ -41,7 +51,7 @@ let foreign_call entries (row : Rir.foreign) =
     if syntax = Syntax.SProd [] then Ok (Rir.TyStruct (Rir.Tid "tuple<>")) else
     let* name = Elab.var_name syntax |> Option.to_result
       ~none:(Error.Not_yet "Rust emission: non-atomic foreign call type") in
-    let* _path = foreign_type entries name in Ok (Rir.TyForeign name) in
+    let* _path = foreign_type entries name [] in Ok (Rir.TyForeign (name, [])) in
   let* params = Rules.all_ok (List.map (fun b ->
     let* ty = repr b.Syntax.b_ty in Ok (Rir.owned b.Syntax.b_q ty)) binders) in
   let* result = repr result in

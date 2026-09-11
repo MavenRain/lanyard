@@ -1517,3 +1517,69 @@ Review close (2026-09-11), slice review LSEA:
   and medium effort. They ran on opus and medium effort, because
   the fable probe died on the reasoning_extraction classifier
   (req_011CewA1sr4zrozEBVREn7Kk), so the three rulings are UNMET.
+
+## Lanyard Stage E applied foreign types (2026-09-11)
+
+Continued from committed async slice d2c32b4 in the isolated checkout
+`/Users/oobi/Documents/gpt2/lanyard-schema`. The eraser and IR retain
+checked foreign type arguments. The target printer now renders Form T
+and Deferred T, including nested wrappers, aliases, native product
+arguments and recursive family arguments. Arguments participate in
+layout validation, declaration discovery and family discovery.
+
+The foreign policy checks the catalog type telescope, erased quantities,
+effects, argument count and template bindings. One binders move opaque
+values; Many binders retain Arc ownership. The earlier Deferred identity
+refusal now tests the shared-to-owned copy refusal after type application
+support. The missing-argument IR test still refuses bare Deferred.
+
+Validation:
+
+- `zsh dev/gates.sh --stage E-foreign-types`: STAGE-E-FOREIGN-TYPES OK,
+  including every prior Stage B, C, D, native, foreign and async leg.
+- LAN-FOREIGN-TYPES-EMIT: 6 positives and 20 refusals.
+- LAN-FOREIGN-TYPES: 15 runtime observations, 3 killed mutations,
+  4 source refusal cases and the native-printer refusal, Rust 1.98.1.
+- The exact golden carries 10 functions, including 2 async functions.
+  Strict wrapper doubles lack Clone. Their suspended futures satisfy
+  Send, and the oracle observes payloads, unloaded state and Arc counts.
+- Existing goldens retain their bytes. KERNEL-CARRY, R0-COUNT,
+  R0-TARGET, TARGET-PIN and HOUSE pass in the cumulative command.
+
+TRUSTED-LINES measures erase=1519, rir=155, emit=628, foreign=65,
+template=71 and effects=46, after the review fix of round 1 added nine
+lines to rust/emit.ml. The printer total that the leg prints moved with
+that fix, and it stays PROPOSED. The carried
+kernel is still 3997/4000 and the generated catalog is still 104.
+All numeric allowances remain pending user rulings. Model/schema
+printing, fused handlers, the Todo crate golden and Stage F remain
+ahead. No Stage E completion or M0 exit is claimed.
+
+The exact golden also built offline against Toasty 7bd502cb and Topcoat
+51caa01 using the existing dependency cache. The real-library probe
+checks Future + Send for both async functions and produces all seven
+expected synchronous observations. No database was constructed or
+contacted. Captures, commands, the manifest, lockfile hash and source
+hashes are in `dev/validation/stage-e-foreign-types/receipt.json`.
+
+Review round 1 (2026-09-11) applied seven fixes on top of the slice.
+rust/emit.ml now refuses a closure argument of a foreign type with
+`foreign closure argument`, and it refuses an empty foreign name in a
+layout text with `malformed foreign layout`. test/lan_foreign_types_emit.ml
+gains the `closure argument` refusal row, so the leg prints positives=6
+refusals=20. test/lan_foreign_types.py gains the `runtime-argument`
+and `index-argument` refusal rows, which check the opaque fallback of
+the eraser, so the leg prints refusals=5. dev/STAGE-E-ASYNC.md now scopes its 776 line count to
+its own slice and points here. dev/KERNEL-CARRIED.md gains section 12
+with the component measurements and the changed lib/rir.ml row, each
+PROPOSED. dev/MUTATION-LOG.md records that the real Toasty Deferred and
+the real Topcoat Form derive Clone, so the owned-copy kill is a property
+of the python doubles. dev/STAGE-E-FOREIGN-TYPES.md drops the unused
+`git init` preparation step. These edits change the sha256 of
+rust/emit.ml, test/lan_foreign_types_emit.ml, test/lan_foreign_types.py
+and the edited documents, so the source_sha256 rows of
+`dev/validation/stage-e-foreign-types/receipt.json` are stale by design.
+The receipt and its nine captures stay unedited. The command that would
+produce the new bytes is
+`python3 -P /Users/oobi/Documents/gpt2/lanyard-foreign-types-record.py`,
+and this review does not run it.

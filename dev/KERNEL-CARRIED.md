@@ -28,7 +28,7 @@ bucket has no row here.
 | lib/global.ml | 046689a | VERBATIM | - |
 | lib/order.ml | 046689a | VERBATIM | - |
 | lib/bignum.ml | 046689a | VERBATIM | - |
-| lib/erase.ml | 046689a | EDITED | Stage D: Rust IR, retained binder quantities, explicit runtime unit and foreign type identities. Stage E: typed closure signatures. quantity_runtime is unchanged. |
+| lib/erase.ml | 046689a | EDITED | Stage D: Rust IR, retained binder quantities, explicit runtime unit and foreign type identities. Stage E: typed closure signatures and checked foreign type arguments. quantity_runtime is unchanged. |
 
 ## 1 The row set
 
@@ -151,3 +151,15 @@ pinned database effect row and the runtime unit result. No kernel, eraser,
 IR, surface or target pin file changes. The printer bucket now includes
 effects.ml: 604 + 55 + 71 + 46 = 776 lines. The allowance remains pending.
 See STAGE-E-ASYNC.md for validation and the remaining printing boundaries.
+
+## 12 Applied foreign types slice (2026-09-11)
+
+lib/erase.ml reads zero-quantity type applications from checked neutral spines.
+It measures 1519 lines (PROPOSED). lib/rir.ml changes for the first time since
+Stage D: TyForeign carries a name and a list of representations, and the file
+measures 155 lines (PROPOSED). rust/emit.ml measures 628 lines, rust/foreign.ml
+65, rust/template.ml 71 and rust/effects.ml 46, each PROPOSED. This page states
+no sum for them. The twelve-file kernel bucket stays 3997/4000, quantity_runtime
+and lib/erase_kan.ml keep their bytes, and the frozen 1484 and 5481 base does
+not move. A_rir and A_emit remain open user rulings.
+See STAGE-E-FOREIGN-TYPES.md for behavior and validation.

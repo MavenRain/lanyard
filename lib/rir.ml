@@ -10,7 +10,7 @@ type repr =
   | TyFunc of tid
   | TyThunk of tid
   | TyArc of repr
-  | TyForeign of string
+  | TyForeign of string * repr list
 
 type foreign = {
   name : string;
@@ -57,7 +57,9 @@ let rec print_repr (r : repr) : string =
   | TyFunc t -> "func " ^ tid_text t
   | TyThunk t -> "thunk " ^ tid_text t
   | TyArc inner -> "Arc<" ^ print_repr inner ^ ">"
-  | TyForeign name -> "foreign " ^ name
+  | TyForeign (name, arguments) -> "foreign " ^ name
+      ^ (if List.is_empty arguments then "" else
+          "<" ^ String.concat "," (List.map print_repr arguments) ^ ">")
 
 let rec print_rtm (t : rtm) : string =
   match t with
