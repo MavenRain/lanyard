@@ -122,6 +122,8 @@ def validate(row):
         raise SignatureError("a One argument must occur exactly once in its print rule")
     if ("?" in row["print"]) != any(effect.endswith("::Error") for effect in row["effects"]):
         raise SignatureError("question-mark propagation must agree with the error effect row")
+    if (".await" in row["print"]) != ("DbExec" in row["effects"]):
+        raise SignatureError("await text must agree with the DbExec effect row")
     return row
 
 

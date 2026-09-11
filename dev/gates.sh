@@ -24,8 +24,13 @@
 #   zsh dev/gates.sh --stage D
 #   zsh dev/gates.sh --stage E-native
 #   zsh dev/gates.sh --stage E-foreign
+#   zsh dev/gates.sh --stage E-async
 
 set -u
+
+if [[ $# -eq 2 && $1 == "--stage" && $2 == "E-async" ]]; then
+  exec zsh ${0:A:h}/stage-e-async.sh
+fi
 
 if [[ $# -eq 2 && $1 == "--stage" && $2 == "E-foreign" ]]; then
   exec zsh ${0:A:h}/stage-e-foreign.sh
@@ -227,7 +232,7 @@ if [[ $# -ge 2 && $1 == "--leg" ]]; then
 fi
 
 if [[ $# -ne 0 ]]; then
-  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C|D|E-native|E-foreign]"
+  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C|D|E-native|E-foreign|E-async]"
   exit 64
 fi
 

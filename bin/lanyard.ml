@@ -1,8 +1,8 @@
 (** The lanyard driver.  M0 Stage A deletes the wasm back end at the
     fork point, so the driver holds check, axioms and spec-count.
     The first Stage E slice also prints native Rust through emit --native.
-    The synchronous target slice also prints foreign constants through --target.
-    Async foreign calls and the crate command land at a later slice.
+    Target slices print synchronous and async foreign constants through --target.
+    Foreign schemas and the crate command land at a later slice.
 
     Exit codes.  0 is a file that checks, 1 is a file that does not and
     64 is a usage error or a missing file.  A check failure writes one

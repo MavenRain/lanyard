@@ -1,0 +1,13 @@
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+
+def push : Db -> prod () := fun (db : Db) => Db.push_schema db
+def forward : Db -> prod () := fun (db : Db) => push db
+def twice : Db -> prod () := fun (db : Db) =>
+  let first : prod () := forward db in push db
+def sequential : Db -> Db -> prod () := fun (first : Db) (second : Db) =>
+  let done : prod () := push first in push second
+def keep : Db -> Uri -> SeeOther := fun (db : Db) (uri : Uri) =>
+  let done : prod () := push db in topcoat.see_other uri
+def choose : Bool -> Db -> prod () := fun (flag : Bool) (db : Db) =>
+  case flag with | 0 (u : prod ()) => push db | 1 (u : prod ()) => tuple ()
+def pure : Nat -> Nat := fun (n : Nat) => natAdd n 1

@@ -115,6 +115,10 @@ class Signatures(unittest.TestCase):
         self.change("Db.push_schema", lambda row: row.update(effects=[]))
         self.rejected("error effect row")
 
+    def test_await_text_cannot_lose_its_effect(self):
+        self.change("Db.push_schema", lambda row: row.update(effects=["toasty::Error"]))
+        self.rejected("DbExec effect row")
+
     def test_one_argument_cannot_duplicate(self):
         self.change("topcoat.db", lambda row: row.update(
             type="(1 cx : Cx) -> Db", quantities=["1"], print="pair(#{cx}, #{cx})"))

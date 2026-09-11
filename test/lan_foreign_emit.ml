@@ -65,7 +65,9 @@ let tests = [
       not (String.equal entry.name row.schema)) Catalog.entries) row |> Result.map (fun _signature -> ""));
   "schema call", "foreign schema", catalog_call "Model.create";
   "type called", "type used as a call", catalog_call "Uri";
-  "async constant", "effectful foreign call", catalog_call "Db.push_schema";
+  "unsupported effect", "effectful foreign call", (let* row = row in
+    Foreign.foreign_call (edited (fun entry -> {entry with effects=["Unknown"]}))
+      {row with effects=["Unknown"]} |> Result.map (fun _signature -> ""));
   "foreign argument count", "foreign argument count", (let* row = row in
     Foreign.source [fn "bad" [] response (RForeign (row, []))]);
   "foreign argument type", "conversion from unit", (let* row = row in

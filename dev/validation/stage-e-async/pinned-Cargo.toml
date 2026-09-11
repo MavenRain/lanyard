@@ -1,0 +1,12 @@
+[package]
+name = "lanyard-foreign-validation"
+version = "0.0.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+[lib]
+path = "src/send.rs"
+
+[dependencies]
+topcoat = { path = "/Users/oobi/Documents/topcoat/crates/topcoat", default-features = false, features = ["router"] }
+toasty = { path = "/Users/oobi/Documents/toasty/crates/toasty", default-features = false }

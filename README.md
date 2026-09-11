@@ -9,8 +9,8 @@ those signatures, elaborates models and operation families, and derives the
 foreign-type census. Stage D adds Rust IR, quantity-aware erasure and checked
 foreign-call metadata. The Stage E native command prints Rust for pure
 programs, including typed closures, captures and recursive data. The target
-command adds synchronous foreign constants and concrete foreign types.
-Async target printing and the complete M0 driver remain ahead.
+command adds synchronous foreign constants, concrete foreign types, and
+async database calls. Foreign schemas and the complete M0 driver remain ahead.
 The generated signature allowance is proposed at 104 lines and awaits the
 user's ruling. See [target documentation](target/README.md), the
 [Stage B build log](dev/M0-BUILD-LOG.md#lanyard-m0-stage-b-2026-09-09) and
@@ -46,8 +46,18 @@ _build/default/bin/lanyard.exe emit --target test/fixtures/foreign.lan
 ```
 
 This prints a Rust source module using the pinned target paths, including
-`topcoat.db` and `topcoat.see_other`. Foreign schemas and async effects
-remain explicit refusals.
+`topcoat.db` and `topcoat.see_other`.
+
+Validate and use the [async database printer](dev/STAGE-E-ASYNC.md):
+
+```sh
+zsh dev/gates.sh --stage E-async
+_build/default/bin/lanyard.exe emit --target test/fixtures/async.lan
+```
+
+`Db.push_schema` prints an awaited call. Its callers become async functions
+and propagate database errors. Foreign schemas, async closures and recursive
+async calls remain explicit refusals.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current

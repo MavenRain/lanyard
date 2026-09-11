@@ -1421,3 +1421,99 @@ from the staged bytes of the paths it lists;
 command that would produce the new receipt bytes, and it was not run. A_emit
 stays PROPOSED as printer total 698 = 575 + 52 + 71, and the ceiling wording
 stays 5481 + A_rir + A_emit + A_sig with no total. No commit was created.
+
+## Lanyard Stage E async database constants (2026-09-10)
+
+Base: a487a9570d06146ce54cca7f253587f5fbd1cafc. The target command now
+emits Db.push_schema, marks its named callers async and awaits their calls.
+The generated error enum wraps toasty::Error and preserves its Display and
+source. Pure functions stay synchronous. Effect analysis runs to a fixed
+point over the call graph and evaluated expressions. It refuses recursive
+async calls and runtime async closures, including transitive ones.
+
+Validation in /Users/oobi/Documents/gpt2/lanyard-async:
+
+- `zsh dev/gates.sh --stage E-async`: STAGE-E-ASYNC OK. All cumulative
+  native, closure, recursive, synchronous foreign and earlier stage legs pass.
+- LAN-ASYNC-EMIT: six refusals and one propagation oracle. The oracle puts
+  callers before callees and separates lifted bodies from evaluated captures.
+- LAN-ASYNC: 17 observations, four mutants, one native-policy refusal,
+  Rust 1.98.1. Pending futures and cancellation are observed explicitly;
+  errors stop later calls and retain their original source. The native and
+  synchronous foreign goldens retain their bytes.
+- The former unsupported-async tests now cover an unknown effect row and a
+  runtime async closure. Their previous Db.push_schema refusal is replaced
+  by the new positive runtime fixture, not silently discarded.
+- The exact async golden builds offline against Toasty 7bd502cb and
+  Topcoat 51caa01 using the retained validation lockfile. Six separate
+  Future + Send instantiations compile against the real API types. The
+  build reuses the previous foreign validation target directory. No database
+  was contacted. Captures and source hashes are in validation/stage-e-async.
+
+TRUSTED-LINES measures 776 printer lines: emit 604, foreign 55, template 71,
+effects 46. A_emit and the symbolic ceiling remain pending user rulings.
+The kernel, source checker, erasers, IR and target pins retain their bytes.
+The checked language's proof and Zero erasure still apply. This completes
+the runtime async-constant slice. Model/schema printing, fused handlers,
+parameterized foreign layouts, the Todo crate golden and Stage F remain
+ahead. No Stage E completion or M0-EXIT is claimed.
+
+Review round 1 (2026-09-11), slice review LSEA:
+
+- C-1: test/lan_async_emit.ml adds one printed-text row. Its async caller
+  awaits the database call and calls a synchronous helper with no await.
+  A scratch mutant that awaits every named call fails that row.
+- C-3: dev/STAGE-E-FOREIGN.md drops its stale effectful-constant claim and
+  dates its 698 line measurement to that slice.
+- A-1: dev/gen-target.py refuses a print rule whose await text disagrees
+  with its DbExec effect row. test/target.py adds the failing case.
+- A-2: rust/effects.ml carries one visited set through the cycle search,
+  so each function expands at most once per search. The file stays at 46
+  lines and the measured printer total stays 776. Both stay PROPOSED.
+- C-2: the dev/gates.sh usage line now names the E-async stage.
+- C-4 and D-7: the MUTATION-LOG heading matches this heading, and one
+  banned connector leaves dev/STAGE-E-ASYNC.md.
+- This round edits seven slice sources, so
+  dev/validation/stage-e-async/receipt.json is stale by design. The
+  command `python3 -P /Users/oobi/Documents/gpt2/lanyard-async-record.py`
+  would produce the new receipt bytes. The receipt and the six captures
+  stay unedited.
+
+Review round 2 (2026-09-11), slice review LSEA:
+
+- A-2 and ND-1-1: rust/effects.ml keeps the memoized `search` and restores
+  the call shape `List.exists (reaches name []) calls`. A `reaches` wrapper
+  starts one visited set per direct call, so each function expands at most
+  once per search. The mutation control LSEA-M22 finds its target again.
+  The file stays at 46 lines and the measured printer total stays 776.
+  Both stay PROPOSED.
+- ND-1-2: dev/MUTATION-LOG.md now reads 28 tests for `test/target.py`. The
+  ladder row `LEG TARGET-TESTS OK rc=0 tests=28` supports the number.
+- PIN-1: target/PIN.json, target/pin.sha256 and the two `.sig` files keep
+  their committed bytes. The gate prints `TARGET-PIN DIFF OK signatures=2
+  anchors=4` and `STAGE-B OK`, so no pin row needs a new digest.
+- This round edits rust/effects.ml and dev/MUTATION-LOG.md, so
+  dev/validation/stage-e-async/receipt.json stays stale by design. The
+  command `python3 -P /Users/oobi/Documents/gpt2/lanyard-async-record.py`
+  would produce the new receipt bytes. The receipt and the six captures
+  stay unedited.
+
+Review close (2026-09-11), slice review LSEA:
+
+- The closing ladder reads `LADDER LSEA tag=close GREEN
+  legs_ok=41/41 mutants_killed=24/24` with `HEAD-BASE OK`,
+  `UNSTAGED empty` and `PORCELAIN rows=29 A=14 M=15 other=0`.
+- `LEG RECEIPT-DIGESTS OK rc=0 ... matched=39/39 staged_match=32/39`
+  lists seven staged drift paths. Every receipt row matches the
+  recorded checkout, so the receipt stays stale by design and
+  unedited.
+- The review kept seven findings and refuted two. It dropped seven
+  candidates: five as merges, one on the merits and the finding cap,
+  and one to the rulings. Both rounds and the close fixed every kept
+  item and every check item.
+- The close changed no repository source. It completed two record
+  items inside the review directory only.
+- The finder, builder and closer rulings pin those stages to fable
+  and medium effort. They ran on opus and medium effort, because
+  the fable probe died on the reasoning_extraction classifier
+  (req_011CewA1sr4zrozEBVREn7Kk), so the three rulings are UNMET.

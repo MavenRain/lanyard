@@ -137,7 +137,7 @@ def main():
         require(rejected.returncode != 0 and "expected `&Cx`" in rejected.stderr,
                 "missing borrow mutant did not fail the input type")
         refusals = [
-            ("async", "def push : Db -> prod () := fun (db : Db) => Db.push_schema db", "effectful foreign call"),
+            ("async-closure", "def closure : Db -> prod (Nat -> Nat) := fun (db : Db) => tuple (fun (n : Nat) => let done : prod () := Db.push_schema db in natAdd n 1)", "async closure"),
             ("clone", "def copy : SeeOther -> SeeOther := fun (x : SeeOther) => x", "owned copy of a shared foreign value"),
             ("applied", "def identity : Deferred Uri -> Deferred Uri := fun (x : Deferred Uri) => x", "Rust emission: foreign type (Out SPi"),
             ("aggregate", "def pair : Uri -> prod (Uri, Uri) := fun (x : Uri) => tuple (x, x)", "foreign aggregate layout"),

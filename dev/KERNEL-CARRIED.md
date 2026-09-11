@@ -141,3 +141,13 @@ Rust and are measured together under A_emit: 575 + 52 + 71 = 698 lines.
 The allowance and total ceiling remain pending numeric rulings.
 The kernel, erasers, IR, surface lowering and target signature bytes retain
 their previous values. See STAGE-E-FOREIGN.md for the supported boundary.
+
+## 11 Async database slice (2026-09-10)
+
+rust/effects.ml adds checked effect propagation over runtime expressions and
+the direct call graph. rust/emit.ml prints async signatures and awaits and
+adds a typed database error wrapper when needed. rust/foreign.ml admits the
+pinned database effect row and the runtime unit result. No kernel, eraser,
+IR, surface or target pin file changes. The printer bucket now includes
+effects.ml: 604 + 55 + 71 + 46 = 776 lines. The allowance remains pending.
+See STAGE-E-ASYNC.md for validation and the remaining printing boundaries.

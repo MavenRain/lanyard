@@ -1,5 +1,9 @@
 # Synchronous foreign printing
 
+This records the synchronous slice. The later [async database
+slice](STAGE-E-ASYNC.md) adds `Db.push_schema` and awaited named calls.
+Its gate retains the synchronous observations and golden below.
+
 `lanyard emit --target FILE.lan` checks, lowers and prints a Rust source
 module. It extends native emission with concrete foreign type paths and
 synchronous constant print rules. The fixture exercises `topcoat.db`,
@@ -37,8 +41,9 @@ and foreign fields in products, sums, function signatures or nominal
 families are refused. In particular, the pinned SeeOther type lacks Clone;
 a checked Many identity cannot silently emit a payload clone.
 
-Effectful constants, schemas, parameterized foreign types, model printing,
-handler fusion and the crate driver remain ahead. Unsupported definitions
+Schemas, parameterized foreign types, model printing, handler fusion and
+the crate driver remain ahead. The later async slice adds the effectful
+constant `Db.push_schema`; see STAGE-E-ASYNC.md. Unsupported definitions
 are never pruned to make the rest print. The Todo example still refuses
 its CLI family's foreign payload layout. An inline model source in
 test/lan_foreign.py pins the `foreign schema Model.create` refusal. This slice does not claim EMIT-DIFF
@@ -57,8 +62,9 @@ exercise the driver. Three mutants change argument order, repeat argument
 evaluation or drop the required Cx borrow. Two must compile and disagree
 with the oracle; the missing borrow must fail the input type check.
 
-TRUSTED-LINES counts all printer implementation files: rust/emit.ml at
+TRUSTED-LINES counted the printer files at that slice: rust/emit.ml at
 575 lines, rust/foreign.ml at 52 and rust/template.ml at 71, totaling 698.
+The async slice measures these files again in STAGE-E-ASYNC.md.
 A_emit and the symbolic total still await the user's numeric ruling.
 The existing target and kernel pins retain their bytes.
 

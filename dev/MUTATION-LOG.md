@@ -319,7 +319,7 @@ three at 2026-09-05 22:03.
 
 ## Lanyard M0 Stage B (2026-09-09)
 
-`python3 -P test/target.py` passes 27 tests. Mutation source copies hold the
+`python3 -P test/target.py` passes 28 tests. Mutation source copies hold the
 required upstream file bytes alone. They link no Git metadata, and they live
 under `.gatework/` in the repository root. No test edits Toasty, Topcoat,
 their references, or the committed Lanyard base.
@@ -425,3 +425,22 @@ requires a missing-print-rule error. It rejects altered print text, effects,
 names, type arguments, arities, permuted catalog quantities and non-atomic
 call types. The Todo crate's deleted-print-rule
 EMIT-DIFF mutation remains future work with model and async printing.
+
+## Lanyard Stage E async database constants (2026-09-10)
+
+`test/lan_async.py` checks the exact async golden, then kills four mutants:
+
+- Swallow the database error after awaiting it. This must compile, then
+  violate the error and later-call observations.
+- Remove the foreign await. Rust must reject `?` on the unpolled future.
+- Reverse two sequential pushes. This must compile, then violate the order
+  and early-error observations with distinct database identifiers.
+- Replace Arc with Rc. The explicit Future + Send bounds must reject the
+  generated futures, including a URI retained across suspension.
+
+Baseline: 17 runtime observations; mutants killed: 4/4. LAN-ASYNC-EMIT also
+rejects direct and mutual async recursion, direct and transitive async
+closures, forged effects and missing async print rules. It also pins the
+printed text of a synchronous call in an async function. Existing Stage E
+native and foreign mutations remain in the cumulative gate. The Todo crate
+EMIT-DIFF mutation remains pending with model printing and handler fusion.
