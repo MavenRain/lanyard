@@ -1312,3 +1312,112 @@ the finding cap. The closing ladder ran with the tag close and its log is
 The index holds 19 paths on 2a87a52f6c60fe102a305313090022faa1857feb. The
 allowance A_emit stays PROPOSED at the measured 535 lines and the ceiling
 wording stays 5481 + A_rir + A_emit + A_sig with no total.
+## Lanyard Stage E synchronous foreign constants (2026-09-10)
+
+Starting at 7de6ef1 in an isolated checkout, this slice adds `emit --target FILE.lan` and the
+cumulative `zsh dev/gates.sh --stage E-foreign` command. The printer uses
+the generated target catalog for concrete foreign types and synchronous
+constants. The fixture covers Topcoat context lookup and redirect creation,
+native forwarding, local Many bindings and owned opaque moves. Unsupported
+schemas, async effects and opaque aggregate layouts produce explicit errors.
+The Todo crate, handler fusion and M0-EXIT remain ahead.
+
+rust/emit.ml shares the native printer through a policy functor.
+rust/foreign.ml checks call metadata against the catalog and reads parameter
+types and quantities from its telescope. rust/template.ml tokenizes print
+rules before substitution, requires exact named bindings, checks One uses,
+and evaluates arguments once in source order before borrowing Many payloads.
+The kernel, erasers, IR and target signatures retain their prior bytes.
+
+The trusted printer measurement includes all three implementation files:
+575 lines in emit.ml, 52 in foreign.ml and 71 in template.ml, total 698.
+A_emit and the symbolic ceiling remain pending the user's numeric ruling.
+Splitting target and template helpers does not remove them from the count.
+
+Validation adds 36 malformed-template or IR refusal cases, two substitution
+checks, one shared foreign case check, a byte-compared Rust golden, 13 runtime observations, five checked
+surface refusals, the Todo layout refusal and three CLI usage refusals.
+The three mutation checks require failures for reordered argument evaluation,
+repeated evaluation and a missing borrowed Cx argument.
+An initial cumulative run caught a changed native polymorphic diagnostic;
+the native policy now retains the original diagnostic, with no test change.
+Local closure factories are validated too, including types absent from
+exported signatures. See STAGE-E-FOREIGN.md and the validation receipt for
+the final cumulative verdict and source hashes.
+
+The exact foreign golden also compiled as a library against the pinned
+Topcoat and Toasty worktrees using Rust 1.98.1. Tracked upstream files stayed
+clean; Toasty retained an unrelated untracked .DS_Store. The upstream lockfile
+resolved an initial offline version conflict; missing locked dependencies
+were then downloaded. Captures and the standalone validation manifest are
+recorded alongside the cumulative gate evidence.
+
+Final validation: `zsh dev/gates.sh --stage E-foreign` exited 0 and printed
+STAGE-E-FOREIGN OK. All native, closure, recursive, foreign, erasure, target,
+kernel carry and HOUSE legs passed. The receipt binds the final source
+hashes and both successful compiler captures. No commit was created.
+
+Review round 1 (2026-09-10) fixed seven items. `branch_result` kept the
+shared type of an arm whose value is a shared foreign handle, so a case over
+Arc handles prints again. Both inline copies of that code carry the fix; the
+duplication stays open as ruling A-2. The printer now prefixes every
+diagnostic with `Rust emission: `, because one `emit --target` run printed
+two prefixes. test/lan_emit.ml holds that prefix and moved with it, which
+adds one path to the index. The OCaml suite gained a catalog quantity
+mismatch row, a non-atomic call type row and the shared foreign case
+positive, so it prints `LAN-FOREIGN-EMIT OK refusals=36 positives=3`. The
+`generic` surface row of test/lan_foreign.py took the unknown atom arm, so
+it is renamed `applied` and now asserts the printed text. The counted five
+surface refusals do not move. STAGE-E-RECURSIVE.md, STAGE-E-FOREIGN.md and
+this block were corrected against the tree. The printer measurement is
+unchanged at 575 + 52 + 71 = 698 lines. A_emit stays PROPOSED and the
+ceiling wording stays 5481 + A_rir + A_emit + A_sig with no total.
+The round changes this file, so a digest of
+dev/validation/stage-e-foreign/receipt.json now differs from the staged
+bytes of the paths it lists; `python3 -P /Users/oobi/Documents/gpt2/lanyard-foreign-record.py`
+is the command that produced the receipt bytes, and it was not run.
+
+Review round 2 (2026-09-10) staged the round 1 edits and changed no code. The
+round 1 run left nine paths modified in the worktree. The gate ladder then
+printed `UNSTAGED 9` and `PORCELAIN rows=28 A=14 M=13 other=1` and returned
+RED, while every leg row and every mutation control of that same run passed.
+Round 2 stages rust/emit.ml, rust/foreign.ml, test/lan_emit.ml,
+test/lan_foreign.py, test/lan_foreign_emit.ml, dev/STAGE-E-FOREIGN.md,
+dev/STAGE-E-RECURSIVE.md, dev/MUTATION-LOG.md and this file. test/lan_emit.ml
+is the one path that round 1 added to the index.
+
+Round 2 re-checked the target pin layer instead of editing it. `shasum -a 256
+target/toasty-7bd502cb.sig` prints
+9b3a6ec3ad2c365cec6bbdd8767ba144a295bbe60affeb418c42dad65952a7fc and
+`shasum -a 256 target/topcoat-51caa01.sig` prints
+40ee029ce9885b1402d76cc4d0340545c24b9932649cec031c10075b1a21504d. Both equal
+the signature_sha256 rows of target/PIN.json. The rows
+`LEG TARGET-SIG OK rc=0 rows=15 foreign_types=9 generated_lines=104` and
+`LEG TARGET-PIN OK rc=0` of the round 1 log read the live topcoat tree and the
+four anchor rows of target/pin.sha256. target/PIN.json and target/pin.sha256
+keep their bytes.
+
+This round changes this file, so a digest of
+dev/validation/stage-e-foreign/receipt.json still differs from the staged
+bytes of the paths it lists.
+`python3 -P /Users/oobi/Documents/gpt2/lanyard-foreign-record.py` is the
+command that would produce the new receipt bytes, and it was not run. A_emit
+stays PROPOSED and the ceiling wording stays 5481 + A_rir + A_emit + A_sig
+with no total.
+
+Review close (2026-09-10) staged no new path and edited no code. The index
+holds 28 paths: the 27 slice paths and test/lan_emit.ml, which review round 1
+added when the diagnostic prefix moved. `git status --short -uall` shows no
+unstaged row and no untracked row. Seven of the nine review items are fixed,
+PIN-1 is refuted by measurement against target/PIN.json, and GATE-1 closed
+when round 2 staged the round 1 edits. The closing ladder runs with the tag
+close and writes its rows to
+/Users/oobi/Documents/lanyard-stage-e-foreign-review/gates-LSEF-close.log.
+The find, fix and close stages ran on opus/medium although the rulings pin
+them to fable/medium, so those three pins stay unmet. This close changes this
+file, so a digest of dev/validation/stage-e-foreign/receipt.json still differs
+from the staged bytes of the paths it lists;
+`python3 -P /Users/oobi/Documents/gpt2/lanyard-foreign-record.py` is the
+command that would produce the new receipt bytes, and it was not run. A_emit
+stays PROPOSED as printer total 698 = 575 + 52 + 71, and the ceiling wording
+stays 5481 + A_rir + A_emit + A_sig with no total. No commit was created.

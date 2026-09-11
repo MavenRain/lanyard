@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "base": "7de6ef10db7dffd7b70d9d85c5285c36e683e162",
+  "checkout": "/Users/oobi/Documents/gpt2/lanyard-foreign",
+  "command": "zsh dev/gates.sh --stage E-foreign",
+  "exit_code": 0,
+  "verdict": "STAGE-E-FOREIGN OK",
+  "source_sha256": {
+    "README.md": "ab7e319162710ecd23b96a87c3ee26b7ea53ebc2f86f1abd1be5c3dd1bda9634",
+    "bin/lanyard.ml": "6ce58d85e19a21bd9f2f97b91e56ae59bb203547f144fe1ce00b8af4146d5154",
+    "dev/KERNEL-CARRIED.md": "36c73eb9406eed3c7f22ccb2420f81edee37bac53aab1b4cf0368a2507a4367a",
+    "dev/M0-BUILD-LOG.md": "f5de3ee34892b2eaa5dfb93faa2b0010a04e1df9c456339d6d174493fd0438c5",
+    "dev/MUTATION-LOG.md": "75f330c6334a6259926928c93ce9fb7ed0a3aa2a113c60797b0938407b5da9b5",
+    "dev/STAGE-E-FOREIGN.md": "3922e9cbad7d4d38af0a1e462a46e8640e3f347262eed6ad64b25611c1d97030",
+    "dev/STAGE-E-NATIVE.md": "79e29ea76027627c6fd7c4b934f9de7389d7d2bf575e01aa2133f937e21d67be",
+    "dev/STAGE-E-RECURSIVE.md": "0a42ce0625a4a11660ce8913f65e1ed8d3806bae5a0e6b9a2e0cedf3b033438a",
+    "dev/gates.sh": "8b9265d133d001a8512cce7e2a8073002d1ab790b0a5a16e1c5ca4b88487d90e",
+    "dev/stage-e-foreign.sh": "7f0e6a575e2921bd09b68dd165a105a584f4e84aa1379b8eb12aa75faabe634d",
+    "dev/trusted-lines.sh": "53cc7658969c06ac99b529e873c762088b95abe6a76b3d9364ff744e55a6a7cc",
+    "rust/dune": "02599b681a5cc3d65d598f1c403dc6500c6749cbb4f957ad6bd8057c94135bef",
+    "rust/emit.ml": "2ca327a31c751538195ac8de3126ed48496126575a5cd487b4d7c847a5a014d5",
+    "rust/foreign.ml": "5d018a9666034655747300ee5800dc913a8f230b8da68194555fd308374c7bea",
+    "rust/template.ml": "3a721565fbb8993bd24d55de30d159222af165f4e01f6cd63a570abfafa5ebda",
+    "target/README.md": "86ec0d4e38a7f862a63d070195eb4d7c8797da89624b09a4c654dab4fc99beff",
+    "test/dune": "41664557ef6d3862417db129eeb5cd2a26d3e1c27fa1689997cbf892d46a5bfd",
+    "test/fixtures/foreign.lan": "ddea3ac799641ee237b3e8fa5547ccb7217b867f9d07c7200e6045f5c75fd39b",
+    "test/goldens/foreign.rs": "61569b7bfc4d7698493f7f7f2421c8a5e5320f25503348925cb4a06ee2ae1a54",
+    "test/lan_foreign.py": "d7691f0e8ba8d057b57cf38ab22ef2aa6a9d6e64e2a47df36ec894a6128d5cb4",
+    "test/lan_foreign_emit.ml": "e086a32f463da30c6c81c056fd1814a75a5e951cd769288265b7fedecb191a8a"
+  },
+  "unchanged_sha256": {
+    "lib/erase.ml": "036ebd7b79914591825e674c649c317de1c09808bbe6e4af86a4ddfb86487169",
+    "lib/erase_kan.ml": "a6d03447ab9dfedf8e53bceff26cd7da57f113bb4b5d1453aecd618fac508a88",
+    "lib/rir.ml": "a87e729871ffc53767eae01700a36a2f8a4055ac0702ea99d4c6346082b6ea7d",
+    "surface/lower.ml": "5a4298b34ece07ebec2a8d0a2a92f8d7a26448b43effa0506370cf4e31c0f965",
+    "surface/elab.ml": "14ae994942aa1071339666abb53293d628582b0f0b42de0df2713c5babe40a80",
+    "target/PIN.json": "79acb0c0e756de89d15d483abf295cff74e11465b9c1e061e5d25a4041853718",
+    "target/pin.sha256": "bc150e69de798eadf8a6cdeb7be31440c7c544e7e297e531fbb98967ca37287f",
+    "target/toasty-7bd502cb.sig": "9b3a6ec3ad2c365cec6bbdd8767ba144a295bbe60affeb418c42dad65952a7fc",
+    "target/topcoat-51caa01.sig": "40ee029ce9885b1402d76cc4d0340545c24b9932649cec031c10075b1a21504d"
+  },
+  "captures_sha256": {
+    "gates.stderr": "469f35d86cdb0b97361e26357dba3efe94bc551a646dfb50ac32c1de6a736f83",
+    "gates.stdout": "149c38bb302590c1f79f26e20a94d6b5033e9e54aaa74c4333f3cb8a51671d5c",
+    "pinned-Cargo.toml": "355ad270a05874756e7bf7dd147975a02359f4fb59509d6a0c66b3b5576d3aa2",
+    "pinned.stderr": "d7123f44741b13c0bda9c8ca1edb92ed6a814920d8301350d3b7d15107ceb3e1",
+    "pinned.stdout": "ac6ea4249c0b7f9c3bb741b6bbe1e5314acad7b786561032c5dc7b62111e0f08"
+  },
+  "gate_artifact": "/Users/oobi/Documents/gpt2/lanyard-foreign/.kanon-exec/run-CV4MNT",
+  "pinned_build": {
+    "artifact": "/Users/oobi/Documents/gpt2/lanyard-foreign/.kanon-exec/run-vrajDW",
+    "checkout": "/Users/oobi/Documents/gpt2/lanyard-foreign-pinned",
+    "command": "env RUSTC_WRAPPER= rustup run 1.98 cargocho build -- --manifest-path /Users/oobi/Documents/gpt2/lanyard-foreign-pinned/Cargo.toml --locked --jobs 2",
+    "compiler": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "golden_sha256": "61569b7bfc4d7698493f7f7f2421c8a5e5320f25503348925cb4a06ee2ae1a54",
+    "lock_sha256": "fd8b8cd03ebff812141431fbf0c0b55edeef454c86a7462aa820e5ce5689ced3",
+    "topcoat_lock_sha256": "e247f77b4395808cdb19f47bb9e3ccdbf158e08635a7ddb570ea47371d0ddd57",
+    "topcoat": "51caa01dca3a8f20bdacfa771b1b8ac8b6f2668a",
+    "toasty": "7bd502cbf44cc47f70db9f2b27ab35d77a096364",
+    "tracked_upstream_changes": 0,
+    "untracked_upstream": {
+      "toasty": [
+        ".DS_Store"
+      ]
+    },
+    "exit_code": 0
+  },
+  "trusted_lines": {
+    "rust/emit.ml": 575,
+    "rust/foreign.ml": 52,
+    "rust/template.ml": 71,
+    "printer_total": 698
+  },
+  "allowance": "A_emit remains pending the user numeric ruling"
+}

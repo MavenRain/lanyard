@@ -53,7 +53,8 @@ foreign types and foreign calls remain unsupported. The former concrete
 recursive surface refusal is now a successful execution suite; the second
 surface refusal pins the unsupported polymorphic layout instead.
 
-This continues Stage E and does not claim M0-EXIT. Foreign templates, model
-printing, handler fusion, the crate command and Todo golden remain ahead.
-The current line measurements are 1500 for lib/erase.ml and 535 for
-rust/emit.ml. A_emit remains pending the user's numeric ruling.
+This continues Stage E and does not claim M0-EXIT. Async foreign templates,
+model printing, handler fusion, the crate command and Todo golden remain ahead.
+At completion of this slice, measurements were 1500 for lib/erase.ml and
+535 for rust/emit.ml. The synchronous foreign slice records later printer
+measurements in STAGE-E-FOREIGN.md. A_emit remains pending the user's ruling.

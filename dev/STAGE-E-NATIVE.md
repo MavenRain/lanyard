@@ -58,8 +58,10 @@ nominal metadata validation, execution observations and mutation checks.
 The former concrete-recursion refusal is now covered by successful
 execution. The second refusal pins unsupported polymorphic family fields.
 
-Next Stage E work: foreign templates, model printing, handler fusion, the
-CLI main and the Todo crate golden with its deleted-print-rule mutation.
+The [synchronous foreign slice](STAGE-E-FOREIGN.md) adds `emit --target`
+with checked constant templates and concrete foreign types.
+Next Stage E work: async foreign templates, model printing, handler fusion,
+the CLI main and the Todo crate golden with its deleted-print-rule mutation.
 The Todo fixture is not yet printable.
 `emit FILE.lan` without `--native` remains reserved for the crate command.
 Stage F still owns the remaining driver instruments and M0 close.

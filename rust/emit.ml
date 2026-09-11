@@ -1,19 +1,27 @@
-(** Native Rust printing with typed layouts and explicit ownership conversions.
-    Nominal family payloads own boxed tuples; foreign calls remain unsupported. *)
+(** Rust printing with typed layouts and explicit ownership conversions.
+    Target policies supply checked foreign layouts and call templates. *)
 open Kanon_kernel
 open Rir
+module type Target = sig
+  val foreign_type : string -> (string, Error.t) result
+  val foreign_layout : string -> (string, Error.t) result
+  val foreign_call : foreign ->
+    (repr list * repr * (string list -> (string, Error.t) result), Error.t) result
+end
+module Make (Target : Target) = struct
 let ( let* ) = Result.bind
 let all = Rules.all_ok
-let refuse text = Error (Error.Not_yet ("Rust native emission: " ^ text))
-let invalid text = Error (Error.Mismatch ("Rust native emission: " ^ text))
+let refuse text = Error (Error.Not_yet ("Rust emission: " ^ text))
+let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
 type ty = Nat | Unit | Product of ty list | Sum of ty list | Shared of ty
-  | Closure of ty list * ty | Nominal of string
+  | Closure of ty list * ty | Nominal of string | Foreign of string
 type family = { family_name : string; variants : ty list list }
 type value = { code : string; ty : ty }
 type signature = { name : string; params : ty list; result : ty; body : rtm }
 let rec key = function
   | Nat -> "nat" | Unit -> "unit"
   | Nominal name -> "nominal(" ^ string_of_int (String.length name) ^ ":" ^ name ^ ")"
+  | Foreign name -> "foreign(" ^ name ^ ")"
   | Product fields -> "product(" ^ String.concat "," (List.map key fields) ^ ")"
   | Sum fields -> "sum(" ^ String.concat "," (List.map key fields) ^ ")"
   | Shared ty -> "shared(" ^ key ty ^ ")"
@@ -45,12 +53,12 @@ let rec layout text =
   if String.equal text "nat" then Ok Nat
   else if String.starts_with ~prefix:"mu<" text then
     let* name = inside "mu<" text |> Option.to_result
-      ~none:(Error.Mismatch "Rust native emission: malformed family layout") in
+      ~none:(Error.Mismatch "Rust emission: malformed family layout") in
     if String.equal name "" || String.exists (fun c -> Char.equal c '<' || Char.equal c '>') name
     then invalid "malformed family name" else Ok (Nominal name)
   else if String.starts_with ~prefix:"fn<" text then
     let* contents = inside "fn<" text |> Option.to_result
-      ~none:(Error.Mismatch "Rust native emission: malformed closure layout") in
+      ~none:(Error.Mismatch "Rust emission: malformed closure layout") in
     let* parts = split ';' contents in
     (match parts with
     | [params; result] ->
@@ -60,7 +68,7 @@ let rec layout text =
     | [] | [_] | _ :: _ :: _ :: _ -> invalid "closure layout requires parameters and result")
   else Option.fold ~none:(refuse ("layout " ^ text)) ~some:(fun (prefix, delimiter, make) ->
     let* contents = inside prefix text |> Option.to_result
-      ~none:(Error.Mismatch ("Rust native emission: malformed layout: " ^ text)) in
+      ~none:(Error.Mismatch ("Rust emission: malformed layout: " ^ text)) in
     let* fields = split delimiter contents in
     let* fields = all (List.map representation fields) in Ok (make fields))
     (List.find_opt (fun (prefix, _delimiter, _make) -> String.starts_with ~prefix text)
@@ -71,11 +79,13 @@ and representation text =
   if String.equal text "i31" then Ok Nat
   else if String.starts_with ~prefix:"Arc<" text then
     let* contents = inside "Arc<" text |> Option.to_result
-      ~none:(Error.Mismatch "Rust native emission: malformed shared layout") in
+      ~none:(Error.Mismatch "Rust emission: malformed shared layout") in
     let* ty = representation contents in Ok (Shared ty)
   else Option.fold ~none:(refuse ("representation " ^ text)) ~some:(fun prefix ->
-    layout (drop (String.length prefix) text))
-    (List.find_opt (fun prefix -> String.starts_with ~prefix text) [ "struct "; "union "; "func " ])
+    let name = drop (String.length prefix) text in
+    if String.equal prefix "foreign " then Target.foreign_layout name |> Result.map (fun name -> Foreign name)
+    else layout name)
+    (List.find_opt (fun prefix -> String.starts_with ~prefix text) [ "struct "; "union "; "func "; "foreign " ])
 let rec repr = function
   | TyI31 -> Ok Nat
   | TyStruct tid | TyUnion tid -> layout (tid_text tid)
@@ -84,11 +94,12 @@ let rec repr = function
       let* ty = layout (tid_text tid) in
       (match ty with
       | Closure _ -> Ok ty
-      | Nat | Unit | Product _ | Sum _ | Shared _ | Nominal _ -> invalid "function representation needs closure layout")
+      | Nat | Unit | Product _ | Sum _ | Shared _ | Nominal _ | Foreign _ -> invalid "function representation needs closure layout")
   | TyThunk tid -> refuse ("thunk signature " ^ tid_text tid)
-  | TyForeign name -> refuse ("foreign type " ^ name)
+  | TyForeign name -> Target.foreign_type name |> Result.map (fun name -> Foreign name)
 let rec rust_type = function
   | Nat -> "Nat" | Unit -> "()"
+  | Foreign name -> name
   | Product fields -> type_name (Product fields)
   | Sum fields -> type_name (Sum fields)
   | Shared ty -> "Arc<" ^ rust_type ty ^ ">"
@@ -96,17 +107,18 @@ let rec rust_type = function
 let rec coerce target value =
   if same target value.ty then Ok value.code
   else match target, value.ty with
-    | Shared target, (Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _) ->
+    | Foreign _, Shared _ -> refuse "owned copy of a shared foreign value"
+    | Shared target, (Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _ | Foreign _) ->
         let* code = coerce target value in Ok ("Arc::new(" ^ code ^ ")")
     | (Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _), Shared source ->
         coerce target { code = "(*(" ^ value.code ^ ")).clone()"; ty = source }
     | Shared _, Shared _
-    | (Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _), (Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _) ->
+    | (Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _ | Foreign _), (Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _ | Foreign _) ->
         invalid ("conversion from " ^ key value.ty ^ " to " ^ key target)
 let at index values =
   if index < 0 then invalid "negative runtime index"
   else List.to_seq values |> Seq.drop index |> Seq.uncons |> Option.map fst |> Option.to_result
-    ~none:(Error.Mismatch ("Rust native emission: runtime index " ^ string_of_int index))
+    ~none:(Error.Mismatch ("Rust emission: runtime index " ^ string_of_int index))
 let rec arguments what params values =
   match params, values with
   | [], [] -> Ok []
@@ -131,12 +143,12 @@ let rec shared_slot index = function
 let local_value shared value =
   if not shared then value else match value.ty with
   | Shared _ -> value
-  | Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _ ->
+  | Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _ | Foreign _ ->
       { code = "Arc::new(" ^ value.code ^ ")"; ty = Shared value.ty }
 let closure_signature signatures fid arity =
   let name = fid_text fid in
   let* signature = List.find_opt (fun signature -> String.equal signature.name name) signatures
-    |> Option.to_result ~none:(Error.Mismatch ("Rust native emission: missing closure function " ^ name)) in
+    |> Option.to_result ~none:(Error.Mismatch ("Rust emission: missing closure function " ^ name)) in
   if arity < 0 || arity > List.length signature.params then invalid "closure arity"
   else let count = List.length signature.params - arity in
     let captures = List.to_seq signature.params |> Seq.take count |> List.of_seq in
@@ -144,21 +156,21 @@ let closure_signature signatures fid arity =
     Ok (captures, params, signature.result)
 let closure_name fid arity = identifier "c_" (fid_text fid ^ ":" ^ string_of_int arity)
 let find_family families name = List.find_opt (fun family -> String.equal family.family_name name) families
-  |> Option.to_result ~none:(Error.Mismatch ("Rust native emission: missing family metadata " ^ name))
-let family_fields families name tag = let* family = find_family families name in at tag family.variants |> Result.map_error (fun _error -> Error.Mismatch ("Rust native emission: constructor tag " ^ string_of_int tag ^ " of " ^ name))
+  |> Option.to_result ~none:(Error.Mismatch ("Rust emission: missing family metadata " ^ name))
+let family_fields families name tag = let* family = find_family families name in at tag family.variants |> Result.map_error (fun _error -> Error.Mismatch ("Rust emission: constructor tag " ^ string_of_int tag ^ " of " ^ name))
 let tuple codes = "(" ^ String.concat ", " codes ^ (if List.is_empty codes then "" else ",") ^ ")"
 let branch_result arms =
   match arms with
   | [] -> invalid "empty case"
   | (_pattern, first) :: _rest ->
-      let result = match first.ty with Shared ty -> ty
-        | Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _ -> first.ty in
+      let result = match first.ty with Shared (Foreign _) -> first.ty | Shared ty -> ty
+        | Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _ | Foreign _ -> first.ty in
       let* arms = all (List.map (fun (pattern, body) ->
         let* body = coerce result body in Ok (pattern ^ " => " ^ body)) arms) in
       Ok (result, String.concat ", " arms)
 let primitive name args =
   let* primitive = Prim.of_name name |> Option.to_result
-    ~none:(Error.Not_yet ("Rust native emission: native call " ^ name)) in
+    ~none:(Error.Not_yet ("Rust emission: native call " ^ name)) in
   let* args = arguments "argument" [Nat; Nat] args in
   let* left = at 0 args in let* right = at 1 args in
   let call method_name = "(" ^ left ^ ")." ^ method_name ^ "(&(" ^ right ^ "))?" in
@@ -191,6 +203,7 @@ let rec expression families signatures env term =
       let* value = walk term in
       (match value.ty with
       | Shared _ -> Ok { value with code = "Arc::clone(&(" ^ value.code ^ "))" }
+      | Foreign _ -> refuse "clone of an owned foreign value"
       | Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _ ->
           Ok { code = "Arc::new((" ^ value.code ^ ").clone())"; ty = Shared value.ty })
   | RCall (name, terms) ->
@@ -208,7 +221,7 @@ let rec expression families signatures env term =
           let* args = arguments "argument" fields args in
           Ok { code = rust_type ty ^ " { " ^ String.concat ", "
             (List.mapi (fun i code -> "f" ^ string_of_int i ^ ": " ^ code) args) ^ " }"; ty }
-      | Nat | Sum _ | Shared _ | Closure _ | Nominal _ -> invalid "product layout")
+      | Nat | Sum _ | Shared _ | Closure _ | Nominal _ | Foreign _ -> invalid "product layout")
   | RProj (tid, index, term) ->
       let* ty = layout (tid_text tid) in let* value = walk term in let* code = coerce ty value in
       (match ty with
@@ -219,7 +232,7 @@ let rec expression families signatures env term =
           let bindings = List.mapi (fun i name -> "f" ^ string_of_int i ^ ": " ^ name) names in
           Ok { code = "{ let " ^ rust_type ty ^ " { " ^ String.concat ", " bindings ^ " } = "
             ^ code ^ "; " ^ name ^ " }"; ty = field }
-      | Nat | Unit | Sum _ | Shared _ | Closure _ | Nominal _ -> invalid "projection layout")
+      | Nat | Unit | Sum _ | Shared _ | Closure _ | Nominal _ | Foreign _ -> invalid "projection layout")
   | RTag (tid, tag, terms) ->
       let* ty = layout (tid_text tid) in let* args = values terms in
       (match ty with
@@ -231,7 +244,7 @@ let rec expression families signatures env term =
       | Sum fields ->
           let* field = at tag fields in let* args = arguments "argument" [field] args in
           Ok { code = rust_type ty ^ "::V" ^ string_of_int tag ^ "(" ^ String.concat ", " args ^ ")"; ty }
-      | Nat | Unit | Product _ | Shared _ | Closure _ -> invalid "sum layout")
+      | Nat | Unit | Product _ | Shared _ | Closure _ | Foreign _ -> invalid "sum layout")
   | RCase (tid, term, branches) ->
       let* ty = layout (tid_text tid) in let* value = walk term in let* code = coerce ty value in
       (match ty with
@@ -276,12 +289,12 @@ let rec expression families signatures env term =
             (match arms with
             | [] -> invalid "empty case"
             | (_pattern, first) :: _rest ->
-                let result = match first.ty with Shared ty -> ty
-                  | Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _ -> first.ty in
+                let result = match first.ty with Shared (Foreign _) -> first.ty | Shared ty -> ty
+                  | Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _ | Foreign _ -> first.ty in
                 let* arms = all (List.map (fun (pattern, body) ->
                   let* body = coerce result body in Ok (pattern ^ " => " ^ body)) arms) in
                 Ok { code = "match " ^ code ^ " { " ^ String.concat ", " arms ^ " }"; ty = result })
-      | Nat | Unit | Product _ | Shared _ | Closure _ -> invalid "case layout")
+      | Nat | Unit | Product _ | Shared _ | Closure _ | Foreign _ -> invalid "case layout")
   | RLam (fid, arity, captures) ->
       let* capture_types, params, result = closure_signature signatures fid arity in
       let* captures = values captures in let* captures = arguments "capture" capture_types captures in
@@ -292,13 +305,19 @@ let rec expression families signatures env term =
       let rec signature = function
         | Closure (params, result) -> Ok (params, result)
         | Shared ty -> signature ty
-        | Nat | Unit | Product _ | Sum _ | Nominal _ -> invalid "closure call needs a function" in
+        | Nat | Unit | Product _ | Sum _ | Nominal _ | Foreign _ -> invalid "closure call needs a function" in
       let* params, result = signature head.ty in let* args = arguments "argument" params args in
       Ok { code = "((" ^ head.code ^ ").call)(" ^ String.concat ", " args ^ ")?"; ty = result }
-  | RForeign (row, _args) -> refuse ("foreign call " ^ row.name)
+  | RForeign (row, terms) ->
+      let* params, result, render = Target.foreign_call row in
+      let* params = all (List.map repr params) in
+      let* ty = repr result in
+      let* args = values terms in
+      let* args = arguments "foreign argument" params args in
+      let* code = render args in Ok { code; ty }
 let rec aggregates ty =
   match ty with
-  | Nat | Unit | Nominal _ -> []
+  | Nat | Unit | Nominal _ | Foreign _ -> []
   | Shared ty -> aggregates ty
   | Product fields | Sum fields -> ty :: List.concat_map aggregates fields
   | Closure (params, result) -> ty :: List.concat_map aggregates (result :: params)
@@ -330,7 +349,7 @@ let rec closure_sites = function
 let rec has_closure = function
   | Closure _ -> true
   | Nat | Unit -> false
-  | Nominal _ -> true
+  | Nominal _ | Foreign _ -> true
   | Shared ty -> has_closure ty
   | Product fields | Sum fields -> List.exists has_closure fields
 let closure_declaration params result =
@@ -345,12 +364,15 @@ let closure_declaration params result =
    an owned closure from explicit copies, including Arc handle clones for Many. *)
 let closure_factory signatures (fid, arity) =
   let* captures, params, result = closure_signature signatures fid arity in
+  let* () = if List.exists (function Foreign _ -> true
+    | Nat | Unit | Product _ | Sum _ | Shared _ | Closure _ | Nominal _ -> false) captures
+    then refuse "owned foreign closure capture" else Ok () in
   let names prefix types = List.mapi (fun i ty -> (prefix ^ string_of_int i, ty)) types in
   let captures = names "c" captures and params = names "p" params in
   let declarations values = String.concat ", " (List.map (fun (name, ty) -> name ^ ": " ^ rust_type ty) values) in
   let copy (name, ty) = match ty with
     | Shared _ -> "Arc::clone(&(" ^ name ^ "))"
-    | Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _ -> "(" ^ name ^ ").clone()" in
+    | Nat | Unit | Product _ | Sum _ | Closure _ | Nominal _ | Foreign _ -> "(" ^ name ^ ").clone()" in
   let saved = List.map (fun (name, ty) -> ("saved_" ^ name, ty)) captures in
   let name = closure_name fid arity in let ty = Closure (List.map snd params, result) in
   let code = "fn " ^ name ^ "(" ^ declarations captures ^ ") -> " ^ rust_type ty ^ " {\n"
@@ -365,13 +387,13 @@ let closure_factory signatures (fid, arity) =
 let declaration ty =
   match ty with
   | Closure (params, result) -> closure_declaration params result
-  | Nat | Unit | Product _ | Sum _ | Shared _ | Nominal _ ->
+  | Nat | Unit | Product _ | Sum _ | Shared _ | Nominal _ | Foreign _ ->
   let fields = match ty with
     | Product fields -> "struct " ^ rust_type ty ^ " { " ^ String.concat ", "
         (List.mapi (fun i ty -> "f" ^ string_of_int i ^ ": " ^ rust_type ty) fields) ^ " }"
     | Sum fields -> "enum " ^ rust_type ty ^ " { " ^ String.concat ", "
         (List.mapi (fun i ty -> "V" ^ string_of_int i ^ "(" ^ rust_type ty ^ ")") fields) ^ " }"
-    | Nat | Unit | Shared _ | Closure _ | Nominal _ -> "" in
+    | Nat | Unit | Shared _ | Closure _ | Nominal _ | Foreign _ -> "" in
   (if has_closure ty then "#[derive(Clone, Debug)]\n"
    else "#[derive(Clone, Debug, PartialEq, Eq)]\n") ^ fields ^ "\n"
 
@@ -461,18 +483,18 @@ let family_catalog rows =
     let text = tid_text tid in
     if not (String.starts_with ~prefix:"leg<" text) then None else Some (
       let* contents = inside "leg<" text |> Option.to_result
-        ~none:(Error.Mismatch "Rust native emission: malformed constructor metadata") in
+        ~none:(Error.Mismatch "Rust emission: malformed constructor metadata") in
       let* parts = split ',' contents in
       match parts with
       | family :: tag :: fields ->
           let* family = layout family in
           let* tag_number = int_of_string_opt tag |> Option.to_result
-            ~none:(Error.Mismatch "Rust native emission: constructor tag is not an integer") in
+            ~none:(Error.Mismatch "Rust emission: constructor tag is not an integer") in
           if tag_number < 0 || not (String.equal tag (string_of_int tag_number)) then invalid "invalid constructor tag"
           else let* fields = all (List.map representation fields) in
             (match family with
             | Nominal name -> Ok (name, tag_number, fields)
-            | Nat | Unit | Product _ | Sum _ | Shared _ | Closure _ -> invalid "constructor family layout")
+            | Nat | Unit | Product _ | Sum _ | Shared _ | Closure _ | Foreign _ -> invalid "constructor family layout")
       | [] | [_] -> invalid "incomplete constructor metadata")) |> all in
   let* unique = List.fold_left (fun acc (name, tag, fields) ->
     let* acc = acc in
@@ -485,18 +507,29 @@ let family_catalog rows =
       |> List.sort (fun (a, _fields) (b, _other) -> Int.compare a b) in
     if List.map fst variants <> List.init (List.length variants) Fun.id then invalid ("noncontiguous constructor tags " ^ name)
     else Ok { family_name = name; variants = List.map snd variants }) names)
+let rec contains_foreign = function
+  | Foreign _ -> true
+  | Nat | Unit | Nominal _ -> false
+  | Shared ty -> contains_foreign ty
+  | Product fields | Sum fields -> List.exists contains_foreign fields
+  | Closure (params, result) -> List.exists contains_foreign (result :: params)
+let aggregate_foreign fields =
+  if List.exists contains_foreign fields then refuse "foreign aggregate layout" else Ok ()
 let rec validate_type families = function
-  | Nat | Unit -> Ok ()
+  | Nat | Unit | Foreign _ -> Ok ()
   | Nominal name -> let* _family = find_family families name in Ok ()
   | Shared ty -> validate_type families ty
-  | Product fields | Sum fields -> let* _checked = all (List.map (validate_type families) fields) in Ok ()
-  | Closure (params, result) -> let* _checked = all (List.map (validate_type families) (result :: params)) in Ok ()
+  | Product fields | Sum fields -> let* () = aggregate_foreign fields in
+      let* _checked = all (List.map (validate_type families) fields) in Ok ()
+  | Closure (params, result) -> let* () = aggregate_foreign (result :: params) in
+      let* _checked = all (List.map (validate_type families) (result :: params)) in Ok ()
 let family_declaration family =
   let variants = List.mapi (fun tag fields ->
     "V" ^ string_of_int tag ^ (if List.is_empty fields then "" else "(Box<" ^ tuple (List.map rust_type fields) ^ ">)")) family.variants in
   "#[derive(Clone, Debug)]\nenum " ^ rust_type (Nominal family.family_name) ^ " { " ^ String.concat ", " variants ^ " }\n"
 let native rows =
   let* families = family_catalog rows in
+  let* _checked = all (List.map (fun family -> aggregate_foreign (List.concat family.variants)) families) in
   let* signatures = rows |> List.concat_map (fun (_name, entry) ->
     match entry with
     | Erase.Dropped | Erase.Postulate _ -> []
@@ -526,6 +559,7 @@ let native rows =
     let sites = List.concat_map (fun signature -> closure_sites signature.body) signatures
       |> List.sort_uniq compare in
     let* factories = all (List.map (closure_factory signatures) sites) in
+    let* _checked = all (List.map (fun (ty, _code) -> validate_type families ty) factories) in
     let types = bool_ty :: List.map fst factories @ mentioned @ family_types
       @ List.concat_map (fun signature -> signature.result :: signature.params) signatures
       |> List.concat_map aggregates |> List.sort_uniq (fun a b -> String.compare (key a) (key b)) in
@@ -533,3 +567,9 @@ let native rows =
     Ok (runtime ^ family_code ^ String.concat "\n" (List.map declaration types) ^ "\n"
       ^ String.concat "\n" (List.map snd factories) ^ (if List.is_empty factories then "" else "\n")
       ^ String.concat "\n" bodies)
+end
+include Make (struct
+  let foreign_type name = Error (Error.Not_yet ("Rust emission: foreign type " ^ name))
+  let foreign_layout name = Error (Error.Not_yet ("Rust emission: representation foreign " ^ name))
+  let foreign_call row = Error (Error.Not_yet ("Rust emission: foreign call " ^ row.name))
+end)

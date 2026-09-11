@@ -1,0 +1,7 @@
+def redirect : Uri -> SeeOther := fun (uri : Uri) => topcoat.see_other uri
+def moveUri : (1 uri : Uri) -> Uri := fun (1 uri : Uri) => uri
+def redirectLet : Uri -> SeeOther := fun (uri : Uri) =>
+  let destination : Uri := uri in topcoat.see_other destination
+def forward : Uri -> SeeOther := fun (uri : Uri) => redirect uri
+def contextDb : Cx -> Db := fun (cx : Cx) => topcoat.db cx
+def moveRedirect : (1 response : SeeOther) -> SeeOther := fun (1 response : SeeOther) => response

@@ -17,7 +17,7 @@ let report expected rows = Emit.native rows |> Result.fold
     let text = Error.to_string error in
     if holds text expected then "" else text)
 let term body = [ function_row "main" [] nat body ]
-let prefix = "Rust native emission: "
+let prefix = "Rust emission: "
 let mismatch text = "mismatch: " ^ prefix ^ text
 let not_yet text = "not yet: " ^ prefix ^ text
 let tests = [

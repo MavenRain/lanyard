@@ -127,6 +127,23 @@ if [[ -d $root/rust ]]; then
     exit 1
   fi
   print -r -- "TRUSTED-LINES emit=$emit_lines allowance=A_emit (pending user ruling)"
+  # Foreign policy and template expansion decide emitted Rust too. Include both
+  # in the measured printer total; splitting files cannot hide trusted code.
+  printer_lines=$emit_lines
+  for part in foreign template; do
+    if [[ ! -f $root/rust/$part.ml ]]; then
+      print -r -- "TRUSTED-LINES FAIL: rust/$part.ml missing"
+      exit 1
+    fi
+    part_lines=$(wc -l < $root/rust/$part.ml | tr -d ' ')
+    if [[ -z $part_lines ]]; then
+      print -r -- "TRUSTED-LINES FAIL: rust/$part.ml has an empty line count"
+      exit 1
+    fi
+    printer_lines=$((printer_lines + part_lines))
+    print -r -- "TRUSTED-LINES $part=$part_lines allowance=A_emit (pending user ruling)"
+  done
+  print -r -- "TRUSTED-LINES printer-total=$printer_lines allowance=A_emit (pending user ruling)"
 fi
 
 # Stage B measures the generated module; S0-D1 leaves its allowance to the user.

@@ -1,7 +1,8 @@
 (** The lanyard driver.  M0 Stage A deletes the wasm back end at the
     fork point, so the driver holds check, axioms and spec-count.
     The first Stage E slice also prints native Rust through emit --native.
-    The foreign target printer and the crate command land at a later slice.
+    The synchronous target slice also prints foreign constants through --target.
+    Async foreign calls and the crate command land at a later slice.
 
     Exit codes.  0 is a file that checks, 1 is a file that does not and
     64 is a usage error or a missing file.  A check failure writes one
@@ -20,7 +21,7 @@
 
 let usage () : unit =
   prerr_endline
-    "usage: lanyard check [--print|--erased] FILE | emit --native FILE.lan | axioms FILE | spec-count"
+    "usage: lanyard check [--print|--erased] FILE | emit [--native|--target] FILE.lan | axioms FILE | spec-count"
 
 let read_file (path : string) : string =
   if Sys.file_exists path then In_channel.with_open_bin path In_channel.input_all
@@ -97,6 +98,12 @@ let dispatch_emit args =
       Kanon_surface.Elab.check_lanyard (read_file path)
       |> Fun.flip Result.bind Kanon_surface.Lower.program
       |> Fun.flip Result.bind Lanyard_rust.Emit.native
+      |> Result.fold ~ok:print_string ~error:(fun error ->
+          prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
+  | [ "--target"; path ] when Filename.check_suffix path ".lan" ->
+      Kanon_surface.Elab.check_lanyard (read_file path)
+      |> Fun.flip Result.bind Kanon_surface.Lower.program
+      |> Fun.flip Result.bind Lanyard_rust.Foreign.source
       |> Result.fold ~ok:print_string ~error:(fun error ->
           prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
   | [] | _ :: _ -> usage (); exit 64

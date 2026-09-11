@@ -1,0 +1,2 @@
+gateledger: MISS a12c49c8: env RUSTC_WRAPPER= rustup run 1.98 cargocho build -- --manifest-path /Users/oobi/Documents/gpt2/lanyard-foreign-pinned/Cargo.toml --locked --jobs 2
+gateledger: recorded green a12c49c8 (138s)

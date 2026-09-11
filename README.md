@@ -8,8 +8,9 @@ a generated OCaml metadata library, and source drift checks. Stage C checks
 those signatures, elaborates models and operation families, and derives the
 foreign-type census. Stage D adds Rust IR, quantity-aware erasure and checked
 foreign-call metadata. The Stage E native command prints Rust for pure
-programs, including typed closures, captures and recursive data. Foreign
-target printing and the complete M0 driver remain ahead.
+programs, including typed closures, captures and recursive data. The target
+command adds synchronous foreign constants and concrete foreign types.
+Async target printing and the complete M0 driver remain ahead.
 The generated signature allowance is proposed at 104 lines and awaits the
 user's ruling. See [target documentation](target/README.md), the
 [Stage B build log](dev/M0-BUILD-LOG.md#lanyard-m0-stage-b-2026-09-09) and
@@ -36,6 +37,17 @@ products, sums, native calls, [typed closures](dev/STAGE-E-CLOSURES.md), and
 [recursive families](dev/STAGE-E-RECURSIVE.md).
 It reports unsupported foreign and polymorphic field layouts explicitly.
 The Todo crate golden is still pending.
+
+Validate and use the [synchronous foreign printer](dev/STAGE-E-FOREIGN.md):
+
+```sh
+zsh dev/gates.sh --stage E-foreign
+_build/default/bin/lanyard.exe emit --target test/fixtures/foreign.lan
+```
+
+This prints a Rust source module using the pinned target paths, including
+`topcoat.db` and `topcoat.see_other`. Foreign schemas and async effects
+remain explicit refusals.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current

@@ -408,3 +408,20 @@ other families without constructing or matching any of them, checking
 transitive metadata completion. Eighteen new malformed-IR refusal rows
 and one duplicate-metadata success row exercise the printer boundary.
 The foreign print-rule deletion mutation remains in the pending Todo slice.
+## Lanyard Stage E synchronous foreign constants (2026-09-10)
+
+test/lan_foreign.py exercises three non-vacuity controls against generated
+code and template expansions:
+
+- Reverse the evaluation order of two same-typed arguments. The mutant
+  compiles, then its order-sensitive values differ from the oracle.
+- Evaluate a repeated Many slot again instead of borrowing its stored
+  value. The mutant compiles, then values and the evaluation count differ.
+- Pass an Arc directly where the pinned context helper requires a Cx
+  reference. The strict API double rejects the mutant for its argument type.
+
+The OCaml suite additionally removes a used entry from the catalog and
+requires a missing-print-rule error. It rejects altered print text, effects,
+names, type arguments, arities, permuted catalog quantities and non-atomic
+call types. The Todo crate's deleted-print-rule
+EMIT-DIFF mutation remains future work with model and async printing.

@@ -4,8 +4,10 @@ Stage B provides 15 proposed foreign declarations: nine type constants and
 six constant or model schemas. The target layer builds as `lanyard_target`;
 its `Target_generated` module exposes immutable metadata and total lookup.
 Stage C instantiates schemas and checks their types before adding axioms.
-Stage E will apply the print rules. Stage B does not establish Rust compilation
-or kernel soundness for a schema merely by generating its metadata.
+The synchronous Stage E slice applies constant print rules through
+`emit --target`, with `topcoat.db` and `topcoat.see_other` in its fixture.
+Schema and async printing remain ahead. Stage B does not establish Rust
+compilation or kernel soundness for a schema merely by generating metadata.
 
 Run `zsh dev/gates.sh --stage B` from the repository. It builds the compiler
 and generated library, checks the target pins, runs the mutation suite and
