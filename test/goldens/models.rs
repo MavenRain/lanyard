@@ -90,6 +90,9 @@ impl Nat {
 struct T70726f64756374286e61742c6e617429 { f0: Nat, f1: Nat }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
+struct T70726f647563742873756d28756e69742c756e6974292c6e61742c6e61742c73756d28756e69742c756e69742929 { f0: T73756d28756e69742c756e697429, f1: Nat, f2: Nat, f3: T73756d28756e69742c756e697429 }
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 enum T73756d28756e69742c756e697429 { V0(()), V1(()) }
 
 fn f_6974656d() -> Result<T70726f64756374286e61742c6e617429, Error> {
@@ -116,6 +119,22 @@ async fn f_6c6f6f6b757053696e676c65(a0: Arc<Nat>, a1: Arc<toasty::Db>) -> Result
     Ok({ let __lan_value = Arc::clone(&(a0)); let __lan_db_arg = Arc::clone(&(a1)); let mut __lan_db = (*__lan_db_arg).clone(); let __lan_row = LanModel53696e676c65::get_by_id(&mut __lan_db, &lan_model_to_i64(&__lan_value)?).await?; T70726f64756374286e61742c6e617429 { f0: lan_model_from_i64(__lan_row.f_76616c7565)?, f1: lan_model_from_i64(__lan_row.id)? } })
 }
 
+fn f_666c6167(a0: Arc<Nat>, a1: Arc<Nat>) -> Result<T70726f647563742873756d28756e69742c756e6974292c6e61742c6e61742c73756d28756e69742c756e69742929, Error> {
+    Ok(T70726f647563742873756d28756e69742c756e6974292c6e61742c6e61742c73756d28756e69742c756e69742929 { f0: if ((*(Arc::clone(&(a1)))).clone()).compare(&(Nat::decimal("1")?)).is_eq() { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) }, f1: (*(Arc::clone(&(a0)))).clone(), f2: (*(Arc::clone(&(a1)))).clone(), f3: if ((*(Arc::clone(&(a1)))).clone()).compare(&(Nat::decimal("1")?)).is_lt() { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) } })
+}
+
+async fn f_637265617465466c6167(a0: Arc<T70726f647563742873756d28756e69742c756e6974292c6e61742c6e61742c73756d28756e69742c756e69742929>, a1: Arc<toasty::Db>) -> Result<T70726f647563742873756d28756e69742c756e6974292c6e61742c6e61742c73756d28756e69742c756e69742929, Error> {
+    Ok({ let __lan_value = Arc::clone(&(a0)); let __lan_db_arg = Arc::clone(&(a1)); let mut __lan_db = (*__lan_db_arg).clone(); let __lan_row = toasty::create!(LanModel466c6167 { f_656e61626c6564: match &__lan_value.f0 { T73756d28756e69742c756e697429::V0(()) => false, T73756d28756e69742c756e697429::V1(()) => true }, id: lan_model_to_i64(&__lan_value.f1)?, f_636f756e74: lan_model_to_i64(&__lan_value.f2)?, f_6172636869766564: match &__lan_value.f3 { T73756d28756e69742c756e697429::V0(()) => false, T73756d28756e69742c756e697429::V1(()) => true } }).exec(&mut __lan_db).await?; T70726f647563742873756d28756e69742c756e6974292c6e61742c6e61742c73756d28756e69742c756e69742929 { f0: if __lan_row.f_656e61626c6564 { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) }, f1: lan_model_from_i64(__lan_row.id)?, f2: lan_model_from_i64(__lan_row.f_636f756e74)?, f3: if __lan_row.f_6172636869766564 { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) } } })
+}
+
+async fn f_637265617465466c616756616c7565(a0: Arc<Nat>, a1: Arc<Nat>, a2: Arc<toasty::Db>) -> Result<T70726f647563742873756d28756e69742c756e6974292c6e61742c6e61742c73756d28756e69742c756e69742929, Error> {
+    Ok({ let __lan_value = Arc::new(f_666c6167(Arc::clone(&(a0)), Arc::clone(&(a1)))?); let __lan_db_arg = Arc::clone(&(a2)); let mut __lan_db = (*__lan_db_arg).clone(); let __lan_row = toasty::create!(LanModel466c6167 { f_656e61626c6564: match &__lan_value.f0 { T73756d28756e69742c756e697429::V0(()) => false, T73756d28756e69742c756e697429::V1(()) => true }, id: lan_model_to_i64(&__lan_value.f1)?, f_636f756e74: lan_model_to_i64(&__lan_value.f2)?, f_6172636869766564: match &__lan_value.f3 { T73756d28756e69742c756e697429::V0(()) => false, T73756d28756e69742c756e697429::V1(()) => true } }).exec(&mut __lan_db).await?; T70726f647563742873756d28756e69742c756e6974292c6e61742c6e61742c73756d28756e69742c756e69742929 { f0: if __lan_row.f_656e61626c6564 { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) }, f1: lan_model_from_i64(__lan_row.id)?, f2: lan_model_from_i64(__lan_row.f_636f756e74)?, f3: if __lan_row.f_6172636869766564 { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) } } })
+}
+
+async fn f_6c6f6f6b7570466c6167(a0: Arc<Nat>, a1: Arc<toasty::Db>) -> Result<T70726f647563742873756d28756e69742c756e6974292c6e61742c6e61742c73756d28756e69742c756e69742929, Error> {
+    Ok({ let __lan_value = Arc::clone(&(a0)); let __lan_db_arg = Arc::clone(&(a1)); let mut __lan_db = (*__lan_db_arg).clone(); let __lan_row = LanModel466c6167::get_by_id(&mut __lan_db, &lan_model_to_i64(&__lan_value)?).await?; T70726f647563742873756d28756e69742c756e6974292c6e61742c6e61742c73756d28756e69742c756e69742929 { f0: if __lan_row.f_656e61626c6564 { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) }, f1: lan_model_from_i64(__lan_row.id)?, f2: lan_model_from_i64(__lan_row.f_636f756e74)?, f3: if __lan_row.f_6172636869766564 { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) } } })
+}
+
 #[derive(Debug, toasty::Model)]
 struct LanModel436f756e746572 {
     #[key]
@@ -128,6 +147,15 @@ struct LanModel53696e676c65 {
     f_76616c7565: i64,
     #[key]
     id: i64,
+}
+
+#[derive(Debug, toasty::Model)]
+struct LanModel466c6167 {
+    f_656e61626c6564: bool,
+    #[key]
+    id: i64,
+    f_636f756e74: i64,
+    f_6172636869766564: bool,
 }
 
 fn lan_model_to_i64(value: &Nat) -> Result<i64, Error> {

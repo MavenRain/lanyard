@@ -1,4 +1,4 @@
-(** The first model bridge stores Nat fields through checked i64 conversions.
+(** Model fields store Nat through checked i64 conversions and two-unit sums as bool.
     Checked model instances select schemas; only the key field id keeps its source name. *)
 open Kanon_kernel
 module Elab = Kanon_surface.Elab
@@ -8,7 +8,18 @@ module Printer = Foreign.Printer
 let ( let* ) = Result.bind
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
 let refuse text = Error (Error.Not_yet ("Rust emission: " ^ text))
-type t = { name : string; fields : string list; repr : Rir.repr; instances : Rir.foreign list }
+type scalar = Nat_field | Bool_field
+type t = { name : string; fields : (string * scalar) list; repr : Rir.repr; instances : Rir.foreign list }
+let bool_repr = Rir.TyUnion (Rir.Tid "sum<struct tuple<>|struct tuple<>>")
+let bool_type = Printer.rust_type (Printer.Sum [Printer.Unit; Printer.Unit])
+let storage_type = function Nat_field -> "i64" | Bool_field -> "bool"
+let to_storage scalar value = match scalar with
+  | Nat_field -> "lan_model_to_i64(&" ^ value ^ ")?"
+  | Bool_field -> "match &" ^ value ^ " { " ^ bool_type ^ "::V0(()) => false, "
+      ^ bool_type ^ "::V1(()) => true }"
+let from_storage scalar value = match scalar with
+  | Nat_field -> "lan_model_from_i64(" ^ value ^ ")?"
+  | Bool_field -> "if " ^ value ^ " { " ^ bool_type ^ "::V1(()) } else { " ^ bool_type ^ "::V0(()) }"
 let rust_name model = Printer.identifier "LanModel" model.name
 let field_name name = if String.equal name "id" then "id" else Printer.identifier "f_" name
 let catalog (checked : Elab.lan_program) =
@@ -20,15 +31,19 @@ let catalog (checked : Elab.lan_program) =
     let representation syntax =
       let* term = Elab.elab ec.c ~expected:None syntax in
       let* ty = Eval.eval checked.globals [] term in Erase.repr_of ec ty in
-    let* _fields = Rules.all_ok (List.map (fun (field, syntax) ->
+    let* fields = Rules.all_ok (List.map (fun (field, syntax) ->
       let* repr = representation syntax in
-      if repr = Rir.TyUnion (Rir.Tid "nat") then Ok ()
-      else refuse ("model field " ^ model.model_name ^ "." ^ field ^ " requires Nat")) model.fields) in
+      let is_key = String.equal field "id" in
+      match () with
+      | () when repr = Rir.TyUnion (Rir.Tid "nat") -> Ok (field, Nat_field)
+      | () when repr = bool_repr && not is_key -> Ok (field, Bool_field)
+      | () -> refuse ("model field " ^ model.model_name ^ "." ^ field ^ " requires "
+        ^ (if is_key then "Nat" else "Nat or Bool (a two-unit sum)"))) model.fields) in
     let* () = if List.mem_assoc "id" model.fields then Ok () else invalid "model requires id" in
     let* repr = representation (Kanon_surface.Syntax.SVar model.model_name) in
     let instances = List.filter (fun (row : Rir.foreign) ->
       List.assoc_opt "M" row.type_arguments = Some model.model_name) instances in
-    Ok { name = model.model_name; fields = List.map fst model.fields; repr; instances }) checked.models)
+    Ok { name = model.model_name; fields; repr; instances }) checked.models)
 
 type operation = Create | Get
 let operation name =
@@ -64,14 +79,14 @@ let foreign_call entries models (row : Rir.foreign) =
     then Ok () else invalid "model schema placeholders" in
   let render arguments = match arguments with
     | [value; db] ->
-      let fields = List.mapi (fun index field -> field_name field ^ ": lan_model_to_i64(&__lan_value.f"
-        ^ string_of_int index ^ ")?") model.fields |> String.concat ", " in
+      let fields = List.mapi (fun index (field, scalar) -> field_name field ^ ": "
+        ^ to_storage scalar ("__lan_value.f" ^ string_of_int index)) model.fields |> String.concat ", " in
       let value_slot, value_code = match op with
         | Create -> "fields", fields
         | Get -> "key", "lan_model_to_i64(&__lan_value)?" in
       let* call = Template.render template ["M", rust_name model; value_slot, value_code; "db", "__lan_db"] in
-      let result = List.mapi (fun index field -> "f" ^ string_of_int index
-        ^ ": lan_model_from_i64(__lan_row." ^ field_name field ^ ")?") model.fields |> String.concat ", " in
+      let result = List.mapi (fun index (field, scalar) -> "f" ^ string_of_int index
+        ^ ": " ^ from_storage scalar ("__lan_row." ^ field_name field)) model.fields |> String.concat ", " in
       Ok ("{ let __lan_value = " ^ value ^ "; let __lan_db_arg = " ^ db
         ^ "; let mut __lan_db = (*__lan_db_arg).clone(); let __lan_row = " ^ call
         ^ "; " ^ native ^ " { " ^ result ^ " } }")
@@ -81,9 +96,9 @@ let foreign_call entries models (row : Rir.foreign) =
 
 let declaration model =
   "#[derive(Debug, toasty::Model)]\nstruct " ^ rust_name model ^ " {\n"
-  ^ String.concat "" (List.map (fun field ->
+  ^ String.concat "" (List.map (fun (field, scalar) ->
     (if String.equal field "id" then "    #[key]\n" else "")
-    ^ "    " ^ field_name field ^ ": i64,\n") model.fields) ^ "}\n"
+    ^ "    " ^ field_name field ^ ": " ^ storage_type scalar ^ ",\n") model.fields) ^ "}\n"
 let conversions = {|
 fn lan_model_to_i64(value: &Nat) -> Result<i64, Error> {
     value.0.iter().rev().try_fold(0_i64, |number, byte| {

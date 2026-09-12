@@ -1664,3 +1664,58 @@ B-1, B-2, C-6, A-5 and D-2. Round 2 applied ND-1-1, and that record also
 closes the receipt pin item PIN-2. The closing ladder with the tag close
 runs after this paragraph. Its verdict is recorded in the review report
 lanyard-stage-e-models-review/review-LSEM-report.md.
+
+## Boolean model fields (2026-09-11)
+
+The model printer accepts fields whose normalized representation is a
+sum of two units. These fields use Toasty bool columns, with tag 0 as
+false and tag 1 as true, matching the native comparison primitives.
+Aliases receive the same conversion. Nat fields keep their checked i64
+carrier, and keys still require Nat. Unsupported payload sums and
+three-unit sums refuse before Rust is printed.
+
+The Flag fixture mixes two Boolean columns with Nat fields and places
+its key second. Tests cover both Boolean combinations, shared records,
+fresh values, lazy execution, Send, field order, database failures and
+Nat range checks. The emitter suite passes 9 positives and 22 refusals.
+The compiled oracle passes 28 observations and kills all 8 mutations.
+The cumulative `zsh dev/gates.sh --stage E-models` command passes every
+earlier stage leg and ends with STAGE-E-MODELS OK.
+
+The exact golden also builds offline with the existing lockfile,
+Toasty 7bd502cb and Rust 1.98.1. Its SQLite probe passes 28 observations,
+including direct reads of the stored Boolean columns, native lookups,
+duplicate keys and an overflowing Nat write leaving no row. Missing
+cached dependencies were fetched with `cargo fetch --locked` before
+the offline build. The validation records are under
+dev/validation/stage-e-model-bools/.
+
+The model printer grows from 111 to 124 lines; the measured printer
+total is 934. The kernel, eraser, IR, surface, target signatures and pins
+retain their committed bytes. Numeric allowances remain pending user
+rulings. Other field types, including Todo.title, Db.connect, handler
+fusion and the M0 driver remain ahead. No Stage E completion or M0 exit
+is claimed.
+
+Review run wf_bf105e66-afe checked this slice. Finding 0 and finding 3
+say that the new Boolean write mutations also rewrite the oracle helper
+is_true. Both are refuted: test/lan_models.py replaces text in the
+emitted source only, and the helper belongs to the DOUBLE harness
+constant that is added after the replacement. Finding 1 is fixed in
+dev/STAGE-E-MODELS.md, which now says that dev/prepare-models.py writes
+the local checkout path into the probe manifest, and that the checkout
+must be at Toasty commit 7bd502cb. Finding 2 is fixed in rust/model.ml:
+the field classifier binds the key test once and uses match guards, with
+no change to the printed output. Finding 4 is fixed by a rewrap of two
+paragraphs in dev/STAGE-E-MODELS.md, with the words unchanged. After
+these edits the source_sha256 entries of
+dev/validation/stage-e-model-bools/receipt.json differ for
+dev/M0-BUILD-LOG.md, dev/STAGE-E-MODELS.md and rust/model.ml. The
+receipt keeps the pre-review hashes by design, because it records the
+run as it was made.
+The stage gate ran again on the staged tree after these fixes, from
+2026-09-12T04:33:12Z to 2026-09-12T04:36:03Z, and it was GREEN with
+STAGE-GATE-EXIT 0 and the same 25 stage rows as the baseline run and as
+the capture dev/validation/stage-e-model-bools/stage-gate.stdout. This
+sentence is a later change to the build log only, and the gate does not
+read this file.

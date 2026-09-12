@@ -1,4 +1,4 @@
-"""Byte-exact model emission and compiled ownership/range/suspension controls."""
+"""Byte-exact model emission and compiled scalar/ownership/range controls."""
 from pathlib import Path
 import re
 import subprocess
@@ -82,6 +82,20 @@ impl LanModel53696e676c65 {
         db.step().await?; Ok(Self { id: *id, f_76616c7565: db.value(99) })
     }
 }
+impl LanModel466c6167 {
+    async fn get_by_id(db: &mut toasty::Db, id: &i64) -> Result<Self, toasty::Error> {
+        db.step().await?;
+        Ok(Self { f_656e61626c6564: *id == 31, id: *id,
+            f_636f756e74: db.value(*id - 30), f_6172636869766564: *id == 30 })
+    }
+}
+fn is_true(value: &T73756d28756e69742c756e697429) -> bool {
+    match value {
+        T73756d28756e69742c756e697429::V0(()) => false,
+        T73756d28756e69742c756e697429::V1(()) => true,
+    }
+}
+fn nat(number: &str) -> Result<Arc<Nat>, Error> { Nat::decimal(number).map(Arc::new) }
 struct Wake;
 impl std::task::Wake for Wake { fn wake(self: Arc<Self>) {} }
 fn execute<F: std::future::Future + Send>(future: F) -> Result<F::Output, Error> {
@@ -123,6 +137,35 @@ fn main() -> Result<(), Error> {
     let before = db.count();
     report("key-overflow", matches!(execute(f_6c6f6f6b7570(Arc::new(Nat::decimal("9223372036854775808")?), Arc::clone(&db)))?, Err(Error::ModelRange)))?;
     report("no-effect", db.count() == before)?;
+    let true_row = Arc::new(f_666c6167(nat("31")?, nat("1")?)?);
+    let false_row = f_666c6167(nat("30")?, nat("0")?)?;
+    report("bool-source-true", is_true(&true_row.f0) && !is_true(&true_row.f3))?;
+    report("bool-source-false", !is_true(&false_row.f0) && is_true(&false_row.f3))?;
+    let before = db.count();
+    let future = f_637265617465466c6167(Arc::clone(&true_row), Arc::clone(&db));
+    report("bool-lazy", db.count() == before)?;
+    let made = execute(future)??;
+    report("bool-create-true", is_true(&made.f0) && !is_true(&made.f3)
+        && lan_model_to_i64(&made.f1)? == 31 && lan_model_to_i64(&made.f2)? == 1)?;
+    report("bool-once", db.count() == before + 1)?;
+    let made = execute(f_637265617465466c616756616c7565(nat("30")?, nat("0")?, Arc::clone(&db)))??;
+    report("bool-create-false", !is_true(&made.f0) && is_true(&made.f3)
+        && lan_model_to_i64(&made.f1)? == 30 && lan_model_to_i64(&made.f2)? == 0)?;
+    let found = execute(f_6c6f6f6b7570466c6167(nat("31")?, Arc::clone(&db)))??;
+    report("bool-lookup-true", is_true(&found.f0) && !is_true(&found.f3)
+        && lan_model_to_i64(&found.f1)? == 31 && lan_model_to_i64(&found.f2)? == 1)?;
+    let found = execute(f_6c6f6f6b7570466c6167(nat("30")?, Arc::clone(&db)))??;
+    report("bool-lookup-false", !is_true(&found.f0) && is_true(&found.f3)
+        && lan_model_to_i64(&found.f1)? == 30 && lan_model_to_i64(&found.f2)? == 0)?;
+    report("bool-shared", Arc::strong_count(&true_row) == 1 && Arc::strong_count(&db) == 1)?;
+    let fail = Arc::new(toasty::Db::new(toasty::Mode::Fail));
+    report("bool-error", matches!(execute(f_637265617465466c6167(Arc::clone(&true_row), fail))?, Err(Error::Database(_))))?;
+    let negative = Arc::new(toasty::Db::new(toasty::Mode::Negative));
+    report("bool-negative-field", matches!(execute(f_6c6f6f6b7570466c6167(nat("31")?, negative))?, Err(Error::ModelRange)))?;
+    let before = db.count();
+    report("bool-overflow", matches!(execute(f_637265617465466c616756616c7565(nat("32")?, nat("9223372036854775808")?, Arc::clone(&db)))?, Err(Error::ModelRange)))?;
+    report("bool-key-overflow", matches!(execute(f_6c6f6f6b7570466c6167(nat("9223372036854775808")?, Arc::clone(&db)))?, Err(Error::ModelRange)))?;
+    report("bool-no-effect", db.count() == before)?;
     Ok(())
 }
 '''
@@ -148,7 +191,10 @@ def main():
     require(version.returncode == 0 and version.stdout.startswith("rustc 1.98.1 "), "pinned rustc missing")
     expected = [f"{name} OK" for name in (
         "zero", "maximum", "overflow", "negative", "lazy", "create", "once", "lookup",
-        "field-order", "shared", "error", "negative-field", "key-overflow", "no-effect")]
+        "field-order", "shared", "error", "negative-field", "key-overflow", "no-effect",
+        "bool-source-true", "bool-source-false", "bool-lazy", "bool-create-true", "bool-once",
+        "bool-create-false", "bool-lookup-true", "bool-lookup-false", "bool-shared", "bool-error",
+        "bool-negative-field", "bool-overflow", "bool-key-overflow", "bool-no-effect")]
     with tempfile.TemporaryDirectory(prefix="lanyard-models-") as work:
         work = Path(work)
         derive = work / "derive.rs"
@@ -175,8 +221,12 @@ def main():
             ("negative guard", "if value < 0", "if value < i64::MIN"),
             ("overflow guard", "number.checked_mul(256).and_then(|number| number.checked_add(i64::from(*byte)))",
              "Some(number.wrapping_mul(256).wrapping_add(i64::from(*byte)))"),
-            ("result field", "lan_model_from_i64(__lan_row.id)", "lan_model_from_i64(__lan_row.f_76616c7565)"),
+            ("result field", "f0: lan_model_from_i64(__lan_row.id)", "f0: lan_model_from_i64(__lan_row.f_76616c7565)"),
             ("missing await", ".exec(&mut __lan_db).await?", ".exec(&mut __lan_db)?"),
+            ("false write", "::V0(()) => false", "::V0(()) => true"),
+            ("true write", "::V1(()) => true", "::V1(()) => false"),
+            ("Bool read", "if __lan_row.f_656e61626c6564", "if !__lan_row.f_656e61626c6564"),
+            ("Bool column", "if __lan_row.f_6172636869766564", "if __lan_row.f_656e61626c6564"),
         ]
         killed = 0
         for name, before, after in mutations:

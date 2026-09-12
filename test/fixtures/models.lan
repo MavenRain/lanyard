@@ -17,3 +17,20 @@ def roundtrip : Db -> Counter := fun (db : Db) =>
   let created : Counter := create db in lookup created.0 db
 def createSingle : Single -> Db -> Single := fun (row : Single) (db : Db) => Single.create row db
 def lookupSingle : Nat -> Db -> Single := fun (id : Nat) (db : Db) => Single.get_by_id id db
+
+def Bit : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+def Status : Type 0 := Bit
+
+model Flag with
+| enabled : Status
+| id : Nat
+| count : Nat
+| archived : Bit
+end
+
+def flag : Nat -> Nat -> Flag := fun (id : Nat) (count : Nat) =>
+  tuple (natEq count 1, id, count, natLt count 1)
+def createFlag : Flag -> Db -> Flag := fun (row : Flag) (db : Db) => Flag.create row db
+def createFlagValue : Nat -> Nat -> Db -> Flag := fun (id : Nat) (count : Nat) (db : Db) =>
+  Flag.create (flag id count) db
+def lookupFlag : Nat -> Db -> Flag := fun (id : Nat) (db : Db) => Flag.get_by_id id db

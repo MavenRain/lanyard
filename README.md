@@ -10,7 +10,7 @@ foreign-type census. Stage D adds Rust IR, quantity-aware erasure and checked
 foreign-call metadata. The Stage E native command prints Rust for pure
 programs, including typed closures, captures and recursive data. The target
 command adds synchronous foreign constants, concrete and applied foreign
-types, async database calls, and model create/lookup for Nat fields.
+types, async database calls, and model create/lookup for Nat and Bool fields.
 Db.connect, other model field types and the complete M0 driver remain ahead.
 The generated signature allowance is proposed at 104 lines and awaits the
 user's ruling. See [target documentation](target/README.md), the
@@ -71,7 +71,7 @@ _build/default/bin/lanyard.exe emit --target test/fixtures/foreign-types.lan
 nested wrappers and native data layouts. A One binder moves its wrapper;
 a Many binder shares it through `Arc`.
 
-Validate [Nat model schemas](dev/STAGE-E-MODELS.md):
+Validate [scalar model schemas](dev/STAGE-E-MODELS.md):
 
 ```sh
 zsh dev/gates.sh --stage E-models
@@ -81,6 +81,8 @@ _build/default/bin/lanyard.exe emit --target test/fixtures/models.lan
 `Counter.create` and `Counter.get_by_id` print awaited Toasty operations.
 The `id` field is the supplied primary key. Database fields use checked
 integer conversions; overflow and negative stored values return an error.
+Two-unit sums, including aliases, use Boolean columns with tag 0 as false
+and tag 1 as true. Keys remain Nat.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current

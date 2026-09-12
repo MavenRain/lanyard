@@ -3,6 +3,7 @@ module Model = Lanyard_rust.Model
 module Catalog = Lanyard_target.Target_generated
 let ( let* ) = Result.bind
 let base = "model Counter with | id : Nat | value : Nat end\n"
+let bit = "def Bit : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))\n"
 let emit text = Kanon_surface.Elab.check_lanyard text |> Fun.flip Result.bind Model.source
 let create = base ^ "def main : Db -> Counter := fun (db : Db) => Counter.create (tuple (7, 42)) db"
 let holds text needle = List.init (String.length text + 1) Fun.id |> List.exists (fun index ->
@@ -18,12 +19,20 @@ let metadata ?(rewrite = Fun.id) change_row change_entry =
     if String.equal entry.name "Model.create" then change_entry entry else entry) Catalog.entries in
   Model.foreign_call entries models (change_row row) |> Result.map (fun _call -> "printed")
 let refusals = [
-  "non-Nat field", "model field Counter.value requires Nat",
+  "unit field", "model field Counter.value requires Nat or Bool",
     emit "model Counter with | id : Nat | value : prod () end";
   "non-Nat key", "model field Counter.id requires Nat",
     emit "model Counter with | id : Uri end";
-  "opaque field", "model field Counter.value requires Nat",
+  "opaque field", "model field Counter.value requires Nat or Bool",
     emit "model Counter with | id : Nat | value : Uri end";
+  "Bool key", "model field Counter.id requires Nat",
+    emit (bit ^ "model Counter with | id : Bit end");
+  "payload sum", "model field Counter.value requires Nat or Bool",
+    emit "model Counter with | id : Nat | value : sum ((prod () : Type 0), Nat) end";
+  "three-unit sum", "model field Counter.value requires Nat or Bool",
+    emit "model Counter with | id : Nat | value : sum ((prod () : Type 0), (prod () : Type 0), (prod () : Type 0)) end";
+  "Bool name with unsupported layout", "model field Counter.value requires Nat or Bool",
+    emit "def Bool : Type 0 := prod ()\nmodel Counter with | id : Nat | value : Bool end";
   "missing key", "needs an id field", emit "model Counter with | value : Nat end";
   "duplicate field", "duplicate declaration", emit "model Counter with | id : Nat | id : Nat end";
   "forged name", "unknown model instance", metadata (fun row -> {row with name="Other_create"}) Fun.id;
@@ -52,6 +61,12 @@ let positives = [
   "alias", "id: i64", emit "def Key : Type 0 := Nat\nmodel Counter with | id : Key end";
   "keyword field", "f_74797065: i64", emit "model Counter with | id : Nat | type : Nat end";
   "range error", "ModelRange", emit create;
+  "Bool field alias", "f_76616c7565: bool",
+    emit (bit ^ "def State : Type 0 := Bit\nmodel Counter with | id : Nat | value : State end");
+  "structural Bool", "f_76616c7565: bool",
+    emit "model Counter with | value : sum ((prod () : Type 0), (prod () : Type 0)) | id : Nat end";
+  "Bool name with Nat layout", "f_76616c7565: i64",
+    emit "def Bool : Type 0 := Nat\nmodel Counter with | id : Nat | value : Bool end";
 ]
 let () =
   let failures = List.filter_map (fun (name, needle, result) -> Result.fold

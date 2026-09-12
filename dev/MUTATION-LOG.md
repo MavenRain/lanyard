@@ -508,3 +508,24 @@ The earlier foreign gate now checks unsupported model fields, including
 Todo.title, in place of its blanket schema refusal. Schema calls for
 models with Nat fields are positive coverage in the new slice. No prior
 native, closure, recursive, foreign or async mutation was removed.
+
+## Boolean model fields (2026-09-11)
+
+The model oracle now passes 28 compiled observations and kills eight
+mutations. The four additional controls corrupt false writes, true
+writes, Boolean reads or the selected Boolean result column. Each
+mutant must compile and then fail execution. The fixture gives its two
+Boolean columns opposite values and exercises both combinations.
+
+The Nat result-field mutation now targets `f0` of Counter explicitly.
+Its previous unqualified replacement also rewrote Flag's key read to a
+nonexistent value column and failed compilation. The scoped mutation
+still corrupts Counter's key, compiles and fails the create observation.
+The other three Nat and await controls retain their targets and verdicts.
+
+The printer suite has 9 positives and 22 refusals. New cases cover
+aliases, anonymous two-unit sums, a misleading Bool name, Boolean keys,
+payload sums and three-unit sums. The real Toasty/SQLite probe passes
+28 observations, including direct stored-value checks that do not use
+the printer's Boolean read conversion. Final captures are recorded in
+dev/validation/stage-e-model-bools/.

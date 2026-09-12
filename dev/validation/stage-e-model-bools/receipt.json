@@ -1,0 +1,199 @@
+{
+  "format": 1,
+  "base_commit": "e9d00dff1d20037bbf7c5f3c73477a906254a1c0",
+  "checkout": "/Users/oobi/Documents/gpt2/lanyard-bool",
+  "captures": {
+    "stage-gate": {
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "E-models"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-bool",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-bool/.kanon-exec/run-ktXxvP",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-model-bools/stage-gate.stdout",
+          "sha256": "4e6ceeeb8d16bdcf5d5121848393d50ee3b09f99866a285d8e6bbe6228b90384"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-model-bools/stage-gate.stderr",
+          "sha256": "544d6194335e0b27eded4d6ead2380c103a4f9aeaef5678ba9883d8fde9b6db0"
+        }
+      }
+    },
+    "pinned-build": {
+      "command": [
+        "env",
+        "RUSTC_WRAPPER=",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "CARGO_BUILD_JOBS=2",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_TARGET_DIR=/Users/oobi/Documents/gpt2/lanyard-foreign-pinned/target",
+        "gateledger",
+        "run",
+        "--dir",
+        "/Users/oobi/Documents/gpt2/lanyard-bool/.gatework/models-pinned",
+        "--scope",
+        "Cargo.toml",
+        "--scope",
+        "Cargo.lock",
+        "--scope",
+        "src",
+        "--toolchain",
+        "1.98",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-bool/.gatework/ledger",
+        "--",
+        "cargocho",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-bool/.gatework/models-pinned/Cargo.toml"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-bool",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-bool/.kanon-exec/run-NwIeFE",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-model-bools/pinned-build.stdout",
+          "sha256": "ef2cfffee5e0ea7e03667fbe8508e45fbecdbe2c742ac3ebbc13ac6e45eafd17"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-model-bools/pinned-build.stderr",
+          "sha256": "0912c711bc18abe87d0a0ec58de5393a8facede7ba82f1092e9a698131254f84"
+        }
+      }
+    },
+    "pinned-run": {
+      "command": [
+        "/Users/oobi/Documents/gpt2/lanyard-foreign-pinned/target/debug/lanyard-model-validation"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-bool",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-bool/.kanon-exec/run-C9glrx",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-model-bools/pinned-run.stdout",
+          "sha256": "b8a3d4a0b32013d520a47b4ad45f73b0e9f7012cc6a035224f263bdab397ea83"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-model-bools/pinned-run.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "house": {
+      "command": [
+        "zsh",
+        "dev/house.sh"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-bool",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-bool/.kanon-exec/run-ULrGWG",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-model-bools/house.stdout",
+          "sha256": "23c57b5dce561d3f2caa9fa53d43974bed0f245cde0beb820d302dc57a3871dc"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-model-bools/house.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  },
+  "dependency_lock": {
+    "path": "dev/validation/stage-e-models/Cargo.lock",
+    "sha256": "37eab434114f43ba1f2d4a24aa9e4669eea15b78affbb0164c144f235205eab5"
+  },
+  "probe_manifest_sha256": "668d17953b166c5ad2acaecf469f5b55f0b1436b13db062525f58447d8403e0d",
+  "observations": {
+    "printer_positives": 9,
+    "printer_refusals": 22,
+    "compiled": 28,
+    "mutants_killed": 8,
+    "native_refusals": 1,
+    "pinned_sqlite": 28
+  },
+  "trusted_lines": {
+    "emit": 628,
+    "foreign": 65,
+    "template": 71,
+    "effects": 46,
+    "model": 124,
+    "printer_total": 934,
+    "allowances": "pending user rulings"
+  },
+  "post_gate_changes": [
+    "dev/M0-BUILD-LOG.md",
+    "dev/MUTATION-LOG.md"
+  ],
+  "post_gate_note": "Only the two log entries changed after the cumulative gate. The final house capture covers them. This receipt and its capture copies were recorded afterward.",
+  "source_sha256": {
+    "README.md": "eceac7fa4114dc249448d76df3a1f37d7a57768e52fc623d04dd315d35c7f1ac",
+    "bin/lanyard.ml": "cbcd71e635d6a48c32ea6ad1c191700e28aac2d341a13464787c5b2bcdf9d5d7",
+    "dev/KERNEL-CARRIED.md": "fbc78a3a9507a6723ad61cb962376ef64dc9c8193fb9cec2a795bbc0bb8cbf48",
+    "dev/M0-BUILD-LOG.md": "bf29d3eb7d5ffadf83dcd9469eac098adcc2fe2ba4ea8c9b8759651dd1a22ec6",
+    "dev/MUTATION-LOG.md": "8d4e54a7b011001f5ef816fd8660ea96228a46d5800bcb51671ba5ea85f9e215",
+    "dev/STAGE-E-FOREIGN-TYPES.md": "acf896e7a4107bae991acd13128896208865d60fdadaef15baacff573716b595",
+    "dev/STAGE-E-FOREIGN.md": "69c4815c4a1aca084d7b3599cf957a2b95c8cea6c1829818ce2d0fa623e437a2",
+    "dev/STAGE-E-MODELS.md": "e53cbf6d9f12f0034d1923a474ab2fee0b41cc0e64b0b76a2662b57d4fc1e360",
+    "dev/gates.sh": "2dd67590b6b1e7fec3a8836d647c1de207aaf75351975429af39eed30e8c4f76",
+    "dev/prepare-models.py": "0d3741012f54d2b8e1d4635b3f0f66a19146e34ca48b29840a856f833ac97eff",
+    "dev/stage-e-models.sh": "b7f6219d8aac13746613b40ffaef3df3c32f6c3b08dc6ce78cb354540758eb02",
+    "dev/trusted-lines.sh": "eb18f78751069d3bce28515647bd573108e8db6c655770dcd2e69e9c719bec7c",
+    "lib/bignum.ml": "7159dd7e75fa08a5fc272cba76a8ec6214c7d190151dabf7db1a13bf5ecddd72",
+    "lib/budget.ml": "7d8b2afc86883415c892d6fea0e56c2115e4d859b6b6daa21c611b4e9517f028",
+    "lib/budget.mli": "b830149c9eb6d9362786d2e92c2dc8322f4d31f7b4cfc960ac6e1681d385578f",
+    "lib/check.ml": "cdc3712bf5ed0fa49d8dae34ea946d85a195ea94b25235c821b155570010e335",
+    "lib/conv.ml": "e73e707bcdac54808d8f8a1d9e9a174062edf0afd970972dee2c6d024f6bbe39",
+    "lib/erase.ml": "794defe507c4d97910c2d92f925a7efa69433dc2ab67d2085340670886a95986",
+    "lib/erase_kan.ml": "a6d03447ab9dfedf8e53bceff26cd7da57f113bb4b5d1453aecd618fac508a88",
+    "lib/error.ml": "44c9c263479575ec04db5056404a5940d6bb5514a5b9e1ec6215385c6eccb5b6",
+    "lib/eterm.ml": "028ff6e790f9c391463b961f7a3eac12e105d484285cfde1597e52c5b9ac69c7",
+    "lib/eval.ml": "155ddf7578d4ad68352505064616bed6afa7a260a88f3ddf1722b95fa6a6bd18",
+    "lib/global.ml": "2e5d2d932dfddcb329bcfdf237df87a70f2d79820470dc236e337ec6d275c329",
+    "lib/level.ml": "344bb9819870d8c459154ac8109ba1d69a4ee4312670f3887c6ed30d3dbca448",
+    "lib/level.mli": "c143b2b97e417724a81f8e83548b946d3339917488758b4d5fbf9da9e72e6811",
+    "lib/literal.ml": "80554b1d98c8dde3b474023a01ac57cc4abcaba2a5f20b707041cc5f0361b617",
+    "lib/order.ml": "d2cc3258fde25b61ba33093eaf19112c319329dc5b46ba029b3f042c14388e94",
+    "lib/positivity.ml": "97cb5fc9484ecaec360b4be1ac42f0668ae767aad25efc10ddbc1d4143185471",
+    "lib/pp.ml": "69618578ebb33a3d9803e604760252c77c64681aef2d847f3e1b40f9464e3895",
+    "lib/prim.ml": "5224df4f75e499b8fb962fad2a256b31086fcc9de5ab2f353eb90f61a8408aaa",
+    "lib/quantity.ml": "bf3f633c40a0dbb362cf85ca41b798ae0c9e1d4eca7e09f9b6f482bab2bfbb8b",
+    "lib/rir.ml": "6dbaa88a61863938d62e099a339277ecde0b2cace633fea5912b95bc248a9f1c",
+    "lib/rules.ml": "b625cec31061ca79f77669889039e4ae2658393911e39076dc65189022f702ab",
+    "lib/shape.ml": "dafd7741b4332dcab6faba9cb9afb131fb3654172e0d375b1edd1046e69f7f7b",
+    "lib/spec_count.ml": "87aa1bad45716737bfeca13986b58332245d252ba0f9ddda55cb7d402eec8c92",
+    "lib/term.ml": "2de6729958bfbc3af10ed2e9c51d6591ab40fa16bd19b7acea1fbf37adf60690",
+    "lib/totality.ml": "046c608584ac21d465d46b05119a89dca5488a15113359eea30ed318a3f7c028",
+    "lib/value.ml": "997f4634df60744c49555e896c1de8d60e51a1086e731e547b48450def9c68c7",
+    "rust/effects.ml": "0cd1e0d6caf5474f7845725341a316b7fc79c8a8ac41bb16d81a4038c7f79d42",
+    "rust/emit.ml": "c5b39f1e1a732af7ecfabbf0ebde3d6ddc0141f76203f2fde553d06b2b864734",
+    "rust/foreign.ml": "f7aaa9fc74478a2488ddd64ddaeb500b4437bde86d1d9f6c537baf2babbbf012",
+    "rust/model.ml": "fcd153d7900270b869b29a24b5a303156cd73d52ea887231c187c14edcf45764",
+    "rust/template.ml": "3a721565fbb8993bd24d55de30d159222af165f4e01f6cd63a570abfafa5ebda",
+    "surface/elab.ml": "14ae994942aa1071339666abb53293d628582b0f0b42de0df2713c5babe40a80",
+    "surface/lexer.ml": "bb524f0202a01ab0b7a2e94745c9af50c5eede2a4c7d3fa450be785e2eb14254",
+    "surface/lower.ml": "5a4298b34ece07ebec2a8d0a2a92f8d7a26448b43effa0506370cf4e31c0f965",
+    "surface/parser.ml": "107bb45cfba1335a41cf0268e6c28e05dbb961c1c454c47ef364683d6e04d977",
+    "surface/syntax.ml": "774c0c713f2cdfe493656131b446eb10614e9415ef4d3a0d7cf8a64d2da04c5a",
+    "surface/token.ml": "cd93b520f023f2aa80f42a4e352b47e63fd0c05e399f4c2344af898054fbb6db",
+    "target/PIN.json": "79acb0c0e756de89d15d483abf295cff74e11465b9c1e061e5d25a4041853718",
+    "target/pin.sha256": "bc150e69de798eadf8a6cdeb7be31440c7c544e7e297e531fbb98967ca37287f",
+    "target/toasty-7bd502cb.sig": "9b3a6ec3ad2c365cec6bbdd8767ba144a295bbe60affeb418c42dad65952a7fc",
+    "target/topcoat-51caa01.sig": "40ee029ce9885b1402d76cc4d0340545c24b9932649cec031c10075b1a21504d",
+    "test/dune": "b12b9b31d40d8c6e6ce93814cc7bcc064535f3538d9e2df955ff4ac992dcc882",
+    "test/fixtures/models.lan": "d0e3dd4b31f2feb38d36b3e2f4f825308bce44deab1a8298d4eae10cc8681cba",
+    "test/goldens/models.rs": "f240633e116acf5ba0e1fbb170bef345a20cd4ed96a3d9852c9639051e8a28dd",
+    "test/lan_foreign.py": "012652eed93ca1337d285ac8128bad0f6e3034ccfa982d64b3473fbc75259575",
+    "test/lan_models.py": "0a5470407e1c166d47772bcc4ff48c677f0a4e29bc7eaf7de9e0d39a5c0de62b",
+    "test/lan_models_emit.ml": "e4a63779c3934ada82faaffac3443265376f6538ca773b08fd9bd6c05c6a97b4",
+    "test/models-pinned.rs": "fa28199fdf04dc6adbd5c06c82fbe0acdd140a695866ca8605359f9298c52ed3"
+  }
+}
