@@ -120,6 +120,15 @@ entry point runs a zero-argument `main`, discards its returned value and
 propagates errors through Rust's `Result`. This fixture connects to SQLite
 in memory, creates a Todo and looks it up. Emission does not run Cargo.
 
+Crates now keep the [dependencies of main](dev/STAGE-E-REACHABLE.md).
+Unused functions and model schemas are omitted before lowering. The full
+source still typechecks; references in types and untaken branches are
+retained. Module emission continues to print every definition.
+
+```sh
+zsh dev/gates.sh --stage E-reachable
+```
+
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current
 limits and the proposed IR allowance. The carried `.kan` checker is also available:

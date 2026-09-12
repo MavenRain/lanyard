@@ -595,3 +595,22 @@ of the same primary key. The original program exits 0; the duplicate
 exits 1 and reports a Database error with the unique constraint failure.
 This checks propagation through the generated async main. The duplicate
 source and both execution captures live under dev/validation/stage-e-crate/.
+
+## Crate dependency selection (2026-09-12)
+
+The pure fixture retains offset through a captured closure. The metadata
+probe references First through a model operation whose quoted type has
+lost the model alias. A separate pinned SQLite fixture creates key 1 in
+First and Second and then reads both rows, so conflating the two models
+would turn the second create into a duplicate-key error.
+
+| Control | Mutation | Observed failure |
+| --- | --- | --- |
+| reachable-schema-arguments | Look up a missing instance name instead of the visited name | LAN-REACHABLE fails with unknown model instance First_get_by_id |
+| reachable-closure-body | Skip Sec bodies in the dependency walk | LAN-REACHABLE fails with function value needs eta expansion: offset |
+| reachable-function | Rename the emitted offset definition, preserving its call | Rust compilation fails with cannot find function |
+
+The first two mutations were applied separately to the new source pass.
+Each built with zero errors and warnings before the test failed, and each
+was restored before the cumulative gate. The third control runs in
+test/lan_reachable.py. Captures are in dev/validation/stage-e-reachable/.

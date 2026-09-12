@@ -13,6 +13,11 @@ with `?`. An async main uses Tokio's current-thread runtime and awaits the
 call. The existing effect analysis determines whether main is async;
 unrelated async functions do not make a synchronous main async.
 
+The [dependency selection slice](STAGE-E-REACHABLE.md) now omits unused
+definitions and model schemas before lowering. The complete source still
+typechecks. All definitions in this crate golden are reachable, so its
+output bytes stay the same.
+
 The manifest has four direct dependencies: serde, tokio, toasty and
 topcoat. Toasty and Topcoat use the full Git revisions in `target/PIN.json`,
 with SQLite and router features respectively. Tokio enables the runtime

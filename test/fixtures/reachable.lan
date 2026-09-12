@@ -1,0 +1,21 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+model Unused with
+| id : Nat
+| unsupported : prod ()
+end
+
+def generic : (0 M : Type 0) -> Bytes -> Db :=
+  fun (0 M : Type 0) (url : Bytes) => Db.connect M Bytes url
+def idle : Db -> prod () := Db.push_schema
+axiom unusedPostulate : Nat
+
+def offset : Nat := 7
+def pack : Nat -> prod (Nat -> Nat) := fun (x : Nat) =>
+  tuple (fun (y : Nat) => natAdd (natAdd x y) offset)
+def invoke : (Nat -> Nat) -> Nat := fun (f : Nat -> Nat) => f 11
+def selected : Nat := invoke ((pack 13).0)
+def selectedExtra : Nat := unusedPostulate
+def main : Nat := selected

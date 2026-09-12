@@ -101,8 +101,20 @@ def main():
         emitted = run(CLI, "emit", "--crate", mixed, fixture)
         require(emitted.returncode == 0, emitted.stderr)
         mixed_source = (mixed / "src/main.rs").read_text()
-        require("async fn f_69646c65(" in mixed_source and "async fn main" not in mixed_source
-                and "    f_6d61696e()?;" in mixed_source, "unrelated async function changed main")
+        require("fn f_69646c65(" not in mixed_source and "async fn main" not in mixed_source
+                and "    f_6d61696e()?;" in mixed_source,
+                "unreachable async function was emitted or main changed")
+
+        fixture.write_text("def idle : Db -> prod () := Db.push_schema\n"
+                           "def useIdle : (0 f : Db -> prod ()) -> Nat := fun (0 f : Db -> prod ()) => 41\n"
+                           "def main : Nat := useIdle idle\n")
+        retained = work / "retained"
+        emitted = run(CLI, "emit", "--crate", retained, fixture)
+        require(emitted.returncode == 0, emitted.stderr)
+        retained_source = (retained / "src/main.rs").read_text()
+        require("async fn f_69646c65(" in retained_source and "async fn main" not in retained_source
+                and "    f_6d61696e()?;" in retained_source,
+                "reachable async function changed main")
 
         fixture.write_text("def main : Nat := 41\n")
         native = work / "native"

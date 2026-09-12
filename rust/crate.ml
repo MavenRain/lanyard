@@ -18,5 +18,6 @@ topcoat = { git = "https://github.com/tokio-rs/topcoat", rev = "51caa01dca3a8f20
 |}
 
 let files checked =
-  Model.source ~entrypoint:"main" checked
+  let entrypoint = "main" in
+  Result.bind (Reachable.program entrypoint checked) (Model.source ~entrypoint)
   |> Result.map (fun source -> ["Cargo.toml", manifest; "src/main.rs", source])

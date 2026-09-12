@@ -1,0 +1,17 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+model First with | id : Nat end
+model Second with | id : Nat end
+model SchemaOnly with | id : Nat end
+model Unused with | id : Nat | unsupported : prod () end
+
+def Models : Type 0 := prod (First, Second, SchemaOnly)
+def connect : Bytes -> Db := Db.connect Models Bytes
+def main : prod (First, Second) :=
+  let db : Db := connect b"sqlite::memory:" in
+  let ready : prod () := Db.push_schema db in
+  let first : First := First.create (tuple (1)) db in
+  let second : Second := Second.create (tuple (1)) db in
+  tuple (First.get_by_id 1 db, Second.get_by_id 1 db)

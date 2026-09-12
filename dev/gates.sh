@@ -29,8 +29,13 @@
 #   zsh dev/gates.sh --stage E-models
 #   zsh dev/gates.sh --stage E-connections
 #   zsh dev/gates.sh --stage E-crate
+#   zsh dev/gates.sh --stage E-reachable
 
 set -u
+
+if [[ $# -eq 2 && $1 == "--stage" && $2 == "E-reachable" ]]; then
+  exec zsh ${0:A:h}/stage-e-reachable.sh
+fi
 
 if [[ $# -eq 2 && $1 == "--stage" && $2 == "E-crate" ]]; then
   exec zsh ${0:A:h}/stage-e-crate.sh
@@ -252,7 +257,7 @@ if [[ $# -ge 2 && $1 == "--leg" ]]; then
 fi
 
 if [[ $# -ne 0 ]]; then
-  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C|D|E-native|E-foreign|E-async|E-foreign-types|E-models|E-connections|E-crate]"
+  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C|D|E-native|E-foreign|E-async|E-foreign-types|E-models|E-connections|E-crate|E-reachable]"
   exit 64
 fi
 

@@ -1986,3 +1986,69 @@ The review gate ran as tag fix-1 and is GREEN in 5 min 4 s (20:01:18Z to
 The close check confirms GATE LSECR tag=fix-1 GREEN in 5 min 4 s, 68 of
 68 stage rows identical to the capture, porcelain with 35 staged paths
 and 0 unstaged paths, and receipt drift of 4 of 67 keys.
+
+## Lanyard Stage E crate dependency selection (2026-09-12)
+
+Starting from c2bb288, crate emission follows the dependencies of main
+before specializing connections and erasing runtime definitions. The
+complete source is checked first. Module emission, checked forms and
+axiom disclosure retain their existing scope.
+
+The pass visits global names once, follows definition bodies and types,
+shape payloads, motives, branches and family fields, and retains source
+order. Foreign instance arguments preserve model identity after quoted
+types have reduced aliases to equal structural layouts. Models selected
+only for a connection schema stay present. Unused unsupported models,
+generic connections and postulates no longer block a separate main.
+References in erased arguments, types and untaken branches are retained.
+
+The new executable checks pass six compiled Rust observations, six
+refusals, a three-schema selection and an operation metadata probe.
+Closures, aliases, mutual recursion and nested recursive layouts all run.
+Existing crate checks pass with both golden files unchanged. The unused
+async helper in the mixed crate is now omitted and main stays synchronous.
+
+The pinned SQLite fixture creates the same key in two distinct models and
+reads both rows. It selects a third schema only through a connection and
+omits a fourth model whose field is unsupported. Preparation checked the
+Toasty and Topcoat revisions and clean tracked sources. The offline,
+locked build passed with six unused-code/local warnings; execution exited
+0 with empty stdout and stderr. Only the dependency locations in the
+manifest use local paths. The compiler reuses the earlier Cargo artifact
+directory, and gateledger records the new source key.
+
+Two temporary source mutations were killed: dropping foreign instance
+arguments failed on First_get_by_id, and skipping closure bodies failed
+on offset. Both compiled before their expected failures and were restored.
+The permanent test also deletes a transitive Rust function and requires
+the compiler to reject its remaining call.
+
+The new pass is 74 lines, crate.ml is 23 lines and the measured printer
+total is 1169. The kernel, erasers, target signatures and existing golden
+files keep their committed bytes. Numeric allowances remain pending user
+rulings. The cumulative gate and matching source hashes are recorded in
+dev/validation/stage-e-reachable/. This slice does not complete handler
+fusion, the frozen M0 Todo golden, M0 timing or M0 exit. Build and
+interpreted run are M1 work in the ratified plan.
+
+Review run wf_18642aa3-3bd raised 8 findings. It upheld 5 and refuted 3.
+The crate file list in rust/crate.ml now binds the entry point name once
+and calls Result.bind directly, so the reversed bind and the repeated
+literal are gone. The mixed-crate check in test/lan_crate.py states that
+an unreachable async function must not reach the output, and a second
+inline program keeps the negative async coverage: an erased function
+argument holds the async sibling, so the sibling is emitted and main
+stays synchronous. Two carried items await a user ruling. The pinned
+build and run captures use the shared lanyard-fusion Cargo target
+directory, so a recapture with a per-checkout target directory is needed
+(F0 with F6). The receipt does not hash the seed lock file
+dev/validation/stage-e-crate/Cargo.lock, which is byte-identical to
+dev/validation/stage-e-reachable/Cargo.lock today (F7). The receipt
+dev/validation/stage-e-reachable/receipt.json keeps the source digests
+from before these edits; the edited files are rust/crate.ml and
+test/lan_crate.py; the captures are not regenerated.
+The review gate ran as tag fix-1 and is GREEN in 3 min 59 s (21:21:15Z to
+21:25:14Z), 70 of 70 stage rows identical to the capture.
+The close check confirms GATE LSER tag=fix-1 GREEN in 3 min 59 s, 70
+of 70 stage rows identical to the capture, porcelain with 39 staged
+paths and 0 unstaged paths, and receipt drift of 3 of 74 keys.
