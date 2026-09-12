@@ -12,7 +12,8 @@ programs, including typed closures, captures and recursive data. The target
 command adds synchronous foreign constants, concrete and applied foreign
 types, async database calls, and model create/lookup for Nat, Bool and text
 fields. Direct Db.connect calls and aliases select model schemas and check
-URL text.
+URL text. The crate command writes a standalone program with pinned
+dependencies and a synchronous or async entry point.
 Other model field types, handler fusion and the complete M0 driver
 remain ahead. The generated signature allowance is proposed at 104 lines and
 awaits the user's ruling. See [target documentation](target/README.md), the
@@ -39,7 +40,7 @@ The [native printer slice](dev/STAGE-E-NATIVE.md) supports arithmetic,
 products, sums, native calls, [typed closures](dev/STAGE-E-CLOSURES.md), and
 [recursive families](dev/STAGE-E-RECURSIVE.md).
 It reports unsupported foreign and polymorphic field layouts explicitly.
-The Todo crate golden is still pending.
+The complete M0 Todo crate golden is still pending.
 
 Validate and use the [synchronous foreign printer](dev/STAGE-E-FOREIGN.md):
 
@@ -105,6 +106,19 @@ Direct calls such as `Db.connect Todo Bytes url` work inside functions,
 let bodies and case branches. Several calls in one body can select different
 models and URLs. Model and text type arguments must be closed; generic
 connection functions and stored connection function values still refuse.
+
+Emit a [standalone target crate](dev/STAGE-E-CRATE.md):
+
+```sh
+zsh dev/gates.sh --stage E-crate
+_build/default/bin/lanyard.exe emit --crate /tmp/lanyard-todo test/fixtures/crate.lan
+cargo run --manifest-path /tmp/lanyard-todo/Cargo.toml
+```
+
+The output directory must be new and its parent must exist. The generated
+entry point runs a zero-argument `main`, discards its returned value and
+propagates errors through Rust's `Result`. This fixture connects to SQLite
+in memory, creates a Todo and looks it up. Emission does not run Cargo.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current

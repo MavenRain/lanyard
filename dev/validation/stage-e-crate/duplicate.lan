@@ -1,0 +1,22 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+
+model Todo with
+| id : Nat
+| title : Bytes
+| completed : Bool
+end
+
+def initialize : Db -> prod () := fun (db : Db) => Db.push_schema db
+def create : Db -> Todo := fun (db : Db) =>
+  Todo.create (tuple (1, b"hello", inj 0 of 2 ())) db
+def lookup : Db -> Todo := fun (db : Db) => Todo.get_by_id 1 db
+def run : Bytes -> Todo := fun (url : Bytes) =>
+  let db : Db := Db.connect Todo Bytes url in
+  let ready : prod () := initialize db in
+  let created : Todo := create db in
+  create db
+def main : Todo := run b"sqlite::memory:"

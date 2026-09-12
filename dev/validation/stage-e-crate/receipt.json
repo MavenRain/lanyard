@@ -1,0 +1,303 @@
+{
+  "format": 1,
+  "base_commit": "fab6234273c030f2e7031af6c30cb28ef43ce633",
+  "checkout": "/Users/oobi/Documents/gpt2/lanyard-fusion",
+  "captures": {
+    "stage-gate": {
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "E-crate"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-fusion",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-0t0ozH",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-crate/stage-gate.stdout",
+          "sha256": "0f2986a17dcde70bcdb33c2b30bd921434cc60ec5e7ea9987495e36a8cd29190"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-crate/stage-gate.stderr",
+          "sha256": "f7fd396e3ef40de55cbe3a3eb9258c49e41f1fbeb00bf6f4e8ab8c117473b4f1"
+        }
+      }
+    },
+    "crate-checks": {
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_crate.py"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-fusion",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-JnAvE3",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-crate/crate-checks.stdout",
+          "sha256": "ba9388b9732647197f2c266da91e0e0232e344775e7835daba5b752ae075542e"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-crate/crate-checks.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "pinned-build": {
+      "command": [
+        "gateledger",
+        "run",
+        "--dir",
+        ".gatework/crate-pinned",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-fusion/.gatework/gateledger",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_BUILD_JOBS=2",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_TARGET_DIR=/Users/oobi/Documents/gpt2/lanyard-fusion/.gatework/crate-target",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--workspace"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-fusion",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-or7lIC",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-crate/pinned-build.stdout",
+          "sha256": "c8f7af7b01667a8e4e4781d45b97a75adf539355a034ed22f049ea9cc6f0730c"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-crate/pinned-build.stderr",
+          "sha256": "85e234c916019ba5857ea077bb0e799547db349f2c1d0d213fa2ade4880ff88b"
+        }
+      }
+    },
+    "pinned-run": {
+      "command": [
+        ".gatework/crate-target/debug/lanyard-program"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-fusion",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-qXLvqa",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-crate/pinned-run.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-crate/pinned-run.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "duplicate-prepare": {
+      "command": [
+        "python3",
+        "-P",
+        "dev/prepare-crate.py",
+        "--toasty",
+        "/Users/oobi/Documents/toasty",
+        "--topcoat",
+        "/Users/oobi/Documents/topcoat",
+        "--source",
+        "dev/validation/stage-e-crate/duplicate.lan",
+        "--output",
+        ".gatework/crate-duplicate",
+        "--lock",
+        ".gatework/crate-pinned/Cargo.lock"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-fusion",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-T9rGUC",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-crate/duplicate-prepare.stdout",
+          "sha256": "d79a71604bf5e1cc8b9f9c2f4917dd01e33ca958e1e5c50e689e5702f5450cb5"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-crate/duplicate-prepare.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "duplicate-build": {
+      "command": [
+        "gateledger",
+        "run",
+        "--dir",
+        ".gatework/crate-duplicate",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-fusion/.gatework/gateledger",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_BUILD_JOBS=2",
+        "CARGO_PROFILE_DEV_DEBUG=0",
+        "CARGO_TARGET_DIR=/Users/oobi/Documents/gpt2/lanyard-fusion/.gatework/crate-target",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--workspace"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-fusion",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-IQvlOG",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-crate/duplicate-build.stdout",
+          "sha256": "aaf9796198b21162934535819b14e25f3223c99f90aae83517ce59be10c916ed"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-crate/duplicate-build.stderr",
+          "sha256": "a492a3f651cfc0969ca47522cefcdab4256654d303bb0613a132c7f5f8c2c4a7"
+        }
+      }
+    },
+    "duplicate-run": {
+      "command": [
+        ".gatework/crate-target/debug/lanyard-program"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-fusion",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "capture_artifact": ".kanon-exec/run-FBv7Cy",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-crate/duplicate-run.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-crate/duplicate-run.stderr",
+          "sha256": "16e907e9a492a19b8027ea07a8a0406ad0f2d81d8b51f22168e01b619c370fff"
+        }
+      }
+    }
+  },
+  "observations": {
+    "sqlite_success_exit": 0,
+    "duplicate_key_exit": 1,
+    "golden_files": 2,
+    "compiled_sync_observations": 3,
+    "semantic_refusals": 5,
+    "usage_refusals": 6,
+    "output_refusals": 4
+  },
+  "trusted_lines": {
+    "kernel": 3997,
+    "emit": 645,
+    "crate": 22,
+    "printer_total": 1094
+  },
+  "notes": [
+    "The pinned builds use clean local checkouts at both target/PIN.json revisions. Only dependency locations differ from the emitted Git manifest.",
+    "The lock was seeded from the async validation lock and resolved once for the SQLite feature and new root package. Final builds are offline and locked.",
+    "Compile gate keys come from separate validation repositories with the manifest, lock and generated source staged. No validation repository was committed.",
+    "The successful build has three unused-code/local warnings. The duplicate source also has an unused lookup function.",
+    "The original Git manifest is compared byte for byte with the golden and its revisions are checked against target/PIN.json. The Git dependency form was not itself fetched by Cargo in this validation.",
+    "All numeric trusted-line allowances remain pending. This receipt does not claim Stage E completion or M0 exit."
+  ],
+  "Cargo.toml": {
+    "sha256": "f542ef1107feceb9f68626d4d27917d6515db34c404ffbaef5475bf03fe58efe",
+    "path": "dev/validation/stage-e-crate/Cargo.toml"
+  },
+  "Cargo.lock": {
+    "sha256": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "path": "dev/validation/stage-e-crate/Cargo.lock"
+  },
+  "generated_sources": {
+    "success": "e2569a0f8ac32fdcac93f384f1fee7dbabaea82122ff5c31ff27aaf9a6b47177",
+    "duplicate": "8d7c134689bd595a083023ad64b06704082eb43fee31cefc7b4fe23e216b45c2"
+  },
+  "source_sha256": {
+    "README.md": "af30b3dc9f4bdcfc196e3bb3ab3ef7807c8e91ef78ca895d5e54305f4c75185c",
+    "bin/lanyard.ml": "04288443aeb46b4d0c3a3155faad0f616218fcb403409779d3ea1002843849ce",
+    "dev/M0-BUILD-LOG.md": "0c373287491612fede2f97a1e8d5bcd14a3834782cfc4baa19183b7245d3cc6a",
+    "dev/MUTATION-LOG.md": "96661b588beecb4f6e0bed965feed984a0917aa3cebd11f33c37b05ecaf1752f",
+    "dev/STAGE-E-CRATE.md": "f17df2c3953041d9bd33d2b7f1a982a51cf48bab0928a9b3537bb479c7d2bf0a",
+    "dev/gates.sh": "91efefd865b1602168001a357beb79db7b3d35a31cc8c01a9028ca5e21243dfb",
+    "dev/gen-target.py": "8e75b2fe89bfc7c0ab5bc906bcda5d196e19a1da91a96931fb2f5118c5069bd1",
+    "dev/prepare-crate.py": "545847cc38f9a03d2ba9a5f5971343c2140601120a1b5f83fc9bf87a2e191c8b",
+    "dev/stage-b.sh": "4b9eccb94763dec9098a35503e90a2d184838c20f9625b59bc5044eca0413dae",
+    "dev/stage-c.sh": "c04fd3af4da762a92014d6911238f4e7beed6d2595ed184027619875b5ec72fd",
+    "dev/stage-d.sh": "5e4f5efd4fc0117014b67b2818408e44490b703efbd8c4ca68b6571f9accfa7d",
+    "dev/stage-e-async.sh": "5a7ecdd86cd4b95092d0647564f0b381379fe8514b82a32a01fc25856fb4c95e",
+    "dev/stage-e-connections.sh": "a78197fd3f11d9f141e264e4222f62052fae082f5f8e867f93a048b0913a1b50",
+    "dev/stage-e-crate.sh": "cc9e964983395cae1d2e92d313fab1bcc7eede32a7e5343ffcb025f610613c68",
+    "dev/stage-e-foreign-types.sh": "ce039f67924e2ce2a71820595665e645f683f577b923eb7a108c793434b2f90b",
+    "dev/stage-e-foreign.sh": "7f0e6a575e2921bd09b68dd165a105a584f4e84aa1379b8eb12aa75faabe634d",
+    "dev/stage-e-models.sh": "b7f6219d8aac13746613b40ffaef3df3c32f6c3b08dc6ce78cb354540758eb02",
+    "dev/stage-e-native.sh": "b9a675d1543d6ec2416e809b5e1a60e155e07fd80aa685c151f4b331b76c7f84",
+    "dev/trusted-lines.sh": "4566b79e65087ba5f0ae55a21522234d7773f0f6495e8f60a7c92752da663b16",
+    "dev/validation/stage-e-crate/duplicate.lan": "0bb55032e780f3473cff874eae79ae9f6f0e0be3d013783f12d4b12e23f5f300",
+    "lib/bignum.ml": "7159dd7e75fa08a5fc272cba76a8ec6214c7d190151dabf7db1a13bf5ecddd72",
+    "lib/budget.ml": "7d8b2afc86883415c892d6fea0e56c2115e4d859b6b6daa21c611b4e9517f028",
+    "lib/check.ml": "cdc3712bf5ed0fa49d8dae34ea946d85a195ea94b25235c821b155570010e335",
+    "lib/conv.ml": "e73e707bcdac54808d8f8a1d9e9a174062edf0afd970972dee2c6d024f6bbe39",
+    "lib/erase.ml": "794defe507c4d97910c2d92f925a7efa69433dc2ab67d2085340670886a95986",
+    "lib/erase_kan.ml": "a6d03447ab9dfedf8e53bceff26cd7da57f113bb4b5d1453aecd618fac508a88",
+    "lib/error.ml": "44c9c263479575ec04db5056404a5940d6bb5514a5b9e1ec6215385c6eccb5b6",
+    "lib/eterm.ml": "028ff6e790f9c391463b961f7a3eac12e105d484285cfde1597e52c5b9ac69c7",
+    "lib/eval.ml": "155ddf7578d4ad68352505064616bed6afa7a260a88f3ddf1722b95fa6a6bd18",
+    "lib/global.ml": "2e5d2d932dfddcb329bcfdf237df87a70f2d79820470dc236e337ec6d275c329",
+    "lib/level.ml": "344bb9819870d8c459154ac8109ba1d69a4ee4312670f3887c6ed30d3dbca448",
+    "lib/literal.ml": "80554b1d98c8dde3b474023a01ac57cc4abcaba2a5f20b707041cc5f0361b617",
+    "lib/order.ml": "d2cc3258fde25b61ba33093eaf19112c319329dc5b46ba029b3f042c14388e94",
+    "lib/positivity.ml": "97cb5fc9484ecaec360b4be1ac42f0668ae767aad25efc10ddbc1d4143185471",
+    "lib/pp.ml": "69618578ebb33a3d9803e604760252c77c64681aef2d847f3e1b40f9464e3895",
+    "lib/prim.ml": "5224df4f75e499b8fb962fad2a256b31086fcc9de5ab2f353eb90f61a8408aaa",
+    "lib/quantity.ml": "bf3f633c40a0dbb362cf85ca41b798ae0c9e1d4eca7e09f9b6f482bab2bfbb8b",
+    "lib/rir.ml": "6dbaa88a61863938d62e099a339277ecde0b2cace633fea5912b95bc248a9f1c",
+    "lib/rules.ml": "b625cec31061ca79f77669889039e4ae2658393911e39076dc65189022f702ab",
+    "lib/shape.ml": "dafd7741b4332dcab6faba9cb9afb131fb3654172e0d375b1edd1046e69f7f7b",
+    "lib/spec_count.ml": "87aa1bad45716737bfeca13986b58332245d252ba0f9ddda55cb7d402eec8c92",
+    "lib/term.ml": "2de6729958bfbc3af10ed2e9c51d6591ab40fa16bd19b7acea1fbf37adf60690",
+    "lib/totality.ml": "046c608584ac21d465d46b05119a89dca5488a15113359eea30ed318a3f7c028",
+    "lib/value.ml": "997f4634df60744c49555e896c1de8d60e51a1086e731e547b48450def9c68c7",
+    "rust/connection.ml": "cf65e905ebc278aac762cfd117b5aacf33fbc8ce06ba5e514a2be247c3246c85",
+    "rust/crate.ml": "5c767857bc1f98f07ab0f78141fab138e8c9da46c88b637759bd7cb0045697c9",
+    "rust/effects.ml": "0cd1e0d6caf5474f7845725341a316b7fc79c8a8ac41bb16d81a4038c7f79d42",
+    "rust/emit.ml": "524ea5a1aeb8b1e31473c7a963fa75cc0cc4298493897983cb4fa43cdc8c67f0",
+    "rust/foreign.ml": "7104df6a0161c6faff6971a6a3fcf38c9a19db74f5fef18b3e2db297abc834c4",
+    "rust/model.ml": "d5d91e8093f519fd7ccd45f04b8e90c94b02252ef826c62d5b74e9af3fee6217",
+    "rust/template.ml": "3a721565fbb8993bd24d55de30d159222af165f4e01f6cd63a570abfafa5ebda",
+    "surface/elab.ml": "14ae994942aa1071339666abb53293d628582b0f0b42de0df2713c5babe40a80",
+    "surface/lexer.ml": "bb524f0202a01ab0b7a2e94745c9af50c5eede2a4c7d3fa450be785e2eb14254",
+    "surface/lower.ml": "3ee2543c860f0e242405a83996357ba483b88094243bd82d474c56fabc00dcb5",
+    "surface/parser.ml": "107bb45cfba1335a41cf0268e6c28e05dbb961c1c454c47ef364683d6e04d977",
+    "surface/specialize.ml": "7d674a16e7d75e78d9cb4dbf5b4d802c200e8fb8f840a5350ae8bef11025f27e",
+    "surface/syntax.ml": "774c0c713f2cdfe493656131b446eb10614e9415ef4d3a0d7cf8a64d2da04c5a",
+    "surface/token.ml": "cd93b520f023f2aa80f42a4e352b47e63fd0c05e399f4c2344af898054fbb6db",
+    "target/PIN.json": "79acb0c0e756de89d15d483abf295cff74e11465b9c1e061e5d25a4041853718",
+    "target/README.md": "0d0827dbe6235eb23e560e8e9501348aa71ed4ceebc31b0907a347955e70b585",
+    "target/pin.sha256": "bc150e69de798eadf8a6cdeb7be31440c7c544e7e297e531fbb98967ca37287f",
+    "target/toasty-7bd502cb.sig": "9b3a6ec3ad2c365cec6bbdd8767ba144a295bbe60affeb418c42dad65952a7fc",
+    "target/topcoat-51caa01.sig": "40ee029ce9885b1402d76cc4d0340545c24b9932649cec031c10075b1a21504d",
+    "test/fixtures/crate.lan": "302cfa5045023aeebd19229a31c142d07e23c38f56318cc754920bccb19409fd",
+    "test/goldens/crate/Cargo.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "test/goldens/crate/src/main.rs": "e2569a0f8ac32fdcac93f384f1fee7dbabaea82122ff5c31ff27aaf9a6b47177",
+    "test/lan_crate.py": "2c1ea02295e4cadd007e878a83c8db034ed917dd47c6656d12a07b3c6cdc90ed"
+  }
+}

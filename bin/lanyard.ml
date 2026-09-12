@@ -2,7 +2,7 @@
     fork point, so the driver holds check, axioms and spec-count.
     The first Stage E slice also prints native Rust through emit --native.
     Target slices print synchronous and async foreign constants through --target.
-    Target model schemas support Nat fields; the crate command is pending.
+    The crate command writes a standalone target program with a main entry point.
 
     Exit codes.  0 is a file that checks, 1 is a file that does not and
     64 is a usage error or a missing file.  A check failure writes one
@@ -21,7 +21,7 @@
 
 let usage () : unit =
   prerr_endline
-    "usage: lanyard check [--print|--erased] FILE | emit [--native|--target] FILE.lan | axioms FILE | spec-count"
+    "usage: lanyard check [--print|--erased] FILE | emit [--native|--target|--crate DIR] FILE.lan | axioms FILE | spec-count"
 
 let read_file (path : string) : string =
   if Sys.file_exists path then In_channel.with_open_bin path In_channel.input_all
@@ -91,9 +91,49 @@ let run_spec_count () : unit =
          prerr_endline (Kanon_kernel.Error.to_string error);
          exit 1)
 
-(** Native source goes to stdout only after the entire module prints. *)
+(** A fresh directory prevents overwriting any existing output. The parent
+    entries are read with [Sys.readdir], so a name that [Sys.file_exists]
+    cannot see, a dangling symlink, is refused as well. The files go to a
+    staging directory beside the destination and [Sys.rename] publishes
+    them in one step, so a write that stops part way leaves the
+    destination free and the next run is never blocked by half a crate.
+    As with input reads, an I/O failure after the guards is loud, and it
+    leaves the staging directory in place for inspection. All semantic
+    validation finishes before any file is written. *)
+let write_crate directory files =
+  let parent = Filename.dirname directory in
+  let staging = directory ^ ".partial" in
+  let entry_at path =
+    Sys.file_exists path
+    || Array.exists (String.equal (Filename.basename path)) (Sys.readdir parent)
+  in
+  match () with
+  | () when not (Sys.file_exists parent && Sys.is_directory parent) ->
+      prerr_endline ("lanyard: output parent is not a directory: " ^ parent);
+      exit 64
+  | () when entry_at directory ->
+      prerr_endline ("lanyard: output path exists: " ^ directory);
+      exit 64
+  | () when entry_at staging ->
+      prerr_endline ("lanyard: output path exists: " ^ staging);
+      exit 64
+  | () ->
+      Sys.mkdir staging 0o755;
+      Sys.mkdir (Filename.concat staging "src") 0o755;
+      List.iter (fun (path, contents) ->
+        Out_channel.with_open_bin (Filename.concat staging path)
+          (fun channel -> Out_channel.output_string channel contents)) files;
+      Sys.rename staging directory
+
+(** Source goes to stdout, or crate files to a fresh directory, only after
+    the entire module prints. Emission never invokes Cargo or the program. *)
 let dispatch_emit args =
   match args with
+  | [ "--crate"; directory; path ] when Filename.check_suffix path ".lan" ->
+      Kanon_surface.Elab.check_lanyard (read_file path)
+      |> Fun.flip Result.bind Lanyard_rust.Crate.files
+      |> Result.fold ~ok:(write_crate directory) ~error:(fun error ->
+          prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
   | [ "--native"; path ] when Filename.check_suffix path ".lan" ->
       Kanon_surface.Elab.check_lanyard (read_file path)
       |> Fun.flip Result.bind Kanon_surface.Lower.program

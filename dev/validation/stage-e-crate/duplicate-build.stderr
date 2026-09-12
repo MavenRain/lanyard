@@ -1,0 +1,2 @@
+gateledger: MISS 8030fb8e: env RUSTUP_TOOLCHAIN=1.98 RUSTC_WRAPPER= CARGO_BUILD_JOBS=2 CARGO_PROFILE_DEV_DEBUG=0 CARGO_TARGET_DIR=/Users/oobi/Documents/gpt2/lanyard-fusion/.gatework/crate-target cargocho --warn build -- --offline --locked --workspace
+gateledger: recorded green 8030fb8e (3s)

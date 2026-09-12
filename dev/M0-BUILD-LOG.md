@@ -1905,3 +1905,84 @@ gate ran as tag fix-1 and is GREEN in 2 minutes 2 seconds (17:34:40Z to
 The close check confirms GATE LSECC tag=fix-1 GREEN in 2 min 2 s, 66 of 66
 stage rows identical to the capture, porcelain with 24 staged paths and 0
 unstaged paths, and receipt drift of 4 of 71 keys.
+
+## Lanyard Stage E standalone target crates (2026-09-12)
+
+Starting from fab6234, `emit --crate DIR FILE.lan` writes Cargo.toml and
+src/main.rs after checking and printing the whole program. Its runtime
+main must take no runtime arguments. The wrapper uses the main function's
+inferred effect, awaits async execution and propagates errors with `?`.
+It discards the returned Lanyard value. Existing module goldens retain
+their bytes. Output directories must be new, with an existing parent.
+Semantic failures write no files. I/O failures remain loud and can leave
+partial output, matching the driver's existing input I/O discipline.
+
+The new Todo fixture opens SQLite in memory, pushes a schema, creates a
+row and looks it up. Both crate files have checked-in goldens. The manifest
+uses the two full target Git revisions and only the four permitted direct
+dependencies. An empty workspace prevents inheritance from a parent crate.
+Cargo resolves the registry dependencies when building the output.
+
+The cumulative E-crate gate is green. Its new checks cover both golden
+files, manifest pins and features, synchronous main in a mixed async
+module, five semantic refusals, six usage refusals and four output-path
+refusals. Three compiled runtime observations check success, error
+propagation and the deleted-entry-call control. The earlier native,
+foreign, async, applied foreign type, model and connection checks pass.
+
+The same generated source builds against clean checkouts of both target
+revisions and runs successfully with SQLite. A second source replaces the
+lookup with another create of the same primary key. It exits 1 with the
+database constraint error, confirming async error propagation through
+main. Gateledger records both locked offline builds from isolated
+validation repositories. The successful fixture has three compiler
+warnings for unused runtime methods and locals; the duplicate fixture
+also has an unused lookup function. No warning suppression was added.
+
+The first offline resolution needed an existing validation lock, and
+missing registry packages were fetched before the final offline builds.
+dev/prepare-crate.py verifies the target revisions and clean tracked
+sources, saves the original Git manifest and changes only the two local
+dependency locations. It accepts a lockfile seed. Captures, the resulting
+lockfile, the duplicate fixture and source hashes are recorded under
+dev/validation/stage-e-crate/.
+
+The printer total is 1094 lines, including the 22-line crate module.
+Kernel, eraser, IR, elaborator, target signatures and pins retain their
+committed bytes. Numeric allowances remain pending user rulings. Handler
+fusion, the frozen M0 Todo golden, build/run commands and M0 exit gates
+remain ahead. A recursive handler probe of `handle (resume value)` still
+fails the carried structural termination guard. This slice does not
+change that guard or claim Stage E completion.
+
+Review run wf_bb202fa1-831 raised 7 findings. It upheld 6 and refuted 1.
+It refuted the claim that the pinned and duplicate captures share one
+build: the receipt is a sequential record and cargo relinks when the
+source changes. The pin duplication in rust/crate.ml is not a defect
+either: test/lan_crate.py already compares the emitted toasty and
+topcoat git URLs and revisions with target/PIN.json, so drift fails the
+crate gate. dev/prepare-crate.py now reports a subprocess timeout, a
+missing --lock file, a missing PIN entry and a missing or non-git
+manifest dependency as the single CRATE-PREPARE FAIL line, so no failure
+path escapes that contract. bin/lanyard.ml now reads the parent entries
+by name, so a dangling symlink at the destination is refused with the
+existing exit 64, and it writes the crate into DIR.partial and renames
+that directory onto the destination as the last step, so a failed write
+leaves the destination free instead of a half-written crate. The one
+catch site rule (SD-D14) stops the writer from turning a mid-write
+Sys_error into a diagnosed message with its own exit code, so that half
+of the finding awaits a user ruling. Two prelude findings are carried
+and await a user ruling, because each one changes the crate goldens and
+needs a new capture: the Nat helpers should fold into a buffer from
+Vec::with_capacity and push instead of re-collecting the accumulator,
+and canonical should collect once; and the fallible conversion
+u8::try_from(x % 256) with map_err to Error::Arithmetic should become a
+total low-byte helper, so Error::Arithmetic appears only at the carry
+and borrow checks. dev/STAGE-E-CRATE.md records the new refusal and the
+staged publish. The review edits change the source hashes recorded in
+dev/validation/stage-e-crate/receipt.json; the captures are unchanged.
+The review gate ran as tag fix-1 and is GREEN in 5 min 4 s (20:01:18Z to
+20:06:22Z), 68 of 68 stage rows identical to the capture.
+The close check confirms GATE LSECR tag=fix-1 GREEN in 5 min 4 s, 68 of
+68 stage rows identical to the capture, porcelain with 35 staged paths
+and 0 unstaged paths, and receipt drift of 4 of 67 keys.

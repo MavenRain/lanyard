@@ -581,3 +581,17 @@ then fail the execution oracle.
 Printer checks retain refusals for open type arguments and include positive
 cases for erased arguments and constructor fields. The erased constructor
 case caught premature specialization before its quantity guard was added.
+
+## Standalone target crates (2026-09-12)
+
+The synchronous crate probe changes its generated decimal literal to an
+invalid digit string. The compiled program must return a nonzero status
+with the Digit error. Deleting the entry point's call to the Lanyard main
+then makes the same program exit successfully, so the error observation
+detects the missing execution. Both versions must compile.
+
+The pinned SQLite probe replaces the final lookup with a second create
+of the same primary key. The original program exits 0; the duplicate
+exits 1 and reports a Database error with the unique constraint failure.
+This checks propagation through the generated async main. The duplicate
+source and both execution captures live under dev/validation/stage-e-crate/.
