@@ -1719,3 +1719,60 @@ STAGE-GATE-EXIT 0 and the same 25 stage rows as the baseline run and as
 the capture dev/validation/stage-e-model-bools/stage-gate.stdout. This
 sentence is a later change to the build log only, and the gate does not
 read this file.
+
+## Text model fields (2026-09-11)
+
+The model printer accepts the checked byte-list representation used by
+Todo.title. It requires an empty first constructor and a second
+constructor containing a Nat head and a tail of the same family.
+Aliases and different family names receive the same rule. Other list
+shapes refuse, and model keys still require Nat. Model declarations
+retain recursive metadata even when no runtime definition uses them.
+
+Text columns use String. Writes borrow the native list, reject Nat
+elements above 255, and validate UTF-8 before the database call. Errors
+distinguish the byte range from invalid UTF-8. Reads rebuild the list in
+byte order. Empty strings, Unicode and embedded zero bytes round-trip.
+The two conversions use iterators without recursive function calls.
+
+The printer suite passes 14 positives and 29 refusals. The compiled
+oracle passes 45 observations and kills 13 mutations, retaining the
+eight earlier model controls. The text controls cover range truncation,
+lossy decoding, reversed reads, wrong columns and corrupted zero bytes.
+The fixture has two text fields, a Boolean field and a non-leading key.
+It exercises shared records, fresh values, lazy start, suspension, Send,
+database errors and invalid input that performs no database operation.
+
+The exact golden builds offline and locked with Toasty 7bd502cb and
+Rust 1.98.1. Its in-memory SQLite probe passes 41 observations, including
+direct String-column reads, externally inserted Unicode, empty values,
+duplicate keys and rejected text writes leaving no row. The cumulative
+E-models gate also compiles otherwise unused model declarations with
+two distinct recursive families. Captures and source digests are under
+dev/validation/stage-e-model-text/.
+
+The measured printer total is 983 lines: emit=632, foreign=65,
+template=71, effects=46 and model=169. Kernel, eraser, IR, surface,
+signature and pin sources retain their committed bytes. Numeric
+allowances remain pending user rulings. The Todo example now refuses
+its handler's foreign aggregate layout after accepting its fields.
+Db.connect, handler fusion, the full Todo crate and the M0 driver remain
+ahead. No Stage E completion or M0 exit is claimed.
+The review run wf_f83676d3-8dc examined this slice. Its finder and verify
+stages ran on opus. The Fable tier ruling stays unmet. The baseline gate is
+GREEN in gates-LSEMT-baseline.log. Its 63 rows are identical to the
+captured stage-gate.stdout. The run fixed S0 and S8 in rust/emit.ml: the
+two text error variants now print only for a program with a text field. It
+fixed S1 in rust/model.ml, S2 in dev/MUTATION-LOG.md, S3 in README.md and
+dev/STAGE-E-FOREIGN.md, S5 in test/lan_foreign.py and S6 in
+test/lan_models.py. It deferred S7 in rust/model.ml pending a ruling on a
+read bound or an iterative Drop. dev/STAGE-E-MODELS.md now records the read
+recursion depth. It refuted D4. The review edits changed these captured
+sources after the capture: README.md, dev/MUTATION-LOG.md,
+dev/STAGE-E-FOREIGN.md, dev/STAGE-E-MODELS.md, rust/emit.ml, rust/model.ml,
+test/lan_foreign.py, test/lan_models.py. The captures under
+dev/validation/stage-e-model-text/ stay as recorded. The fix round gate is
+GREEN in gates-LSEMT-fix-1.log with STAGE-GATE-EXIT 0 and 63 rows identical
+to the baseline. The closing check found the fix-1 rows identical to the 63
+baseline rows, the tree fully staged, no em-dash in the staged diff, and the
+receipt captures unchanged.

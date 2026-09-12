@@ -1,4 +1,5 @@
 include!("golden.rs");
+include!("text-oracle.rs");
 
 fn assert_send<F: std::future::Future + Send>(future: F) -> F { future }
 
@@ -24,7 +25,7 @@ async fn main() -> Result<(), Error> {
     report("large-overflow", matches!(lan_model_to_i64(&Nat::decimal("340282366920938463463374607431768211455")?), Err(Error::ModelRange)))?;
     report("negative", matches!(lan_model_from_i64(-1), Err(Error::ModelRange)))?;
     let mut db = toasty::Db::builder()
-        .models(toasty::models!(LanModel436f756e746572, LanModel53696e676c65, LanModel466c6167))
+        .models(toasty::models!(LanModel436f756e746572, LanModel53696e676c65, LanModel466c6167, LanModel546f646f))
         .connect("sqlite::memory:").await?;
     db.push_schema().await?;
     let db = Arc::new(db);
@@ -74,6 +75,35 @@ async fn main() -> Result<(), Error> {
     report("bool-duplicate", matches!(f_637265617465466c6167(true_row, Arc::clone(&db)).await, Err(Error::Database(_))))?;
     report("bool-overflow", matches!(f_637265617465466c616756616c7565(nat("32")?, nat("9223372036854775808")?, Arc::clone(&db)).await, Err(Error::ModelRange)))?;
     report("bool-overflow-no-insert", matches!(f_6c6f6f6b7570466c6167(nat("32")?, Arc::clone(&db)).await, Err(Error::Database(_))))?;
+    let title = text_input("héllo🦀\0");
+    let row = Arc::new(f_746f646f(nat("41")?, Arc::clone(&title), text_input("other"))?);
+    let made = assert_send(f_637265617465546f646f(Arc::clone(&row), Arc::clone(&db))).await?;
+    report("text-create", text_is(&made.f0, "héllo🦀\0") && lan_model_to_i64(&made.f1)? == 41
+        && is_true(&made.f2) && text_is(&made.f3, "other"))?;
+    let stored = LanModel546f646f::get_by_id(&mut direct, &41_i64).await?;
+    report("text-stored", stored.f_7469746c65 == "héllo🦀\0" && stored.f_6e6f7465 == "other"
+        && stored.id == 41 && stored.f_636f6d706c65746564)?;
+    let found = assert_send(f_6c6f6f6b7570546f646f(nat("41")?, Arc::clone(&db))).await?;
+    report("text-lookup", text_is(&found.f0, "héllo🦀\0") && text_is(&found.f3, "other"))?;
+    let made = assert_send(f_637265617465546f646f56616c7565(nat("40")?, Arc::clone(&db))).await?;
+    report("text-create-value", text_is(&made.f0, "hello") && text_is(&made.f3, "note") && !is_true(&made.f2))?;
+    report("text-shared", Arc::strong_count(&row) == 1 && Arc::strong_count(&title) == 1)?;
+    report("text-duplicate", matches!(f_637265617465546f646f(row, Arc::clone(&db)).await, Err(Error::Database(_))))?;
+    let bad = Arc::new(f_746f646f(nat("42")?, byte_input(&[256])?, text_input("note"))?);
+    report("text-byte-range", matches!(f_637265617465546f646f(bad, Arc::clone(&db)).await, Err(Error::ModelByteRange)))?;
+    report("text-byte-no-insert", matches!(f_6c6f6f6b7570546f646f(nat("42")?, Arc::clone(&db)).await, Err(Error::Database(_))))?;
+    let bad = Arc::new(f_746f646f(nat("43")?, text_input("title"), byte_input(&[255])?)?);
+    report("text-invalid-utf8", matches!(f_637265617465546f646f(bad, Arc::clone(&db)).await, Err(Error::ModelUtf8)))?;
+    report("text-utf8-no-insert", matches!(f_6c6f6f6b7570546f646f(nat("43")?, Arc::clone(&db)).await, Err(Error::Database(_))))?;
+    let empty = Arc::new(f_746f646f(nat("44")?, text_input(""), text_input(""))?);
+    let made = assert_send(f_637265617465546f646f(empty, Arc::clone(&db))).await?;
+    report("text-empty", text_is(&made.f0, "") && text_is(&made.f3, ""))?;
+    let found = f_6c6f6f6b7570546f646f(nat("44")?, Arc::clone(&db)).await?;
+    report("text-empty-lookup", text_is(&found.f0, "") && text_is(&found.f3, ""))?;
+    toasty::create!(LanModel546f646f { id: 45_i64, f_7469746c65: String::from("external λ"),
+        f_636f6d706c65746564: false, f_6e6f7465: String::from("stored 🚀") }).exec(&mut direct).await?;
+    let found = assert_send(f_6c6f6f6b7570546f646f(nat("45")?, Arc::clone(&db))).await?;
+    report("text-external-read", text_is(&found.f0, "external λ") && text_is(&found.f3, "stored 🚀"))?;
     report("database-sharing", Arc::strong_count(&db) == 1)?;
     Ok(())
 }

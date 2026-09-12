@@ -5,7 +5,7 @@ use std::sync::Arc;
 struct Nat(Vec<u8>);
 
 #[derive(Debug)]
-enum Error { Digit, Arithmetic, Database(toasty::Error), ModelRange }
+enum Error { Digit, Arithmetic, Database(toasty::Error), ModelRange, ModelByteRange, ModelUtf8 }
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -13,13 +13,15 @@ impl std::fmt::Display for Error {
             Self::Arithmetic => f.write_str("natural limb invariant failed"),
             Self::Database(error) => std::fmt::Display::fmt(error, f),
             Self::ModelRange => f.write_str("model Nat is outside 0..=i64::MAX"),
+            Self::ModelByteRange => f.write_str("model text element is outside 0..=255"),
+            Self::ModelUtf8 => f.write_str("model text is not valid UTF-8"),
         }
     }
 }
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            Self::Digit | Self::Arithmetic | Self::ModelRange => None,
+            Self::Digit | Self::Arithmetic | Self::ModelRange | Self::ModelByteRange | Self::ModelUtf8 => None,
             Self::Database(error) => Some(error),
         }
     }
@@ -86,8 +88,14 @@ impl Nat {
     }
 }
 
+#[derive(Clone, Debug)]
+enum T6e6f6d696e616c28353a427974657329 { V0, V1(Box<(Nat, T6e6f6d696e616c28353a427974657329,)>) }
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct T70726f64756374286e61742c6e617429 { f0: Nat, f1: Nat }
+
+#[derive(Clone, Debug)]
+struct T70726f64756374286e6f6d696e616c28353a4279746573292c6e61742c73756d28756e69742c756e6974292c6e6f6d696e616c28353a42797465732929 { f0: T6e6f6d696e616c28353a427974657329, f1: Nat, f2: T73756d28756e69742c756e697429, f3: T6e6f6d696e616c28353a427974657329 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct T70726f647563742873756d28756e69742c756e6974292c6e61742c6e61742c73756d28756e69742c756e69742929 { f0: T73756d28756e69742c756e697429, f1: Nat, f2: Nat, f3: T73756d28756e69742c756e697429 }
@@ -135,6 +143,22 @@ async fn f_6c6f6f6b7570466c6167(a0: Arc<Nat>, a1: Arc<toasty::Db>) -> Result<T70
     Ok({ let __lan_value = Arc::clone(&(a0)); let __lan_db_arg = Arc::clone(&(a1)); let mut __lan_db = (*__lan_db_arg).clone(); let __lan_row = LanModel466c6167::get_by_id(&mut __lan_db, &lan_model_to_i64(&__lan_value)?).await?; T70726f647563742873756d28756e69742c756e6974292c6e61742c6e61742c73756d28756e69742c756e69742929 { f0: if __lan_row.f_656e61626c6564 { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) }, f1: lan_model_from_i64(__lan_row.id)?, f2: lan_model_from_i64(__lan_row.f_636f756e74)?, f3: if __lan_row.f_6172636869766564 { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) } } })
 }
 
+fn f_746f646f(a0: Arc<Nat>, a1: Arc<T6e6f6d696e616c28353a427974657329>, a2: Arc<T6e6f6d696e616c28353a427974657329>) -> Result<T70726f64756374286e6f6d696e616c28353a4279746573292c6e61742c73756d28756e69742c756e6974292c6e6f6d696e616c28353a42797465732929, Error> {
+    Ok(T70726f64756374286e6f6d696e616c28353a4279746573292c6e61742c73756d28756e69742c756e6974292c6e6f6d696e616c28353a42797465732929 { f0: (*(Arc::clone(&(a1)))).clone(), f1: (*(Arc::clone(&(a0)))).clone(), f2: if ((*(Arc::clone(&(a0)))).clone()).compare(&(Nat::decimal("41")?)).is_eq() { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) }, f3: (*(Arc::clone(&(a2)))).clone() })
+}
+
+async fn f_637265617465546f646f(a0: Arc<T70726f64756374286e6f6d696e616c28353a4279746573292c6e61742c73756d28756e69742c756e6974292c6e6f6d696e616c28353a42797465732929>, a1: Arc<toasty::Db>) -> Result<T70726f64756374286e6f6d696e616c28353a4279746573292c6e61742c73756d28756e69742c756e6974292c6e6f6d696e616c28353a42797465732929, Error> {
+    Ok({ let __lan_value = Arc::clone(&(a0)); let __lan_db_arg = Arc::clone(&(a1)); let mut __lan_db = (*__lan_db_arg).clone(); let __lan_row = toasty::create!(LanModel546f646f { f_7469746c65: lan_model_text_to_4279746573(&__lan_value.f0)?, id: lan_model_to_i64(&__lan_value.f1)?, f_636f6d706c65746564: match &__lan_value.f2 { T73756d28756e69742c756e697429::V0(()) => false, T73756d28756e69742c756e697429::V1(()) => true }, f_6e6f7465: lan_model_text_to_4279746573(&__lan_value.f3)? }).exec(&mut __lan_db).await?; T70726f64756374286e6f6d696e616c28353a4279746573292c6e61742c73756d28756e69742c756e6974292c6e6f6d696e616c28353a42797465732929 { f0: lan_model_text_from_4279746573(__lan_row.f_7469746c65), f1: lan_model_from_i64(__lan_row.id)?, f2: if __lan_row.f_636f6d706c65746564 { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) }, f3: lan_model_text_from_4279746573(__lan_row.f_6e6f7465) } })
+}
+
+async fn f_637265617465546f646f56616c7565(a0: Arc<Nat>, a1: Arc<toasty::Db>) -> Result<T70726f64756374286e6f6d696e616c28353a4279746573292c6e61742c73756d28756e69742c756e6974292c6e6f6d696e616c28353a42797465732929, Error> {
+    Ok({ let __lan_value = Arc::new(f_746f646f(Arc::clone(&(a0)), Arc::new(T6e6f6d696e616c28353a427974657329::V1(Box::new((Nat::decimal("104")?, T6e6f6d696e616c28353a427974657329::V1(Box::new((Nat::decimal("101")?, T6e6f6d696e616c28353a427974657329::V1(Box::new((Nat::decimal("108")?, T6e6f6d696e616c28353a427974657329::V1(Box::new((Nat::decimal("108")?, T6e6f6d696e616c28353a427974657329::V1(Box::new((Nat::decimal("111")?, T6e6f6d696e616c28353a427974657329::V0,))),))),))),))),)))), Arc::new(T6e6f6d696e616c28353a427974657329::V1(Box::new((Nat::decimal("110")?, T6e6f6d696e616c28353a427974657329::V1(Box::new((Nat::decimal("111")?, T6e6f6d696e616c28353a427974657329::V1(Box::new((Nat::decimal("116")?, T6e6f6d696e616c28353a427974657329::V1(Box::new((Nat::decimal("101")?, T6e6f6d696e616c28353a427974657329::V0,))),))),))),)))))?); let __lan_db_arg = Arc::clone(&(a1)); let mut __lan_db = (*__lan_db_arg).clone(); let __lan_row = toasty::create!(LanModel546f646f { f_7469746c65: lan_model_text_to_4279746573(&__lan_value.f0)?, id: lan_model_to_i64(&__lan_value.f1)?, f_636f6d706c65746564: match &__lan_value.f2 { T73756d28756e69742c756e697429::V0(()) => false, T73756d28756e69742c756e697429::V1(()) => true }, f_6e6f7465: lan_model_text_to_4279746573(&__lan_value.f3)? }).exec(&mut __lan_db).await?; T70726f64756374286e6f6d696e616c28353a4279746573292c6e61742c73756d28756e69742c756e6974292c6e6f6d696e616c28353a42797465732929 { f0: lan_model_text_from_4279746573(__lan_row.f_7469746c65), f1: lan_model_from_i64(__lan_row.id)?, f2: if __lan_row.f_636f6d706c65746564 { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) }, f3: lan_model_text_from_4279746573(__lan_row.f_6e6f7465) } })
+}
+
+async fn f_6c6f6f6b7570546f646f(a0: Arc<Nat>, a1: Arc<toasty::Db>) -> Result<T70726f64756374286e6f6d696e616c28353a4279746573292c6e61742c73756d28756e69742c756e6974292c6e6f6d696e616c28353a42797465732929, Error> {
+    Ok({ let __lan_value = Arc::clone(&(a0)); let __lan_db_arg = Arc::clone(&(a1)); let mut __lan_db = (*__lan_db_arg).clone(); let __lan_row = LanModel546f646f::get_by_id(&mut __lan_db, &lan_model_to_i64(&__lan_value)?).await?; T70726f64756374286e6f6d696e616c28353a4279746573292c6e61742c73756d28756e69742c756e6974292c6e6f6d696e616c28353a42797465732929 { f0: lan_model_text_from_4279746573(__lan_row.f_7469746c65), f1: lan_model_from_i64(__lan_row.id)?, f2: if __lan_row.f_636f6d706c65746564 { T73756d28756e69742c756e697429::V1(()) } else { T73756d28756e69742c756e697429::V0(()) }, f3: lan_model_text_from_4279746573(__lan_row.f_6e6f7465) } })
+}
+
 #[derive(Debug, toasty::Model)]
 struct LanModel436f756e746572 {
     #[key]
@@ -158,6 +182,15 @@ struct LanModel466c6167 {
     f_6172636869766564: bool,
 }
 
+#[derive(Debug, toasty::Model)]
+struct LanModel546f646f {
+    f_7469746c65: String,
+    #[key]
+    id: i64,
+    f_636f6d706c65746564: bool,
+    f_6e6f7465: String,
+}
+
 fn lan_model_to_i64(value: &Nat) -> Result<i64, Error> {
     value.0.iter().rev().try_fold(0_i64, |number, byte| {
         number.checked_mul(256).and_then(|number| number.checked_add(i64::from(*byte)))
@@ -167,4 +200,24 @@ fn lan_model_to_i64(value: &Nat) -> Result<i64, Error> {
 fn lan_model_from_i64(value: i64) -> Result<Nat, Error> {
     if value < 0 { Err(Error::ModelRange) }
     else { Ok(Nat::canonical(value.to_le_bytes().to_vec())) }
+}
+
+fn lan_model_text_to_4279746573(value: &T6e6f6d696e616c28353a427974657329) -> Result<String, Error> {
+    std::iter::successors(Some(value), |node| match node {
+        T6e6f6d696e616c28353a427974657329::V0 => None,
+        T6e6f6d696e616c28353a427974657329::V1(fields) => Some(&fields.1),
+    }).filter_map(|node| match node {
+        T6e6f6d696e616c28353a427974657329::V0 => None,
+        T6e6f6d696e616c28353a427974657329::V1(fields) => Some(match fields.0.0.as_slice() {
+            [] => Ok(0),
+            [byte] => Ok(*byte),
+            [_, _, ..] => Err(Error::ModelByteRange),
+        }),
+    }).collect::<Result<Vec<u8>, Error>>()
+        .and_then(|bytes| String::from_utf8(bytes).map_err(|_error| Error::ModelUtf8))
+}
+fn lan_model_text_from_4279746573(value: String) -> T6e6f6d696e616c28353a427974657329 {
+    value.bytes().rev().fold(T6e6f6d696e616c28353a427974657329::V0, |tail, byte| {
+        T6e6f6d696e616c28353a427974657329::V1(Box::new((Nat::canonical(vec![byte]), tail)))
+    })
 }

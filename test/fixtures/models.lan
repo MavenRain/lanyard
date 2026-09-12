@@ -34,3 +34,23 @@ def createFlag : Flag -> Db -> Flag := fun (row : Flag) (db : Db) => Flag.create
 def createFlagValue : Nat -> Nat -> Db -> Flag := fun (id : Nat) (count : Nat) (db : Db) =>
   Flag.create (flag id count) db
 def lookupFlag : Nat -> Db -> Flag := fun (id : Nat) (db : Db) => Flag.get_by_id id db
+
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def Text : Type 0 := Bytes
+
+model Todo with
+| title : Text
+| id : Nat
+| completed : Status
+| note : Bytes
+end
+
+def todo : Nat -> Bytes -> Bytes -> Todo := fun (id : Nat) (title : Bytes) (note : Bytes) =>
+  tuple (title, id, natEq id 41, note)
+def createTodo : Todo -> Db -> Todo := fun (row : Todo) (db : Db) => Todo.create row db
+def createTodoValue : Nat -> Db -> Todo := fun (id : Nat) (db : Db) =>
+  Todo.create (todo id b"hello" b"note") db
+def lookupTodo : Nat -> Db -> Todo := fun (id : Nat) (db : Db) => Todo.get_by_id id db

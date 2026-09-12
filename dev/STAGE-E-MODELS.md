@@ -1,7 +1,8 @@
 # Scalar model schemas
 
-The target command prints Toasty models whose fields normalize to Nat or
-a sum of two units (Bool). Each model requires a Nat `id` field, used as
+The target command prints Toasty models whose fields normalize to Nat,
+a sum of two units (Bool), or a checked byte list (text).
+Each model requires a Nat `id` field, used as
 a supplied primary key. Type aliases normalize before validation. Field
 order follows the checked model declaration, including models whose key
 is not the first field.
@@ -39,6 +40,30 @@ type named `Bool` with a different layout receives that layout's rule.
 Other sums, including sums with payloads or three unit legs, refuse.
 Keys remain Nat; a Boolean key refuses before Rust is printed.
 
+Text fields use Rust String columns. Their normalized family must have
+two constructors in order: an empty constructor and a constructor with
+a Nat head and a tail of the same family. The printer checks the erased
+constructor metadata, including field order. Aliases and other family
+names work; a type merely named Bytes receives no special treatment.
+Other recursive shapes and text keys refuse before Rust is printed.
+
+Writes traverse the borrowed list without consuming shared input. Each
+Nat element must fit one byte, otherwise `Error::ModelByteRange` is
+returned. `Error::ModelUtf8` rejects invalid UTF-8 without replacement.
+Both checks finish before the database call, including checks of later
+text columns. Reads reconstruct the native list in byte order. Empty
+strings, Unicode and embedded zero bytes retain their exact contents.
+Conversion uses iterator traversal; it adds no recursive Rust calls.
+Unused model declarations still emit the family metadata needed by their
+conversion functions. Native list representation and ownership rules
+are unchanged.
+
+The read path builds one linked node for each stored byte. The recursion
+depth of the generated Drop, Clone and Debug glue is equal to the stored
+byte length. The tested size is about 1 KB. A read bound is a numeric
+allowance. An iterative Drop changes the native recursive representation
+of every family. Both options stay a pending decision.
+
 The fixture's `Flag` model mixes two Boolean columns and a Nat counter,
 with its key in the second slot. Its creation functions cover shared
 records and fresh values. Both true/false combinations are checked on
@@ -69,6 +94,15 @@ of a negative value inserted through the Rust API.
 For the mixed model it also inspects stored Boolean columns directly,
 independently of the native conversion, and checks both lookup results,
 duplicate keys and a rejected overflowing Nat write leaving no row.
+The text model has two text columns, a Boolean column and a non-leading
+key. Both probes cover shared and fresh rows, errors, column order and
+Unicode contents. The pinned probe reads stored String columns directly,
+checks empty values and native reads of externally inserted Unicode,
+and verifies that invalid-byte and invalid-UTF-8 writes leave no row.
+Five text mutations truncate a byte, allow lossy UTF-8, reverse a read,
+select the wrong text column, or corrupt a zero byte. Each must compile
+and fail the execution oracle. The oracle is added after mutation and
+does not use the generated text conversions to check returned lists.
 
 Prepare that probe with the pinned checkout and an existing dependency
 lockfile:
@@ -97,3 +131,5 @@ the full Todo crate and the M0 driver remain ahead. This slice changes
 no kernel, eraser, IR, target signature or pin bytes. The printer bucket
 includes rust/model.ml; all numeric allowances remain pending rulings.
 No Stage E completion or M0 exit is claimed.
+The Todo example now passes its title-field check and still refuses its
+handler's foreign aggregate layout. Handler fusion remains separate work.

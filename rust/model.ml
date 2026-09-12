@@ -1,4 +1,4 @@
-(** Model fields store Nat through checked i64 conversions and two-unit sums as bool.
+(** Model fields store Nat, two-unit sums and checked byte lists as database scalars.
     Checked model instances select schemas; only the key field id keeps its source name. *)
 open Kanon_kernel
 module Elab = Kanon_surface.Elab
@@ -8,18 +8,23 @@ module Printer = Foreign.Printer
 let ( let* ) = Result.bind
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
 let refuse text = Error (Error.Not_yet ("Rust emission: " ^ text))
-type scalar = Nat_field | Bool_field
-type t = { name : string; fields : (string * scalar) list; repr : Rir.repr; instances : Rir.foreign list }
+type scalar = Nat_field | Bool_field | Text_field of string
+type t = { name : string; fields : (string * scalar) list; repr : Rir.repr;
+  data : Rir.tid list; instances : Rir.foreign list }
 let bool_repr = Rir.TyUnion (Rir.Tid "sum<struct tuple<>|struct tuple<>>")
 let bool_type = Printer.rust_type (Printer.Sum [Printer.Unit; Printer.Unit])
-let storage_type = function Nat_field -> "i64" | Bool_field -> "bool"
+let storage_type = function Nat_field -> "i64" | Bool_field -> "bool" | Text_field _ -> "String"
+let text_to name = Printer.identifier "lan_model_text_to_" name
+let text_from name = Printer.identifier "lan_model_text_from_" name
 let to_storage scalar value = match scalar with
   | Nat_field -> "lan_model_to_i64(&" ^ value ^ ")?"
   | Bool_field -> "match &" ^ value ^ " { " ^ bool_type ^ "::V0(()) => false, "
       ^ bool_type ^ "::V1(()) => true }"
+  | Text_field name -> text_to name ^ "(&" ^ value ^ ")?"
 let from_storage scalar value = match scalar with
   | Nat_field -> "lan_model_from_i64(" ^ value ^ ")?"
   | Bool_field -> "if " ^ value ^ " { " ^ bool_type ^ "::V1(()) } else { " ^ bool_type ^ "::V0(()) }"
+  | Text_field name -> text_from name ^ "(" ^ value ^ ")"
 let rust_name model = Printer.identifier "LanModel" model.name
 let field_name name = if String.equal name "id" then "id" else Printer.identifier "f_" name
 let catalog (checked : Elab.lan_program) =
@@ -28,22 +33,34 @@ let catalog (checked : Elab.lan_program) =
   Rules.all_ok (List.map (fun (model : Elab.model_info) ->
     let ec : Erase.ectx = { c = Check.make checked.globals Budget.unlimited;
       slots = []; self = model.model_name } in
-    let representation syntax =
+    let evaluate syntax =
       let* term = Elab.elab ec.c ~expected:None syntax in
-      let* ty = Eval.eval checked.globals [] term in Erase.repr_of ec ty in
+      Eval.eval checked.globals [] term in
+    let* ty = evaluate (Kanon_surface.Syntax.SVar model.model_name) in
+    let* repr = Erase.repr_of ec ty in
+    let* tid = Erase.tid_of ec ty in
+    let* data = Erase.complete_groups ec [tid] in
+    let* families = Printer.family_catalog [model.model_name, Erase.Code [Rir.RData data]] in
     let* fields = Rules.all_ok (List.map (fun (field, syntax) ->
-      let* repr = representation syntax in
+      let* ty = evaluate syntax in
+      let* repr = Erase.repr_of ec ty in
       let is_key = String.equal field "id" in
+      let text_family = List.find_opt (fun (family : Printer.family) ->
+        repr = Rir.TyUnion (Erase.mu_tid family.family_name)
+        && family.variants = [[]; [Printer.Nat; Printer.Nominal family.family_name]]) families in
       match () with
       | () when repr = Rir.TyUnion (Rir.Tid "nat") -> Ok (field, Nat_field)
-      | () when repr = bool_repr && not is_key -> Ok (field, Bool_field)
-      | () -> refuse ("model field " ^ model.model_name ^ "." ^ field ^ " requires "
-        ^ (if is_key then "Nat" else "Nat or Bool (a two-unit sum)"))) model.fields) in
+      | () when is_key -> refuse ("model field " ^ model.model_name ^ "." ^ field ^ " requires Nat")
+      | () when repr = bool_repr -> Ok (field, Bool_field)
+      | () -> Option.fold
+          ~none:(refuse ("model field " ^ model.model_name ^ "." ^ field
+            ^ " requires Nat or Bool (a two-unit sum) or a byte list"))
+          ~some:(fun (family : Printer.family) -> Ok (field, Text_field family.family_name))
+          text_family) model.fields) in
     let* () = if List.mem_assoc "id" model.fields then Ok () else invalid "model requires id" in
-    let* repr = representation (Kanon_surface.Syntax.SVar model.model_name) in
     let instances = List.filter (fun (row : Rir.foreign) ->
       List.assoc_opt "M" row.type_arguments = Some model.model_name) instances in
-    Ok { name = model.model_name; fields; repr; instances }) checked.models)
+    Ok { name = model.model_name; fields; repr; data; instances }) checked.models)
 
 type operation = Create | Get
 let operation name =
@@ -111,6 +128,29 @@ fn lan_model_from_i64(value: i64) -> Result<Nat, Error> {
     else { Ok(Nat::canonical(value.to_le_bytes().to_vec())) }
 }
 |}
+let text_conversions name =
+  let ty = Printer.rust_type (Printer.Nominal name) in
+  Printf.sprintf {|
+fn %s(value: &%s) -> Result<String, Error> {
+    std::iter::successors(Some(value), |node| match node {
+        %s::V0 => None,
+        %s::V1(fields) => Some(&fields.1),
+    }).filter_map(|node| match node {
+        %s::V0 => None,
+        %s::V1(fields) => Some(match fields.0.0.as_slice() {
+            [] => Ok(0),
+            [byte] => Ok(*byte),
+            [_, _, ..] => Err(Error::ModelByteRange),
+        }),
+    }).collect::<Result<Vec<u8>, Error>>()
+        .and_then(|bytes| String::from_utf8(bytes).map_err(|_error| Error::ModelUtf8))
+}
+fn %s(value: String) -> %s {
+    value.bytes().rev().fold(%s::V0, |tail, byte| {
+        %s::V1(Box::new((Nat::canonical(vec![byte]), tail)))
+    })
+}
+|} (text_to name) ty ty ty ty ty (text_from name) ty ty ty
 let source (checked : Elab.lan_program) =
   let* models = catalog checked in
   let* rows = Lower.program checked in
@@ -122,5 +162,11 @@ let source (checked : Elab.lan_program) =
       if String.starts_with ~prefix:"Model." row.Rir.schema then foreign_call Catalog.entries models row
       else Foreign.foreign_call Catalog.entries row
   end) in
-  let* source = Target.native ~model_errors:true rows in
-  Ok (source ^ "\n" ^ String.concat "\n" (List.map declaration models) ^ conversions)
+  let data = List.concat_map (fun model -> model.data) models in
+  let text = List.concat_map (fun model -> List.filter_map (fun (_field, scalar) ->
+    match scalar with Nat_field | Bool_field -> None | Text_field name -> Some name) model.fields) models
+    |> List.sort_uniq String.compare in
+  let* source = Target.native ~model_errors:true ~text_errors:(text <> [])
+    (("", Erase.Code [Rir.RData data]) :: rows) in
+  Ok (source ^ "\n" ^ String.concat "\n" (List.map declaration models) ^ conversions
+    ^ (List.map text_conversions text |> String.concat ""))

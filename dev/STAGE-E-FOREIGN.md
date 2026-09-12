@@ -44,11 +44,12 @@ a checked Many identity cannot silently emit a payload clone.
 Db.connect, other model field types, handler fusion and
 the crate driver remain ahead. The later async slice adds the effectful
 constant `Db.push_schema`; see STAGE-E-ASYNC.md. Unsupported definitions
-are never pruned to make the rest print. The model slice now refuses
-the Todo example at its unsupported title field. An inline model source
-in test/lan_foreign.py pins an unsupported Uri field. Nat model schemas
-are covered by STAGE-E-MODELS.md. This slice does not claim EMIT-DIFF
-for the Todo crate or M0-EXIT. Target rows retain PROPOSED status.
+are never pruned to make the rest print. The model slice now accepts
+the Todo title field and refuses its handler's foreign aggregate layout.
+An inline model source in test/lan_foreign.py pins an unsupported Uri
+field. Nat, Bool and text model schemas are covered by STAGE-E-MODELS.md.
+This slice does not claim EMIT-DIFF for the Todo crate or M0-EXIT. Target
+rows retain PROPOSED status.
 
 The cumulative gate retains every Stage E native leg. The new OCaml suite
 checks malformed templates and IR metadata, deleted catalog entries, type

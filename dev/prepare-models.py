@@ -39,6 +39,7 @@ def main():
     shutil.copyfile(args.lock, destination / "Cargo.lock")
     shutil.copyfile(ROOT / "test/goldens/models.rs", source / "golden.rs")
     shutil.copyfile(ROOT / "test/models-pinned.rs", source / "main.rs")
+    shutil.copyfile(ROOT / "test/models-text-oracle.rs", source / "text-oracle.rs")
     print(f"MODELS-PREPARE OK manifest={destination / 'Cargo.toml'}")
 
 

@@ -529,3 +529,23 @@ payload sums and three-unit sums. The real Toasty/SQLite probe passes
 28 observations, including direct stored-value checks that do not use
 the printer's Boolean read conversion. Final captures are recorded in
 dev/validation/stage-e-model-bools/.
+
+## Text model fields (2026-09-11)
+
+The model oracle adds five live Rust mutations for text conversions:
+
+- Keep the low byte of a Nat outside the byte range.
+- Replace strict UTF-8 decoding with lossy decoding.
+- Reconstruct a list in reversed byte order.
+- Read the note column into the title field.
+- Turn a canonical zero byte into one.
+
+Each mutation changes emitted source before the independent oracle is
+appended. All five compile and fail execution. The gate retains the
+eight existing model mutations and passes 45 compiled observations,
+with 13 mutations killed in total. A separate compile checks unused
+schemas with two distinct list families and a shared type alias.
+
+The Todo example now gets past its text field and refuses at the
+handler's foreign aggregate layout. The prior foreign gate pins that
+refusal and retains its unsupported Uri model-field control.

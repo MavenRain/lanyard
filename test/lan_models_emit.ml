@@ -4,6 +4,7 @@ module Catalog = Lanyard_target.Target_generated
 let ( let* ) = Result.bind
 let base = "model Counter with | id : Nat | value : Nat end\n"
 let bit = "def Bit : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))\n"
+let bytes = "mu Bytes : Type 0 := | bytesNil : Bytes | bytesCons (head : Nat) (tail : Bytes) : Bytes\n"
 let emit text = Kanon_surface.Elab.check_lanyard text |> Fun.flip Result.bind Model.source
 let create = base ^ "def main : Db -> Counter := fun (db : Db) => Counter.create (tuple (7, 42)) db"
 let holds text needle = List.init (String.length text + 1) Fun.id |> List.exists (fun index ->
@@ -33,6 +34,19 @@ let refusals = [
     emit "model Counter with | id : Nat | value : sum ((prod () : Type 0), (prod () : Type 0), (prod () : Type 0)) end";
   "Bool name with unsupported layout", "model field Counter.value requires Nat or Bool",
     emit "def Bool : Type 0 := prod ()\nmodel Counter with | id : Nat | value : Bool end";
+  "text key", "model field Counter.id requires Nat", emit (bytes ^ "model Counter with | id : Bytes end");
+  "Bytes name with unsupported layout", "model field Counter.value requires",
+    emit "def Bytes : Type 0 := prod ()\nmodel Counter with | id : Nat | value : Bytes end";
+  "reversed constructors", "model field Counter.value requires",
+    emit "mu Bytes : Type 0 := | cons (head : Nat) (tail : Bytes) : Bytes | nil : Bytes\nmodel Counter with | id : Nat | value : Bytes end";
+  "reversed list fields", "model field Counter.value requires",
+    emit "mu Bytes : Type 0 := | nil : Bytes | cons (tail : Bytes) (head : Nat) : Bytes\nmodel Counter with | id : Nat | value : Bytes end";
+  "non-Nat list element", "model field Counter.value requires",
+    emit (bit ^ "mu Bytes : Type 0 := | nil : Bytes | cons (head : Bit) (tail : Bytes) : Bytes\nmodel Counter with | id : Nat | value : Bytes end");
+  "extra constructor", "model field Counter.value requires",
+    emit "mu Bytes : Type 0 := | nil : Bytes | cons (head : Nat) (tail : Bytes) : Bytes | extra : Bytes\nmodel Counter with | id : Nat | value : Bytes end";
+  "other tail family", "model field Counter.value requires",
+    emit (bytes ^ "mu Other : Type 0 := | nil : Other | cons (head : Nat) (tail : Bytes) : Other\nmodel Counter with | id : Nat | value : Other end");
   "missing key", "needs an id field", emit "model Counter with | value : Nat end";
   "duplicate field", "duplicate declaration", emit "model Counter with | id : Nat | id : Nat end";
   "forged name", "unknown model instance", metadata (fun row -> {row with name="Other_create"}) Fun.id;
@@ -67,6 +81,16 @@ let positives = [
     emit "model Counter with | value : sum ((prod () : Type 0), (prod () : Type 0)) | id : Nat end";
   "Bool name with Nat layout", "f_76616c7565: i64",
     emit "def Bool : Type 0 := Nat\nmodel Counter with | id : Nat | value : Bool end";
+  "text field alias", "f_76616c7565: String",
+    emit (bytes ^ "def Text : Type 0 := Bytes\nmodel Counter with | id : Nat | value : Text end");
+  "unused text model metadata", "enum T6e6f6d696e616c28353a427974657329",
+    emit (bytes ^ "model Counter with | id : Nat | value : Bytes end");
+  "structural byte list", "f_76616c7565: String",
+    emit "mu Octets : Type 0 := | empty : Octets | more (byte : Nat) (rest : Octets) : Octets\nmodel Counter with | value : Octets | id : Nat end";
+  "Bytes name with Nat layout", "f_76616c7565: i64",
+    emit "def Bytes : Type 0 := Nat\nmodel Counter with | id : Nat | value : Bytes end";
+  "Todo fields", "f_7469746c65: String",
+    emit (bytes ^ bit ^ "model Todo with | id : Nat | title : Bytes | completed : Bit end");
 ]
 let () =
   let failures = List.filter_map (fun (name, needle, result) -> Result.fold

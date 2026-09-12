@@ -156,8 +156,9 @@ def main():
             rejected = run(DRIVER, "emit", *args)
             require(rejected.returncode == 64 and not rejected.stdout, "target usage accepted")
         rejected = run(DRIVER, "emit", "--target", ROOT / "examples/m0-todo.lan")
-        require(rejected.returncode == 1 and not rejected.stdout and "model field Todo.title requires Nat" in rejected.stderr,
-                f"Todo field refusal differs: {rejected.stderr}")
+        require(rejected.returncode == 1 and not rejected.stdout
+                and rejected.stderr.strip() == "not yet: Rust emission: foreign aggregate layout",
+                f"Todo handler refusal differs: {rejected.stderr}")
     print(f"LAN-FOREIGN OK observations={len(expected)} mutants=3 refusals={len(refusals)} compiler={version.stdout.strip()}")
 
 
