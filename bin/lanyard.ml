@@ -2,7 +2,7 @@
     fork point, so the driver holds check, axioms and spec-count.
     The first Stage E slice also prints native Rust through emit --native.
     Target slices print synchronous and async foreign constants through --target.
-    Foreign schemas and the crate command land at a later slice.
+    Target model schemas support Nat fields; the crate command is pending.
 
     Exit codes.  0 is a file that checks, 1 is a file that does not and
     64 is a usage error or a missing file.  A check failure writes one
@@ -102,8 +102,7 @@ let dispatch_emit args =
           prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
   | [ "--target"; path ] when Filename.check_suffix path ".lan" ->
       Kanon_surface.Elab.check_lanyard (read_file path)
-      |> Fun.flip Result.bind Kanon_surface.Lower.program
-      |> Fun.flip Result.bind Lanyard_rust.Foreign.source
+      |> Fun.flip Result.bind Lanyard_rust.Model.source
       |> Result.fold ~ok:print_string ~error:(fun error ->
           prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
   | [] | _ :: _ -> usage (); exit 64

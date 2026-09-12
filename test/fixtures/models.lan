@@ -1,0 +1,19 @@
+def Count : Type 0 := Nat
+
+model Counter with
+| id : Count
+| value : Nat
+end
+
+model Single with
+| value : Nat
+| id : Nat
+end
+
+def item : Counter := tuple (7, 42)
+def create : Db -> Counter := fun (db : Db) => Counter.create item db
+def lookup : Nat -> Db -> Counter := fun (id : Nat) (db : Db) => Counter.get_by_id id db
+def roundtrip : Db -> Counter := fun (db : Db) =>
+  let created : Counter := create db in lookup created.0 db
+def createSingle : Single -> Db -> Single := fun (row : Single) (db : Db) => Single.create row db
+def lookupSingle : Nat -> Db -> Single := fun (id : Nat) (db : Db) => Single.get_by_id id db

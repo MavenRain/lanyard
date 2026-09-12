@@ -10,8 +10,8 @@ foreign-type census. Stage D adds Rust IR, quantity-aware erasure and checked
 foreign-call metadata. The Stage E native command prints Rust for pure
 programs, including typed closures, captures and recursive data. The target
 command adds synchronous foreign constants, concrete and applied foreign
-types, and async database calls. Foreign schemas and the complete M0 driver
-remain ahead.
+types, async database calls, and model create/lookup for Nat fields.
+Db.connect, other model field types and the complete M0 driver remain ahead.
 The generated signature allowance is proposed at 104 lines and awaits the
 user's ruling. See [target documentation](target/README.md), the
 [Stage B build log](dev/M0-BUILD-LOG.md#lanyard-m0-stage-b-2026-09-09) and
@@ -57,8 +57,8 @@ _build/default/bin/lanyard.exe emit --target test/fixtures/async.lan
 ```
 
 `Db.push_schema` prints an awaited call. Its callers become async functions
-and propagate database errors. Foreign schemas, async closures and recursive
-async calls remain explicit refusals.
+and propagate database errors. Async closures and recursive async calls
+remain explicit refusals. Model schemas are described below.
 
 Validate [applied foreign types](dev/STAGE-E-FOREIGN-TYPES.md):
 
@@ -70,6 +70,17 @@ _build/default/bin/lanyard.exe emit --target test/fixtures/foreign-types.lan
 `Form T` and `Deferred T` retain their checked type arguments, including
 nested wrappers and native data layouts. A One binder moves its wrapper;
 a Many binder shares it through `Arc`.
+
+Validate [Nat model schemas](dev/STAGE-E-MODELS.md):
+
+```sh
+zsh dev/gates.sh --stage E-models
+_build/default/bin/lanyard.exe emit --target test/fixtures/models.lan
+```
+
+`Counter.create` and `Counter.get_by_id` print awaited Toasty operations.
+The `id` field is the supplied primary key. Database fields use checked
+integer conversions; overflow and negative stored values return an error.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current

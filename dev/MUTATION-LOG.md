@@ -483,3 +483,28 @@ an application the quantity of its binder, so a Zero `PPoint` never
 meets a non-Zero `VAPt`, and the mutant is unreachable from checked
 source. The code keeps the Zero pattern as a defensive guard. To delete
 the pattern or to keep it is a user ruling.
+
+## Nat model schemas (2026-09-11)
+
+test/lan_models.py compiles the exact golden with an explicit library
+double and records 14 runtime observations. Its four controls are:
+
+- Disable the negative database-value guard. The mutant compiles and
+  fails the negative-value observation.
+- Replace checked Nat-to-i64 arithmetic with wrapping arithmetic. The
+  mutant compiles and fails the overflow observation.
+- Read a model's value field into its native key field. The mutant
+  compiles and fails the create result observation.
+- Remove await from create. The mutant fails compilation.
+
+All four controls were killed. The printer unit suite has 6 positives
+and 18 refusals, including forged instances, schema type/quantity/effect
+drift, and missing or additional print-rule placeholders. The real
+Toasty/SQLite probe separately passed 18 observations using the same
+golden. Its storage observations cover duplicate/missing keys, model
+isolation, a non-leading key, rejected writes and negative stored values.
+
+The earlier foreign gate now checks unsupported model fields, including
+Todo.title, in place of its blanket schema refusal. Schema calls for
+models with Nat fields are positive coverage in the new slice. No prior
+native, closure, recursive, foreign or async mutation was removed.

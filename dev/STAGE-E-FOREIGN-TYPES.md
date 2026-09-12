@@ -60,11 +60,12 @@ path dependencies for package `lanyard-foreign-validation` version
 refuses tracked source changes. Validation captures, hashes and the
 resolved manifest are in `validation/stage-e-foreign-types/`.
 
-Foreign model schemas, foreign fields in generated aggregates, closure
+Model schemas with Nat fields are covered by STAGE-E-MODELS.md.
+Other model field types, foreign fields in generated aggregates, closure
 arguments of a foreign type, runtime foreign closures and shared-to-owned
 foreign copies remain refusals.
 Form parsing and Deferred loading are library operations; this slice
-only transports their opaque values. Model/schema printing, handler
+only transports their opaque values. Remaining model/schema printing, handler
 fusion, the Todo crate golden and the M0 driver remain ahead.
 
 The existing TRUSTED-LINES command measures the changed eraser, IR and

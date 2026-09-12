@@ -26,8 +26,13 @@
 #   zsh dev/gates.sh --stage E-foreign
 #   zsh dev/gates.sh --stage E-async
 #   zsh dev/gates.sh --stage E-foreign-types
+#   zsh dev/gates.sh --stage E-models
 
 set -u
+
+if [[ $# -eq 2 && $1 == "--stage" && $2 == "E-models" ]]; then
+  exec zsh ${0:A:h}/stage-e-models.sh
+fi
 
 if [[ $# -eq 2 && $1 == "--stage" && $2 == "E-foreign-types" ]]; then
   exec zsh ${0:A:h}/stage-e-foreign-types.sh
@@ -237,7 +242,7 @@ if [[ $# -ge 2 && $1 == "--leg" ]]; then
 fi
 
 if [[ $# -ne 0 ]]; then
-  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C|D|E-native|E-foreign|E-async|E-foreign-types]"
+  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C|D|E-native|E-foreign|E-async|E-foreign-types|E-models]"
   exit 64
 fi
 

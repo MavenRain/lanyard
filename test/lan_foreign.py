@@ -141,7 +141,7 @@ def main():
             ("clone", "def copy : SeeOther -> SeeOther := fun (x : SeeOther) => x", "owned copy of a shared foreign value"),
             ("applied-copy", "def identity : Deferred Uri -> Deferred Uri := fun (x : Deferred Uri) => x", "owned copy of a shared foreign value"),
             ("aggregate", "def pair : Uri -> prod (Uri, Uri) := fun (x : Uri) => tuple (x, x)", "foreign aggregate layout"),
-            ("schema", "model Row with | id : Nat end\ndef create : Row -> Db -> Row := fun (row : Row) (db : Db) => Row.create row db", "foreign schema Model.create"),
+            ("schema-field", "model Row with | id : Nat | value : Uri end\ndef create : Row -> Db -> Row := fun (row : Row) (db : Db) => Row.create row db", "model field Row.value requires Nat"),
         ]
         for name, source, diagnostic in refusals:
             path = Path(directory) / f"{name}.lan"
@@ -156,8 +156,8 @@ def main():
             rejected = run(DRIVER, "emit", *args)
             require(rejected.returncode == 64 and not rejected.stdout, "target usage accepted")
         rejected = run(DRIVER, "emit", "--target", ROOT / "examples/m0-todo.lan")
-        require(rejected.returncode == 1 and not rejected.stdout and "foreign aggregate layout" in rejected.stderr,
-                f"Todo layout refusal differs: {rejected.stderr}")
+        require(rejected.returncode == 1 and not rejected.stdout and "model field Todo.title requires Nat" in rejected.stderr,
+                f"Todo field refusal differs: {rejected.stderr}")
     print(f"LAN-FOREIGN OK observations={len(expected)} mutants=3 refusals={len(refusals)} compiler={version.stdout.strip()}")
 
 

@@ -1583,3 +1583,84 @@ The receipt and its nine captures stay unedited. The command that would
 produce the new bytes is
 `python3 -P /Users/oobi/Documents/gpt2/lanyard-foreign-types-record.py`,
 and this review does not run it.
+
+## Lanyard Stage E Nat model schemas (2026-09-11)
+
+Continued from af6ca9f in the isolated checkout
+`/Users/oobi/Documents/gpt2/lanyard-models`. The target command now
+retains checked model metadata and prints Toasty model declarations,
+create calls and key lookups for models whose fields normalize to Nat.
+The supplied id is the primary key. Native structural records cross
+the database boundary through checked i64 conversions, with explicit
+ModelRange errors for overflow and negative stored values. Database
+errors and async effects propagate through existing named calls.
+
+The fixture has two models with the same native layout and different
+field order. It exercises both schema operations and a create/lookup
+composition. Rust identifiers encode model and field names. The model
+policy checks the instance, schema kind, type, quantities, effects,
+arity and placeholder set before printing a call. Modules without
+models keep the existing target path and golden bytes.
+
+The model tests passed 6 printer positives, 18 refusals, 14 compiled
+runtime observations and 4 killed mutations. The exact golden built
+offline against Toasty 7bd502cb with Rust 1.98.1 and passed all 18
+real-library observations against sqlite::memory:. The probe checks
+Future + Send for all five async fixture functions. It covers duplicate
+and missing keys, shared handles, field order, model isolation, rejected
+writes leaving no row and a negative field inserted through the Rust API.
+SQLite dependencies missing from the cache were fetched using the
+resolved lockfile before the offline build.
+
+The first cumulative runs found the new policy's catch-all and two
+outdated foreign refusal expectations. Schema selection now uses
+explicit string comparisons. The foreign gate checks unsupported
+fields, including Todo.title, and preserves its positive and mutation
+coverage. The final cumulative result is recorded in the slice receipt
+and stage-gate capture under dev/validation/stage-e-models/.
+
+TRUSTED-LINES measures emit=628, foreign=65, template=71, effects=46
+and model=111, for a printer total of 921. The kernel stays 3997/4000,
+the generated catalog stays 104, and the eraser, IR, surface and pinned
+target files keep their committed bytes. All allowances remain pending
+user rulings. Other model field types, Db.connect, handler fusion,
+the complete Todo crate and the M0 driver remain ahead. No Stage E
+completion or M0 exit is claimed.
+
+Review round 1 on 2026-09-11 applied seven fixes to documents and tests.
+STAGE-E-MODELS.md now states that the printer pins the callee model, that
+a value of any model with the same native layout is accepted, and that its
+slots map by position into the callee column order. The same file states
+that `emit --native` erases model declarations, applies no model field
+rule, and still refuses a model call through the Db foreign type.
+STAGE-E-FOREIGN.md drops the stale claim that model printing remains
+ahead and names Db.connect with the other model field types. README.md
+names Db.connect again in the sentence about the work ahead. The header
+of rust/model.ml names the single id exception, and that file stays at
+111 lines. test/lan_models.py counts the native refusal into a variable,
+requires that the native stderr names no model rule, and pins the E0277
+text of the missing await mutant in place of a bare question mark. The
+printed LAN-MODELS row keeps its bytes, with observations=14, mutants=4
+and native-refusals=1. The round edits README.md, dev/STAGE-E-FOREIGN.md,
+dev/STAGE-E-MODELS.md, rust/model.ml, test/lan_models.py and this file
+dev/M0-BUILD-LOG.md, so the source_sha256 rows of
+dev/validation/stage-e-models/receipt.json for those six paths are stale
+by design; `shasum -a 256 README.md dev/STAGE-E-FOREIGN.md
+dev/STAGE-E-MODELS.md rust/model.ml test/lan_models.py
+dev/M0-BUILD-LOG.md` with cwd ROOT prints the new digests, and the
+receipt and the ten captures stay unedited.
+
+Review round 2 on 2026-09-11 applied one fix to this log. The drift
+record of round 1 named five stale receipt rows. It now names six,
+because the round also edits dev/M0-BUILD-LOG.md, and that path is one of
+the 60 source_sha256 rows of the receipt. The ladder leg RECEIPT-DIGESTS
+measured `staged_match=54/60` in gates-LSEM-LSEM-1.log against
+`staged_match=60/60` in the baseline log, so six rows drift, not five.
+The printed `shasum -a 256` command now covers all six paths. Round 2
+edits no code, no test and no golden. The receipt and the ten captures
+stay unedited.
+The review closes with the two rounds above. Round 1 applied A-1, D-1,
+B-1, B-2, C-6, A-5 and D-2. Round 2 applied ND-1-1, and that record also
+closes the receipt pin item PIN-2. The closing ladder with the tag close
+runs after this paragraph. Its verdict is recorded in the review report
+lanyard-stage-e-models-review/review-LSEM-report.md.

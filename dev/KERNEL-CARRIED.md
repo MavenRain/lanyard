@@ -163,3 +163,13 @@ no sum for them. The twelve-file kernel bucket stays 3997/4000, quantity_runtime
 and lib/erase_kan.ml keep their bytes, and the frozen 1484 and 5481 base does
 not move. A_rir and A_emit remain open user rulings.
 See STAGE-E-FOREIGN-TYPES.md for behavior and validation.
+
+## 13 Nat model schemas (2026-09-11)
+
+rust/model.ml adds checked model metadata and Nat database conversions.
+The TRUSTED-LINES printer bucket now measures it alongside emit, foreign,
+template and effects. rust/emit.ml adds an optional model range error;
+modules without models retain their existing golden bytes. Kernel,
+eraser, IR, surface and target signature files retain their bytes.
+The kernel remains 3997/4000. All printer allowances remain PROPOSED.
+See STAGE-E-MODELS.md for the supported boundary and validation.
