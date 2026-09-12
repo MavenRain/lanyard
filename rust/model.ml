@@ -153,18 +153,23 @@ fn %s(value: String) -> %s {
 |} (text_to name) ty ty ty ty ty (text_from name) ty ty ty
 let source (checked : Elab.lan_program) =
   let* models = catalog checked in
-  let* rows = Lower.program checked in
-  if List.is_empty models then Foreign.source rows else
+  let* instances = Lower.connections checked in
+  let* connections = Connection.catalog checked (List.map (fun model -> model.name, rust_name model) models) instances in
+  let* rows = Lower.program_with instances checked in
+  if List.is_empty models && List.is_empty connections then Foreign.source rows else
   let module Target = Emit.Make (struct
     let foreign_type = Foreign.foreign_type Catalog.entries
     let foreign_layout = foreign_type
     let foreign_call row =
       if String.starts_with ~prefix:"Model." row.Rir.schema then foreign_call Catalog.entries models row
+      else if String.equal row.Rir.schema "Db.connect" then Connection.foreign_call Catalog.entries connections row
       else Foreign.foreign_call Catalog.entries row
   end) in
-  let data = List.concat_map (fun model -> model.data) models in
+  let data = List.concat_map (fun model -> model.data) models
+    @ List.concat_map (fun (connection : Connection.t) -> connection.data) connections in
   let text = List.concat_map (fun model -> List.filter_map (fun (_field, scalar) ->
     match scalar with Nat_field | Bool_field -> None | Text_field name -> Some name) model.fields) models
+    @ List.map (fun (connection : Connection.t) -> connection.family) connections
     |> List.sort_uniq String.compare in
   let* source = Target.native ~model_errors:true ~text_errors:(text <> [])
     (("", Erase.Code [Rir.RData data]) :: rows) in

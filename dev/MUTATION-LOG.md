@@ -549,3 +549,18 @@ schemas with two distinct list families and a shared type alias.
 The Todo example now gets past its text field and refuses at the
 handler's foreign aggregate layout. The prior foreign gate pins that
 refusal and retains its unsupported Uri model-field control.
+
+## Database connections (2026-09-12)
+
+test/lan_connections.py checks the connection golden byte for byte and
+runs 20 observations against an instrumented API double. Its five controls
+modify generated code before attaching the independent Rust harness and
+text oracle. All five are killed by the connection test.
+
+| Control | Mutation | Required failure |
+| --- | --- | --- |
+| connection-models | Reverse the two selected model names | Execution reports the wrong model registration |
+| connection-url | Replace the checked URL with a fixed string | Execution reports the wrong URL |
+| connection-await | Remove await from the connection call | Rust rejects applying the question-mark operator to a future |
+| connection-byte | Keep only the low byte of an oversized Nat | Execution accepts a value that should return ModelByteRange |
+| connection-utf8 | Decode invalid UTF-8 with replacement | Execution accepts a value that should return ModelUtf8 |

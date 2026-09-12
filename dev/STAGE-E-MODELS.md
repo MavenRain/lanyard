@@ -126,7 +126,9 @@ directory does not hide its inputs. The executable is
 captures and the resolved lockfile are recorded under
 `dev/validation/stage-e-models/`.
 
-Other model field types, Db.connect specialization, handler fusion,
+Closed Db.connect aliases now select these model schemas; see
+[database connections](STAGE-E-CONNECTIONS.md).
+Other model field types, handler fusion,
 the full Todo crate and the M0 driver remain ahead. This slice changes
 no kernel, eraser, IR, target signature or pin bytes. The printer bucket
 includes rust/model.ml; all numeric allowances remain pending rulings.

@@ -41,8 +41,9 @@ and foreign fields in products, sums, function signatures or nominal
 families are refused. In particular, the pinned SeeOther type lacks Clone;
 a checked Many identity cannot silently emit a payload clone.
 
-Db.connect, other model field types, handler fusion and
-the crate driver remain ahead. The later async slice adds the effectful
+Other model field types, handler fusion and the crate driver remain ahead.
+Closed Db.connect aliases are covered by STAGE-E-CONNECTIONS.md.
+The later async slice adds the effectful
 constant `Db.push_schema`; see STAGE-E-ASYNC.md. Unsupported definitions
 are never pruned to make the rest print. The model slice now accepts
 the Todo title field and refuses its handler's foreign aggregate layout.

@@ -1,0 +1,26 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+model Counter with
+| id : Nat
+| value : Nat
+end
+
+model Audit with
+| value : Nat
+| id : Nat
+end
+
+def Models : Type 0 := prod (Counter, Audit)
+def Text : Type 0 := Bytes
+def open : Text -> Db := Db.connect Models Text
+def single : Bytes -> Db := Db.connect Counter Bytes
+def connect : Bytes -> Db := fun (url : Bytes) => open url
+def initialize : Db -> prod () := fun (db : Db) => Db.push_schema db
+def create : Db -> Counter := fun (db : Db) => Counter.create (tuple (7, 42)) db
+def audit : Db -> Audit := fun (db : Db) => Audit.create (tuple (99, 8)) db
+def lookup : Db -> Counter := fun (db : Db) => Counter.get_by_id 7 db
+def run : Bytes -> Counter := fun (url : Bytes) =>
+  let db : Db := connect url in
+  let ready : prod () := initialize db in create db

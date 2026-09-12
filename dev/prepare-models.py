@@ -19,6 +19,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--toasty", type=Path, required=True)
     parser.add_argument("--lock", type=Path, required=True)
+    parser.add_argument("--connections", action="store_true", help="prepare the connection golden and SQLite probe")
     args = parser.parse_args()
     toasty = args.toasty.resolve()
     pin = json.loads((ROOT / "target/PIN.json").read_text())["libraries"]["toasty"]["commit"]
@@ -28,7 +29,8 @@ def main():
     status = subprocess.run(["git", "-C", str(toasty), "status", "--porcelain", "--untracked-files=no"],
                             text=True, capture_output=True, timeout=30)
     require(status.returncode == 0 and not status.stdout, "Toasty tracked sources are dirty")
-    destination = ROOT / ".gatework/models-pinned"
+    fixture = "connections" if args.connections else "models"
+    destination = ROOT / ".gatework" / f"{fixture}-pinned"
     source = destination / "src"
     source.mkdir(parents=True, exist_ok=True)
     cargo = ['[package]', 'name = "lanyard-model-validation"', 'version = "0.0.0"',
@@ -37,10 +39,10 @@ def main():
              'tokio = { version = "1", features = ["rt", "macros"] }']
     (destination / "Cargo.toml").write_text("\n".join(cargo) + "\n")
     shutil.copyfile(args.lock, destination / "Cargo.lock")
-    shutil.copyfile(ROOT / "test/goldens/models.rs", source / "golden.rs")
-    shutil.copyfile(ROOT / "test/models-pinned.rs", source / "main.rs")
+    shutil.copyfile(ROOT / "test/goldens" / f"{fixture}.rs", source / "golden.rs")
+    shutil.copyfile(ROOT / "test" / f"{fixture}-pinned.rs", source / "main.rs")
     shutil.copyfile(ROOT / "test/models-text-oracle.rs", source / "text-oracle.rs")
-    print(f"MODELS-PREPARE OK manifest={destination / 'Cargo.toml'}")
+    print(f"{fixture.upper()}-PREPARE OK manifest={destination / 'Cargo.toml'}")
 
 
 if __name__ == "__main__":

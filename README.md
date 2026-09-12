@@ -11,7 +11,8 @@ foreign-call metadata. The Stage E native command prints Rust for pure
 programs, including typed closures, captures and recursive data. The target
 command adds synchronous foreign constants, concrete and applied foreign
 types, async database calls, and model create/lookup for Nat, Bool and text
-fields. Db.connect, other model field types and the complete M0 driver
+fields. Closed Db.connect aliases select model schemas and check URL text.
+Other model field types, handler fusion and the complete M0 driver
 remain ahead. The generated signature allowance is proposed at 104 lines and
 awaits the user's ruling. See [target documentation](target/README.md), the
 [Stage B build log](dev/M0-BUILD-LOG.md#lanyard-m0-stage-b-2026-09-09) and
@@ -85,6 +86,19 @@ Two-unit sums, including aliases, use Boolean columns with tag 0 as false
 and tag 1 as true. Keys remain Nat.
 Checked byte lists, including the Todo title type, use String columns.
 Writes reject elements above 255 and invalid UTF-8 before the database call.
+
+Validate [database connections](dev/STAGE-E-CONNECTIONS.md):
+
+```sh
+zsh dev/gates.sh --stage E-connections
+_build/default/bin/lanyard.exe emit --target test/fixtures/connections.lan
+```
+
+A checked alias such as `def open : Bytes -> Db := Db.connect Todo Bytes`
+prints an async connection function. A product of declared model types
+selects several schemas. Callers can connect, push the schema and create
+rows in one generated program. URL conversion rejects invalid bytes and
+UTF-8 before opening a connection.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current

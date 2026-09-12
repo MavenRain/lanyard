@@ -1776,3 +1776,66 @@ GREEN in gates-LSEMT-fix-1.log with STAGE-GATE-EXIT 0 and 63 rows identical
 to the baseline. The closing check found the fix-1 rows identical to the 63
 baseline rows, the tree fully staged, no em-dash in the staged diff, and the
 receipt captures unchanged.
+
+## Database connections (2026-09-12)
+
+Closed aliases of Db.connect now retain their model and text arguments
+through lowering. A named model or a product of named models selects the
+Toasty schema set. Type aliases preserve those identities. Repeated
+models, empty sets and structural lookalikes refuse. URL types normalize
+to the checked byte-list representation before printing.
+
+The alias remains an ordinary checked definition. Its erased generic call
+resolves only inside its wrapper. The printer checks the catalog type,
+kind, quantities, effects, arity and slots, then prints the pinned builder
+template with a borrowed String and an awaited result. URL conversion
+rejects oversized bytes and invalid UTF-8 before the connection call.
+Named callers propagate async execution and database errors. The fixture
+connects, pushes its schema and creates a row in one generated function.
+
+The printer suite passes 7 positives and 21 refusals. The compiled double
+passes 20 observations and kills all 5 mutations, covering schema order,
+URL contents, an omitted await, byte truncation and lossy UTF-8. Lazy
+start, suspension, cancellation, Send, sharing, pre-call refusals and
+caller error propagation are observed. The cumulative E-connections gate
+retains every earlier stage leg and finishes with STAGE-E-CONNECTIONS OK.
+The prior model suite still passes 14 positives, 29 refusals, 45 compiled
+observations and 13 mutations.
+
+The exact connection golden builds offline and locked against Toasty
+7bd502cb with Rust 1.98.1. Its SQLite probe passes 14 observations: both
+selected models, direct stored columns, create/lookup, duplicate keys,
+independent connections, shared inputs and errors. The dependency lock
+retains its bytes. The compile verdict is recorded by gateledger in the
+workspace cache. Captures and source hashes are under
+dev/validation/stage-e-connections/.
+
+The measured printer total is 1060 lines: emit=635, foreign=65,
+template=71, effects=46, model=176 and connection=67. The target bridge
+is 94 lines. Kernel, eraser, IR, elaborator, target signatures and pins
+retain their committed bytes. Numeric allowances remain pending user
+rulings. Inline generic connections and eta-expanded aliases still
+refuse; the exact supported form is documented in STAGE-E-CONNECTIONS.md.
+Handler fusion, the full Todo crate and the M0 driver remain ahead.
+No Stage E completion or M0 exit is claimed.
+
+Review run wf_89bbee71-e0d examined this slice with 4 agents. It raised
+5 findings. It upheld 4 and refuted 1. The baseline gate was GREEN, with
+66 of 66 stage rows identical to the user capture. S0 lowers the
+connection instances one time: surface/lower.ml adds program_with, and
+rust/model.ml gives the lowered list to Connection.catalog and to
+Lower.program_with. S1 defers the inner Option.fold refusal in
+rust/connection.ml, so the refusal text is built only on a miss. S2
+prints the fixture tag in dev/prepare-models.py, thus the connection
+probe prints CONNECTIONS-PREPARE OK. S3 prints a poll-budget FAIL line
+in test/connections-double.rs before the stalled future gives
+Error::Arithmetic. The refuted item asked to share the report helper
+between the two pinned drivers; each driver is a standalone crate, and
+the duplication follows the other pinned drivers. receipt drift: 7 of 79
+keys (dev/M0-BUILD-LOG.md, dev/prepare-models.py, rust/connection.ml,
+rust/model.ml, surface/lower.ml, test/connections-double.rs,
+test/lan_connections_emit.ml). The fix round gate fix-1 is GREEN with
+STAGE-GATE-EXIT 0, and its 66 stage rows stay identical to the
+capture. The close check confirms GATE LSEC tag=fix-1 GREEN in
+3 min 56 s, 66 of 66 stage rows identical to the capture, porcelain with
+31 staged paths and 0 unstaged paths, and receipt drift of 7 of 79 keys.

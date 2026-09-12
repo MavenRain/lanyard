@@ -1,5 +1,5 @@
-(** Target constants consume checked, pinned metadata. The async slice supports
-    database effects; schema instantiation needs the later crate printer. *)
+(** Target constants consume checked, pinned metadata. The model and connection
+    printers specialize schemas; this module supplies their constant policy. *)
 open Kanon_kernel
 module Elab = Kanon_surface.Elab
 module Syntax = Kanon_surface.Syntax
