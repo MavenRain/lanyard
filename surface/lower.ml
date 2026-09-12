@@ -36,15 +36,18 @@ let catalog (program : Elab.lan_program) =
     program.instances) in
   Ok (constants @ instances)
 
+(** A lowering reads a specialized program only. The wrapper of every
+    direct connection call exists after this step, so no caller can lower
+    a program whose direct calls are still unresolved. *)
+type specialized = { specialized : Elab.lan_program }
+let specialize (checked : Elab.lan_program) =
+  Specialize.program checked |> Result.map (fun program -> { specialized = program })
+
 (** A closed connection alias retains its erased schema arguments. Its
     wrapper stays a native function; the generic call resolves only there. *)
 type connection = { wrapper : string; models : Term.t; text : Term.t; row : Rir.foreign }
-let connections (program : Elab.lan_program) =
-  let arguments = function
-    | Term.Out (_, Term.APt (Quantity.Zero, text),
-        Term.Out (_, Term.APt (Quantity.Zero, models), Term.Global "Db_connect")) -> Some (models, text)
-    | Term.Var _ | Term.Univ _ | Term.Lan _ | Term.Ran _ | Term.In _ | Term.Elim _
-    | Term.Sec _ | Term.Out _ | Term.Let _ | Term.Ann _ | Term.Global _ | Term.Lit _ | Term.Auto -> None in
+let connections (source : specialized) =
+  let program = source.specialized in
   Rules.all_ok (List.filter_map (fun (wrapper, entry) -> match entry with
     | Global.Axiom _ | Global.Prim _ -> None
     | Global.Def definition -> Option.map (fun (models, text) ->
@@ -54,7 +57,7 @@ let connections (program : Elab.lan_program) =
         let* row = foreign_row program.globals wrapper schema
           ["Models", Pp.term [] models; "Text", Pp.term [] text] in
         Ok { wrapper; models; text; row = { row with name = "Db_connect" } })
-        (arguments definition.Global.def)) program.rows)
+        (Specialize.arguments definition.Global.def)) program.rows)
 
 (** The emitted parameter count of every function item, lifted ones included.
     A direct call to a native name is checked against this count. *)
@@ -70,7 +73,8 @@ let emitted_arities rows =
 
 (** The caller supplies the lowered connections once. A second lowering
     repeats the whole program scan and builds equal but distinct rows. *)
-let program_with (connections : connection list) (checked : Elab.lan_program) =
+let program_with (connections : connection list) (source : specialized) =
+  let checked = source.specialized in
   let* foreign = catalog checked in
   let* rows = Erase.program checked.globals checked.rows in
   let emitted = emitted_arities rows in
@@ -95,5 +99,6 @@ let program_with (connections : connection list) (checked : Elab.lan_program) =
         Ok (name, Erase.Code decls)) rows)
 
 let program (checked : Elab.lan_program) =
-  let* connections = connections checked in
-  program_with connections checked
+  let* specialized = specialize checked in
+  let* connections = connections specialized in
+  program_with connections specialized

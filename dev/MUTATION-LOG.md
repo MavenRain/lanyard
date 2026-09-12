@@ -564,3 +564,20 @@ text oracle. All five are killed by the connection test.
 | connection-await | Remove await from the connection call | Rust rejects applying the question-mark operator to a future |
 | connection-byte | Keep only the low byte of an oversized Nat | Execution accepts a value that should return ModelByteRange |
 | connection-utf8 | Decode invalid UTF-8 with replacement | Execution accepts a value that should return ModelUtf8 |
+
+## Direct database connection calls (2026-09-12)
+
+The connection golden now includes direct calls, different model selections
+in one function and a call in each case branch. Its independent double
+passes 33 observations. The five original mutations and these two added
+controls are all killed. Each added control must compile successfully and
+then fail the execution oracle.
+
+| Control | Mutation | Required failure |
+| --- | --- | --- |
+| inline-wrong-model | Select Counter in the Audit connection wrapper | Execution reports the wrong model selection |
+| inline-wrong-argument | Feed the first URL to the second direct call | Execution reports the wrong URL |
+
+Printer checks retain refusals for open type arguments and include positive
+cases for erased arguments and constructor fields. The erased constructor
+case caught premature specialization before its quantity guard was added.

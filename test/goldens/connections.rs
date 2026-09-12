@@ -97,6 +97,18 @@ struct T70726f64756374286e61742c6e617429 { f0: Nat, f1: Nat }
 #[derive(Clone, Debug, PartialEq, Eq)]
 enum T73756d28756e69742c756e697429 { V0(()), V1(()) }
 
+async fn f_5f5f6c616e5f636f6e6e6563745f30(a0: Arc<T6e6f6d696e616c28353a427974657329>) -> Result<toasty::Db, Error> {
+    Ok({ let __lan_url_arg = Arc::clone(&(a0)); let __lan_url = lan_model_text_to_4279746573(&__lan_url_arg)?; toasty::Db::builder().models(toasty::models!(LanModel436f756e746572, LanModel4175646974)).connect(&__lan_url).await? })
+}
+
+async fn f_5f5f6c616e5f636f6e6e6563745f31(a0: Arc<T6e6f6d696e616c28353a427974657329>) -> Result<toasty::Db, Error> {
+    Ok({ let __lan_url_arg = Arc::clone(&(a0)); let __lan_url = lan_model_text_to_4279746573(&__lan_url_arg)?; toasty::Db::builder().models(toasty::models!(LanModel436f756e746572)).connect(&__lan_url).await? })
+}
+
+async fn f_5f5f6c616e5f636f6e6e6563745f32(a0: Arc<T6e6f6d696e616c28353a427974657329>) -> Result<toasty::Db, Error> {
+    Ok({ let __lan_url_arg = Arc::clone(&(a0)); let __lan_url = lan_model_text_to_4279746573(&__lan_url_arg)?; toasty::Db::builder().models(toasty::models!(LanModel4175646974)).connect(&__lan_url).await? })
+}
+
 async fn f_6f70656e(a0: Arc<T6e6f6d696e616c28353a427974657329>) -> Result<toasty::Db, Error> {
     Ok({ let __lan_url_arg = Arc::clone(&(a0)); let __lan_url = lan_model_text_to_4279746573(&__lan_url_arg)?; toasty::Db::builder().models(toasty::models!(LanModel436f756e746572, LanModel4175646974)).connect(&__lan_url).await? })
 }
@@ -107,6 +119,10 @@ async fn f_73696e676c65(a0: Arc<T6e6f6d696e616c28353a427974657329>) -> Result<to
 
 async fn f_636f6e6e656374(a0: Arc<T6e6f6d696e616c28353a427974657329>) -> Result<toasty::Db, Error> {
     f_6f70656e(Arc::clone(&(a0))).await
+}
+
+async fn f_696e6c696e65(a0: Arc<T6e6f6d696e616c28353a427974657329>) -> Result<toasty::Db, Error> {
+    f_5f5f6c616e5f636f6e6e6563745f30(Arc::clone(&(a0))).await
 }
 
 async fn f_696e697469616c697a65(a0: Arc<toasty::Db>) -> Result<(), Error> {
@@ -126,7 +142,15 @@ async fn f_6c6f6f6b7570(a0: Arc<toasty::Db>) -> Result<T70726f64756374286e61742c
 }
 
 async fn f_72756e(a0: Arc<T6e6f6d696e616c28353a427974657329>) -> Result<T70726f64756374286e61742c6e617429, Error> {
-    Ok({ let v1 = Arc::new(f_636f6e6e656374(Arc::clone(&(a0))).await?); { let v2 = f_696e697469616c697a65(Arc::clone(&(v1))).await?; f_637265617465(Arc::clone(&(v1))).await? } })
+    Ok({ let v1 = Arc::new(f_5f5f6c616e5f636f6e6e6563745f30(Arc::clone(&(a0))).await?); { let v2 = f_696e697469616c697a65(Arc::clone(&(v1))).await?; f_637265617465(Arc::clone(&(v1))).await? } })
+}
+
+async fn f_7477696365(a0: Arc<T6e6f6d696e616c28353a427974657329>, a1: Arc<T6e6f6d696e616c28353a427974657329>) -> Result<toasty::Db, Error> {
+    Ok({ let v2 = Arc::new(f_5f5f6c616e5f636f6e6e6563745f31(Arc::clone(&(a0))).await?); { let v3 = { let __lan_arg_0 = Arc::clone(&(v2)); (&*(__lan_arg_0)).push_schema().await? }; f_5f5f6c616e5f636f6e6e6563745f32(Arc::clone(&(a1))).await? } })
+}
+
+async fn f_63686f6f7365(a0: Arc<T73756d28756e69742c756e697429>, a1: Arc<T6e6f6d696e616c28353a427974657329>) -> Result<toasty::Db, Error> {
+    Ok(match (*(Arc::clone(&(a0)))).clone() { T73756d28756e69742c756e697429::V0(v2) => f_5f5f6c616e5f636f6e6e6563745f31(Arc::clone(&(a1))).await?, T73756d28756e69742c756e697429::V1(v2) => f_5f5f6c616e5f636f6e6e6563745f32(Arc::clone(&(a1))).await? })
 }
 
 #[derive(Debug, toasty::Model)]

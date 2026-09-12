@@ -152,10 +152,12 @@ fn %s(value: String) -> %s {
 }
 |} (text_to name) ty ty ty ty ty (text_from name) ty ty ty
 let source (checked : Elab.lan_program) =
+  let* specialized = Lower.specialize checked in
+  let checked = specialized.Lower.specialized in
   let* models = catalog checked in
-  let* instances = Lower.connections checked in
+  let* instances = Lower.connections specialized in
   let* connections = Connection.catalog checked (List.map (fun model -> model.name, rust_name model) models) instances in
-  let* rows = Lower.program_with instances checked in
+  let* rows = Lower.program_with instances specialized in
   if List.is_empty models && List.is_empty connections then Foreign.source rows else
   let module Target = Emit.Make (struct
     let foreign_type = Foreign.foreign_type Catalog.entries

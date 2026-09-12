@@ -1,0 +1,221 @@
+{
+  "format": 1,
+  "base_commit": "eb6c556432ae60b9bd3be7357495f4056421a067",
+  "checkout": "/Users/oobi/Documents/gpt2/lanyard-connection-calls",
+  "captures": {
+    "stage-gate": {
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "E-connections"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-connection-calls",
+      "exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-kq2iJJ",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-connection-calls/stage-gate.stdout",
+          "sha256": "67fb72d0c05ac0b87d2d8cbfb2cb6cac60e8b6b10b19c1e4e50a02c176433cdc"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-connection-calls/stage-gate.stderr",
+          "sha256": "5a5ba58b692e899e3ceed372252bfd2870ea3b34fab092483099beb3ea98c483"
+        }
+      }
+    },
+    "pinned-build": {
+      "command": [
+        "gateledger",
+        "run",
+        "--dir",
+        "/Users/oobi/Documents/gpt2/lanyard-connection-calls-pinned",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-connection-calls/.gatework/gateledger",
+        "--toolchain",
+        "1.98",
+        "--scope",
+        "Cargo.toml",
+        "--scope",
+        "Cargo.lock",
+        "--scope",
+        "src",
+        "--",
+        "env",
+        "-u",
+        "RUSTC_WRAPPER",
+        "-u",
+        "RUSTC_WORKSPACE_WRAPPER",
+        "rustup",
+        "run",
+        "1.98",
+        "cargocho",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--config",
+        "build.rustc-wrapper=\"\"",
+        "--target-dir",
+        "/Users/oobi/Documents/gpt2/lanyard-foreign-pinned/target"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-connection-calls",
+      "exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-CCRrxo",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-connection-calls/pinned-build.stdout",
+          "sha256": "a94511f4c02f34a898f3db681fd61d2ea3a62bb95408333f4185ced15199702d"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-connection-calls/pinned-build.stderr",
+          "sha256": "285d07a21a586390a918b7fd78a801dc11fc7f48c71744e767a216cac121b44b"
+        }
+      }
+    },
+    "pinned-run": {
+      "command": [
+        "/Users/oobi/Documents/gpt2/lanyard-connection-calls-pinned/lanyard-model-validation"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-connection-calls",
+      "exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-8KrKJG",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-connection-calls/pinned-run.stdout",
+          "sha256": "e8095e757bade701d046d77b5716fb920faae1bdc9edb23679308a1233b93a26"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-connection-calls/pinned-run.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "house": {
+      "command": [
+        "zsh",
+        "dev/house.sh"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-connection-calls",
+      "exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-vh5n26",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-connection-calls/house.stdout",
+          "sha256": "60c7f440ce210590430a957b6f9bd7a499304e183fc4becf7a3bee8084304a83"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-connection-calls/house.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  },
+  "dependency_lock": {
+    "path": "dev/validation/stage-e-models/Cargo.lock",
+    "sha256": "37eab434114f43ba1f2d4a24aa9e4669eea15b78affbb0164c144f235205eab5"
+  },
+  "probe_manifest_sha256": "668d17953b166c5ad2acaecf469f5b55f0b1436b13db062525f58447d8403e0d",
+  "probe_binary_sha256": "b42ad4089399f905a6a88a1b37637a8bd5de1a5ae1e9c8e9cbb32b95892bc3e1",
+  "observations": {
+    "printer_positives": 18,
+    "printer_refusals": 23,
+    "compiled": 33,
+    "mutants_killed": 7,
+    "native_refusals": 1,
+    "pinned_sqlite": 22
+  },
+  "trusted_lines": {
+    "rir": 155,
+    "erase": 1519,
+    "erase-kan": 1484,
+    "eterm": 117,
+    "target-bridge": 95,
+    "specialization": 87,
+    "target-bridge-total": 182,
+    "emit": 635,
+    "foreign": 65,
+    "template": 71,
+    "effects": 46,
+    "model": 178,
+    "connection": 66,
+    "printer-total": 1061,
+    "signature": 104,
+    "kernel": 3997,
+    "allowances": "pending user rulings"
+  },
+  "gate_note": "Compiler and test sources stayed unchanged during the cumulative gate. The final house capture covers the later build-log and mutation-log additions. This receipt and its capture copies were recorded afterward.",
+  "source_sha256": {
+    "README.md": "26183f779d5a8524682b2a70f164d4390d7ffdd7fc10e840486521a595e560e5",
+    "bin/lanyard.ml": "cbcd71e635d6a48c32ea6ad1c191700e28aac2d341a13464787c5b2bcdf9d5d7",
+    "dev/KERNEL-CARRIED.md": "fbc78a3a9507a6723ad61cb962376ef64dc9c8193fb9cec2a795bbc0bb8cbf48",
+    "dev/M0-BUILD-LOG.md": "195d6092b33f43f0f1554bc2318feae52c91739480285032cb47275d939c966b",
+    "dev/MUTATION-LOG.md": "2df622474f6559b284fbd7b8568cefa273a4ebf1eeb9a7f20d49f8b304915bf4",
+    "dev/STAGE-E-CONNECTIONS.md": "27d0c58cefa5a54725d93929b1774803294f30c79357ddeb85f100a86b1aa44d",
+    "dev/STAGE-E-FOREIGN-TYPES.md": "acf896e7a4107bae991acd13128896208865d60fdadaef15baacff573716b595",
+    "dev/STAGE-E-FOREIGN.md": "e9ab6b5aea6df89624c009dd81a82524ffe3b7742e40bc1231cd6a5e53730365",
+    "dev/STAGE-E-MODELS.md": "f5d96c19a39772568e4dd922c487781875a989de2df9654a5ff846d8afa90f5d",
+    "dev/gates.sh": "43da43a508ae62c83f30d295c52f7bd05c5ca27edc433ba21a21f5693d1f0835",
+    "dev/prepare-models.py": "6e069e30808cdfbea932e057c21626c72c6f69985505820e4f6b275985db5b77",
+    "dev/stage-e-connections.sh": "a78197fd3f11d9f141e264e4222f62052fae082f5f8e867f93a048b0913a1b50",
+    "dev/stage-e-models.sh": "b7f6219d8aac13746613b40ffaef3df3c32f6c3b08dc6ce78cb354540758eb02",
+    "dev/trusted-lines.sh": "2fc28c571759435bdc973f6d01afadfb9c674c80ac925d37dc17cb97c9901d42",
+    "lib/bignum.ml": "7159dd7e75fa08a5fc272cba76a8ec6214c7d190151dabf7db1a13bf5ecddd72",
+    "lib/budget.ml": "7d8b2afc86883415c892d6fea0e56c2115e4d859b6b6daa21c611b4e9517f028",
+    "lib/budget.mli": "b830149c9eb6d9362786d2e92c2dc8322f4d31f7b4cfc960ac6e1681d385578f",
+    "lib/check.ml": "cdc3712bf5ed0fa49d8dae34ea946d85a195ea94b25235c821b155570010e335",
+    "lib/conv.ml": "e73e707bcdac54808d8f8a1d9e9a174062edf0afd970972dee2c6d024f6bbe39",
+    "lib/erase.ml": "794defe507c4d97910c2d92f925a7efa69433dc2ab67d2085340670886a95986",
+    "lib/erase_kan.ml": "a6d03447ab9dfedf8e53bceff26cd7da57f113bb4b5d1453aecd618fac508a88",
+    "lib/error.ml": "44c9c263479575ec04db5056404a5940d6bb5514a5b9e1ec6215385c6eccb5b6",
+    "lib/eterm.ml": "028ff6e790f9c391463b961f7a3eac12e105d484285cfde1597e52c5b9ac69c7",
+    "lib/eval.ml": "155ddf7578d4ad68352505064616bed6afa7a260a88f3ddf1722b95fa6a6bd18",
+    "lib/global.ml": "2e5d2d932dfddcb329bcfdf237df87a70f2d79820470dc236e337ec6d275c329",
+    "lib/level.ml": "344bb9819870d8c459154ac8109ba1d69a4ee4312670f3887c6ed30d3dbca448",
+    "lib/level.mli": "c143b2b97e417724a81f8e83548b946d3339917488758b4d5fbf9da9e72e6811",
+    "lib/literal.ml": "80554b1d98c8dde3b474023a01ac57cc4abcaba2a5f20b707041cc5f0361b617",
+    "lib/order.ml": "d2cc3258fde25b61ba33093eaf19112c319329dc5b46ba029b3f042c14388e94",
+    "lib/positivity.ml": "97cb5fc9484ecaec360b4be1ac42f0668ae767aad25efc10ddbc1d4143185471",
+    "lib/pp.ml": "69618578ebb33a3d9803e604760252c77c64681aef2d847f3e1b40f9464e3895",
+    "lib/prim.ml": "5224df4f75e499b8fb962fad2a256b31086fcc9de5ab2f353eb90f61a8408aaa",
+    "lib/quantity.ml": "bf3f633c40a0dbb362cf85ca41b798ae0c9e1d4eca7e09f9b6f482bab2bfbb8b",
+    "lib/rir.ml": "6dbaa88a61863938d62e099a339277ecde0b2cace633fea5912b95bc248a9f1c",
+    "lib/rules.ml": "b625cec31061ca79f77669889039e4ae2658393911e39076dc65189022f702ab",
+    "lib/shape.ml": "dafd7741b4332dcab6faba9cb9afb131fb3654172e0d375b1edd1046e69f7f7b",
+    "lib/spec_count.ml": "87aa1bad45716737bfeca13986b58332245d252ba0f9ddda55cb7d402eec8c92",
+    "lib/term.ml": "2de6729958bfbc3af10ed2e9c51d6591ab40fa16bd19b7acea1fbf37adf60690",
+    "lib/totality.ml": "046c608584ac21d465d46b05119a89dca5488a15113359eea30ed318a3f7c028",
+    "lib/value.ml": "997f4634df60744c49555e896c1de8d60e51a1086e731e547b48450def9c68c7",
+    "rust/connection.ml": "cf65e905ebc278aac762cfd117b5aacf33fbc8ce06ba5e514a2be247c3246c85",
+    "rust/effects.ml": "0cd1e0d6caf5474f7845725341a316b7fc79c8a8ac41bb16d81a4038c7f79d42",
+    "rust/emit.ml": "291865d39413a95490f904dd95df21ae1273444f58ad4e377babd2892ab4a673",
+    "rust/foreign.ml": "7104df6a0161c6faff6971a6a3fcf38c9a19db74f5fef18b3e2db297abc834c4",
+    "rust/model.ml": "1ab026cd4faad0eed81bccbfd9673b969f0bd690e5e85e43e1a4ce8a55418190",
+    "rust/template.ml": "3a721565fbb8993bd24d55de30d159222af165f4e01f6cd63a570abfafa5ebda",
+    "surface/elab.ml": "14ae994942aa1071339666abb53293d628582b0f0b42de0df2713c5babe40a80",
+    "surface/lexer.ml": "bb524f0202a01ab0b7a2e94745c9af50c5eede2a4c7d3fa450be785e2eb14254",
+    "surface/lower.ml": "0d615dfdf034a340bd155f0cfc4d9f976d2be42a444450e91ac9155be386c18c",
+    "surface/parser.ml": "107bb45cfba1335a41cf0268e6c28e05dbb961c1c454c47ef364683d6e04d977",
+    "surface/specialize.ml": "7d674a16e7d75e78d9cb4dbf5b4d802c200e8fb8f840a5350ae8bef11025f27e",
+    "surface/syntax.ml": "774c0c713f2cdfe493656131b446eb10614e9415ef4d3a0d7cf8a64d2da04c5a",
+    "surface/token.ml": "cd93b520f023f2aa80f42a4e352b47e63fd0c05e399f4c2344af898054fbb6db",
+    "target/PIN.json": "79acb0c0e756de89d15d483abf295cff74e11465b9c1e061e5d25a4041853718",
+    "target/pin.sha256": "bc150e69de798eadf8a6cdeb7be31440c7c544e7e297e531fbb98967ca37287f",
+    "target/toasty-7bd502cb.sig": "9b3a6ec3ad2c365cec6bbdd8767ba144a295bbe60affeb418c42dad65952a7fc",
+    "target/topcoat-51caa01.sig": "40ee029ce9885b1402d76cc4d0340545c24b9932649cec031c10075b1a21504d",
+    "test/connections-double.rs": "023fe16d9044313877dd97d3f80412ba102eb18273021463d95807ebfe40bcd2",
+    "test/connections-pinned.rs": "487f2810bdeb170890c223b4685fb553bca3ef11c25c52b832d950211435d0c2",
+    "test/dune": "50d085e9a356b71eb1edec528218ce02fad2e1e392d5157149e3e159bd744252",
+    "test/fixtures/connections.lan": "cf57daf4bed269d45783a8698ee53ad4cc7e67edb82e5c685ba28339881c2322",
+    "test/fixtures/models.lan": "8309fead10e6bb5dddf411486450330c1eb476cc9390365f8ad6c75defa28676",
+    "test/goldens/connections.rs": "f1fcd5d94027b5be80ac7d26b181a40a99414bcfcb0ddb3cee194c65b8383cc2",
+    "test/goldens/models.rs": "0b357b8a2a842aabd239f2a24d841f75545cceeef7500cf3ea75a06be88a089b",
+    "test/lan_connections.py": "e9cf6fea8338acfd646b23b43114945f05820b91d0a805ff42c006e80a18f35f",
+    "test/lan_connections_emit.ml": "1cd9264e8495b7da9cd27f224f00b793a94bb196cb0db3f32d6164c218b083e7",
+    "test/lan_foreign.py": "3bd20104078765bb7e56de910f627960a04ad5eaf41ea7f1a6faa801066aff69",
+    "test/lan_models.py": "daceb26c55a228ba87bd874dd80e5249c06e3fef988c048825d2c6e487573a6f",
+    "test/lan_models_emit.ml": "ecb96a4d536434d40dcdcc756996899f5719fcceed043fc947ec359aadab0f41",
+    "test/models-pinned.rs": "be9bbfd21efc1d83a81aff5b1bcd8b98c47c5627738ccf3b2054e8b42eebfe11",
+    "test/models-text-oracle.rs": "472f59bf7a89e7a55d8847fa49a3f00a07eea7766cddfc0ca17bf901ebf93d95"
+  }
+}

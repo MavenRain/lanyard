@@ -88,7 +88,7 @@ line="TRUSTED-LINES kernel=$kernel/$kernel_bound"
 # lib/eterm.ml serves only that carried eraser, so both get a measurement row.
 # Their place in the base is an open user ruling, so no row moves a bound.
 if [[ -f $root/lib/rir.ml ]]; then
-  measured_files=(lib/erase.ml lib/erase_kan.ml lib/eterm.ml surface/lower.ml)
+  measured_files=(lib/erase.ml lib/erase_kan.ml lib/eterm.ml surface/lower.ml surface/specialize.ml)
   for measured in $measured_files; do
     if [[ ! -f $root/$measured ]]; then
       print -r -- "TRUSTED-LINES FAIL: $measured missing"
@@ -100,9 +100,10 @@ if [[ -f $root/lib/rir.ml ]]; then
   erase_kan_lines=$(wc -l < $root/lib/erase_kan.ml | tr -d ' ')
   eterm_lines=$(wc -l < $root/lib/eterm.ml | tr -d ' ')
   lower_lines=$(wc -l < $root/surface/lower.ml | tr -d ' ')
+  specialize_lines=$(wc -l < $root/surface/specialize.ml | tr -d ' ')
   # Quote each word.  An unquoted empty parameter drops out of the list, so
   # the guard could not see it.
-  for count in "$rir_lines" "$erase_lines" "$erase_kan_lines" "$eterm_lines" "$lower_lines"; do
+  for count in "$rir_lines" "$erase_lines" "$erase_kan_lines" "$eterm_lines" "$lower_lines" "$specialize_lines"; do
     if [[ -z $count ]]; then
       print -r -- "TRUSTED-LINES FAIL: a measured file has an empty line count"
       exit 1
@@ -113,6 +114,8 @@ if [[ -f $root/lib/rir.ml ]]; then
   print -r -- "TRUSTED-LINES erase-kan=$erase_kan_lines (ceiling treatment pending user ruling)"
   print -r -- "TRUSTED-LINES eterm=$eterm_lines (ceiling treatment pending user ruling)"
   print -r -- "TRUSTED-LINES target-bridge=$lower_lines (ceiling treatment pending user ruling)"
+  print -r -- "TRUSTED-LINES specialization=$specialize_lines (ceiling treatment pending user ruling)"
+  print -r -- "TRUSTED-LINES target-bridge-total=$((lower_lines + specialize_lines)) (ceiling treatment pending user ruling)"
 fi
 
 # Stage E measures the printer without assigning its pending allowance.

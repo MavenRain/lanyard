@@ -47,6 +47,10 @@ def main():
         ("byte-wrap", "[_, _, ..] => Err(Error::ModelByteRange)", "[byte, _, ..] => Ok(*byte)", "execution"),
         ("lossy-url", "String::from_utf8(bytes).map_err(|_error| Error::ModelUtf8)",
          "Ok(String::from_utf8_lossy(&bytes).into_owned())", "execution"),
+        ("inline-wrong-model", "toasty::models!(LanModel4175646974)",
+         "toasty::models!(LanModel436f756e746572)", "execution"),
+        ("inline-wrong-argument", " }; f_5f5f6c616e5f636f6e6e6563745f32(Arc::clone(&(a1)))",
+         " }; f_5f5f6c616e5f636f6e6e6563745f32(Arc::clone(&(a0)))", "execution"),
     ]
     with tempfile.TemporaryDirectory(prefix="lanyard-connections-") as temporary:
         work = Path(temporary)

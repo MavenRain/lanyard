@@ -32,5 +32,23 @@ async fn main() -> Result<(), Error> {
     report("byte-range", matches!(f_6f70656e(byte_input(&[256])?).await, Err(Error::ModelByteRange)))?;
     report("utf8", matches!(f_6f70656e(byte_input(&[255])?).await, Err(Error::ModelUtf8)))?;
     report("database-sharing", Arc::strong_count(&db) == 1)?;
+    let inline = Arc::new(assert_send(f_696e6c696e65(Arc::clone(&url))).await?);
+    assert_send(f_696e697469616c697a65(Arc::clone(&inline))).await?;
+    report("inline-create", assert_send(f_637265617465(Arc::clone(&inline))).await? == created)?;
+    report("inline-audit", assert_send(f_6175646974(inline)).await? == audit)?;
+    let twice = Arc::new(assert_send(f_7477696365(Arc::clone(&url), Arc::clone(&url))).await?);
+    assert_send(f_696e697469616c697a65(Arc::clone(&twice))).await?;
+    report("inline-distinct-model", assert_send(f_6175646974(Arc::clone(&twice))).await? == audit)?;
+    let left = Arc::new(assert_send(f_63686f6f7365(Arc::new(T73756d28756e69742c756e697429::V0(())), Arc::clone(&url))).await?);
+    assert_send(f_696e697469616c697a65(Arc::clone(&left))).await?;
+    report("inline-left", assert_send(f_637265617465(left)).await? == created)?;
+    let right = Arc::new(assert_send(f_63686f6f7365(Arc::new(T73756d28756e69742c756e697429::V1(())), Arc::clone(&url))).await?);
+    assert_send(f_696e697469616c697a65(Arc::clone(&right))).await?;
+    report("inline-right", assert_send(f_6175646974(right)).await? == audit)?;
+    report("inline-first-error", matches!(assert_send(f_7477696365(text_input("unknown:lanyard"), Arc::clone(&url))).await,
+        Err(Error::Database(_))))?;
+    report("inline-second-error", matches!(assert_send(f_7477696365(Arc::clone(&url), text_input("unknown:lanyard"))).await,
+        Err(Error::Database(_))))?;
+    report("inline-sharing", Arc::strong_count(&url) == 1)?;
     Ok(())
 }

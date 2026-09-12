@@ -1839,3 +1839,69 @@ STAGE-GATE-EXIT 0, and its 66 stage rows stay identical to the
 capture. The close check confirms GATE LSEC tag=fix-1 GREEN in
 3 min 56 s, 66 of 66 stage rows identical to the capture, porcelain with
 31 staged paths and 0 unstaged paths, and receipt drift of 7 of 79 keys.
+
+## Direct database connection calls (2026-09-12)
+
+Db.connect now works inside function bodies, let values and bodies, and
+case branches. Each distinct closed instance receives a checked private
+wrapper before erasure. The wrapper retains its nominal model selection
+and URL type. Several calls in one body can use different schemas and
+URLs, with ordinary async propagation and evaluation order. Existing
+closed aliases retain their representation. Generated names avoid both
+earlier and later source definitions and family names.
+
+The specialization pass requires closed model and text arguments. Local
+type parameters and stored connection function values still refuse. Zero
+arguments and constructor fields are skipped. A regression test caught
+the initial traversal of an erased constructor field; consulting the
+checked constructor quantities fixes it without touching the eraser.
+The new wrappers are checked definitions, with no generated axioms.
+
+The cumulative E-connections gate is green. The connection printer passes
+18 positives and 23 refusals. The compiled golden passes 33 observations
+and kills all 7 mutations, including wrong model selection and URL routing
+between direct calls. Checks observe both suspension points, cancellation
+between calls, branch selection, sharing and errors from either call.
+The earlier native, foreign, async, foreign-type and model gates pass.
+
+The same golden builds offline and locked against pinned Toasty with Rust
+1.98.1. The SQLite probe passes 22 observations. It creates and looks up
+real rows, exercises direct calls with distinct selections, takes both
+branches and checks failures from either URL. Gateledger records the
+compile verdict. The dependency lock retains its bytes. The probe lives
+in a separate validation checkout so its inputs can be tracked by the
+ledger. Captures and source hashes are recorded under
+dev/validation/stage-e-connection-calls/.
+
+The specialization is 87 lines, the target bridge is 95, and their measured
+sum is 182. The printer total is 1061 lines. Kernel, eraser, IR, elaborator,
+target signatures and pins retain their committed bytes. Numeric allowances
+remain pending user rulings. Handler fusion, the full Todo crate and the
+M0 driver remain ahead. No Stage E completion or M0 exit is claimed.
+
+The review of this slice changed four items. The three freshness positives in
+test/lan_connections_emit.ml now expect the mangled wrapper header
+`async fn f_5f5f6c616e5f636f6e6e6563745f31(`. They no longer expect the
+generic `.connect(&__lan_url).await?` substring, so a wrapper that reuses a
+taken name fails the case. The two erasure positives now expect the whole
+emitted item of `keep`, from the newline before its header through its closing
+brace. An async wrapper at the erased site, or a connection call in that body,
+fails the case. The case names stay. surface/lower.ml adds the newtype
+`specialized` with `specialize`, and `connections` and `program_with` accept
+that type, so no caller can lower a program whose direct calls are
+unspecialized. rust/model.ml and test/lan_connections_emit.ml pass the wrapped
+program. The review refuted one item: the alias chain of
+test/fixtures/connections.lan keeps callers in the runtime oracle at
+test/connections-double.rs:93 and :110, so the oracle needs no new call. The
+review carried two items. The specialization memo reads only the wrappers of
+its own pass, so a program that holds a closed alias and an equal direct call
+gets a duplicate wrapper. A seed of the memo from the existing closed alias
+rows changes the frozen golden and the documented representation, so it needs
+a user ruling and a new capture. A separate fixture definition that keeps `run`
+on the alias also needs a new capture. No capture under dev/validation/ was
+regenerated. The stage
+gate ran as tag fix-1 and is GREEN in 2 minutes 2 seconds (17:34:40Z to
+17:36:42Z), with 66 of 66 stage rows identical to the user capture.
+The close check confirms GATE LSECC tag=fix-1 GREEN in 2 min 2 s, 66 of 66
+stage rows identical to the capture, porcelain with 24 staged paths and 0
+unstaged paths, and receipt drift of 4 of 71 keys.

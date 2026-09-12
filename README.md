@@ -11,7 +11,8 @@ foreign-call metadata. The Stage E native command prints Rust for pure
 programs, including typed closures, captures and recursive data. The target
 command adds synchronous foreign constants, concrete and applied foreign
 types, async database calls, and model create/lookup for Nat, Bool and text
-fields. Closed Db.connect aliases select model schemas and check URL text.
+fields. Direct Db.connect calls and aliases select model schemas and check
+URL text.
 Other model field types, handler fusion and the complete M0 driver
 remain ahead. The generated signature allowance is proposed at 104 lines and
 awaits the user's ruling. See [target documentation](target/README.md), the
@@ -99,6 +100,11 @@ prints an async connection function. A product of declared model types
 selects several schemas. Callers can connect, push the schema and create
 rows in one generated program. URL conversion rejects invalid bytes and
 UTF-8 before opening a connection.
+
+Direct calls such as `Db.connect Todo Bytes url` work inside functions,
+let bodies and case branches. Several calls in one body can select different
+models and URLs. Model and text type arguments must be closed; generic
+connection functions and stored connection function values still refuse.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current

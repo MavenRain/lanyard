@@ -17,10 +17,22 @@ def Text : Type 0 := Bytes
 def open : Text -> Db := Db.connect Models Text
 def single : Bytes -> Db := Db.connect Counter Bytes
 def connect : Bytes -> Db := fun (url : Bytes) => open url
+def inline : Bytes -> Db := fun (url : Bytes) => Db.connect Models Text url
 def initialize : Db -> prod () := fun (db : Db) => Db.push_schema db
 def create : Db -> Counter := fun (db : Db) => Counter.create (tuple (7, 42)) db
 def audit : Db -> Audit := fun (db : Db) => Audit.create (tuple (99, 8)) db
 def lookup : Db -> Counter := fun (db : Db) => Counter.get_by_id 7 db
 def run : Bytes -> Counter := fun (url : Bytes) =>
-  let db : Db := connect url in
+  let db : Db := Db.connect Models Text url in
   let ready : prod () := initialize db in create db
+
+def twice : Bytes -> Bytes -> Db := fun (first : Bytes) (second : Bytes) =>
+  let db : Db := Db.connect Counter Bytes first in
+  let ready : prod () := Db.push_schema db in
+  Db.connect Audit Bytes second
+
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+def choose : Bool -> Bytes -> Db := fun (choice : Bool) (url : Bytes) =>
+  case choice with
+  | 0 (value : prod ()) => Db.connect Counter Bytes url
+  | 1 (value : prod ()) => Db.connect Audit Bytes url

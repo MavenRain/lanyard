@@ -14,6 +14,14 @@ mod toasty {
     static STARTS: AtomicUsize = AtomicUsize::new(0);
     static FINISHES: AtomicUsize = AtomicUsize::new(0);
     static PUSHES: AtomicUsize = AtomicUsize::new(0);
+    struct Connection { models: Vec<&'static str>, url: String }
+    static TRACE: std::sync::Mutex<Vec<Connection>> = std::sync::Mutex::new(Vec::new());
+    pub fn trace_ends_with(expected: &[(&[&str], &str)]) -> Result<bool, Error> {
+        TRACE.lock().map_err(|_error| Error).map(|trace| {
+            trace.len() >= expected.len() && trace.iter().rev().zip(expected.iter().rev())
+                .all(|(connection, (models, url))| connection.models == *models && connection.url == *url)
+        })
+    }
     pub fn counts() -> (usize, usize, usize) {
         (STARTS.load(Ordering::SeqCst), FINISHES.load(Ordering::SeqCst), PUSHES.load(Ordering::SeqCst))
     }
@@ -33,6 +41,8 @@ mod toasty {
         pub async fn connect(&mut self, url: &str) -> Result<Db, Error> {
             enum Step { Start, Finish }
             STARTS.fetch_add(1, Ordering::SeqCst);
+            TRACE.lock().map_err(|_error| Error)?
+                .push(Connection { models: self.models.clone(), url: url.to_owned() });
             let mut step = Step::Start;
             std::future::poll_fn(move |cx| match step {
                 Step::Start => { step = Step::Finish; cx.waker().wake_by_ref(); std::task::Poll::Pending }
@@ -115,5 +125,45 @@ fn main() -> Result<(), Error> {
             && toasty::counts() == (before.0 + 1, before.1, before.2))?;
     }
     report("canceled", toasty::counts() == (before.0 + 1, before.1, before.2))?;
+    let inline = execute(f_696e6c696e65(text_input("inline")))??;
+    report("inline", inline.registered() == ["LanModel436f756e746572", "LanModel4175646974"]
+        && inline.url() == "inline")?;
+    let before = toasty::counts();
+    let first = text_input("first");
+    let second = text_input("second");
+    let twice = f_7477696365(Arc::clone(&first), Arc::clone(&second));
+    report("inline-lazy", toasty::counts() == before)?;
+    let twice = execute(twice)??;
+    report("inline-distinct", twice.registered() == ["LanModel4175646974"] && twice.url() == "second"
+        && toasty::counts() == (before.0 + 2, before.1 + 2, before.2 + 1))?;
+    report("inline-order", toasty::trace_ends_with(&[
+        (&["LanModel436f756e746572"], "first"), (&["LanModel4175646974"], "second")])?)?;
+    report("inline-sharing", Arc::strong_count(&first) == 1 && Arc::strong_count(&second) == 1)?;
+    let before = toasty::counts();
+    report("inline-first-error", matches!(execute(f_7477696365(text_input("fail"), text_input("unused")))?,
+        Err(Error::Database(_))) && toasty::counts() == (before.0 + 1, before.1 + 1, before.2))?;
+    let before = toasty::counts();
+    report("inline-second-error", matches!(execute(f_7477696365(text_input("first"), text_input("fail")))?,
+        Err(Error::Database(_))) && toasty::counts() == (before.0 + 2, before.1 + 2, before.2 + 1))?;
+    let before = toasty::counts();
+    report("inline-invalid-first", matches!(execute(f_7477696365(byte_input(&[256])?, text_input("unused")))?,
+        Err(Error::ModelByteRange)) && toasty::counts() == before)?;
+    report("inline-invalid-second", matches!(execute(f_7477696365(text_input("first"), byte_input(&[255])?))?,
+        Err(Error::ModelUtf8)) && toasty::counts() == (before.0 + 1, before.1 + 1, before.2 + 1))?;
+    let before = toasty::counts();
+    let left = execute(f_63686f6f7365(Arc::new(T73756d28756e69742c756e697429::V0(())), text_input("left")))??;
+    let right = execute(f_63686f6f7365(Arc::new(T73756d28756e69742c756e697429::V1(())), text_input("right")))??;
+    report("inline-branches", left.registered() == ["LanModel436f756e746572"] && left.url() == "left"
+        && right.registered() == ["LanModel4175646974"] && right.url() == "right"
+        && toasty::counts() == (before.0 + 2, before.1 + 2, before.2))?;
+    let before = toasty::counts();
+    {
+        let mut canceled = std::pin::pin!(f_7477696365(text_input("first"), text_input("second")));
+        report("inline-first-suspension", matches!(canceled.as_mut().poll(&mut context), std::task::Poll::Pending)
+            && toasty::counts() == (before.0 + 1, before.1, before.2))?;
+        report("inline-second-suspension", matches!(canceled.as_mut().poll(&mut context), std::task::Poll::Pending)
+            && toasty::counts() == (before.0 + 2, before.1 + 1, before.2 + 1))?;
+    }
+    report("inline-cancellation", toasty::counts() == (before.0 + 2, before.1 + 1, before.2 + 1))?;
     Ok(())
 }
