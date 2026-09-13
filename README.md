@@ -14,7 +14,8 @@ types, async database calls, and model create/lookup for Nat, Bool and text
 fields. Direct Db.connect calls and aliases select model schemas and check
 URL text. The crate command writes a standalone program with pinned
 dependencies and a synchronous or async entry point.
-Other model field types, handler fusion and the complete M0 driver
+Crate emission specializes finite checked handlers into direct operation
+bodies. Other model field types, general recursive handlers and the complete M0 driver
 remain ahead. The generated signature allowance is proposed at 104 lines and
 awaits the user's ruling. See [target documentation](target/README.md), the
 [Stage B build log](dev/M0-BUILD-LOG.md#lanyard-m0-stage-b-2026-09-09) and
@@ -127,6 +128,17 @@ retained. Module emission continues to print every definition.
 
 ```sh
 zsh dev/gates.sh --stage E-reachable
+```
+
+Crates also specialize [finite checked handlers](dev/STAGE-E-HANDLERS.md).
+Known signature constructors and their continuations reduce to direct
+code. Database operations keep their order and execute once, including
+calls whose results are unused. Remaining runtime signature programs
+refuse before output is created.
+
+```sh
+zsh dev/gates.sh --stage E-handlers
+_build/default/bin/lanyard.exe emit --crate /tmp/lanyard-handlers test/fixtures/handlers-db.lan
 ```
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked

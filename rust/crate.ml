@@ -19,5 +19,12 @@ topcoat = { git = "https://github.com/tokio-rs/topcoat", rev = "51caa01dca3a8f20
 
 let files checked =
   let entrypoint = "main" in
-  Result.bind (Reachable.program entrypoint checked) (Model.source ~entrypoint)
+  let ( let* ) = Result.bind in
+  let* checked = Reachable.program entrypoint checked in
+  let* checked =
+    if List.is_empty checked.Kanon_surface.Elab.signatures then Ok checked else
+    let* checked = Kanon_surface.Fuse.program checked in
+    let* checked = Reachable.program entrypoint checked in
+    Kanon_surface.Fuse.closed checked in
+  Model.source ~entrypoint checked
   |> Result.map (fun source -> ["Cargo.toml", manifest; "src/main.rs", source])

@@ -1,0 +1,48 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+model Row with
+| id : Nat
+| title : Bytes
+end
+
+signature Store : Row with
+| Create (db : Db) (row : Row) : Row
+end
+
+def finish : Store -> Row := fun (program : Store) =>
+  match program as self in Store return Row with
+  | Store.pure row => row
+  | Store.Create db row resume => row
+
+def handle : Store -> Row := fun (program : Store) =>
+  match program as self in Store return Row with
+  | Store.pure row => row
+  | Store.Create db row resume => finish (resume (Row.create row db))
+
+def handleTwo : Store -> Row := fun (program : Store) =>
+  match program as self in Store return Row with
+  | Store.pure row => row
+  | Store.Create db row resume => handle (resume (Row.create row db))
+
+def request : Db -> Store := fun (db : Db) =>
+  Store.Create db (tuple (1, b"first")) (fun (first : Row) =>
+    Store.Create db (tuple (natAdd first.0 first.0, b"second"))
+      (fun (second : Row) => Store.pure second))
+
+def keep : Row -> Row -> Row := fun (kept : Row) (ignored : Row) => kept
+def keepPair : ((row : Row) * Nat) -> Row -> Row :=
+  fun (pair : (row : Row) * Nat) (kept : Row) => kept
+
+def run : Bytes -> Row := fun (url : Bytes) =>
+  let db : Db := Db.connect Row Bytes url in
+  let ready : prod () := Db.push_schema db in
+  let created : Row := handleTwo (request db) in
+  let second : Row := Row.get_by_id 2 db in
+  let ignored : Row := keep created (Row.create (tuple (3, b"third")) db) in
+  let third : Row := Row.get_by_id 3 db in
+  let ignoredPair : Row := keepPair (Row.create (tuple (4, b"fourth")) db, 9) created in
+  Row.get_by_id 4 db
+
+def main : Row := run b"sqlite::memory:"

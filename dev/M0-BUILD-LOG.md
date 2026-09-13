@@ -2052,3 +2052,84 @@ The review gate ran as tag fix-1 and is GREEN in 3 min 59 s (21:21:15Z to
 The close check confirms GATE LSER tag=fix-1 GREEN in 3 min 59 s, 70
 of 70 stage rows identical to the capture, porcelain with 39 staged
 paths and 0 unstaged paths, and receipt drift of 3 of 74 keys.
+
+## Lanyard Stage E finite checked handlers (2026-09-12)
+
+Starting from 4ec5796, crate emission specializes finite, checked signature
+applications and matches before lowering. Signature names remain surface
+metadata. A second dependency selection removes consumed helpers, and any
+remaining runtime signature program refuses before output is created.
+Crates without signatures keep their existing printer path and goldens.
+
+The specializer substitutes values and erased arguments. Other computations
+remain ordered bindings, including unused results and constructor fields.
+Every rewritten definition is checked against its original type. Capture
+avoidance covers lambda, let, branch and motive binders, dependent function
+codomains and dependent shape
+payloads. A 4096-term budget per transformed definition bounds expansion.
+
+The executable suite covers eleven Rust observations, eight refusals, the
+database emission shape and an emitted-addition mutation. Cases include
+captures, two operation layers, both native branches, a One binder,
+dependent constructor fields and pair components, erased postulates,
+malformed unused code, a linear quantity program, residual signatures,
+a dependent codomain program, dynamic
+signature selection and expansion exhaustion. The linear quantity case is
+an elaborator refusal that occurs before fusion, not a fusion refusal. Two
+source mutations also built and were killed: unsafe beta substitution
+exhausts fuel, and disabled constructor reduction fails kernel rechecking.
+
+The SQLite fixture uses pinned local Toasty and Topcoat sources, an offline
+lock file and a build directory belonging to this checkout. Its first
+created row supplies both operands of the second key. It reads that key,
+creates a third row through an unused function argument and a fourth through
+an unused dependent pair, and reads them back.
+The gate command is `zsh dev/gates.sh --stage E-handlers`; captures and source
+digests are recorded in dev/validation/stage-e-handlers/.
+
+The new surface modules are rechecked and the kernel, erasers and target
+signatures retain their bytes. Numeric allowances remain user rulings.
+This finite slice does not add a generic recursive handler: the carried
+termination guard still rejects a recursive call on a resumed computation.
+General recursive handlers, dynamic signature dispatch, the complete Todo
+golden and the timing and exit gates remain ahead.
+
+### Review fixes (2026-09-12)
+
+The slice review corrected capture avoidance across dependent function
+codomains, the binder types that the specializer substitutes, the mutation
+anchor and the Rust house rule scan in the handler driver. The captures in
+dev/validation/stage-e-handlers are unchanged, so the sources below now
+differ from the digests that receipt.json records:
+
+- surface/term_scope.ml: receipt
+  a3d61757700ece4d820f0fd2ae39e564394c8878316ac1c50f3e9150e3aec90a, now
+  ac95883cd2672c3695099115d1d5b57314048132be6e1d7adba7a6112ad3e5d7
+- surface/fuse.ml: receipt
+  62b74edc9677576dade93714ee857919c3814ab695d9a41cc764e3ef2e3ce1d4, now
+  07a38565139f31e319b4a262b919da7d5c251a759421d53b25d3cebca5f79b16
+- test/lan_handlers.py: receipt
+  52e3af38e8440f66ca5476b733521b6db6959d90fdc0dc573b27dfc99a882c2d, now
+  b29484bddb503d57f5a2ef63e8ab99c38379bb47965c5f290cd654dd53758350
+
+dev/STAGE-E-HANDLERS.md and this log changed in prose only. The receipt
+records no digest for either file. The goldens, the fixtures and every
+other recorded source keep their digests.
+
+The new count row is
+`LAN-HANDLERS OK observations=11 refusals=8 database=1 mutants=1`.
+The budget of 4096 visited terms is unchanged, and the budget now measures
+expansion. Each global is specialized once and the specialized body is
+shared, and a substituted value keeps one ascription instead of one per
+binder it passes through. The stacked ascriptions were the exhaustion:
+they doubled the specialized body at every chain level, so a helper chain
+of depth 9 behind a handler refused. A chain of depth 12 now emits and
+prints its argument, which the shared-chain observation records. The
+expansion exhaustion case duplicates its argument at every level, which
+doubles the specialized body, so it still refuses with the same text.
+
+Review fix ladder: dev/gates.sh --stage E-handlers GREEN on 2026-09-13T01:17:41Z,
+11 min 47 s at load 65.70; rows differ only in:
+`LAN-HANDLERS OK observations=11 refusals=8 database=1 mutants=1`.
+The captures under dev/validation/stage-e-handlers stay as recorded; the
+receipt source_sha256 rows for the files above are the pre-review values.

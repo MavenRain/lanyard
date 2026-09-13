@@ -1199,6 +1199,7 @@ type lan_program = {
   rows : (string * Global.entry) list;
   models : model_info list;
   instances : foreign_instance list;
+  signatures : string list;
 }
 
 let lan_error (message : string) : ('a, Error.t) result =
@@ -1530,13 +1531,13 @@ let check_lanyard ?(budget : Budget.t = Budget.unlimited) (source : string) :
         Ok { program with globals; rows = program.rows @ rows }
     | Signature (name, result, operations) ->
         let* globals = elab_signature budget program.globals name result operations in
-        Ok { program with globals }
+        Ok { program with globals; signatures = program.signatures @ [ name ] }
     | Model (name, fields) ->
         let* globals, rows, instances = elab_model budget program.globals name fields in
-        Ok { globals; rows = program.rows @ rows;
+        Ok { program with globals; rows = program.rows @ rows;
              models = program.models @ [ { model_name = name; fields } ];
              instances = program.instances @ instances })
-    (Ok { globals; rows; models = []; instances = [] }) decls
+    (Ok { globals; rows; models = []; instances = []; signatures = [] }) decls
 
 let check_lanyard_in ?(budget : Budget.t = Budget.unlimited) (source : string) :
     (Global.t * (string * Global.entry) list, Error.t) result =

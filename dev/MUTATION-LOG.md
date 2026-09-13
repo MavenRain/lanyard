@@ -614,3 +614,19 @@ The first two mutations were applied separately to the new source pass.
 Each built with zero errors and warnings before the test failed, and each
 was restored before the cumulative gate. The third control runs in
 test/lan_reachable.py. Captures are in dev/validation/stage-e-reachable/.
+
+## Finite handler specialization (2026-09-12)
+
+| Control | Mutation | Observed failure |
+| --- | --- | --- |
+| handler-beta-value | Substitute computation arguments as if they were values | The positive handler fixture exhausts specialization fuel |
+| handler-constructor | Disable reduction of known signature constructors | Kernel rechecking rejects an untyped residual injection |
+| handler-addition | Replace a fused addition with subtraction in emitted Rust | Compilation succeeds and the observed result changes |
+
+The first two changes each compiled before the test rejected them. Both
+source changes were restored. The third control runs in test/lan_handlers.py.
+The SQLite fixture checks once-only creation, use of a created row twice,
+the second computed key, schema ordering and an unused computation argument.
+An additional creation is the first component of an unused dependent pair;
+reading its key checks that the component still executes.
+Captures are in dev/validation/stage-e-handlers/.

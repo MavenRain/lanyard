@@ -1,0 +1,365 @@
+{
+  "format": 1,
+  "base_commit": "4ec57961b5ddfe63d135cf5d9e6756245e34c4c7",
+  "checkout": "/Users/oobi/Documents/gpt2/lanyard-handlers",
+  "captures": {
+    "stage-gate": {
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "E-handlers"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-handlers",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-PF4coY",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-handlers/stage-gate.stdout",
+          "sha256": "3b15e99d951deb129a76f620b87d6260cdb0f91f5b2c33e349ef06281ce3193a",
+          "raw_sha256": "3b15e99d951deb129a76f620b87d6260cdb0f91f5b2c33e349ef06281ce3193a",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-handlers/stage-gate.stderr",
+          "sha256": "fa02b9ce81b869465f054957e98b5e0299f827fa60ed2d8fb7ca9fd9ba72ff8c",
+          "raw_sha256": "fa02b9ce81b869465f054957e98b5e0299f827fa60ed2d8fb7ca9fd9ba72ff8c",
+          "normalization": "none"
+        }
+      }
+    },
+    "pinned-prepare": {
+      "command": [
+        "python3",
+        "-P",
+        "dev/prepare-crate.py",
+        "--toasty",
+        "/Users/oobi/Documents/toasty",
+        "--topcoat",
+        "/Users/oobi/Documents/topcoat",
+        "--source",
+        "test/fixtures/handlers-db.lan",
+        "--lock",
+        "dev/validation/stage-e-crate/Cargo.lock",
+        "--output",
+        ".gatework/handlers-final"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-handlers",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-34Bnt4",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-handlers/pinned-prepare.stdout",
+          "sha256": "447f8b3b10ed4d7b7dc0c90bd4b0405a1487c154a472d095fdd65116ea042cde",
+          "raw_sha256": "447f8b3b10ed4d7b7dc0c90bd4b0405a1487c154a472d095fdd65116ea042cde",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-handlers/pinned-prepare.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalization": "none"
+        }
+      }
+    },
+    "pinned-build": {
+      "command": [
+        "gateledger",
+        "run",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-handlers/.gatework/gateledger",
+        "--dir",
+        ".gatework/handlers-final",
+        "--scope",
+        "Cargo.toml",
+        "--scope",
+        "Cargo.lock",
+        "--scope",
+        "src/main.rs",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_TARGET_DIR=/Users/oobi/Documents/gpt2/lanyard-handlers/.gatework/cargo-target",
+        "CARGO_BUILD_JOBS=4",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-handlers/.gatework/handlers-final/Cargo.toml"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-handlers",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-0OePsa",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-handlers/pinned-build.stdout",
+          "sha256": "a0fd83c72651a6af7fd0e86982aca107ca9c3ed74ad2a884d70c9934235ea6a8",
+          "raw_sha256": "a0fd83c72651a6af7fd0e86982aca107ca9c3ed74ad2a884d70c9934235ea6a8",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-handlers/pinned-build.stderr",
+          "sha256": "7201625d9d32ac44d52bc13fc03f124eb8327741cfd45c7ec5fd3ee834612dfd",
+          "raw_sha256": "7201625d9d32ac44d52bc13fc03f124eb8327741cfd45c7ec5fd3ee834612dfd",
+          "normalization": "none"
+        }
+      }
+    },
+    "pinned-run": {
+      "command": [
+        ".gatework/cargo-target/debug/lanyard-program"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-handlers",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-okFkeX",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-handlers/pinned-run.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-handlers/pinned-run.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalization": "none"
+        }
+      }
+    },
+    "beta-mutant-build": {
+      "command": [
+        "zsh",
+        "dev/dunecho.sh",
+        "build"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-handlers",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-yQaaSL",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-handlers/beta-mutant-build.stdout",
+          "sha256": "9e007d7a4010fcc271a69a2546c4c166962b8c019f48235eca93e8512b6a997b",
+          "raw_sha256": "9e007d7a4010fcc271a69a2546c4c166962b8c019f48235eca93e8512b6a997b",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-handlers/beta-mutant-build.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalization": "none"
+        }
+      }
+    },
+    "beta-mutant": {
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_handlers.py"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-handlers",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "capture_artifact": ".kanon-exec/run-SE7CW5",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-handlers/beta-mutant.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-handlers/beta-mutant.stderr",
+          "sha256": "1949938049ed4bcb85755fae70f6946807205ba2fca251dbeb6bc5db5abda4dd",
+          "raw_sha256": "e04231a17ba3e128bd6533f4f5fe20b82ea30c11c91bac8995061d180fe3a017",
+          "normalization": "single-trailing-newline"
+        }
+      }
+    },
+    "constructor-mutant-build": {
+      "command": [
+        "zsh",
+        "dev/dunecho.sh",
+        "build"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-handlers",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-vDzQOV",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-handlers/constructor-mutant-build.stdout",
+          "sha256": "9e007d7a4010fcc271a69a2546c4c166962b8c019f48235eca93e8512b6a997b",
+          "raw_sha256": "9e007d7a4010fcc271a69a2546c4c166962b8c019f48235eca93e8512b6a997b",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-handlers/constructor-mutant-build.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalization": "none"
+        }
+      }
+    },
+    "constructor-mutant": {
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_handlers.py"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-handlers",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "capture_artifact": ".kanon-exec/run-tGgJPf",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-handlers/constructor-mutant.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-handlers/constructor-mutant.stderr",
+          "sha256": "58faa5a67f08908f3bf135afcd7ba015a918d6f0736090c97957cf4fcd21b6df",
+          "raw_sha256": "1976dd9c13f4745251080720014b5ee78b490ed3d9e819bb4e6c192414f9a397",
+          "normalization": "single-trailing-newline"
+        }
+      }
+    }
+  },
+  "observations": {
+    "rust_results": [
+      11,
+      19,
+      20,
+      13,
+      12,
+      24,
+      23,
+      17,
+      29,
+      17
+    ],
+    "refusals": 7,
+    "sqlite_creates": 4,
+    "sqlite_reads": 3,
+    "sqlite_exit": 0,
+    "source_mutants_killed": 2,
+    "rust_mutant_killed": 1
+  },
+  "notes": [
+    "The complete source checks before fusion, and each transformed definition is checked again against its original type.",
+    "Module emission and crates without signatures retain their previous paths and golden bytes.",
+    "The pure observations add a println at the entry point. The pinned SQLite executable runs the emitted source unchanged.",
+    "The two source mutation probes preceded the dependent-pair guard refinement. Both anchors are restored; the final cumulative gate covers the final source.",
+    "The SQLite fixture checks four creations, three readbacks, unused arguments, a dependent pair component, and two uses of the first created row.",
+    "Local dependency checkouts match target/PIN.json and have clean tracked sources. Only their locations change in the manifest; Cargo resolution is offline and locked.",
+    "Cargo uses this checkout's .gatework/cargo-target, and gateledger records the final build in this checkout's .gatework/gateledger. The build has 11 unused-code or unused-variable warnings.",
+    "The original Git manifest is retained and compared. This validation does not fetch the Git dependency form.",
+    "A fresh emission from the final compiler matches the archived Git manifest and Rust source byte for byte.",
+    "The seed lock file is hashed as a source and its copied bytes are retained.",
+    "Saved streams remove repeated trailing newlines. The raw and saved stream hashes record any normalization.",
+    "The kernel, erasers, target signatures and existing goldens retain their committed bytes. Numeric allowances remain user rulings. General recursive handlers and M0 exit remain ahead."
+  ],
+  "trusted_lines": {
+    "printer_total": 1176,
+    "allowance": "A_emit pending user ruling"
+  },
+  "pinned_files": {
+    "Cargo.toml": "f542ef1107feceb9f68626d4d27917d6515db34c404ffbaef5475bf03fe58efe",
+    "Cargo.git.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "Cargo.lock": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "src/main.rs": "884bfdaaf31aec52b3d113c1335b5c38aacf96301c2236e105532190cc356acb"
+  },
+  "source_sha256": {
+    "README.md": "551aa678a7079bc86b52b14b2a297187fa83d6aca1f801cbf36635d353ca5d94",
+    "bin/lanyard.ml": "d56709ae3cb7eb3805b61b62514053330260d905cb9340dc784471a72cd23dea",
+    "dev/M0-BUILD-LOG.md": "4544bb0299d16d2631bfc6b23e0d247efbf78b12be2f44e303934564fffb06ee",
+    "dev/MUTATION-LOG.md": "38428360b760fc686fcf0a8743c9c791ef625e291f240e0efb59e0e416ad5a8d",
+    "dev/STAGE-E-HANDLERS.md": "45c1fe4cd19ba2f5d393490901d3ca5d919a0a9afc3f00a2d88e7a6e10dc7867",
+    "dev/gates.sh": "41d6efd9192396482536d4961b942597b0dd744432548d7962259c2347db8080",
+    "dev/gen-target.py": "8e75b2fe89bfc7c0ab5bc906bcda5d196e19a1da91a96931fb2f5118c5069bd1",
+    "dev/prepare-crate.py": "6074d263f657b2d6c5e074cb6d9a552a4a97a80e4e6aa694d0cc3831a316ac1c",
+    "dev/stage-b.sh": "4b9eccb94763dec9098a35503e90a2d184838c20f9625b59bc5044eca0413dae",
+    "dev/stage-c.sh": "c04fd3af4da762a92014d6911238f4e7beed6d2595ed184027619875b5ec72fd",
+    "dev/stage-d.sh": "5e4f5efd4fc0117014b67b2818408e44490b703efbd8c4ca68b6571f9accfa7d",
+    "dev/stage-e-async.sh": "5a7ecdd86cd4b95092d0647564f0b381379fe8514b82a32a01fc25856fb4c95e",
+    "dev/stage-e-connections.sh": "a78197fd3f11d9f141e264e4222f62052fae082f5f8e867f93a048b0913a1b50",
+    "dev/stage-e-crate.sh": "cc9e964983395cae1d2e92d313fab1bcc7eede32a7e5343ffcb025f610613c68",
+    "dev/stage-e-foreign-types.sh": "ce039f67924e2ce2a71820595665e645f683f577b923eb7a108c793434b2f90b",
+    "dev/stage-e-foreign.sh": "7f0e6a575e2921bd09b68dd165a105a584f4e84aa1379b8eb12aa75faabe634d",
+    "dev/stage-e-handlers.sh": "11b424de39f15bd66116c40aa42d951b2be28a4973550a0cb72a1c8cd2402c3b",
+    "dev/stage-e-models.sh": "b7f6219d8aac13746613b40ffaef3df3c32f6c3b08dc6ce78cb354540758eb02",
+    "dev/stage-e-native.sh": "b9a675d1543d6ec2416e809b5e1a60e155e07fd80aa685c151f4b331b76c7f84",
+    "dev/stage-e-reachable.sh": "0ef6a3ef71ecb4b874e2a0a6493864abf28240317c1688f13b170c5710a8e62e",
+    "dev/trusted-lines.sh": "b866523d5966398a65b13fa45b83be059f86f03f0313004c6058558b068fb2c7",
+    "dev/validation/stage-e-crate/Cargo.lock": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "lib/bignum.ml": "7159dd7e75fa08a5fc272cba76a8ec6214c7d190151dabf7db1a13bf5ecddd72",
+    "lib/budget.ml": "7d8b2afc86883415c892d6fea0e56c2115e4d859b6b6daa21c611b4e9517f028",
+    "lib/check.ml": "cdc3712bf5ed0fa49d8dae34ea946d85a195ea94b25235c821b155570010e335",
+    "lib/conv.ml": "e73e707bcdac54808d8f8a1d9e9a174062edf0afd970972dee2c6d024f6bbe39",
+    "lib/erase.ml": "794defe507c4d97910c2d92f925a7efa69433dc2ab67d2085340670886a95986",
+    "lib/erase_kan.ml": "a6d03447ab9dfedf8e53bceff26cd7da57f113bb4b5d1453aecd618fac508a88",
+    "lib/error.ml": "44c9c263479575ec04db5056404a5940d6bb5514a5b9e1ec6215385c6eccb5b6",
+    "lib/eterm.ml": "028ff6e790f9c391463b961f7a3eac12e105d484285cfde1597e52c5b9ac69c7",
+    "lib/eval.ml": "155ddf7578d4ad68352505064616bed6afa7a260a88f3ddf1722b95fa6a6bd18",
+    "lib/global.ml": "2e5d2d932dfddcb329bcfdf237df87a70f2d79820470dc236e337ec6d275c329",
+    "lib/level.ml": "344bb9819870d8c459154ac8109ba1d69a4ee4312670f3887c6ed30d3dbca448",
+    "lib/literal.ml": "80554b1d98c8dde3b474023a01ac57cc4abcaba2a5f20b707041cc5f0361b617",
+    "lib/order.ml": "d2cc3258fde25b61ba33093eaf19112c319329dc5b46ba029b3f042c14388e94",
+    "lib/positivity.ml": "97cb5fc9484ecaec360b4be1ac42f0668ae767aad25efc10ddbc1d4143185471",
+    "lib/pp.ml": "69618578ebb33a3d9803e604760252c77c64681aef2d847f3e1b40f9464e3895",
+    "lib/prim.ml": "5224df4f75e499b8fb962fad2a256b31086fcc9de5ab2f353eb90f61a8408aaa",
+    "lib/quantity.ml": "bf3f633c40a0dbb362cf85ca41b798ae0c9e1d4eca7e09f9b6f482bab2bfbb8b",
+    "lib/rir.ml": "6dbaa88a61863938d62e099a339277ecde0b2cace633fea5912b95bc248a9f1c",
+    "lib/rules.ml": "b625cec31061ca79f77669889039e4ae2658393911e39076dc65189022f702ab",
+    "lib/shape.ml": "dafd7741b4332dcab6faba9cb9afb131fb3654172e0d375b1edd1046e69f7f7b",
+    "lib/spec_count.ml": "87aa1bad45716737bfeca13986b58332245d252ba0f9ddda55cb7d402eec8c92",
+    "lib/term.ml": "2de6729958bfbc3af10ed2e9c51d6591ab40fa16bd19b7acea1fbf37adf60690",
+    "lib/totality.ml": "046c608584ac21d465d46b05119a89dca5488a15113359eea30ed318a3f7c028",
+    "lib/value.ml": "997f4634df60744c49555e896c1de8d60e51a1086e731e547b48450def9c68c7",
+    "rust/connection.ml": "cf65e905ebc278aac762cfd117b5aacf33fbc8ce06ba5e514a2be247c3246c85",
+    "rust/crate.ml": "93b9e56fb647b5b8872dc1e5c2ff9bd13b7062d03a6e4f953c54baafb9c4f7f7",
+    "rust/effects.ml": "0cd1e0d6caf5474f7845725341a316b7fc79c8a8ac41bb16d81a4038c7f79d42",
+    "rust/emit.ml": "524ea5a1aeb8b1e31473c7a963fa75cc0cc4298493897983cb4fa43cdc8c67f0",
+    "rust/foreign.ml": "7104df6a0161c6faff6971a6a3fcf38c9a19db74f5fef18b3e2db297abc834c4",
+    "rust/model.ml": "d5d91e8093f519fd7ccd45f04b8e90c94b02252ef826c62d5b74e9af3fee6217",
+    "rust/reachable.ml": "cdcf89897628f1e5bc8e437496ab36063d049776ac1c9fb7e9e75f6731859be2",
+    "rust/template.ml": "3a721565fbb8993bd24d55de30d159222af165f4e01f6cd63a570abfafa5ebda",
+    "surface/elab.ml": "4abe85308c9db0de80ed1d8685cd02d728df3fbfc7a329fe4e0bc66a4ee91c46",
+    "surface/fuse.ml": "62b74edc9677576dade93714ee857919c3814ab695d9a41cc764e3ef2e3ce1d4",
+    "surface/lexer.ml": "bb524f0202a01ab0b7a2e94745c9af50c5eede2a4c7d3fa450be785e2eb14254",
+    "surface/lower.ml": "3ee2543c860f0e242405a83996357ba483b88094243bd82d474c56fabc00dcb5",
+    "surface/parser.ml": "107bb45cfba1335a41cf0268e6c28e05dbb961c1c454c47ef364683d6e04d977",
+    "surface/specialize.ml": "7d674a16e7d75e78d9cb4dbf5b4d802c200e8fb8f840a5350ae8bef11025f27e",
+    "surface/syntax.ml": "774c0c713f2cdfe493656131b446eb10614e9415ef4d3a0d7cf8a64d2da04c5a",
+    "surface/term_scope.ml": "a3d61757700ece4d820f0fd2ae39e564394c8878316ac1c50f3e9150e3aec90a",
+    "surface/token.ml": "cd93b520f023f2aa80f42a4e352b47e63fd0c05e399f4c2344af898054fbb6db",
+    "target/PIN.json": "79acb0c0e756de89d15d483abf295cff74e11465b9c1e061e5d25a4041853718",
+    "target/pin.sha256": "bc150e69de798eadf8a6cdeb7be31440c7c544e7e297e531fbb98967ca37287f",
+    "target/toasty-7bd502cb.sig": "9b3a6ec3ad2c365cec6bbdd8767ba144a295bbe60affeb418c42dad65952a7fc",
+    "target/topcoat-51caa01.sig": "40ee029ce9885b1402d76cc4d0340545c24b9932649cec031c10075b1a21504d",
+    "test/fixtures/handlers-db.lan": "831ebe9601f133bf7e40e2a52a10b1aec6ddced5af597fff9efe4fb9013de954",
+    "test/fixtures/handlers.lan": "c4492bf4f0d74c8669b65310b4b70e867858181b42c34f070b45160f6aeb60f9",
+    "test/goldens/handlers.rs": "2a615ae15cce60e56bc2b45679eca4d4d3bf6fdfa10ae3a0fd9537c0d9fa8b85",
+    "test/lan_crate.py": "15714b13065349cfd6e7d3c6d4c12703b74896cba1db9fa5fc1e27ec809dc3a2",
+    "test/lan_handlers.py": "52e3af38e8440f66ca5476b733521b6db6959d90fdc0dc573b27dfc99a882c2d",
+    "test/lan_reachable.py": "9c53bb2801289d7cd98bfdeb561ac20e4b5b7741ddca70029cd3d9fa9ca5af7b"
+  },
+  "source_lines": {
+    "surface/fuse.ml": 173,
+    "surface/term_scope.ml": 50,
+    "rust/crate.ml": 30
+  }
+}

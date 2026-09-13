@@ -1,0 +1,19 @@
+signature App : Nat with
+| Read (value : Nat) : Nat
+end
+
+def finish : App -> Nat := fun (program : App) =>
+  match program as self in App return Nat with
+  | App.pure value => value
+  | App.Read value resume => value
+
+def handle : App -> Nat := fun (program : App) =>
+  match program as self in App return Nat with
+  | App.pure value => value
+  | App.Read value resume => finish (resume (natAdd value 1))
+
+def request : Nat -> App := fun (input : Nat) =>
+  App.Read input (fun (response : Nat) => App.pure (natAdd response 3))
+
+def run : Nat -> Nat := fun (input : Nat) => handle (request input)
+def main : Nat := run 7
