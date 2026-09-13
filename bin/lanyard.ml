@@ -21,7 +21,7 @@
 
 let usage () : unit =
   prerr_endline
-    "usage: lanyard check [--print|--erased] FILE | emit [--native|--target|--crate DIR [--print-model MODEL]] FILE.lan | axioms FILE | spec-count"
+    "usage: lanyard check [--print|--erased] FILE | emit [--native|--target|--crate DIR [--print-model MODEL]] FILE.lan | axioms [--names] FILE | spec-count"
 
 let read_file (path : string) : string =
   if Sys.file_exists path then In_channel.with_open_bin path In_channel.input_all
@@ -79,8 +79,18 @@ let run_erased (path : string) : unit =
 
 (** R-Q3: the postulates of the file, one name per line, in declaration
     order.  A file with no postulate prints nothing. *)
-let run_axioms (path : string) : unit =
+let run_axiom_names (path : string) : unit =
   List.iter print_endline (Kanon_surface.Elab.axiom_names (checked path))
+
+(** Lanyard reports the four M0 classes and the unbound ratio inputs.
+    The carried .kan command keeps its declaration-name contract. *)
+let run_axioms (path : string) : unit =
+  if Filename.check_suffix path ".lan" then
+    Kanon_surface.Elab.check_lanyard (read_file path)
+    |> Fun.flip Result.bind Kanon_surface.Axioms.report
+    |> Result.fold ~ok:print_string ~error:(fun error ->
+        prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
+  else run_axiom_names path
 
 let run_spec_count () : unit =
   Kanon_surface.Elab.target_environment ()
@@ -172,10 +182,10 @@ let dispatch_check (args : string list) : unit =
 
 let dispatch_axioms (args : string list) : unit =
   match args with
-  | path :: _rest -> run_axioms path
-  | [] ->
-      usage ();
-      exit 64
+  | [ "--names"; path ] when not (String.starts_with ~prefix:"--" path) ->
+      run_axiom_names path
+  | [ path ] when not (String.starts_with ~prefix:"--" path) -> run_axioms path
+  | [] | _ :: _ -> usage (); exit 64
 
 (* A string match cannot be exhaustive without a last arm, so the last arm
    binds the unknown command instead of writing a wildcard. *)

@@ -16,8 +16,9 @@ URL text. The crate command writes a standalone program with pinned
 dependencies and a synchronous or async entry point.
 Crate emission specializes finite checked handlers into direct operation
 bodies. The M0 Todo corpus emits a complete crate that creates and prints
-a row. Other model field types, general recursive handlers and the complete
-M0 driver remain ahead. The generated signature allowance is proposed at
+a row. Stage F adds classified axiom reports and the AXIOM-RATIO inputs.
+Other model field types, general recursive handlers, timing and the M0
+close remain ahead. The generated signature allowance is proposed at
 104 lines and awaits the user's ruling. See
 [target documentation](target/README.md), the
 [Stage B build log](dev/M0-BUILD-LOG.md#lanyard-m0-stage-b-2026-09-09) and
@@ -154,6 +155,23 @@ The generated program creates one row and prints
 `Todo { id: 1, title: "hi", completed: false }`.
 The optional model formatter checks scalar conversions and propagates
 output errors. EMIT-DIFF compares the whole crate without normalization.
+
+Inspect the [classified axioms](dev/STAGE-F-AXIOMS.md):
+
+```sh
+zsh dev/gates.sh --stage F-axioms
+_build/default/bin/lanyard.exe axioms corpus/m0/todo.lan
+_build/default/bin/lanyard.exe axioms --names examples/m0-todo.lan
+```
+
+The report lists Framework, Foreign, Classical and Div, sorted by class
+and name, with class totals and the compiled target catalog's SHA-256.
+Todo reports 17 foreign constants and 3 definitions of the checked
+module (Bool, Todo and main). These are informational inputs, with no
+ratio bound. The scope is the whole checked module, including unused
+catalog rows and model operations.
+Source postulates without an M0 class produce a diagnostic; `--names`
+prints their declaration names. The carried `.kan` output stays unchanged.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current

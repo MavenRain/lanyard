@@ -2211,3 +2211,97 @@ poll loop waits until exit or the deadline, and a child still alive at
 the deadline is killed and reported as the leg's own FAIL row. The
 second fix ladder is the closing run; its rows differ from the capture
 only in the two rows named above.
+
+## M0 Stage F: classified axioms (2026-09-12)
+
+Continued from the committed Todo slice at 3df84b4. The new
+surface/axioms.ml instrument reads checked module rows and model instance
+metadata. The .lan axioms command prints Framework, Foreign, Classical
+and Div in class/name order, the compiled catalog SHA-256, four counts,
+a total and the two informational AXIOM-RATIO inputs. The complete Todo
+report is in corpus/m0/axioms.txt.
+
+The framework entry names the existing imax l zero = zero assumption.
+Every installed catalog row and model instance counts as Foreign, with
+the source schema named on the entry. Classical is empty at M0. Div
+reads the carried partial marker; the surface still cannot construct it.
+The denominator counts total Global.Def rows, including model products
+and type aliases, and excludes primitives, postulates and family metadata.
+Todo reports 17 Foreign entries and three definitions: Bool, Todo and main.
+No division or bound is applied, including at zero definitions.
+
+The report inventories the full checked module before crate selection.
+Unused catalog rows and model operations remain visible. The initial Nat
+and primitive environment stays outside this module inventory. Exact
+catalog and instance identities determine provenance; name suffixes do
+not. An arbitrary source postulate has no class in the M0 policy, so
+classified disclosure fails with its name and no stdout. This leaves the
+checker unchanged. The --names option retains declaration order and
+postulates, and the carried .kan command retains its existing output.
+
+The stage command is zsh dev/gates.sh --stage F-axioms. It retains the
+complete E-todo gate and its emission golden. Focused tests cover ten
+CLI observations, eleven refusals and two checked-entry observations.
+Four scratch compiler mutations target missing model provenance, a false
+Foreign count, a fabricated class for a source postulate and an ignored
+partial marker. Each mutant must compile, fail its designated test and
+be followed by a green restored compiler. dev/MUTATION-LOG.md records
+the targets. Final captures and source hashes are stored under
+dev/validation/stage-f-axioms/.
+
+During development the compiler rejected an OCaml or-pattern with
+different bound names, and the first recursive test fixture omitted the
+carried match motive syntax. The final tests use the explicit family
+motive. No kernel, target catalog, printer or emitted Rust bytes changed.
+The timing instrument, combined M0 gate, numeric allowance rulings and
+M0 exit stamp remain ahead.
+
+## M0 Stage F review fixes (tag LSFA, 2026-09-12)
+
+### Round 1
+
+- WF-1 test/lan_axioms.py: the local run helper no longer uses the
+  subprocess.run timeout keyword. It starts the driver with Popen, polls
+  a 120 s monotonic deadline, kills the child on expiry and reports the
+  expiry through require, so a slow child gives a LAN-AXIOMS FAIL row and
+  not a TimeoutExpired traceback. The helper keeps the run(*arguments)
+  signature and adds no catch site. Proof: LAN-AXIOMS OK observations=10
+  refusals=11.
+- WF-2 test/lan_axioms.py: the class member count check runs before the
+  entries[0] comparison. An empty entries list now gives the FAIL row
+  "unexpected class members" and not an IndexError. Proof: LAN-AXIOMS OK
+  observations=10 refusals=11.
+- WF-3 test/lan_axioms_mutations.py: the model-metadata mutant kill
+  predicate is the designated diagnostic "unclassified postulate
+  Todo_create" and not the bare name. The ratio-count mutant now removes
+  the Foreign size from the count fold, because the earlier target text
+  moved. Proof: LAN-AXIOMS-MUTATIONS OK killed=4 restored=GREEN.
+- WF-4 surface/axioms.ml: grouped carries the member count as a third
+  field. The COUNT lines read that field and a single fold gives the
+  AXIOM-RATIO Foreign input. The association lookup and its unreachable
+  default are gone. The report bytes do not change. Proof: cmp-rc=0
+  against corpus/m0/axioms.txt.
+- WF-5 test/lan_axioms_report.ml: contains_all splits the report once and
+  checks every expected line against that list. The function stays total.
+  Proof: LAN-AXIOMS-REPORT OK observations=2.
+- HYP-9 (low, docs) README.md: the three Todo definitions are the source
+  declarations Bool, Todo and main, not "kernel-derived"; wording aligned
+  with dev/STAGE-F-AXIOMS.md.
+
+### Fix ladder
+
+- Verdict: GATE LSFA tag=fix-1 GREEN. GATE-START 2026-09-13T05:39:41Z at
+  load 12.80, GATE-END 2026-09-13T05:41:45Z with stage_rc=0, so the run
+  took 2 min 4 s. STAGE-GATE-EXIT 0.
+- The fix ladder printed 85 rows. They are identical to the 85 rows of
+  dev/validation/stage-f-axioms/stage-gate.stdout. RED-WATCH hits=0, so
+  no count row moved.
+- The baseline ladder before the fixes was also green: GATE LSFA
+  tag=baseline GREEN, 2026-09-13T05:16:25Z to 05:19:43Z at load 31.5,
+  compare-rows 85/85 IDENTICAL, RED-WATCH 0.
+- Captures note: dev/validation/stage-f-axioms/* were captured before the
+  review in the sibling checkout at base 3df84b4. After the fixes the
+  receipt rows for surface/axioms.ml, test/lan_axioms.py,
+  test/lan_axioms_mutations.py and test/lan_axioms_report.ml no longer
+  match the staged blobs. The post-fix evidence is the green fix ladder
+  log, whose 85 rows are identical to the captured stage gate output.

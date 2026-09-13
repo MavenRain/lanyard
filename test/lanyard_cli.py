@@ -29,7 +29,7 @@ printed = run(DRIVER, "check", "--print", "examples/m0-todo.lan")
 require(printed.returncode == 0 and "def Todo :" in printed.stdout
         and "axiom Todo_create :" in printed.stdout and printed.stderr == "",
         "checked form omitted the model or its foreign operation")
-disclosed = run(DRIVER, "axioms", "examples/m0-todo.lan")
+disclosed = run(DRIVER, "axioms", "--names", "examples/m0-todo.lan")
 require(disclosed.returncode == 0 and "Todo_create" in disclosed.stdout.splitlines()
         and "Todo_get_by_id" in disclosed.stdout.splitlines()
         and "Todo" not in disclosed.stdout.splitlines(),

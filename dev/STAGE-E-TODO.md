@@ -71,6 +71,7 @@ commands and validation ledger in the development workspace.
 
 The earlier `examples/m0-todo.lan` remains a Stage C/D checker fixture.
 The new corpus supplies the executable M0 source and golden required by
-D-M0-1 and D-M0-2. The classified axioms instrument, timing instrument,
-combined M0 gate and M0 exit stamp remain ahead. Numeric trusted-line
-allowances remain user rulings. The plan places build and run in M1.
+D-M0-1 and D-M0-2. The [classified axioms instrument](STAGE-F-AXIOMS.md)
+now reports the M0 inputs. The timing instrument, combined M0 gate and
+M0 exit stamp remain ahead. Numeric trusted-line allowances remain user
+rulings. The plan places build and run in M1.

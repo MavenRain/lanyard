@@ -646,3 +646,19 @@ run in test/lan_m0.py. Scratch mutations leave the source checkout and
 its goldens untouched. The cumulative E-todo capture records all five
 controls; the separate pinned SQLite execution uses unmodified output.
 Captures and source hashes are in dev/validation/stage-e-todo/.
+
+## Classified axioms (2026-09-12)
+
+| Control | Mutation | Required failure |
+| --- | --- | --- |
+| axioms-model-metadata | Remove model instances from the foreign provenance map | The Todo report refuses the now-unclassified Todo_create entry |
+| axioms-ratio-count | Print zero for the Foreign AXIOM-RATIO input | The CLI test rejects the incorrect ratio inputs |
+| axioms-postulate-class | Assign unknown source postulates a Foreign schema | The CLI refusal test detects the fabricated classification |
+| axioms-partial-marker | Ignore the checked definition's partial marker | The checked-entry test rejects the missing Div entry and count |
+
+test/lan_axioms_mutations.py builds a scratch compiler and checks its
+positive baseline before changing one site at a time. Each mutant must
+build successfully and then fail with its designated diagnostic. The
+original source is restored and both report tests must pass before the
+final mutation verdict. No source checkout, target catalog or golden
+is mutated. Captures are in dev/validation/stage-f-axioms/.

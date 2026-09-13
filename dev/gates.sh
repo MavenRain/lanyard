@@ -32,9 +32,13 @@
 #   zsh dev/gates.sh --stage E-reachable
 #   zsh dev/gates.sh --stage E-handlers
 #   zsh dev/gates.sh --stage E-todo
+#   zsh dev/gates.sh --stage F-axioms
 
 set -u
 
+if [[ $# -eq 2 && $1 == "--stage" && $2 == "F-axioms" ]]; then
+  exec zsh ${0:A:h}/stage-f-axioms.sh
+fi
 if [[ $# -eq 2 && $1 == "--stage" && $2 == "E-todo" ]]; then
   exec zsh ${0:A:h}/stage-e-todo.sh
 fi
@@ -265,7 +269,7 @@ if [[ $# -ge 2 && $1 == "--leg" ]]; then
 fi
 
 if [[ $# -ne 0 ]]; then
-  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C|D|E-native|E-foreign|E-async|E-foreign-types|E-models|E-connections|E-crate|E-reachable|E-handlers|E-todo]"
+  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C|D|E-native|E-foreign|E-async|E-foreign-types|E-models|E-connections|E-crate|E-reachable|E-handlers|E-todo|F-axioms]"
   exit 64
 fi
 
