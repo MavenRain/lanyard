@@ -46,7 +46,11 @@ if [[ ! -x $DRIVER ]]; then
   exit 1
 fi
 
-$DRIVER spec-count > $WORK/driver.txt
+if ! $DRIVER spec-count > $WORK/driver.txt; then
+  print -r -- "R0-COUNT FAIL: spec-count command failed"
+  rm -rf $WORK
+  exit 1
+fi
 
 if diff $WORK/spec.txt $WORK/driver.txt > $WORK/d 2>&1; then
   print -r -- "R0-COUNT OK"

@@ -17,8 +17,9 @@ dependencies and a synchronous or async entry point.
 Crate emission specializes finite checked handlers into direct operation
 bodies. The M0 Todo corpus emits a complete crate that creates and prints
 a row. Stage F adds classified axiom reports, the AXIOM-RATIO inputs,
-and informational compiler timings with a Go denominator refit.
-Other model field types, general recursive handlers and the M0 close
+and informational compiler timings with a Go denominator refit. The
+combined M0 gate records all seven legs and unresolved trust decisions.
+Other model field types, general recursive handlers and the M0 exit stamp
 remain ahead. The generated signature allowance is proposed at
 104 lines and awaits the user's ruling. See
 [target documentation](target/README.md), the
@@ -186,6 +187,19 @@ load averages and ratios at the same input size. It uses one warm-up and
 five samples. The Go refit uses all thirteen frozen S4 packages; omitting
 `--refit-go` labels the comparison as historical. High-load runs are
 NOISY, and all M0 timings are informational.
+
+Run the [combined M0 gate](dev/STAGE-F-GATES.md):
+
+```sh
+zsh dev/gates.sh M0
+zsh dev/gates.sh --stage F-gates
+```
+
+The combined command saves per-check logs and a JSON report. It returns
+exit 2 while the whole-base trust allowances and scope remain unruled;
+an actual failure returns exit 1. The stage command validates the gate
+implementation and retains that pending M0 result. The M0 exit stamp
+remains the user's decision.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current

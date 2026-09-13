@@ -2434,3 +2434,144 @@ watcher found nothing (`RED-WATCH hits=0`). This run reports
 `DENOMINATOR source=same-run-refit sha256=ba1293a3... status=NOISY`, so
 it is a same-minute refit, unlike the captured run. The suite is 23
 tests.
+
+## M0 Stage F: combined gate (2026-09-13)
+
+Continued from 28b1b90. `zsh dev/gates.sh M0` now builds the compiler,
+checks and erases the Todo corpus, compares its axiom golden, runs HOUSE
+and executes the seven M0 legs in plan order. Each check has captured
+stdout and stderr with SHA-256 digests in a JSON report. A failed build
+stops the run; later independent failures do not suppress other legs.
+Child deadlines stop the process group. Timing refits all thirteen Go
+packages once and retains the raw JSON without imposing a speed bound.
+
+The combined gate distinguishes failed assertions from unresolved user
+rulings. The current TRUSTED-LINES script binds only the kernel ceiling.
+Its successful measurement becomes PENDING in M0, with exit 2 for the
+combined run. Real failures take precedence and return 1. No allowance,
+trusted-file scope or M0-EXIT stamp is ratified by this change.
+
+The measured kernel plus Rust eraser is 5516, 35 above the fixed 5481
+base. IR, complete printer and generated signatures measure 155, 1231
+and 104. The carried eraser, carried erased terms, target lowering and
+specialization add 1792 lines whose ceiling treatment is still open.
+The detailed inventory and pending decisions are in STAGE-F-GATES.md.
+
+Nineteen gate tests cover exact markers, nonzero child exits, missing
+tools and goldens, timeout cleanup including descendants, per-stream
+capture hashes, failure precedence, build short-circuiting, continued
+execution, complete leg coverage, pending status and CLI output safety.
+The mutation harness builds a scratch compiler, kills five assertion
+controls, and checks restored positives. The 50-line printer mutation
+remains explicitly PENDING, and M0-TIME is informational.
+
+An additional census control exposed a failure in dev/r0-count.sh: it
+accepted matching output even when spec-count exited nonzero. The leg
+now rejects that exit before comparing bytes. Its regression driver
+prints the correct census and exits 7; the shell leg must return 1.
+
+The F-gates stage retains F-axioms and the timing tests, adds the gate
+tests and controls, then runs the combined M0 command. Its final success
+line explicitly retains m0=PENDING. Validation captures and source hashes
+are under dev/validation/stage-f-gates/. Existing stage captures remain
+historical evidence. Compiler sources and emitted Rust are unchanged.
+
+## M0 Stage F review fixes (tag LSFG, 2026-09-13)
+
+### Round 1
+
+F-1. dev/stage-f-gates.sh accepted any exit 2 from the M0 gate as the
+pending ruling. argparse also exits 2 for a bad flag, so a flag typo made
+a gate that never ran look like a stage pass. The stage now saves the gate
+stdout, reprints every row in order, keeps the exit-2 check, and then runs
+`python3 -P dev/m0-gates.py --verify-stage-log`. The new function
+verify_stage_log reads the last `M0-REPORT ` row and requires status
+PENDING, exit code 2, six passing legs, one pending leg and no failed
+check. dev/STAGE-F-GATES.md now says that the stage pins the pending
+ruling, and that the slice which implements the rulings must also let the
+stage accept a green report. Three tests prove it:
+test_stage_verification_accepts_only_the_pending_report,
+test_stage_verification_needs_a_readable_report_row and
+test_stage_verification_takes_the_last_report_row.
+
+F-2. The deadline path in dev/m0-gates.py could block for ever. The kill
+stops the child's process group only, and the second communicate() had no
+bound, so a descendant in another session held the captured pipes open.
+The new function drain bounds that read with a grace of 30 seconds, then
+kills the child and closes the pipes. The killpg guard now also catches
+PermissionError, so an unkillable descendant gives one FAIL row instead of
+an M0-GATES ERROR with no report. Test:
+test_detached_descendant_cannot_hold_the_deadline_open, which spawns the
+sleeper with start_new_session=True and asserts exit 124 inside the
+elapsed bound.
+
+F-3. M0-CHECK and M0-ERASE asserted a zero exit only, so a driver that
+checks or erases wrongly still passed. M0-CHECK now carries the golden
+`expected=b""`, and M0-ERASE carries the markers in ERASE_MARKERS
+(`erased Db` and `erased Todo`). Neither stream is echoed, so the green
+rows do not change. Test: test_corpus_prerequisites_assert_their_own_bytes.
+
+F-4. The scratch overlay in test/lan_m0_gate_mutations.py copied the files
+directly under dev/ only, so dev subdirectories stayed at clone bytes. The
+overlay now copies the complete dev tree and ignores __pycache__ and the
+frozen validation captures. A require call after the overlay compares
+dev/spikes/denominators.json with the bytes in ROOT.
+
+F-5. The harness printed the kill count and asserted nothing, so a deleted
+control still exited 0. A require call before the summary compares the
+killed list with the ROSTER constant, which holds the five control names
+in run order. The printed row keeps len(killed) and stays byte identical.
+
+F-6. .gatework/m0.* directories are never removed, and no document said
+so. dev/STAGE-F-GATES.md now states that each default run keeps its own
+directory as evidence, that the command removes nothing because the
+printed M0-REPORT path must stay readable, and that the operator prunes
+them. This is a document fix; no code changed.
+
+F-7. The gate replays the child stdout of TRUSTED-LINES and M0-TIME, so a
+child can print text that looks like a gate row. The replay stays, because
+the frozen capture holds it. dev/STAGE-F-GATES.md now records the reader
+rule: take the verdict from report.json, and take the report path from the
+last `M0-REPORT ` row. The stage runner obeys that rule. Test:
+test_replayed_child_row_cannot_forge_the_verdict, in which the fake leg
+prints a forged green summary and a forged report path.
+
+### Round 2
+
+The fix ladder fix-1 stopped in the HOUSE one-catch-site scan. The round 1
+test test_detached_descendant_cannot_hold_the_deadline_open used a
+try/finally block to kill the detached sleeper, and dev/house.sh permits
+exactly one catch site in the scanned tree (test/sys_io.ml:19). The test
+now registers the kill with self.addCleanup and a new helper method
+kill_recorded, which keeps the contextlib.suppress guard. unittest runs
+the cleanup after each outcome, so the sleeper is killed when an assertion
+fails too. The assertions and the probe body do not change.
+
+### Round 3
+
+The fix ladder fix-2 stopped in the stage runner, after the three test
+suites and the mutation harness passed. The round 1 stage saved the gate
+stdout in a `mktemp -t` file, so the run needed the system temp directory,
+and mkstemp failed there with "Operation not permitted" under the review
+sandbox. The scratch log now lives under `.gatework`, like the gate report
+directories, and the EXIT trap still removes it, so the stage depends on no
+path outside the tree. The exit-2 check, the reprint and the
+`--verify-stage-log` step do not change. Checks: `zsh -n
+dev/stage-f-gates.sh`, the em-dash scan over the edited files, and the
+review kit's fast legs.
+
+### Fix ladder
+
+The fix ladders fix-1 and fix-2 were red. Fix ladder fix-1 stopped in the
+house one-catch-site scan, and fix ladder fix-2 stopped because the stage
+runner kept its scratch log in the system temp directory; rounds 2 and 3
+repaired those two regressions. Fix ladder fix-3 then ran the full stage
+green with `zsh dev/gates.sh --stage F-gates`: stage exit 0, `GATE LSFG
+tag=fix-3 GREEN`, rows Ran 28, 23 and 25 tests OK, `M0-GATE-MUTATIONS OK
+killed=5 pending=1 informational=1 restored=GREEN`, `M0-GATES PENDING
+passed=6/7 pending=1 failed=0`, `STAGE-F-GATES OK m0=PENDING` and
+`STAGE-GATE-EXIT 0`. The 86 stage rows of that run are identical to the
+captured stage-gate.stdout (`ROWS tag=fix-3 capture=86 log=86 IDENTICAL`,
+`PINS tag=fix-3 ok=21 missing=0`, `RED-WATCH tag=fix-3 hits=0`). The
+captures under dev/validation/stage-f-gates/ are frozen by design and were
+not refreshed; the fix-3 ladder log is the post-fix evidence.

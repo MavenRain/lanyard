@@ -662,3 +662,36 @@ build successfully and then fail with its designated diagnostic. The
 original source is restored and both report tests must pass before the
 final mutation verdict. No source checkout, target catalog or golden
 is mutated. Captures are in dev/validation/stage-f-axioms/.
+
+## Combined M0 gate (2026-09-13)
+
+test/lan_m0_gate_mutations.py uses the combined runner's actual leg
+commands on a scratch checkout. It copies the current source bytes,
+requires successful compiler builds, and checks the baseline and restored
+positive after each mutation. Upstream anchor bytes are copied through
+the existing target drift fixture; upstream repositories remain read only.
+
+| Leg | Control | Required result |
+| --- | --- | --- |
+| R0-COUNT | Add Extra to the printed former list and rebuild | FAIL with R0-COUNT FAIL. |
+| R0-TARGET | Add a type row naming a tenth atom | FAIL outside the closed atom list. |
+| TARGET-PIN | Flip one byte in a copied anchor | FAIL in DIFF. |
+| TRUSTED-LINES | Add 50 lines to rust/emit.ml | PENDING: the kernel-only script still exits 0. |
+| KERNEL-CARRY | Add a newline to lib/check.ml | FAIL with bytes-differ. |
+| EMIT-DIFF | Delete Model.create's signature row and rebuild | FAIL with unbound: Todo_create. |
+| M0-TIME | Informational under plan section 9 | No speed-bound mutation. |
+
+The final control count is five killed, one pending, one informational.
+The pending printer control is not counted as a kill or a completed M0
+exit requirement. A further regression control prints the correct census
+and exits 7. The shell leg must reject it with exit 1 and the diagnostic
+spec-count command failed, then pass with the original driver restored.
+Captures are under dev/validation/stage-f-gates/.
+
+Review round 1 (tag LSFG) hardened the two harness controls. The scratch
+overlay now copies the complete dev tree, without __pycache__ and without
+the frozen validation captures. It then asserts that the overlaid file
+dev/spikes/denominators.json holds the bytes of ROOT. The harness also
+compares the killed list
+with the five control names in run order before it prints the summary, so
+a deleted control fails the harness instead of printing a smaller count.

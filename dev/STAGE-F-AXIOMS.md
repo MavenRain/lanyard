@@ -73,5 +73,6 @@ then fail its designated report test. The restored compiler must pass.
 
 Captures and source hashes live in `dev/validation/stage-f-axioms/`.
 The kernel, target signature generator, target rows and emitted Rust
-retain their committed bytes. The timing instrument, combined M0 gate,
-numeric allowance rulings and M0 exit stamp remain ahead.
+retain their committed bytes. The [timing instrument](STAGE-F-TIME.md)
+and [combined M0 gate](STAGE-F-GATES.md) are implemented. Numeric
+allowance rulings and the M0 exit stamp remain open.

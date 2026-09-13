@@ -34,9 +34,18 @@
 #   zsh dev/gates.sh --stage E-todo
 #   zsh dev/gates.sh --stage F-axioms
 #   zsh dev/gates.sh --stage F-time
+#   zsh dev/gates.sh --stage F-gates
+#   zsh dev/gates.sh M0
 
 set -u
 
+if [[ $# -ge 1 && $1 == "M0" ]]; then
+  shift
+  exec python3 -P ${0:A:h}/m0-gates.py "$@"
+fi
+if [[ $# -eq 2 && $1 == "--stage" && $2 == "F-gates" ]]; then
+  exec zsh ${0:A:h}/stage-f-gates.sh
+fi
 if [[ $# -eq 2 && $1 == "--stage" && $2 == "F-time" ]]; then
   exec zsh ${0:A:h}/stage-f-time.sh
 fi
@@ -273,7 +282,7 @@ if [[ $# -ge 2 && $1 == "--leg" ]]; then
 fi
 
 if [[ $# -ne 0 ]]; then
-  print -r -- "usage: zsh dev/gates.sh [--leg NAME | --stage B|C|D|E-native|E-foreign|E-async|E-foreign-types|E-models|E-connections|E-crate|E-reachable|E-handlers|E-todo|F-axioms|F-time]"
+  print -r -- "usage: zsh dev/gates.sh [M0 [--output NEW-DIRECTORY] | --leg NAME | --stage B|C|D|E-native|E-foreign|E-async|E-foreign-types|E-models|E-connections|E-crate|E-reachable|E-handlers|E-todo|F-axioms|F-time|F-gates]"
   exit 64
 fi
 

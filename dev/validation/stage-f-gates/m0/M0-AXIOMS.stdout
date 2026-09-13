@@ -1,0 +1,25 @@
+AXIOMS scope=checked-module target-sha256=32866a0cce0bd55b26cc74053827f2f5601449d4d6fc246d3db0d0ff7910ee88
+Framework imax_zero : imax l zero = zero
+Foreign Cx : Type 1 [schema=Cx]
+Foreign Db : Type 1 [schema=Db]
+Foreign Db_connect : (Ran SPi 0 Models Type 1 (Ran SPi 0 Text Type 1 (Ran SPi w url Text Db))) [schema=Db.connect]
+Foreign Db_push_schema : (Ran SPi w db Db (Ran SColl 0 (Sec SColl 0 []))) [schema=Db.push_schema]
+Foreign Deferred : (Ran SPi 0 T Type 1 Type 1) [schema=Deferred]
+Foreign Form : (Ran SPi 0 T Type 1 Type 1) [schema=Form]
+Foreign Model_create : (Ran SPi 0 M Type 1 (Ran SPi w fields M (Ran SPi w db Db M))) [schema=Model.create]
+Foreign Model_get_by_id : (Ran SPi 0 M Type 1 (Ran SPi 0 Key Type 1 (Ran SPi w key Key (Ran SPi w db Db M)))) [schema=Model.get_by_id]
+Foreign Response : Type 1 [schema=Response]
+Foreign SeeOther : Type 1 [schema=SeeOther]
+Foreign Todo_create : (Ran SPi w fields (Ran SColl 3 (Sec SColl 3 [ => Nat;  => (Lan SMu Bytes [] (Sec SColl 0 []));  => (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))])) (Ran SPi w db Db (Ran SColl 3 (Sec SColl 3 [ => Nat;  => (Lan SMu Bytes [] (Sec SColl 0 []));  => (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))])))) [schema=Model.create]
+Foreign Todo_get_by_id : (Ran SPi w key Nat (Ran SPi w db Db (Ran SColl 3 (Sec SColl 3 [ => Nat;  => (Lan SMu Bytes [] (Sec SColl 0 []));  => (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))])))) [schema=Model.get_by_id]
+Foreign Uri : Type 1 [schema=Uri]
+Foreign toasty_Error : Type 1 [schema=toasty::Error]
+Foreign topcoat_Error : Type 1 [schema=topcoat::Error]
+Foreign topcoat_db : (Ran SPi w cx Cx Db) [schema=topcoat.db]
+Foreign topcoat_see_other : (Ran SPi w uri Uri SeeOther) [schema=topcoat.see_other]
+COUNT Framework=1
+COUNT Foreign=17
+COUNT Classical=0
+COUNT Div=0
+AXIOMS total=18
+AXIOM-RATIO constants=17 definitions=3 status=REPORTED

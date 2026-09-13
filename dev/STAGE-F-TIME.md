@@ -92,5 +92,5 @@ and output errors exit 1 with an `M0-TIME ERROR` diagnostic on stderr.
 
 Validation evidence is under `dev/validation/stage-f-time/`. The kernel,
 target catalog, emitted Rust and Todo golden keep their existing bytes.
-The combined M0 gate, numeric allowance rulings and the user's M0 exit
-stamp remain ahead.
+The [combined M0 gate](STAGE-F-GATES.md) now runs this instrument.
+Numeric allowance rulings and the user's M0 exit stamp remain open.
