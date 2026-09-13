@@ -1,0 +1,299 @@
+{
+  "format": 1,
+  "base_commit": "5ee41244d134991a945e47f9a5cbb320a353c4ba",
+  "checkout": "/Users/oobi/Documents/gpt2/lanyard-todo",
+  "captures": {
+    "compiler-build": {
+      "command": [
+        "zsh",
+        "dev/dunecho.sh",
+        "build"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-todo",
+      "exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-No7cKM",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-todo/compiler-build.stdout",
+          "sha256": "9e007d7a4010fcc271a69a2546c4c166962b8c019f48235eca93e8512b6a997b",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-todo/compiler-build.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalization": "none"
+        }
+      }
+    },
+    "stage-gate": {
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "E-todo"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-todo",
+      "exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-Hpvurv",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-todo/stage-gate.stdout",
+          "sha256": "31486969c38b8d1983282298e3bd733f8b3e9e142fce344ea3b5b65bc2bdf62f",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-todo/stage-gate.stderr",
+          "sha256": "bbbd427243709b667a36814156071db456dd805ef89287cf99710649da7b5b9a",
+          "normalization": "none"
+        }
+      }
+    },
+    "final-house": {
+      "command": [
+        "zsh",
+        "dev/house.sh"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-todo",
+      "exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-BHSfxi",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-todo/final-house.stdout",
+          "sha256": "8a5ccb62ca93af7730e715e70832cef6dec9649169d555074ff0d442617d6449",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-todo/final-house.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalization": "none"
+        }
+      }
+    },
+    "pinned-prepare": {
+      "command": [
+        "python3",
+        "-P",
+        "dev/prepare-crate.py",
+        "--toasty",
+        "/Users/oobi/Documents/toasty",
+        "--topcoat",
+        "/Users/oobi/Documents/topcoat",
+        "--source",
+        "corpus/m0/todo.lan",
+        "--print-model",
+        "Todo",
+        "--lock",
+        "dev/validation/stage-e-crate/Cargo.lock",
+        "--output",
+        ".gatework/m0-pinned"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-todo",
+      "exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-qX46rt",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-todo/pinned-prepare.stdout",
+          "sha256": "1f3c7d989d3626604f865af395f84276735731c01113e9f3c63ce6bc234ad81a",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-todo/pinned-prepare.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalization": "none"
+        }
+      }
+    },
+    "pinned-build": {
+      "command": [
+        "gateledger",
+        "run",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-todo/.gatework/gateledger",
+        "--dir",
+        ".gatework/m0-pinned",
+        "--scope",
+        "Cargo.toml",
+        "--scope",
+        "Cargo.lock",
+        "--scope",
+        "src/main.rs",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_TARGET_DIR=/Users/oobi/Documents/gpt2/lanyard-todo/.gatework/cargo-target",
+        "CARGO_BUILD_JOBS=4",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-todo/.gatework/m0-pinned/Cargo.toml"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-todo",
+      "exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-OEDyMy",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-todo/pinned-build.stdout",
+          "sha256": "cd7d26c244102e1a45a9cfa4883ba0a5fcf3cbc61b197691a35e70747e50ad2d",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-todo/pinned-build.stderr",
+          "sha256": "8bb2aa261a8016b76d5e2e0f036a87f284310ef287a955ba2b63a08f932bcd8b",
+          "normalization": "none"
+        }
+      }
+    },
+    "pinned-run": {
+      "command": [
+        ".gatework/cargo-target/debug/lanyard-program"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-todo",
+      "exit_code": 0,
+      "capture_artifact": ".kanon-exec/run-RHPlND",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-e-todo/pinned-run.stdout",
+          "sha256": "efe789298e7521a059f9b565e2c7c4efe9cd29a5bb211f112af52f9f52bd6899",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-e-todo/pinned-run.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalization": "none"
+        }
+      }
+    }
+  },
+  "observations": {
+    "output_checks": 10,
+    "cli_refusals": 8,
+    "rust_mutants_killed": 2,
+    "golden_mutants_killed": 2,
+    "deleted_print_rule_killed": 1,
+    "sqlite_exit": 0,
+    "sqlite_stdout": "Todo { id: 1, title: \"hi\", completed: false }\n"
+  },
+  "trusted_lines": {
+    "printer_total": 1231,
+    "allowance": "A_emit pending user ruling"
+  },
+  "notes": [
+    "The complete source checks before crate selection, lowering and printing. The selected model result layout is checked before output files are written.",
+    "The whole M0 crate is compared without normalization under corpus/m0/golden. Existing module and crate goldens retain their bytes.",
+    "The focused synchronous formatter tests use an empty model derive macro. The separate SQLite build and execution use the actual pinned libraries and unmodified emitted Rust.",
+    "The async entry point instantiates a generic Future + Send bound before awaiting main.",
+    "The stage gate includes expected failure output from its deleted-print-rule control, followed by its positive control summary and STAGE-E-TODO OK.",
+    "The first mutation harness run checked for a schema-level diagnostic. The final assertion checks the actual unbound: Todo_create refusal after successful mutated catalog generation and compiler build.",
+    "Pinned libraries have the revisions in target/PIN.json and clean tracked sources both at preparation and receipt creation. No library checkout was modified.",
+    "The local manifest changes only the two dependency locations. The original Git manifest is retained; its network dependency form was not fetched.",
+    "Cargo resolution is offline and locked. The seed lockfile is included among source hashes. Cargo reuses an APFS clone of the previous slice build cache in this checkout.",
+    "Gateledger records the pinned build in this checkout. It reports zero errors and two unused-code or unused-variable warnings. The validation crate has an isolated Git index and no commit.",
+    "A fresh emission from the final compiler matches both the corpus golden and the archived pinned source and Git manifest byte for byte.",
+    "Capture streams retain their original bytes, without whitespace normalization.",
+    "Documentation was finalized during the cumulative gate; the separate final-house capture checks the completed documentation. Compiler and test sources did not change during that gate.",
+    "Kernel and target signature files retain their committed bytes. No numeric allowance or M0 exit stamp is ratified by this slice."
+  ],
+  "pinned_files": {
+    "Cargo.toml": "f542ef1107feceb9f68626d4d27917d6515db34c404ffbaef5475bf03fe58efe",
+    "Cargo.git.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "Cargo.lock": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "src/main.rs": "0dd7a289b7d860666e43a26af40d40a8737d829804e2c98e4852cd51e64fdef6"
+  },
+  "source_sha256": {
+    "README.md": "0679df6b502e7ff04d86bbdd1211ddd9c14f74fc9e858aa3b6470cd1b7d457ac",
+    "bin/lanyard.ml": "435624383840a19563acf1dedaac214397119d6fb0249f402f7841a8e873a86a",
+    "corpus/m0/golden/Cargo.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "corpus/m0/golden/src/main.rs": "0dd7a289b7d860666e43a26af40d40a8737d829804e2c98e4852cd51e64fdef6",
+    "corpus/m0/todo.lan": "df23ca0c8e46a13acc8c1e2c42cccc672b62b104b11c8ea2a575af4fd69a3064",
+    "dev/M0-BUILD-LOG.md": "43b4ab7f0780b1a0e2c2f9957f8994af665160c2549d91eb9b0ae3a6dcc73232",
+    "dev/MUTATION-LOG.md": "6adabee01c68e67d611437c276c6b8aa6fa50bc88639d6afca6583a7c1c6bc04",
+    "dev/STAGE-E-CRATE.md": "d9a7390a35afafb3cb38960561484ac1a0fd3216cfde3428f6b2126d43b83d8f",
+    "dev/STAGE-E-HANDLERS.md": "be2beff73738c581050733a538996524c0a24c2f6cbb6eee7cc095ec0b28c802",
+    "dev/STAGE-E-REACHABLE.md": "b80d24a5ecb9bedae4e54e8f98f8797a902876a438fd42637d6c33dbdd4590bd",
+    "dev/STAGE-E-TODO.md": "c84989edec0644be55648769ce98979bf811f92c7242ec290fed06d8531195ac",
+    "dev/emit-diff.py": "c79914952a01358f2ab2479fa7eb75eb78940fbb0306ed45ef0b28ee010b3030",
+    "dev/gates.sh": "a17be9765b93cc3ba49b82312882e8227fa5f04120ea274ab78585520d582158",
+    "dev/gen-target.py": "8e75b2fe89bfc7c0ab5bc906bcda5d196e19a1da91a96931fb2f5118c5069bd1",
+    "dev/prepare-crate.py": "7a198479fa45ebb913b86284046e41bd4c11dcec3671526313d5895f0dbc5d4e",
+    "dev/stage-b.sh": "4b9eccb94763dec9098a35503e90a2d184838c20f9625b59bc5044eca0413dae",
+    "dev/stage-c.sh": "c04fd3af4da762a92014d6911238f4e7beed6d2595ed184027619875b5ec72fd",
+    "dev/stage-d.sh": "5e4f5efd4fc0117014b67b2818408e44490b703efbd8c4ca68b6571f9accfa7d",
+    "dev/stage-e-async.sh": "5a7ecdd86cd4b95092d0647564f0b381379fe8514b82a32a01fc25856fb4c95e",
+    "dev/stage-e-connections.sh": "a78197fd3f11d9f141e264e4222f62052fae082f5f8e867f93a048b0913a1b50",
+    "dev/stage-e-crate.sh": "cc9e964983395cae1d2e92d313fab1bcc7eede32a7e5343ffcb025f610613c68",
+    "dev/stage-e-foreign-types.sh": "ce039f67924e2ce2a71820595665e645f683f577b923eb7a108c793434b2f90b",
+    "dev/stage-e-foreign.sh": "7f0e6a575e2921bd09b68dd165a105a584f4e84aa1379b8eb12aa75faabe634d",
+    "dev/stage-e-handlers.sh": "11b424de39f15bd66116c40aa42d951b2be28a4973550a0cb72a1c8cd2402c3b",
+    "dev/stage-e-models.sh": "b7f6219d8aac13746613b40ffaef3df3c32f6c3b08dc6ce78cb354540758eb02",
+    "dev/stage-e-native.sh": "b9a675d1543d6ec2416e809b5e1a60e155e07fd80aa685c151f4b331b76c7f84",
+    "dev/stage-e-reachable.sh": "0ef6a3ef71ecb4b874e2a0a6493864abf28240317c1688f13b170c5710a8e62e",
+    "dev/stage-e-todo.sh": "c532def1dc3cd49dcf9b533aff1043ba2d6643a3fc2d084815eba47a17a2eb82",
+    "dev/trusted-lines.sh": "b866523d5966398a65b13fa45b83be059f86f03f0313004c6058558b068fb2c7",
+    "dev/validation/stage-e-crate/Cargo.lock": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "examples/m0-todo.lan": "55fab68c4bc897fa6ef105bdeea9b8c5d0c55755f5fdd767de97e93ab458cda1",
+    "lib/bignum.ml": "7159dd7e75fa08a5fc272cba76a8ec6214c7d190151dabf7db1a13bf5ecddd72",
+    "lib/budget.ml": "7d8b2afc86883415c892d6fea0e56c2115e4d859b6b6daa21c611b4e9517f028",
+    "lib/budget.mli": "b830149c9eb6d9362786d2e92c2dc8322f4d31f7b4cfc960ac6e1681d385578f",
+    "lib/check.ml": "cdc3712bf5ed0fa49d8dae34ea946d85a195ea94b25235c821b155570010e335",
+    "lib/conv.ml": "e73e707bcdac54808d8f8a1d9e9a174062edf0afd970972dee2c6d024f6bbe39",
+    "lib/erase.ml": "794defe507c4d97910c2d92f925a7efa69433dc2ab67d2085340670886a95986",
+    "lib/erase_kan.ml": "a6d03447ab9dfedf8e53bceff26cd7da57f113bb4b5d1453aecd618fac508a88",
+    "lib/error.ml": "44c9c263479575ec04db5056404a5940d6bb5514a5b9e1ec6215385c6eccb5b6",
+    "lib/eterm.ml": "028ff6e790f9c391463b961f7a3eac12e105d484285cfde1597e52c5b9ac69c7",
+    "lib/eval.ml": "155ddf7578d4ad68352505064616bed6afa7a260a88f3ddf1722b95fa6a6bd18",
+    "lib/global.ml": "2e5d2d932dfddcb329bcfdf237df87a70f2d79820470dc236e337ec6d275c329",
+    "lib/level.ml": "344bb9819870d8c459154ac8109ba1d69a4ee4312670f3887c6ed30d3dbca448",
+    "lib/level.mli": "c143b2b97e417724a81f8e83548b946d3339917488758b4d5fbf9da9e72e6811",
+    "lib/literal.ml": "80554b1d98c8dde3b474023a01ac57cc4abcaba2a5f20b707041cc5f0361b617",
+    "lib/order.ml": "d2cc3258fde25b61ba33093eaf19112c319329dc5b46ba029b3f042c14388e94",
+    "lib/positivity.ml": "97cb5fc9484ecaec360b4be1ac42f0668ae767aad25efc10ddbc1d4143185471",
+    "lib/pp.ml": "69618578ebb33a3d9803e604760252c77c64681aef2d847f3e1b40f9464e3895",
+    "lib/prim.ml": "5224df4f75e499b8fb962fad2a256b31086fcc9de5ab2f353eb90f61a8408aaa",
+    "lib/quantity.ml": "bf3f633c40a0dbb362cf85ca41b798ae0c9e1d4eca7e09f9b6f482bab2bfbb8b",
+    "lib/rir.ml": "6dbaa88a61863938d62e099a339277ecde0b2cace633fea5912b95bc248a9f1c",
+    "lib/rules.ml": "b625cec31061ca79f77669889039e4ae2658393911e39076dc65189022f702ab",
+    "lib/shape.ml": "dafd7741b4332dcab6faba9cb9afb131fb3654172e0d375b1edd1046e69f7f7b",
+    "lib/spec_count.ml": "87aa1bad45716737bfeca13986b58332245d252ba0f9ddda55cb7d402eec8c92",
+    "lib/term.ml": "2de6729958bfbc3af10ed2e9c51d6591ab40fa16bd19b7acea1fbf37adf60690",
+    "lib/totality.ml": "046c608584ac21d465d46b05119a89dca5488a15113359eea30ed318a3f7c028",
+    "lib/value.ml": "997f4634df60744c49555e896c1de8d60e51a1086e731e547b48450def9c68c7",
+    "rust/connection.ml": "cf65e905ebc278aac762cfd117b5aacf33fbc8ce06ba5e514a2be247c3246c85",
+    "rust/crate.ml": "99a6aee960f1bd897f76e539b3c633fa274ad41970513c2616727b3fa530bf59",
+    "rust/effects.ml": "0cd1e0d6caf5474f7845725341a316b7fc79c8a8ac41bb16d81a4038c7f79d42",
+    "rust/emit.ml": "a4b61b9f938f6227c8447edca2c62331d4d26b145f65905cad169f5f8e315a37",
+    "rust/foreign.ml": "7104df6a0161c6faff6971a6a3fcf38c9a19db74f5fef18b3e2db297abc834c4",
+    "rust/model.ml": "642a73510ac43735e5c67232b1527c6fd2ef4a39a055ba9bbb5b02f64be4bd83",
+    "rust/reachable.ml": "cdcf89897628f1e5bc8e437496ab36063d049776ac1c9fb7e9e75f6731859be2",
+    "rust/template.ml": "3a721565fbb8993bd24d55de30d159222af165f4e01f6cd63a570abfafa5ebda",
+    "surface/elab.ml": "4abe85308c9db0de80ed1d8685cd02d728df3fbfc7a329fe4e0bc66a4ee91c46",
+    "surface/fuse.ml": "07a38565139f31e319b4a262b919da7d5c251a759421d53b25d3cebca5f79b16",
+    "surface/lexer.ml": "bb524f0202a01ab0b7a2e94745c9af50c5eede2a4c7d3fa450be785e2eb14254",
+    "surface/lower.ml": "3ee2543c860f0e242405a83996357ba483b88094243bd82d474c56fabc00dcb5",
+    "surface/parser.ml": "107bb45cfba1335a41cf0268e6c28e05dbb961c1c454c47ef364683d6e04d977",
+    "surface/specialize.ml": "7d674a16e7d75e78d9cb4dbf5b4d802c200e8fb8f840a5350ae8bef11025f27e",
+    "surface/syntax.ml": "774c0c713f2cdfe493656131b446eb10614e9415ef4d3a0d7cf8a64d2da04c5a",
+    "surface/term_scope.ml": "ac95883cd2672c3695099115d1d5b57314048132be6e1d7adba7a6112ad3e5d7",
+    "surface/token.ml": "cd93b520f023f2aa80f42a4e352b47e63fd0c05e399f4c2344af898054fbb6db",
+    "target/PIN.json": "79acb0c0e756de89d15d483abf295cff74e11465b9c1e061e5d25a4041853718",
+    "target/pin.sha256": "bc150e69de798eadf8a6cdeb7be31440c7c544e7e297e531fbb98967ca37287f",
+    "target/toasty-7bd502cb.sig": "9b3a6ec3ad2c365cec6bbdd8767ba144a295bbe60affeb418c42dad65952a7fc",
+    "target/topcoat-51caa01.sig": "40ee029ce9885b1402d76cc4d0340545c24b9932649cec031c10075b1a21504d",
+    "test/lan_crate.py": "15714b13065349cfd6e7d3c6d4c12703b74896cba1db9fa5fc1e27ec809dc3a2",
+    "test/lan_handlers.py": "b29484bddb503d57f5a2ef63e8ab99c38379bb47965c5f290cd654dd53758350",
+    "test/lan_m0.py": "93dc1581a69d6e3e87066a17e11d2184fabaa80e2677032c8e54e93dd32f049e",
+    "test/lan_m0_mutations.py": "d5d4c4caeb3b82b3c75f00a8c5a02cc23bfe9aad102b447100bbf616923f4238"
+  },
+  "source_lines": {
+    "rust/emit.ml": 658,
+    "rust/model.ml": 221,
+    "rust/crate.ml": 30,
+    "bin/lanyard.ml": 201
+  }
+}

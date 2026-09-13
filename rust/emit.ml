@@ -2,6 +2,7 @@
     Target policies supply checked foreign layouts and call templates. *)
 open Kanon_kernel
 open Rir
+type entry_output = Discard | Print_model of repr * string
 module type Target = sig
   val foreign_type : string -> string list -> (string, Error.t) result
   val foreign_layout : string -> string list -> (string, Error.t) result
@@ -583,16 +584,28 @@ let family_declaration family =
   let variants = List.mapi (fun tag fields ->
     "V" ^ string_of_int tag ^ (if List.is_empty fields then "" else "(Box<" ^ tuple (List.map rust_type fields) ^ ">)")) family.variants in
   "#[derive(Clone, Debug)]\nenum " ^ rust_type (Nominal family.family_name) ^ " { " ^ String.concat ", " variants ^ " }\n"
-let entry_point signatures name =
+let entry_point output signatures name =
   let* signature = List.find_opt (fun signature -> String.equal signature.name name) signatures
     |> Option.to_result ~none:(Error.Mismatch ("Rust emission: missing runtime entry point " ^ name)) in
   if not (List.is_empty signature.params) then invalid ("entry point requires runtime arguments: " ^ name)
   else
     let attribute = match signature.effect with
       | Effects.Sync -> "" | Effects.Async_db -> "#[tokio::main(flavor = \"current_thread\")]\n" in
-    Ok ("\n" ^ attribute ^ Effects.prefix signature.effect ^ "fn main() -> Result<(), Error> {\n    "
-      ^ function_name name ^ "()" ^ Effects.await signature.effect ^ "?;\n    Ok(())\n}\n")
-let native ?entrypoint ?(model_errors = false) ?(text_errors = false) rows =
+    let call = function_name name ^ "()" in
+    let* error, body, helper = match output with
+      | Discard -> Ok ("Error", call ^ Effects.await signature.effect ^ "?;", "")
+      | Print_model (layout, printer) ->
+          let* expected = repr layout in
+          if not (same expected signature.result) then invalid "entry point result differs from printed model" else
+          let call, helper = match signature.effect with
+            | Effects.Sync -> call, ""
+            | Effects.Async_db -> "lan_require_send(" ^ call ^ ")",
+                "\nfn lan_require_send<F: std::future::Future + Send>(future: F) -> F { future }\n" in
+          Ok ("LanMainError", "let value = " ^ call ^ Effects.await signature.effect
+            ^ "?;\n    " ^ printer ^ "(&value)?;", helper) in
+    Ok (helper ^ "\n" ^ attribute ^ Effects.prefix signature.effect ^ "fn main() -> Result<(), "
+      ^ error ^ "> {\n    " ^ body ^ "\n    Ok(())\n}\n")
+let native ?entrypoint ?(entry_output = Discard) ?(model_errors = false) ?(text_errors = false) rows =
   let* families = family_catalog rows in
   let* _checked = all (List.map (fun family -> aggregate_foreign (List.concat family.variants)) families) in
   let* signatures = rows |> List.concat_map (fun (_name, entry) ->
@@ -610,7 +623,7 @@ let native ?entrypoint ?(model_errors = false) ?(text_errors = false) rows =
     let foreign row = let* _params, _result, _render, effect = Target.foreign_call row in Ok effect in
     let* effects = Effects.infer ~foreign (List.map (fun signature -> signature.name, signature.body) signatures) in
     let signatures = List.map (fun signature -> { signature with effect = Effects.lookup effects signature.name }) signatures in
-    let* entry = Option.fold ~none:(Ok "") ~some:(entry_point signatures) entrypoint in
+    let* entry = Option.fold ~none:(Ok "") ~some:(entry_point entry_output signatures) entrypoint in
     let effect = List.fold_left (fun effect signature -> Effects.join effect signature.effect) Effects.Sync signatures in
     let* mentioned = layouts (List.map (fun signature -> signature.body) signatures) in
     let family_types = List.concat_map (fun family -> List.concat family.variants) families in

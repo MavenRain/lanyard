@@ -1,0 +1,17 @@
+-- The CLI prints main's checked Todo result with --print-model Todo.
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+
+model Todo with
+| id : Nat
+| title : Bytes
+| completed : Bool
+end
+
+def main : Todo :=
+  let db : Db := Db.connect Todo Bytes b"sqlite::memory:" in
+  let ready : prod () := Db.push_schema db in
+  Todo.create (tuple (1, b"hi", inj 0 of 2 ())) db

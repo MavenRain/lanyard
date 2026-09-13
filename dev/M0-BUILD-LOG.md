@@ -2133,3 +2133,81 @@ Review fix ladder: dev/gates.sh --stage E-handlers GREEN on 2026-09-13T01:17:41Z
 `LAN-HANDLERS OK observations=11 refusals=8 database=1 mutants=1`.
 The captures under dev/validation/stage-e-handlers stay as recorded; the
 receipt source_sha256 rows for the files above are the pre-review values.
+
+## Lanyard Stage E M0 Todo crate (2026-09-12)
+
+The executable M0 corpus now lives in corpus/m0/todo.lan, with the whole
+crate golden under corpus/m0/golden as D-M0-1 and D-M0-2 require. Main
+connects to SQLite in memory, pushes the Todo schema and creates one row.
+The new `emit --crate DIR --print-model Todo FILE.lan` option prints its
+returned model with source field names and checked scalar conversions.
+The original Stage C/D checker fixture keeps its bytes.
+
+The entry point checks the selected model's runtime layout. It evaluates
+main once and converts all fields before writing. Its error enum wraps
+program errors and output errors, including a broken stdout pipe. Async
+printed entries instantiate a generic Future + Send bound before awaiting
+main. Ordinary crates and both module emission modes keep their golden
+bytes. No source primitive, foreign atom or target signature is added.
+
+Validation:
+
+- The compiler build reports zero errors and zero warnings.
+- EMIT-DIFF compares the entire golden file set and both files byte for
+  byte, with no normalization.
+- LAN-M0 records ten compiled observations, nine CLI refusals and two
+  executable Rust mutations. It covers integer limits, both Bool tags,
+  empty and escaped strings, UTF-8, aliases, conversion errors and a
+  broken pipe. Synchronous observations use an empty model derive macro.
+- LAN-M0-MUTATIONS kills a trailing newline, an extra golden file and
+  deletion of the Model.create print-rule row. The deleted-row compiler
+  builds, then EMIT-DIFF refuses with `unbound: Todo_create`. The first
+  mutation harness run expected a schema-level name; its diagnostic
+  assertion was corrected to this observed elaborator refusal.
+- The cumulative `zsh dev/gates.sh --stage E-todo` retains all earlier
+  stage checks and adds those three legs. Its final capture and source
+  hashes are recorded in dev/validation/stage-e-todo/receipt.json.
+- The unmodified emitted program builds offline and locked with Rust
+  1.98.1 and the pinned Toasty and Topcoat checkouts. The preparer changes
+  only their manifest locations. The original Git manifest and source
+  match the corpus golden exactly. The build reports two unused-code or
+  unused-variable warnings. Execution exits zero and prints exactly
+  `Todo { id: 1, title: "hi", completed: false }` plus one newline.
+
+Cargo reuses an APFS clone of the previous slice's build cache. Its new
+validation repository and gateledger live in this slice's ignored
+.gatework directory. No library checkout is modified. The receipt stores
+the resolved manifest, lockfile, emitted source and captured streams.
+
+The printed model is explicitly selected and must be reachable from main.
+Models with equal structural layouts use the selected model's field names.
+The formatter uses the database scalar range, including for a synchronous
+model result. General recursive handlers, classified axiom disclosure,
+M0 timing and the combined M0 gate remain ahead. No M0 exit is claimed,
+and no numeric trusted-line allowance is ratified by this slice. Build
+and interpreted run remain M1 work under the plan.
+
+Review fix ladder: dev/gates.sh --stage E-todo GREEN on
+2026-09-13T03:44:35Z, 12 min 10 s at load 24.90. Rows
+then differ only in:
+`LAN-M0 OK observations=10 refusals=9 mutants=2` and the mutation kill
+evidence line, which now reads `LAN-M0-MUTATIONS kill-evidence:
+EMIT-DIFF FAIL: emission exited 1: unbound: Todo_create`.
+The review changed bin/lanyard.ml, rust/model.ml, dev/emit-diff.py,
+dev/prepare-crate.py, test/lan_m0.py, test/lan_m0_mutations.py,
+README.md, dev/STAGE-E-TODO.md and this log. LAN-M0 gains one refusal
+for a declared but unreached model. The emission leg and the mutation
+leg convert a child timeout into their own FAIL row, and the rebuild
+gets 900 s. The captures under dev/validation/stage-e-todo stay as
+recorded: stage-gate.stdout is the pre-review capture, and the receipt
+source_sha256 rows for the files above are the pre-review values.
+
+Review fix round 2: the first fix ladder went RED at the house leg
+one-catch-site, because the timeout conversion used a Python try
+statement in test/lan_m0_mutations.py. The scan admits one catch site
+only, test/sys_io.ml. Both harness scripts now bound the child without
+a catch site: the child runs under Popen with file-backed output, a
+poll loop waits until exit or the deadline, and a child still alive at
+the deadline is killed and reported as the leg's own FAIL row. The
+second fix ladder is the closing run; its rows differ from the capture
+only in the two rows named above.

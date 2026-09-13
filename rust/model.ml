@@ -151,10 +151,52 @@ fn %s(value: String) -> %s {
     })
 }
 |} (text_to name) ty ty ty ty ty (text_from name) ty ty ty
-let source ?entrypoint (checked : Elab.lan_program) =
+type output = Discard | Print_model of string
+let output_errors = {|
+#[derive(Debug)]
+enum LanMainError { Program(Error), Output(std::io::Error) }
+impl std::fmt::Display for LanMainError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Program(error) => std::fmt::Display::fmt(error, f),
+            Self::Output(error) => std::fmt::Display::fmt(error, f),
+        }
+    }
+}
+impl std::error::Error for LanMainError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Program(error) => Some(error),
+            Self::Output(error) => Some(error),
+        }
+    }
+}
+impl From<Error> for LanMainError {
+    fn from(error: Error) -> Self { Self::Program(error) }
+}
+|}
+let output_source model =
+  let* native = Printer.repr model.repr in
+  let format = model.name ^ " {{ " ^ String.concat ", " (List.map (fun (field, scalar) ->
+    field ^ ": " ^ (match scalar with Nat_field | Bool_field -> "{}" | Text_field _ -> "{:?}")) model.fields) ^ " }}\\n" in
+  let arguments = List.mapi (fun index (_field, scalar) ->
+    to_storage scalar ("value.f" ^ string_of_int index)) model.fields in
+  let name = Printer.identifier "lan_print_model_" model.name in
+  Ok (Emit.Print_model (model.repr, name), output_errors ^ "\nfn " ^ name
+    ^ "(value: &" ^ Printer.rust_type native ^ ") -> Result<(), LanMainError> {\n"
+    ^ "    let line = format!(\"" ^ format ^ "\", " ^ String.concat ", " arguments ^ ");\n"
+    ^ "    std::io::Write::write_all(&mut std::io::stdout().lock(), line.as_bytes()).map_err(LanMainError::Output)\n}\n")
+let source ?entrypoint ?(output = Discard) (checked : Elab.lan_program) =
   let* specialized = Lower.specialize checked in
   let checked = specialized.Lower.specialized in
   let* models = catalog checked in
+  let* entry_output, output_code = match output with
+    | Discard -> Ok (Emit.Discard, "")
+    | Print_model name ->
+        let* () = if Option.is_some entrypoint then Ok () else invalid "model output requires a crate entry point" in
+        let* model = List.find_opt (fun model -> String.equal name model.name) models
+          |> Option.to_result ~none:(Error.Mismatch ("Rust emission: printed model is unknown or not reachable: " ^ name)) in
+        output_source model in
   let* instances = Lower.connections specialized in
   let* connections = Connection.catalog checked (List.map (fun model -> model.name, rust_name model) models) instances in
   let* rows = Lower.program_with instances specialized in
@@ -173,7 +215,7 @@ let source ?entrypoint (checked : Elab.lan_program) =
     match scalar with Nat_field | Bool_field -> None | Text_field name -> Some name) model.fields) models
     @ List.map (fun (connection : Connection.t) -> connection.family) connections
     |> List.sort_uniq String.compare in
-  let* source = Target.native ?entrypoint ~model_errors:true ~text_errors:(text <> [])
+  let* source = Target.native ?entrypoint ~entry_output ~model_errors:true ~text_errors:(text <> [])
     (("", Erase.Code [Rir.RData data]) :: rows) in
   Ok (source ^ "\n" ^ String.concat "\n" (List.map declaration models) ^ conversions
-    ^ (List.map text_conversions text |> String.concat ""))
+    ^ (List.map text_conversions text |> String.concat "") ^ output_code)

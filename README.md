@@ -15,9 +15,11 @@ fields. Direct Db.connect calls and aliases select model schemas and check
 URL text. The crate command writes a standalone program with pinned
 dependencies and a synchronous or async entry point.
 Crate emission specializes finite checked handlers into direct operation
-bodies. Other model field types, general recursive handlers and the complete M0 driver
-remain ahead. The generated signature allowance is proposed at 104 lines and
-awaits the user's ruling. See [target documentation](target/README.md), the
+bodies. The M0 Todo corpus emits a complete crate that creates and prints
+a row. Other model field types, general recursive handlers and the complete
+M0 driver remain ahead. The generated signature allowance is proposed at
+104 lines and awaits the user's ruling. See
+[target documentation](target/README.md), the
 [Stage B build log](dev/M0-BUILD-LOG.md#lanyard-m0-stage-b-2026-09-09) and
 the [Stage C build log](dev/spikes/M0-BUILD-LOG.md#stage-c-2026-09-09) with
 its [Stage C mutation log](dev/spikes/MUTATION-LOG.md#stage-c-2026-09-09).
@@ -41,7 +43,7 @@ The [native printer slice](dev/STAGE-E-NATIVE.md) supports arithmetic,
 products, sums, native calls, [typed closures](dev/STAGE-E-CLOSURES.md), and
 [recursive families](dev/STAGE-E-RECURSIVE.md).
 It reports unsupported foreign and polymorphic field layouts explicitly.
-The complete M0 Todo crate golden is still pending.
+The complete M0 Todo crate golden is under `corpus/m0/golden/`.
 
 Validate and use the [synchronous foreign printer](dev/STAGE-E-FOREIGN.md):
 
@@ -140,6 +142,18 @@ refuse before output is created.
 zsh dev/gates.sh --stage E-handlers
 _build/default/bin/lanyard.exe emit --crate /tmp/lanyard-handlers test/fixtures/handlers-db.lan
 ```
+
+Emit and validate the [M0 Todo crate](dev/STAGE-E-TODO.md):
+
+```sh
+zsh dev/gates.sh --stage E-todo
+_build/default/bin/lanyard.exe emit --crate /tmp/lanyard-m0 --print-model Todo corpus/m0/todo.lan
+```
+
+The generated program creates one row and prints
+`Todo { id: 1, title: "hi", completed: false }`.
+The optional model formatter checks scalar conversions and propagates
+output errors. EMIT-DIFF compares the whole crate without normalization.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current

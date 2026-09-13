@@ -17,7 +17,7 @@ toasty = { git = "https://github.com/tokio-rs/toasty", rev = "7bd502cbf44cc47f70
 topcoat = { git = "https://github.com/tokio-rs/topcoat", rev = "51caa01dca3a8f20bdacfa771b1b8ac8b6f2668a", default-features = false, features = ["router"] }
 |}
 
-let files checked =
+let files ?output checked =
   let entrypoint = "main" in
   let ( let* ) = Result.bind in
   let* checked = Reachable.program entrypoint checked in
@@ -26,5 +26,5 @@ let files checked =
     let* checked = Kanon_surface.Fuse.program checked in
     let* checked = Reachable.program entrypoint checked in
     Kanon_surface.Fuse.closed checked in
-  Model.source ~entrypoint checked
+  Model.source ~entrypoint ?output checked
   |> Result.map (fun source -> ["Cargo.toml", manifest; "src/main.rs", source])

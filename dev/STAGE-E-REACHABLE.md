@@ -44,6 +44,7 @@ unused model has an unsupported field. The pinned SQLite execution is
 recorded under `dev/validation/stage-e-reachable/`.
 
 `rust/reachable.ml` joins the measured printer total. The kernel and the
-numeric allowances retain their existing rules. Handler fusion, the frozen
-M0 Todo golden and the M0 timing and exit gates remain ahead. The plan puts
-the build command and interpreted run command at M1.
+numeric allowances retain their existing rules. Finite handler fusion and
+the [M0 Todo golden](STAGE-E-TODO.md) now have their own slices. The M0
+timing and exit gates remain ahead. The plan puts the build command and
+interpreted run command at M1.

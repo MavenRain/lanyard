@@ -28,6 +28,7 @@ def main():
     parser.add_argument("--toasty", type=Path, required=True)
     parser.add_argument("--topcoat", type=Path, required=True)
     parser.add_argument("--source", type=Path, default=ROOT / "test/fixtures/crate.lan")
+    parser.add_argument("--print-model", help="print main's result using the named model")
     parser.add_argument("--lock", type=Path, help="seed Cargo's offline resolution from a validation lock")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -42,7 +43,11 @@ def main():
         require(head.returncode == 0 and head.stdout.strip() == pins[name]["commit"], f"{name} pin differs")
         require(status.returncode == 0 and not status.stdout, f"{name} tracked sources are dirty")
     destination = args.output.absolute()
-    emitted = run(ROOT / "_build/default/bin/lanyard.exe", "emit", "--crate", destination, args.source.absolute())
+    require(args.print_model is None or args.print_model,
+            "--print-model needs a model name")
+    output = ["--print-model", args.print_model] if args.print_model else []
+    emitted = run(ROOT / "_build/default/bin/lanyard.exe", "emit", "--crate", destination,
+                  *output, args.source.absolute())
     require(emitted.returncode == 0 and not emitted.stdout, emitted.stderr)
     manifest = destination / "Cargo.toml"
     original = manifest.read_text()

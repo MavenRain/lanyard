@@ -49,9 +49,10 @@ not a fusion refusal.
 
 `check`, `axioms`, `emit --native` and `emit --target` retain their previous
 behavior. Crates without signatures retain their previous printer path
-and golden bytes. General recursive handlers, a runtime choice between
-signature programs, the complete M0 Todo golden and the timing and exit
-gates remain ahead. A recursive call on `resume value` still fails the
+and golden bytes. The [M0 Todo slice](STAGE-E-TODO.md) adds the complete
+executable corpus golden. General recursive handlers, a runtime choice
+between signature programs and the timing and exit gates remain ahead.
+A recursive call on `resume value` still fails the
 carried termination check.
 
 The new modules live in the rechecked surface layer. The kernel, erasers

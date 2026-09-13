@@ -21,7 +21,7 @@
 
 let usage () : unit =
   prerr_endline
-    "usage: lanyard check [--print|--erased] FILE | emit [--native|--target|--crate DIR] FILE.lan | axioms FILE | spec-count"
+    "usage: lanyard check [--print|--erased] FILE | emit [--native|--target|--crate DIR [--print-model MODEL]] FILE.lan | axioms FILE | spec-count"
 
 let read_file (path : string) : string =
   if Sys.file_exists path then In_channel.with_open_bin path In_channel.input_all
@@ -125,15 +125,20 @@ let write_crate directory files =
           (fun channel -> Out_channel.output_string channel contents)) files;
       Sys.rename staging directory
 
+let run_crate (output : Lanyard_rust.Model.output) (directory : string)
+    (path : string) : unit =
+  Kanon_surface.Elab.check_lanyard (read_file path)
+  |> Fun.flip Result.bind (Lanyard_rust.Crate.files ~output)
+  |> Result.fold ~ok:(write_crate directory) ~error:(fun error ->
+      prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
 (** Source goes to stdout, or crate files to a fresh directory, only after
     the entire module prints. Emission never invokes Cargo or the program. *)
 let dispatch_emit args =
   match args with
+  | [ "--crate"; directory; "--print-model"; model; path ] when Filename.check_suffix path ".lan" ->
+      run_crate (Lanyard_rust.Model.Print_model model) directory path
   | [ "--crate"; directory; path ] when Filename.check_suffix path ".lan" ->
-      Kanon_surface.Elab.check_lanyard (read_file path)
-      |> Fun.flip Result.bind Lanyard_rust.Crate.files
-      |> Result.fold ~ok:(write_crate directory) ~error:(fun error ->
-          prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
+      run_crate Lanyard_rust.Model.Discard directory path
   | [ "--native"; path ] when Filename.check_suffix path ".lan" ->
       Kanon_surface.Elab.check_lanyard (read_file path)
       |> Fun.flip Result.bind Kanon_surface.Lower.program

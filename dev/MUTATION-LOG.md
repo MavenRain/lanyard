@@ -630,3 +630,19 @@ the second computed key, schema ordering and an unused computation argument.
 An additional creation is the first component of an unused dependent pair;
 reading its key checks that the component still executes.
 Captures are in dev/validation/stage-e-handlers/.
+
+## M0 Todo crate and model output (2026-09-12)
+
+| Control | Mutation | Observed failure |
+| --- | --- | --- |
+| m0-golden-byte | Append one newline to the Rust golden | EMIT-DIFF rejects byte drift without normalization |
+| m0-golden-file | Add an unexpected golden file | EMIT-DIFF rejects the complete file set |
+| m0-print-rule | Delete the Model.create row from the scratch signature file and rebuild its catalog and compiler | EMIT-DIFF refuses the Todo source with unbound: Todo_create |
+| m0-output-call | Replace stdout writing with Ok(()) in emitted Rust | The mutant compiles, exits zero and fails the expected output observation |
+| m0-bool-output | Print true for Bool tag 0 | The mutant compiles and its output differs from the expected row |
+
+The first three controls run in test/lan_m0_mutations.py. The last two
+run in test/lan_m0.py. Scratch mutations leave the source checkout and
+its goldens untouched. The cumulative E-todo capture records all five
+controls; the separate pinned SQLite execution uses unmodified output.
+Captures and source hashes are in dev/validation/stage-e-todo/.

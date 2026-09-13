@@ -45,8 +45,8 @@ cargo run --manifest-path /tmp/lanyard-todo/Cargo.toml
 The fixture connects to SQLite in memory, pushes a Todo schema, creates
 a row with Nat, text and Bool fields, and looks it up. It exercises async
 propagation through several function calls. The crate golden is under
-`test/goldens/crate/`. This fixture is separate from the frozen M0 Todo
-example, whose operation-family handler remains unsupported.
+`test/goldens/crate/`. The [M0 Todo slice](STAGE-E-TODO.md) adds the
+executable corpus and its golden, together with optional model output.
 
 The gate retains all preceding stage checks. Its new checks compare both
 golden files, derive the dependency pins from `target/PIN.json`, check the
@@ -77,7 +77,8 @@ Pass `--lock PATH` to seed resolution from an existing validation lockfile
 when the offline index cannot resolve every dependency afresh. Cargo may
 update its root package and feature dependencies on the first build.
 
-Handler fusion, the complete M0 Todo golden, `build` and `run` commands,
-and M0 timing and exit gates remain ahead. Numeric trusted-line allowances
+Finite handler fusion and the M0 Todo golden now have their own slices.
+The M0 timing and exit gates remain ahead; build and run belong to M1.
+Numeric trusted-line allowances
 remain pending user rulings. The printer census includes `rust/crate.ml`;
 this slice does not change an allowance or the kernel.
