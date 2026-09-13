@@ -2305,3 +2305,132 @@ M0 exit stamp remain ahead.
   test/lan_axioms_mutations.py and test/lan_axioms_report.ml no longer
   match the staged blobs. The post-fix evidence is the green fix ladder
   log, whose 85 rows are identical to the captured stage gate output.
+
+## M0 Stage F: timing instrument (2026-09-12)
+
+This slice adds `dev/bench.py`, its copied-package Go helper and the
+`F-time` cumulative gate. It follows the S2 timer: one untimed warm-up,
+five samples, Python perf_counter_ns around a child, and the same clean
+zsh invocation for compiler commands. Both output streams go to the
+null device. Timed children use a blocking wait, since the polling wait
+of a Python subprocess timeout would distort short samples.
+
+The synthetic ladder contains 100, 500 and 1000 distinct one-line Nat
+functions. Check and complete target-module emission each produce a
+fit with F, m and R squared. Crate dependency selection cannot prune
+these module measurements. The report separately measures checking
+and complete crate emission of the Todo corpus, copied before warm-up.
+The target-module time includes checking, and no timing includes Cargo.
+
+The denominator has two explicit modes. The default reads the frozen
+S4 fit, identified by its exact artifact hash and historical NOISY
+status. `--refit-go` copies all thirteen S4 packages and their hidden
+imports to a private module, checks the frozen version and input sizes,
+warms the dependencies and rebuilds each target five times. Each
+target's content changes before each build, as in S4. Go's module and
+build caches remain in the temporary tree. The frozen artifact and
+GOROOT are read only.
+
+All warm-ups precede the shared measurement window. The report records
+its duration, and for a `--refit-go` run whether that window fits within
+sixty seconds; a frozen-denominator run always reports false. Load is
+sampled at the start of the window and then before and after each timed
+child, so the untimed warm-ups take no reading, and any one-minute load
+above 4 marks the run NOISY. Every observation is retained. The slope ratio and the total
+prediction ratio at the same 1.000 kloc are informational, with no M0
+speed bound. Nonpositive denominators report UNAVAILABLE. The final
+line is the exact ratified S0-D3 Arc-price sentence.
+
+Nineteen deterministic observations cover least-squares arithmetic,
+median selection with outliers, fixed-size ratios, invalid fits,
+nonpositive denominators, the frozen artifact and Arc wording, timer
+preparation, warm-up and sample counts, the strict load boundary,
+failed warm-ups and timed children, existing JSON output, shell quoting,
+compiler drift, Todo source snapshots, Go input drift and forced
+recompilation touches. They do not assert wall-clock speed.
+
+Exploratory samples were discarded as validation evidence after the
+blocking-wait correction. One intermediate cumulative run was cancelled
+for that correction and is not counted as a pass. The final gate and
+raw JSON are archived under `dev/validation/stage-f-time/` without
+normalization. The receipt pins source and capture bytes. Earlier
+stage receipts remain historical records of their original versions.
+
+The compiler, Rust printer and Todo golden retain their existing bytes.
+The combined M0 gate, numeric allowances and the user's M0 exit stamp
+remain open.
+
+Final validation: `zsh dev/gates.sh --stage F-time` exited 0 with
+`STAGE-F-TIME OK`. The preceding stages and their mutation controls
+passed, and the timing suite ran 19 tests successfully. The corrected
+measurement retained 105 samples across eight compiler commands and
+thirteen Go packages. The window lasted 136.377 seconds and reached a
+one-minute load of 159.77: NOISY, `same_minute=false`, binding=false.
+It is not a same-minute performance comparison. Todo check and crate
+medians were 35.484 ms and 50.639 ms, reported without a bound. The
+JSON keeps the full fits, raw samples and load readings.
+
+## M0 Stage F review fixes (tag LSFT, 2026-09-13)
+
+### Round 1
+
+LSFT-1 (docs): `dev/STAGE-F-TIME.md` and the Stage F section of this log
+overstated two window claims. `same_minute` is true only for a
+`--refit-go` run whose window lasted at most sixty seconds, so every
+frozen-denominator run reports false. Load averages are read once at the
+start of the window and then before and after each timed child, so the
+untimed warm-ups take no reading and a spike inside a warm-up cannot mark
+the run NOISY. Both paragraphs now say that. Proof: EMDASH leg OK and the
+reworded lines read back with `rg`.
+
+LSFT-2 (`dev/bench.py` main): the `--output` pre-flight tested only
+existence. A missing or unwritable parent directory failed after the whole
+measurement window. The check now refuses before `run()` with
+`M0-TIME ERROR: output directory must exist and be writable` and exit 1.
+Proof: UNIT leg OK with the new test
+`test_missing_output_directory_refuses_before_any_call`, which asserts
+that the compiler call log is never created.
+
+LSFT-3 (`dev/bench_go.py`): the scratch `go.mod` hardcoded `go 1.24`
+beside the frozen toolchain check. The new `module_file()` derives the
+language version from the verified `go version` string, so the two pins
+cannot drift. Proof: UNIT leg OK with
+`test_module_file_follows_frozen_version`, which derives `go 1.24` from
+the frozen string, plus the refit smoke.
+
+LSFT-4 (`dev/bench_go.py`): a standard package with `EmbedFiles` was
+neither copied nor refused and would fail inside the Go build. `listed()`
+now refuses it the way it refuses `CgoFiles`, with
+`unsupported Go package`. Proof: UNIT leg OK with
+`test_embedded_files_refuse`, plus the refit smoke, in which none of the
+thirteen packages embeds.
+
+LSFT-5 (`dev/bench.py`): the JSON document is serialized with
+`json.dumps` before the file is opened, so a rejected value leaves no
+partial file to block the rerun, and the NOISY predicate is computed once
+into a local instead of twice. Proof: UNIT leg OK with
+`test_unserializable_document_leaves_no_output`, plus the SMOKE leg.
+
+LSFT-6 (review kit, no repo file): the row comparison probe now pins five
+exact F-time lines as well as the row set, so a regression that flips
+binding or drops the Arc line cannot compare IDENTICAL. Proof:
+`PINS tag=baseline ok=5 missing=0`.
+
+The timing suite is now 23 tests: `Ran 23 tests` and `OK`.
+
+The captures under `dev/validation/stage-f-time/` predate these fixes and
+are not refreshed by design; the review's fix ladder log is the post-fix
+evidence.
+
+### Fix ladder
+
+Tag fix-1 ran `dev/gates.sh --stage F-time` on the fixed tree from
+2026-09-13T10:13:02Z to 10:18:03Z at load 50.09, and it is GREEN with
+stage exit 0. The 86 stage rows are identical to the capture, the five
+pinned bench rows are all present (`PINS ok=5 missing=0`) and the RED
+watcher found nothing (`RED-WATCH hits=0`). This run reports
+`LOAD max_1m=39.03 status=NOISY`,
+`WINDOW seconds=23.168 same_minute=true` and
+`DENOMINATOR source=same-run-refit sha256=ba1293a3... status=NOISY`, so
+it is a same-minute refit, unlike the captured run. The suite is 23
+tests.

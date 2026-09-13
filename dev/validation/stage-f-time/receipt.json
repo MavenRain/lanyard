@@ -1,0 +1,176 @@
+{
+  "format": 1,
+  "base_commit": "a9e2891b491f1d4b02d94333c0240d7dda0b9b9c",
+  "checkout": "/Users/oobi/Documents/gpt2/lanyard-timing",
+  "captures": {
+    "compiler-build": {
+      "command": [
+        "zsh",
+        "dev/dunecho.sh",
+        "build"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-timing",
+      "exit_code": 0,
+      "capture_artifact": "/tmp/lanyard-captures/run-KkkuP3",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-f-time/compiler-build.stdout",
+          "sha256": "9e007d7a4010fcc271a69a2546c4c166962b8c019f48235eca93e8512b6a997b",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-f-time/compiler-build.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalization": "none"
+        }
+      }
+    },
+    "stage-gate": {
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "F-time"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-timing",
+      "exit_code": 0,
+      "capture_artifact": "/tmp/lanyard-captures/run-aVlKLA",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-f-time/stage-gate.stdout",
+          "sha256": "ba4850d22e7ae6a0566e32aa5893b703f69ed6a978282d185432039088f57820",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-f-time/stage-gate.stderr",
+          "sha256": "a5ddf79d3605ea0df9fe0b66bcf425295381a46bf2352f2e61349d2542a45254",
+          "normalization": "none"
+        }
+      }
+    },
+    "final-house": {
+      "command": [
+        "zsh",
+        "dev/house.sh"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-timing",
+      "exit_code": 0,
+      "capture_artifact": "/tmp/lanyard-captures/run-kt3I5n",
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-f-time/final-house.stdout",
+          "sha256": "25b5944999e03705b22636924eb1ddc5748784227ddf206437c06b7f21e43ac3",
+          "normalization": "none"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-f-time/final-house.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalization": "none"
+        }
+      }
+    }
+  },
+  "raw_timings": {
+    "path": "dev/validation/stage-f-time/timings.json",
+    "sha256": "68061d8fde042e09edcd236a0490e2ebd0b129b8ee66c61bb200550f85b847af"
+  },
+  "observations": {
+    "timing_tests": 19,
+    "compiler_modes": 8,
+    "go_packages": 13,
+    "runs_per_command": 5,
+    "warmups_per_command": 1,
+    "window": {
+      "started_unix": 1789282749.024377,
+      "finished_unix": 1789282885.4033642,
+      "elapsed_seconds": 136.37710545770824,
+      "same_minute": false
+    },
+    "noisy": true,
+    "binding": false
+  },
+  "notes": [
+    "The cumulative F-time gate retains F-axioms, prior stages and their mutation controls.",
+    "The final timer uses the S2 blocking wait, with child stdout and stderr discarded.",
+    "The Todo source is copied before warm-up. Compiler byte drift aborts the run.",
+    "Earlier exploratory timings used a polling subprocess timeout and are not validation evidence.",
+    "An intermediate gate was cancelled for the timer correction; it is not counted as a pass.",
+    "The raw timing artifact preserves every sample, with no timing threshold or discarded observations.",
+    "The compiler and emitted Rust did not change, and the cumulative golden checks pass.",
+    "The combined M0 gate, numeric allowances and the user M0 exit stamp remain open."
+  ],
+  "source_sha256": {
+    "README.md": "e2f099ed410a281d4e4dd4b5bb15d712f0c75e633479dc1a381d04daf911a628",
+    "bin/dune": "643e4c866ea543fd54d4b251883af5e695121eedaf4df962e4e3e46551626315",
+    "bin/lanyard.ml": "eeb3a4e5a78d4db476e570f79fbb6d5bee6de948d4bd231368d2d49dd5a71d35",
+    "corpus/m0/golden/Cargo.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "corpus/m0/golden/src/main.rs": "0dd7a289b7d860666e43a26af40d40a8737d829804e2c98e4852cd51e64fdef6",
+    "corpus/m0/todo.lan": "df23ca0c8e46a13acc8c1e2c42cccc672b62b104b11c8ea2a575af4fd69a3064",
+    "dev/M0-BUILD-LOG.md": "824b921d4d8fedd32d2663828a64f11cca890471b36265b60df10d5bba583d99",
+    "dev/STAGE-F-TIME.md": "3fa56cd138b20da35617c27e1019d095d8ffacf73b1f9b75e85b7c3dfcc895b2",
+    "dev/bench.py": "5eead67ed00a0afd223076cb73ea63cd8e77f8ed4f88cf4f7850a17d93b25c89",
+    "dev/bench.sh": "d408fb5a3d88da3334783e0fb67e8c7ce25aa546c4c428853031d83cfd30d5ae",
+    "dev/bench_go.py": "d78ed6baea96b0391e11c0cfeb3b54dc59906e67ced7f5a3aa564cb5e7528555",
+    "dev/dunecho.sh": "fc1e26cf50034ae7e14e3a553f1f743e4566c020961dc1f3a54e3278685f9c7c",
+    "dev/gates.sh": "40eae71a0885e85353b6cc50555e2fe126aaf7c7baea26562202ac2a84072c94",
+    "dev/spikes/SPIKE-ARC.md": "40a89f97b676232689bbce8905493d038a44916b2a101876f4dfbb0fcb771f8a",
+    "dev/spikes/denominators.json": "ba1293a3f8970531ab32490fc20d55fd8a04cb16ca7f45d2ca0956075f4bf03d",
+    "dev/stage-f-time.sh": "31b6ca5c09172f9d91aee20af68c95c110763f6948938f2a274d3228582f2574",
+    "dune": "a52a26b962f1c151063f898b64225c3c032c0658ef3c8e609b1de25b54db16b8",
+    "dune-project": "e44ffe9a8aedacc32bdaa4762ecfb3f2eba796d582c4c04d33c29381d22c7c87",
+    "lib/bignum.ml": "7159dd7e75fa08a5fc272cba76a8ec6214c7d190151dabf7db1a13bf5ecddd72",
+    "lib/budget.ml": "7d8b2afc86883415c892d6fea0e56c2115e4d859b6b6daa21c611b4e9517f028",
+    "lib/budget.mli": "b830149c9eb6d9362786d2e92c2dc8322f4d31f7b4cfc960ac6e1681d385578f",
+    "lib/check.ml": "cdc3712bf5ed0fa49d8dae34ea946d85a195ea94b25235c821b155570010e335",
+    "lib/conv.ml": "e73e707bcdac54808d8f8a1d9e9a174062edf0afd970972dee2c6d024f6bbe39",
+    "lib/dune": "0e60f3ebdbbf7182dba98dd70eb2d494bd83d6e2934dd1f344f98e4b0e392ec0",
+    "lib/erase.ml": "794defe507c4d97910c2d92f925a7efa69433dc2ab67d2085340670886a95986",
+    "lib/erase_kan.ml": "a6d03447ab9dfedf8e53bceff26cd7da57f113bb4b5d1453aecd618fac508a88",
+    "lib/error.ml": "44c9c263479575ec04db5056404a5940d6bb5514a5b9e1ec6215385c6eccb5b6",
+    "lib/eterm.ml": "028ff6e790f9c391463b961f7a3eac12e105d484285cfde1597e52c5b9ac69c7",
+    "lib/eval.ml": "155ddf7578d4ad68352505064616bed6afa7a260a88f3ddf1722b95fa6a6bd18",
+    "lib/global.ml": "2e5d2d932dfddcb329bcfdf237df87a70f2d79820470dc236e337ec6d275c329",
+    "lib/level.ml": "344bb9819870d8c459154ac8109ba1d69a4ee4312670f3887c6ed30d3dbca448",
+    "lib/level.mli": "c143b2b97e417724a81f8e83548b946d3339917488758b4d5fbf9da9e72e6811",
+    "lib/literal.ml": "80554b1d98c8dde3b474023a01ac57cc4abcaba2a5f20b707041cc5f0361b617",
+    "lib/order.ml": "d2cc3258fde25b61ba33093eaf19112c319329dc5b46ba029b3f042c14388e94",
+    "lib/positivity.ml": "97cb5fc9484ecaec360b4be1ac42f0668ae767aad25efc10ddbc1d4143185471",
+    "lib/pp.ml": "69618578ebb33a3d9803e604760252c77c64681aef2d847f3e1b40f9464e3895",
+    "lib/prim.ml": "5224df4f75e499b8fb962fad2a256b31086fcc9de5ab2f353eb90f61a8408aaa",
+    "lib/quantity.ml": "bf3f633c40a0dbb362cf85ca41b798ae0c9e1d4eca7e09f9b6f482bab2bfbb8b",
+    "lib/rir.ml": "6dbaa88a61863938d62e099a339277ecde0b2cace633fea5912b95bc248a9f1c",
+    "lib/rules.ml": "b625cec31061ca79f77669889039e4ae2658393911e39076dc65189022f702ab",
+    "lib/shape.ml": "dafd7741b4332dcab6faba9cb9afb131fb3654172e0d375b1edd1046e69f7f7b",
+    "lib/spec_count.ml": "87aa1bad45716737bfeca13986b58332245d252ba0f9ddda55cb7d402eec8c92",
+    "lib/term.ml": "2de6729958bfbc3af10ed2e9c51d6591ab40fa16bd19b7acea1fbf37adf60690",
+    "lib/totality.ml": "046c608584ac21d465d46b05119a89dca5488a15113359eea30ed318a3f7c028",
+    "lib/value.ml": "997f4634df60744c49555e896c1de8d60e51a1086e731e547b48450def9c68c7",
+    "rust/connection.ml": "cf65e905ebc278aac762cfd117b5aacf33fbc8ce06ba5e514a2be247c3246c85",
+    "rust/crate.ml": "99a6aee960f1bd897f76e539b3c633fa274ad41970513c2616727b3fa530bf59",
+    "rust/dune": "02599b681a5cc3d65d598f1c403dc6500c6749cbb4f957ad6bd8057c94135bef",
+    "rust/effects.ml": "0cd1e0d6caf5474f7845725341a316b7fc79c8a8ac41bb16d81a4038c7f79d42",
+    "rust/emit.ml": "a4b61b9f938f6227c8447edca2c62331d4d26b145f65905cad169f5f8e315a37",
+    "rust/foreign.ml": "7104df6a0161c6faff6971a6a3fcf38c9a19db74f5fef18b3e2db297abc834c4",
+    "rust/model.ml": "c1ad78b56f22763fc044e96cbd832473fca50acc9ecee7089e5c8f6d39ae64c2",
+    "rust/reachable.ml": "cdcf89897628f1e5bc8e437496ab36063d049776ac1c9fb7e9e75f6731859be2",
+    "rust/template.ml": "3a721565fbb8993bd24d55de30d159222af165f4e01f6cd63a570abfafa5ebda",
+    "surface/axioms.ml": "cafba7079f9f1db8deb250eba6ee8a1c631214334f127c851937a2ad61f47aed",
+    "surface/dune": "9fc6f50502f4042990bbc313fe936a550f93a436d4c892984562af4487ad9d9c",
+    "surface/elab.ml": "4abe85308c9db0de80ed1d8685cd02d728df3fbfc7a329fe4e0bc66a4ee91c46",
+    "surface/fuse.ml": "07a38565139f31e319b4a262b919da7d5c251a759421d53b25d3cebca5f79b16",
+    "surface/lexer.ml": "bb524f0202a01ab0b7a2e94745c9af50c5eede2a4c7d3fa450be785e2eb14254",
+    "surface/lower.ml": "3ee2543c860f0e242405a83996357ba483b88094243bd82d474c56fabc00dcb5",
+    "surface/parser.ml": "107bb45cfba1335a41cf0268e6c28e05dbb961c1c454c47ef364683d6e04d977",
+    "surface/specialize.ml": "7d674a16e7d75e78d9cb4dbf5b4d802c200e8fb8f840a5350ae8bef11025f27e",
+    "surface/syntax.ml": "774c0c713f2cdfe493656131b446eb10614e9415ef4d3a0d7cf8a64d2da04c5a",
+    "surface/term_scope.ml": "ac95883cd2672c3695099115d1d5b57314048132be6e1d7adba7a6112ad3e5d7",
+    "surface/token.ml": "cd93b520f023f2aa80f42a4e352b47e63fd0c05e399f4c2344af898054fbb6db",
+    "target/PIN.json": "79acb0c0e756de89d15d483abf295cff74e11465b9c1e061e5d25a4041853718",
+    "target/README.md": "0d0827dbe6235eb23e560e8e9501348aa71ed4ceebc31b0907a347955e70b585",
+    "target/dune": "eb7bc7a593a50aedf9bb55c94d37d5bbf6cbcbbb3f9a4a3bdd92fac52ea5954e",
+    "target/pin.sha256": "bc150e69de798eadf8a6cdeb7be31440c7c544e7e297e531fbb98967ca37287f",
+    "target/toasty-7bd502cb.sig": "9b3a6ec3ad2c365cec6bbdd8767ba144a295bbe60affeb418c42dad65952a7fc",
+    "target/topcoat-51caa01.sig": "40ee029ce9885b1402d76cc4d0340545c24b9932649cec031c10075b1a21504d",
+    "test/lan_bench.py": "3ffb3c03e0d19da0769259d1a8e942b85b0487b48bfbbac30223b33e42f5a198"
+  }
+}

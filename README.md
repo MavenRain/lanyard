@@ -16,9 +16,10 @@ URL text. The crate command writes a standalone program with pinned
 dependencies and a synchronous or async entry point.
 Crate emission specializes finite checked handlers into direct operation
 bodies. The M0 Todo corpus emits a complete crate that creates and prints
-a row. Stage F adds classified axiom reports and the AXIOM-RATIO inputs.
-Other model field types, general recursive handlers, timing and the M0
-close remain ahead. The generated signature allowance is proposed at
+a row. Stage F adds classified axiom reports, the AXIOM-RATIO inputs,
+and informational compiler timings with a Go denominator refit.
+Other model field types, general recursive handlers and the M0 close
+remain ahead. The generated signature allowance is proposed at
 104 lines and awaits the user's ruling. See
 [target documentation](target/README.md), the
 [Stage B build log](dev/M0-BUILD-LOG.md#lanyard-m0-stage-b-2026-09-09) and
@@ -172,6 +173,19 @@ ratio bound. The scope is the whole checked module, including unused
 catalog rows and model operations.
 Source postulates without an M0 class produce a diagnostic; `--names`
 prints their declaration names. The carried `.kan` output stays unchanged.
+
+Measure the [M0 compiler timings](dev/STAGE-F-TIME.md):
+
+```sh
+zsh dev/gates.sh --stage F-time
+python3 -P dev/bench.py --refit-go --output /tmp/lanyard-time.json
+```
+
+The instrument reports check and target-module fits, Todo crate medians,
+load averages and ratios at the same input size. It uses one warm-up and
+five samples. The Go refit uses all thirteen frozen S4 packages; omitting
+`--refit-go` labels the comparison as historical. High-load runs are
+NOISY, and all M0 timings are informational.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current
