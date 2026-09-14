@@ -1,0 +1,34 @@
+{
+  "format": 1,
+  "stage": "M1-run",
+  "base": "f4f6e16f2f6e6845306d30aea453ef896c727962",
+  "recorded_at": "2026-09-14T17:51:10.255079+00:00",
+  "command": "zsh dev/gates.sh --stage M1-run",
+  "exit_code": 0,
+  "status": "PASS",
+  "compiler_checks": 40,
+  "cli_tests": 25,
+  "mutations_killed": 5,
+  "m0_status": "PENDING",
+  "policy_status": "PROPOSED",
+  "policy_candidate_passed": false,
+  "inventory_files": 49,
+  "inventory_lines": 13194,
+  "normal_access_artifact": "/Users/oobi/Documents/gpt2/lanyard-run/.kanon-exec/run-ZY6bok",
+  "sandbox_attempt": {
+    "artifact": "/Users/oobi/Documents/gpt2/lanyard-run/.kanon-exec/run-M3cV0U",
+    "exit_code": 1,
+    "reason": "Two existing macOS Git environment assertions received a sandbox confstr warning."
+  },
+  "captures_sha256": {
+    "stage.stdout": "88ba70859991b95c3760a0f5f9a4bc825a768a52623424ad142699bd32f22acc",
+    "stage.stderr": "3320ae9bb1403af5b8b3eec217d791487e2158963c1b9fbd42a2656c1428dafc",
+    "sandbox.stderr": "cc7dd4635a74904513806a95d1c068aa8f45d13233735b1a3fbd47b30bc3265f"
+  },
+  "notes": [
+    "The cumulative gate passed with normal filesystem access and unchanged assertions.",
+    "The trust policy remains proposed and M0 remains pending.",
+    "The source program scripts database operations. An HTTP request harness remains future work.",
+    "No Rust source, target pins, goldens or carried kernel files changed."
+  ]
+}

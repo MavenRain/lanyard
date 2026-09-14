@@ -4,6 +4,7 @@
     Target slices print synchronous and async foreign constants through --target.
     The crate command writes a standalone target program with a main entry point.
     The build command emits that crate and reports the Cargo subprocess time.
+    The run command interprets checked IR with a private in-memory model store.
 
     Exit codes.  0 is a file that checks, 1 is a file that does not and
     64 is a usage error or a missing file.  A check failure writes one
@@ -28,6 +29,7 @@ let usage () : unit =
     ("usage: lanyard check [--print|--erased] FILE"
     ^ " | emit [--native|--target|--crate DIR [--print-model MODEL]] FILE.lan"
     ^ " | build --out DIR [--release] [--offline] [--print-model MODEL] FILE.lan"
+    ^ " | run [--steps N] [--print-model MODEL] FILE.lan"
     ^ " | axioms [--names] FILE | spec-count")
 
 let read_file (path : string) : string =
@@ -243,6 +245,35 @@ let dispatch_emit args =
           prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
   | [] | _ :: _ -> usage (); exit 64
 
+(** A run checks and lowers the file before evaluating main. Options are
+    validated before source I/O, and no output is printed on a failed run. *)
+let rec run_options output steps args =
+  let value text = not (String.starts_with ~prefix:"-" text) && text <> "" in
+  match args with
+  | "--steps" :: amount :: rest when Option.is_none steps && value amount ->
+      let number = if String.for_all (fun digit -> digit >= '0' && digit <= '9') amount
+        then int_of_string_opt amount else None in
+      number |> Option.to_result ~none:() |> Fun.flip Result.bind (fun number ->
+        if number <= 0 || number > Lanyard_rust.Interp.max_steps then Error ()
+        else run_options output (Some number) rest)
+  | "--print-model" :: model :: rest when value model ->
+      (match output with
+       | Lanyard_rust.Model.Discard ->
+           run_options (Lanyard_rust.Model.Print_model model) steps rest
+       | Lanyard_rust.Model.Print_model _model -> Error ())
+  | [path] when value path && lan_file path -> Ok (output, steps, path)
+  | [] | _ :: _ -> Error ()
+
+let dispatch_run args =
+  run_options Lanyard_rust.Model.Discard None args
+  |> Result.fold ~error:(fun () -> usage (); exit 64)
+       ~ok:(fun (output, steps, path) ->
+         Kanon_surface.Elab.check_lanyard (read_file path)
+         |> Fun.flip Result.bind (Lanyard_rust.Interp.run ?steps ~output)
+         |> Result.fold ~ok:(fun (_value, text) -> print_string text)
+              ~error:(fun error ->
+                prerr_endline (Kanon_kernel.Error.to_string error); exit 1))
+
 (** "check [--print|--erased] FILE".  A flag is read before the path, so
     "check --print F", "check --erased F" and "check F" are the only
     three forms (SC-D1). *)
@@ -277,6 +308,7 @@ let dispatch (cmd : string) (args : string list) : unit =
   | "axioms" -> dispatch_axioms args
   | "emit" -> dispatch_emit args
   | "build" -> dispatch_build args
+  | "run" -> dispatch_run args
   | _unknown ->
       usage ();
       exit 64

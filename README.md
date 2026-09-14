@@ -45,6 +45,21 @@ dependencies. Cargo output and normal exit codes pass through; a separate
 the program without running it. Its driver growth is measured against
 the existing proposed budget; no trust allowance or M0 exit is approved.
 
+The [M1 interpreter](dev/STAGE-M1-RUN.md) runs the checked program with a
+private in-memory model store:
+
+```sh
+_build/default/bin/lanyard.exe run --print-model Todo corpus/m0/todo.lan
+# Todo { id: 1, title: "hi", completed: false }
+zsh dev/gates.sh --stage M1-run
+```
+
+It supports native functions, closures, recursive data, finite checked
+handlers and model create/lookup. Connections accept `sqlite::memory:`.
+Each connection starts empty, and the program initializes its schema with
+`Db.push_schema`. `--steps N` sets the interpreter's reduction limit.
+This command runs without Cargo, a database service or an HTTP listener.
+
 Build and validate through Stage D:
 
 ```sh

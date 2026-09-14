@@ -542,3 +542,26 @@ attempt is recorded separately in agreement-final-run.json and
 agreement-final/results.json.  That final-source execution passed all
 7,445 cases in 290.166 seconds under the unchanged 300-second watchdog,
 exit zero.  Timing gates remain open.
+
+## Lanyard M1 interpreted execution (2026-09-14)
+
+`test/lan_run_mutations.py` copies the compiler to a temporary directory,
+builds it, and requires clean interpreter and CLI controls before changing
+one source site at a time. Each mutant must compile and exit 1 at its named
+behavioral assertion. The original compiler sources are never modified.
+
+| Mutation | Required failing observation |
+| --- | --- |
+| Pass native arguments without reversing their environment order | Noncommutative subtraction receives the declared argument order |
+| Delay the step limit beyond the nesting limit | A small reduction budget reports step exhaustion |
+| Return unit for an unsupported foreign operation | Foreign dispatch refuses `topcoat.db` |
+| Give every connection handle zero | A second connection cannot read the first connection's row |
+| Ignore the key when selecting a stored row | Lookup returns the requested row after a different key is inserted |
+
+The cumulative stage command is `zsh dev/gates.sh --stage M1-run`.
+Its retained capture and receipt record the clean controls and killed
+mutations under `dev/validation/stage-m1-run/`.
+
+The complete stage passed: clean controls OK, arguments KILLED, steps
+KILLED, foreign KILLED, connection-isolation KILLED and lookup-key KILLED.
+The observed final count was `killed=5/5`.

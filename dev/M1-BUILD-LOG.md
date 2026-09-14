@@ -2396,3 +2396,105 @@ expected state until the user rules on the policy. The four Python
 suites ran: lan_trusted_inventory.py 18 tests OK, lan_trusted_policy.py
 17 tests OK, lan_m0_gates.py 36 tests OK, and lan_build.py 16 tests
 OK. The usage text is byte-identical to the text before the fixes.
+
+## Lanyard M1: in-memory execution (2026-09-14)
+
+`lanyard run [--steps N] [--print-model MODEL] FILE.lan` checks, specializes
+and lowers the source before evaluating main over the Rust IR. Native
+functions, captures, recursive data and finite checked handlers retain
+their checked lowering. The five Nat primitives use arbitrary-precision
+arithmetic. Model operations use an immutable per-run store with separate
+connections, selected schemas, explicit initialization, unique keys and
+create/lookup. Only `sqlite::memory:` connections are accepted. The source
+program scripts its operations; HTTP request parsing remains future work.
+
+Successful runs discard their result unless model output is selected.
+Output is built only after success. Model integer, byte and UTF-8 checks
+retain the printer's storage bounds. Quoted text uses OCaml byte escaping.
+Steps default to 100000 and may be set to 1 through 1000000. Evaluation also
+has a nesting limit of 512. Runtime errors are values and return exit 1;
+invalid options and missing input return 64.
+
+The new sources are `rust/interp.ml` (141 lines), `rust/run_store.ml` (66)
+and `rust/run_value.ml` (107). The driver grows by 32 lines to 326.
+The complete inventory measures 49 files and 13194 lines. The three
+interpreter files occupy the existing unassigned group. The proposed
+12766-line policy, its source roster and the 212-line driver limit remain
+unchanged, with candidate=FAIL and verdict PENDING. No trust scope,
+allowance number, policy approval or milestone exit is recorded.
+
+The stage retains the cumulative M1 build gate, then adds 40 interpreter
+checks, 26 CLI tests and five isolated mutation controls. The CLI suite
+includes 11 observations from existing closure and recursive fixtures,
+the four-row database handler and the M0 Todo output. Its cases cover
+connection and model isolation, aliases, evaluation order, missing rows,
+duplicate keys, scalar limits, foreign refusals, command syntax and paths.
+See `dev/STAGE-M1-RUN.md` and the stage receipt for the commands, outcomes
+and final compiler-source hashes.
+
+The cumulative command completed with `STAGE-M1-RUN OK`, exit 0. All 40
+interpreter checks, 25 CLI tests and five mutation controls passed. M0
+reported six passing legs, one pending trust leg and no failed leg. Timing
+was reported as NOISY and remains informational. The first sandboxed run
+stopped at two existing E2E assertions because macOS Git printed a confstr
+warning. Running the same gate with normal filesystem access passed all
+19 E2E tests with their assertions unchanged. The receipt retains that
+initial diagnostic alongside the successful complete gate capture.
+
+## Stage M1 RUN review fixes (tag LSM1R, 2026-09-14)
+
+A slice review of the 20 paths staged on f4f6e16 produced a judged finding
+list. One prober pass and one review Workflow reported the items, and the
+judge kept seven for this fix round. The fixes below change the
+interpreter, the store, the two test suites and the stage documents. They
+add no interpreter observation, so the pinned row
+`LAN-RUN OK observations=40` stays 40.
+
+- F-1 low, test/lan_run_mutations.py: `run` now takes a `timeout` argument
+  and the six cold builds of the copied tree pass `timeout=None`. A build
+  under machine load can no longer raise an uncaught timeout that reads as
+  a surviving mutant. Mutant executions keep the 120 s bound.
+- F-2 low, dev/STAGE-M1-RUN.md: the nesting limit is stated in units of
+  evaluation depth. Each subterm evaluation and each call consumes one
+  unit, so one source-level call consumes several. The guard is unchanged.
+- F-3 low, rust/interp.ml and test/lan_run.ml: the Boolean tag identity had
+  three copies of one literal. `Interp.boolean_tid` now reads the identity
+  from `Model.bool_repr` with an exhaustive match over the representation
+  constructors, and both `primitive` and the unit test use that helper.
+- F-4 refuted, test/lan_run_mutations.py: the steps mutant is killed by the
+  nesting guard, which is the kill the control is meant to prove. The
+  mutation log sentence is accurate. No change.
+- F-5 nit, test/lan_run.py: the `cargo` stub records its own invocation in
+  a marker file and the test asserts that marker is absent. The Cargo half
+  of the case can now fail.
+- F-6 nit, test/lan_run.py: one new case connects, pushes the schema,
+  creates a row, pushes the schema again and looks the row up. The claim
+  "Repeated schema initialization preserves the rows" is now tested. The
+  CLI count moves from 25 to 26 in dev/STAGE-M1-RUN.md and in the stage
+  description above.
+- F-7 nit, rust/run_value.ml and rust/run_store.ml: `text` takes an
+  optional label and `connect` passes "connection URL", so a non-UTF-8
+  connection URL no longer reports "invalid UTF-8 in model text".
+- F-8 nit, merged Workflow items, no behavior change: `run_store.model`
+  binds `creating` once, `Run_value.key` takes the validated fields from
+  `model_fields` instead of repeating the field and zip work, and the two
+  parameters that shadowed their function name are renamed to `kind` and
+  `name`.
+- Not fixed: the Workflow item about `call` repeating the lookup work of
+  `find` in rust/interp.ml was not upheld by the Workflow verifier, so it
+  stays. Two style-only items, the suffix rebuilding in the `contains`
+  helper of test/lan_run.ml and the option and result chain in the
+  `--steps` parsing of bin/lanyard.ml, were dropped for the seven-finding
+  cap.
+
+The six captures under `dev/validation/stage-m1-run/` predate these fixes
+and stay frozen, and their receipt keeps `cli_tests=25`; the recorded
+outcome sentence above also keeps the counts of that earlier run. The fix
+ladder re-ran `zsh dev/gates.sh --stage M1-run`.
+
+The fix-1 gate run, 2026-09-14 14:02 PDT, is GREEN: `STAGE-GATE-EXIT 0`,
+all 96 of 96 rows match the frozen capture, and all 32 of 32 pinned rows
+hold. test/lan_run.py now reports `Ran 26 tests`, where the frozen
+capture shows 25. The closing run repeats this gate with the same
+expectations; its log stays in the review kit as
+gates-LSM1R-close.log.

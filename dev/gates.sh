@@ -36,10 +36,15 @@
 #   zsh dev/gates.sh --stage F-time
 #   zsh dev/gates.sh --stage F-gates
 #   zsh dev/gates.sh --stage M1-build
+#   zsh dev/gates.sh --stage M1-run
 #   zsh dev/gates.sh M0
 #   zsh dev/gates.sh M0-E2E --toasty PATH --topcoat PATH
 
 set -u
+
+if [[ $# -eq 2 && $1 == "--stage" && $2 == "M1-run" ]]; then
+  exec zsh ${0:A:h}/stage-m1-run.sh
+fi
 
 if [[ $# -eq 2 && $1 == "--stage" && $2 == "M1-build" ]]; then
   exec zsh ${0:A:h}/stage-m1-build.sh
@@ -292,7 +297,7 @@ if [[ $# -ge 2 && $1 == "--leg" ]]; then
 fi
 
 if [[ $# -ne 0 ]]; then
-  print -r -- "usage: zsh dev/gates.sh [M0 [--output NEW-DIRECTORY] | M0-E2E --toasty PATH --topcoat PATH [OPTIONS] | --leg NAME | --stage B|C|D|E-native|E-foreign|E-async|E-foreign-types|E-models|E-connections|E-crate|E-reachable|E-handlers|E-todo|F-axioms|F-time|F-gates|M1-build]"
+  print -r -- "usage: zsh dev/gates.sh [M0 [--output NEW-DIRECTORY] | M0-E2E --toasty PATH --topcoat PATH [OPTIONS] | --leg NAME | --stage B|C|D|E-native|E-foreign|E-async|E-foreign-types|E-models|E-connections|E-crate|E-reachable|E-handlers|E-todo|F-axioms|F-time|F-gates|M1-build|M1-run]"
   exit 64
 fi
 

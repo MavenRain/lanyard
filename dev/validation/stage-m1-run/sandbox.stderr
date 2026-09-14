@@ -1,0 +1,48 @@
+............................
+----------------------------------------------------------------------
+Ran 28 tests in 4.048s
+
+OK
+.......................
+----------------------------------------------------------------------
+Ran 23 tests in 14.818s
+
+OK
+..................
+----------------------------------------------------------------------
+Ran 18 tests in 2.397s
+
+OK
+.................
+----------------------------------------------------------------------
+Ran 17 tests in 5.117s
+
+OK
+....................................
+----------------------------------------------------------------------
+Ran 36 tests in 2.566s
+
+OK
+......FF............
+======================================================================
+FAIL: test_git_steps_ignore_the_operator_configuration (__main__.EndToEnd.test_git_steps_ignore_the_operator_configuration) (name='CRATE-INIT')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/oobi/Documents/gpt2/lanyard-run/test/lan_m0_e2e.py", line 300, in test_git_steps_ignore_the_operator_configuration
+    self.assertEqual(result.stderr, b"")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"git: warning: confstr() failed with code[63 chars]ad\n" != b''
+
+======================================================================
+FAIL: test_git_steps_ignore_the_operator_configuration (__main__.EndToEnd.test_git_steps_ignore_the_operator_configuration) (name='CRATE-INDEX')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/oobi/Documents/gpt2/lanyard-run/test/lan_m0_e2e.py", line 300, in test_git_steps_ignore_the_operator_configuration
+    self.assertEqual(result.stderr, b"")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+AssertionError: b"git: warning: confstr() failed with code[63 chars]ad\n" != b''
+
+----------------------------------------------------------------------
+Ran 19 tests in 1.959s
+
+FAILED (failures=2)
