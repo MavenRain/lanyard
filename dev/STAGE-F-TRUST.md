@@ -1,5 +1,9 @@
 # M0 compiler source inventory
 
+The [policy slice](STAGE-F-POLICY.md) adds explicit proposed budgets and
+enforcement after a user ruling. The measurements below remain current;
+the description of null allowances applies to the proposed policy.
+
 TRUSTED-LINES now measures every current OCaml compiler source and saves
 the file paths, newline counts, byte counts and SHA-256 hashes. The
 inventory includes the generated target module and the handler fusion
@@ -61,7 +65,7 @@ are read. The shell kernel bucket must match the inventory's twelve
 paths. This source census excludes build scripts, vendor sources,
 tests, and emitted Rust; it is not a ruling on the whole trust base.
 
-The JSON leaves all three allowances and the whole-base ceiling total
+While proposed, the JSON leaves the allowances and whole-base ceiling
 as `null`. It retains `5481 + A_rir + A_emit + A_sig`, marks base growth
 and source scope as pending, and leaves M0-EXIT unstamped. A valid
 inventory with a passing kernel check exits zero while reporting

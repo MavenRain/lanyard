@@ -1,6 +1,8 @@
-"""Inventory compiler sources without assigning the open M0 trust allowances."""
+"""Inventory compiler sources and enforce an explicitly approved trust policy."""
 import argparse
+import functools
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import re
@@ -30,6 +32,7 @@ GROUPS = {
 }
 ALLOWANCES = {"rir": "A_rir", "printer": "A_emit", "signatures": "A_sig"}
 SOURCE_SUFFIXES = {".ml", ".mli", ".mll", ".mly"}
+POLICY_MODULE = "dev/trusted-policy.py"
 
 
 def regular_bytes(root, name):
@@ -43,6 +46,22 @@ def regular_bytes(root, name):
     if not stat.S_ISREG(path.stat().st_mode):
         raise ValueError(f"{name}: expected a regular file")
     return path.read_bytes()
+
+
+@functools.cache
+def load_policy():
+    """Load the policy code on demand, so a missing, linked or special module
+    becomes a TRUSTED-INVENTORY FAIL row. An import-time load made the same
+    fault a raw traceback in this script and in every consumer of it. The
+    module comes from THIS script's root, never from the measured root."""
+    # regular_bytes rejects a link or a special file and reports the reason.
+    regular_bytes(ROOT, POLICY_MODULE)
+    spec = importlib.util.spec_from_file_location("trusted_policy", ROOT / POLICY_MODULE)
+    if spec is None or spec.loader is None:
+        raise ValueError(f"{POLICY_MODULE}: expected a loadable policy module")
+    policy = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(policy)
+    return policy
 
 
 def reraise(error):
@@ -93,14 +112,16 @@ def inventory(root):
                        "files": [row["path"] for row in members]})
     kernel = next(row["lines"] for row in groups if row["name"] == "kernel")
     passed = kernel <= 4000
-    return {"format": 1, "status": "PENDING" if passed else "FAIL",
-            "counting": "newline bytes (wc -l), including comments and blank lines",
-            "kernel": {"lines": kernel, "limit": 4000, "passed": passed},
-            "ceiling": {"base": 5481, "formula": FORMULA, "total": None,
-                        "A_rir": None, "A_emit": None, "A_sig": None},
-            "groups": groups, "files": files,
-            "pending_rulings": ["A_rir", "A_emit", "A_sig", "base growth",
-                                "trusted-file scope"], "m0_exit": "not-stamped"}
+    report = {"format": 1, "status": "PENDING" if passed else "FAIL",
+              "counting": "newline bytes (wc -l), including comments and blank lines",
+              "kernel": {"lines": kernel, "limit": 4000, "passed": passed},
+              "ceiling": {"base": 5481, "formula": FORMULA, "total": None,
+                          "A_rir": None, "A_emit": None, "A_sig": None},
+              "groups": groups, "files": files,
+              "pending_rulings": ["A_rir", "A_emit", "A_sig", "base growth",
+                                  "trusted-file scope"], "m0_exit": "not-stamped"}
+    policy = load_policy()
+    return policy.apply(report, regular_bytes(root, policy.PATH))
 
 
 def encoded(report):
@@ -119,10 +140,19 @@ def main():
             with args.output.open("xb") as stream:
                 stream.write(data)
         print(f"TRUSTED-INVENTORY files={len(report['files'])} sha256={hashlib.sha256(data).hexdigest()}")
+        policy = report["policy"]
+        candidate = "PASS" if policy["passed"] else "FAIL"
+        print(f"TRUSTED-POLICY {policy['status']} candidate={candidate} "
+              f"lines={policy['lines']}/{policy['limit']} sha256={policy['sha256']}")
+        if policy["status"] == "APPROVED":
+            for check in policy["checks"]:
+                if not check["passed"]:
+                    print(f"TRUSTED-POLICY group={check['name']} lines={check['lines']}/{check['limit']} "
+                          f"paths_match={str(check['paths_match']).lower()}")
         if not report["kernel"]["passed"]:
             print(f"TRUSTED-INVENTORY kernel={report['kernel']['lines']}/4000")
         print(f"TRUSTED-INVENTORY {report['status']}")
-        return 0 if report["kernel"]["passed"] else 1
+        return 1 if report["status"] == "FAIL" else 0
     except (OSError, ValueError) as error:
         print(f"TRUSTED-INVENTORY FAIL: {error}", file=sys.stderr)
         return 1

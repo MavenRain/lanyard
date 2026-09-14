@@ -1,0 +1,90 @@
+M0 R0-COUNT PASS
+M0 R0-TARGET PASS
+M0 TARGET-PIN PASS
+M0 TRUSTED-LINES PASS
+TRUSTED-INVENTORY files=46 sha256=95ee7575651721d4a5fc3bea9fe9f9111ecc53dca64b1b8b3287444e2c6886c7
+TRUSTED-POLICY APPROVED candidate=PASS lines=12766/12766 sha256=8f314ed9de4d1adfb78efb0473f6a159d5c10ebd86c0b345a5426ad2761c0220
+TRUSTED-INVENTORY PASS
+TRUSTED-LINES rir=155 allowance=A_rir (see inventory policy)
+TRUSTED-LINES erase=1519 baseline=1484
+TRUSTED-LINES erase-kan=1484 (see inventory policy)
+TRUSTED-LINES eterm=117 (see inventory policy)
+TRUSTED-LINES target-bridge=104 (see inventory policy)
+TRUSTED-LINES specialization=87 (see inventory policy)
+TRUSTED-LINES fusion=218 (see inventory policy)
+TRUSTED-LINES target-bridge-total=409 (see inventory policy)
+TRUSTED-LINES emit=658 allowance=A_emit (see inventory policy)
+TRUSTED-LINES foreign=65 allowance=A_emit (see inventory policy)
+TRUSTED-LINES template=71 allowance=A_emit (see inventory policy)
+TRUSTED-LINES effects=46 allowance=A_emit (see inventory policy)
+TRUSTED-LINES model=221 allowance=A_emit (see inventory policy)
+TRUSTED-LINES connection=66 allowance=A_emit (see inventory policy)
+TRUSTED-LINES crate=30 allowance=A_emit (see inventory policy)
+TRUSTED-LINES reachable=74 allowance=A_emit (see inventory policy)
+TRUSTED-LINES printer-total=1231 allowance=A_emit (see inventory policy)
+TRUSTED-LINES signature=104 allowance=A_sig (see inventory policy)
+TRUSTED-LINES kernel=3997/4000
+M0 original ceiling: 5481 + A_rir + A_emit + A_sig
+TRUSTED-LINES OK
+M0 KERNEL-CARRY PASS
+M0 EMIT-DIFF PASS
+M0 R0-COUNT FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/R0-COUNT.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/R0-COUNT.stderr
+M0-GATE-MUTATIONS R0-COUNT=KILLED diagnostic=R0-COUNT FAIL
+M0 R0-COUNT PASS
+M0 R0-COUNT FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/R0-COUNT.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/R0-COUNT.stderr
+M0 R0-COUNT PASS
+M0-GATE-MUTATIONS failed-census-command=KILLED
+M0 R0-TARGET FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/R0-TARGET.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/R0-TARGET.stderr
+M0-GATE-MUTATIONS R0-TARGET=KILLED diagnostic=outside closed atom list
+M0 R0-TARGET PASS
+M0 TARGET-PIN PASS
+M0 TARGET-PIN FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/TARGET-PIN.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/TARGET-PIN.stderr
+M0-GATE-MUTATIONS TARGET-PIN=KILLED diagnostic=TARGET-PIN DIFF FAIL
+M0 TARGET-PIN PASS
+M0 KERNEL-CARRY FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/KERNEL-CARRY.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/KERNEL-CARRY.stderr
+M0-GATE-MUTATIONS KERNEL-CARRY=KILLED diagnostic=bytes-differ
+M0 KERNEL-CARRY PASS
+M0 TRUSTED-LINES FAIL: child failed
+TRUSTED-INVENTORY files=46 sha256=81aea577e0471321f231bb9f466b74f6b818286ab1339991128e2eb0ebb7f26a
+TRUSTED-POLICY APPROVED candidate=FAIL lines=12816/12766 sha256=8f314ed9de4d1adfb78efb0473f6a159d5c10ebd86c0b345a5426ad2761c0220
+TRUSTED-POLICY group=printer lines=1281/1231 paths_match=true
+TRUSTED-INVENTORY FAIL
+TRUSTED-LINES FAIL
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/TRUSTED-LINES.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/TRUSTED-LINES.stderr
+M0-GATE-MUTATIONS TRUSTED-LINES=KILLED diagnostic=TRUSTED-POLICY group=printer
+M0 TRUSTED-LINES PASS
+TRUSTED-INVENTORY files=46 sha256=95ee7575651721d4a5fc3bea9fe9f9111ecc53dca64b1b8b3287444e2c6886c7
+TRUSTED-POLICY APPROVED candidate=PASS lines=12766/12766 sha256=8f314ed9de4d1adfb78efb0473f6a159d5c10ebd86c0b345a5426ad2761c0220
+TRUSTED-INVENTORY PASS
+TRUSTED-LINES rir=155 allowance=A_rir (see inventory policy)
+TRUSTED-LINES erase=1519 baseline=1484
+TRUSTED-LINES erase-kan=1484 (see inventory policy)
+TRUSTED-LINES eterm=117 (see inventory policy)
+TRUSTED-LINES target-bridge=104 (see inventory policy)
+TRUSTED-LINES specialization=87 (see inventory policy)
+TRUSTED-LINES fusion=218 (see inventory policy)
+TRUSTED-LINES target-bridge-total=409 (see inventory policy)
+TRUSTED-LINES emit=658 allowance=A_emit (see inventory policy)
+TRUSTED-LINES foreign=65 allowance=A_emit (see inventory policy)
+TRUSTED-LINES template=71 allowance=A_emit (see inventory policy)
+TRUSTED-LINES effects=46 allowance=A_emit (see inventory policy)
+TRUSTED-LINES model=221 allowance=A_emit (see inventory policy)
+TRUSTED-LINES connection=66 allowance=A_emit (see inventory policy)
+TRUSTED-LINES crate=30 allowance=A_emit (see inventory policy)
+TRUSTED-LINES reachable=74 allowance=A_emit (see inventory policy)
+TRUSTED-LINES printer-total=1231 allowance=A_emit (see inventory policy)
+TRUSTED-LINES signature=104 allowance=A_sig (see inventory policy)
+TRUSTED-LINES kernel=3997/4000
+M0 original ceiling: 5481 + A_rir + A_emit + A_sig
+TRUSTED-LINES OK
+M0 EMIT-DIFF FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/EMIT-DIFF.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-3m7m90vs/repo/.gatework/controls/EMIT-DIFF.stderr
+M0-GATE-MUTATIONS EMIT-DIFF=KILLED diagnostic=unbound: Todo_create
+M0 EMIT-DIFF PASS
+M0-GATE-MUTATIONS OK killed=6 pending=0 informational=1 restored=GREEN
+LAN-APPROVED-POLICY OK temporary-approval=1 source-policy=unchanged

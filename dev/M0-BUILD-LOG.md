@@ -2862,3 +2862,118 @@ RED-WATCH hits=0, `M0-GATES PENDING passed=6/7 pending=1 failed=0`,
 `M0-GATE-MUTATIONS OK killed=5 pending=1 informational=1
 restored=GREEN`, TRUSTED-INVENTORY files=46, suites Ran 17 and Ran 31
 OK.
+
+## M0 Stage F policy enforcement (2026-09-14)
+
+The new `dev/trusted-policy.json` is a proposal for all 46 measured
+compiler sources. Its eleven groups total 12766 lines, at their measured
+sizes without additional margin. This proposes A_rir 155, A_emit 1231,
+A_sig 104, a base of 5516 (35 above the original 5481), and 5760 lines
+for the additional compiler groups. Every allowance and scope decision
+remains the user's. The shipped status is PROPOSED, its ruling is null,
+and M0-EXIT is not stamped.
+
+The policy reader rejects malformed budgets, missing or duplicate
+groups, duplicate JSON keys, missing policy files and linked policy
+paths. The established trusted groups cannot be excluded, and the
+kernel cannot exceed its ratified 4000-line limit. An approved policy
+enforces every included group's own budget and exact source roster;
+an empty new source still fails the scope check. Explicitly excluded
+groups require reasons and remain in the measured source inventory.
+
+The inventory binds the policy bytes by hash. The combined gate
+compares fresh source and policy measurements with the child's evidence
+and requires the matching inventory status marker. It accepts a passing
+approved policy, retains a proposal as pending, and fails budget or
+scope overruns after approval. The stage wrapper verifies the matching
+JSON verdict for exit 0 or 2. No command writes the M0-EXIT stamp.
+
+Validation in the isolated `gpt2/lanyard-trust-policy` checkout:
+
+- `zsh dev/gates.sh --stage F-gates`: exit 0, STAGE-F-GATES OK
+  m0=PENDING. M0 reported six passing legs, one pending leg and no
+  failed checks. The focused suites passed 17 inventory, 16 policy and
+  34 combined-gate tests; the cumulative E2E suite passed 19 tests.
+- `python3 -P test/lan_approved_policy.py`: exit 0. A disposable
+  checkout with a test-only approval killed all six assertion controls,
+  including a printer overrun, and restored the baseline. The timing
+  leg remained informational. The source policy bytes stayed unchanged.
+- `diffclass` requested the normal build path for the changed gate
+  scripts. The cumulative gate supplied that build and the existing
+  compiler and emitted-Rust checks. Normal Git execution outside the
+  sandbox was used for the cumulative and temporary-checkout probes.
+
+The policy documentation describes the proposed scope and the remaining
+ruling. Captures and the validation receipt live in
+`dev/validation/stage-f-policy/`. The implementation changes no OCaml
+compiler source, target signatures or emitted-Rust golden.
+
+## M0 Stage F review fixes (tag LSFP, 2026-09-14)
+
+F-1 `test/lan_approved_policy.py`. The manual probe bounded the mutation
+harness at 1200 s, but the harness allows 900 s for each scratch build. A
+slow machine killed the probe with a TimeoutExpired traceback. The probe
+now uses `BUDGET = 6 * 900 + 1200`, the sum of the harness allowances, and
+a comment states the arithmetic. The module docstring says a
+TimeoutExpired means a slow machine, not a policy failure. No test asserts
+a wall-clock bound, so the three unit suites cover the file unchanged.
+
+F-2 `dev/trusted-lines.sh`. The header said the leg always exits 0 when the
+kernel fits. The Python inventory now gives the exit code, so an approved
+policy that overruns a group budget or a group file roster exits 1. The
+header states both outcomes. The leg keeps its three stdout rows.
+`test_growth_in_every_group_fails_approved_budget` pins the exit code.
+
+F-3 `dev/m0-gates.py`. One reason string covered four failure clauses, so a
+status-row mismatch read as a source or hash difference. The new helper
+`inventory_reason` returns the first failing clause: measured sources
+differ, status not PENDING or PASS, stdout hash row missing, or stdout
+status row missing. `run_check` raises that text.
+`test_each_inventory_clause_names_itself` covers the four clauses and the
+accepting case. Two leg tests assert the clause they trigger. A new test,
+`test_cli_rejects_an_expected_status_without_a_stage_log`, covers the
+`parser.error` for `--expected-status` without `--verify-stage-log`: exit
+code 2, empty stdout and usage text on stderr.
+
+F-4 `dev/STAGE-F-GATES.md`. The doc described `--verify-stage-log` as
+pending-only. It now documents `--expected-status PENDING|PASS`, the
+PENDING default, the report shape each choice accepts, and the exit code 2
+for the option without a stage log. `dev/STAGE-F-POLICY.md` holds no such
+sentence; only its test counts moved to 18, 17 and 36.
+
+F-5 `dev/trusted-policy.py`. An excluded kernel group raised the ratified
+4000-line message, which misdiagnosed a dropped kernel as a budget edit.
+The check is now two checks: `not included` raises "kernel: the established
+trusted base cannot be excluded", and `limit > 4000` keeps the ratified
+message. `test_kernel_cannot_be_excluded_or_budgeted_above_ratified_bound`
+asserts a separate message for each fault, and
+`test_excluded_kernel_reports_the_scope_fault_to_the_operator` asserts the
+operator-facing `TRUSTED-INVENTORY FAIL:` row.
+
+F-6 `dev/trusted-inventory.py`. The policy module was loaded at import
+time, outside the error handling in `main`, so a missing, unreadable or
+linked `dev/trusted-policy.py` was a raw traceback here and in
+`dev/m0-gates.py`, which loads this module by path. The cached helper
+`load_policy` now loads the module on demand. It reuses `regular_bytes` to
+reject a link or a special file, and it treats a None spec or loader as a
+ValueError. The fault becomes a `TRUSTED-INVENTORY FAIL:` row and exit 1,
+and `run_check` reports it as a failed leg because it catches ValueError.
+`test_an_unusable_policy_module_fails_the_report_without_a_traceback`
+copies the script into a root without the policy module, and into a root
+with the module as a symlink, and asserts the row and exit 1. The report
+dict literal is reindented under `report = {`; the JSON output is
+unchanged.
+
+F-7 `test/lan_approved_policy.py`. Untracked files reached the disposable
+checkout through `shutil.copyfile`, which drops the executable bit, while
+tracked changes arrive through `git apply` with their mode. The probe uses
+`shutil.copy2`.
+
+Fix ladder: `gates-LSFP-fix-1.log` GREEN at 2026-09-14T08:48:49Z (610
+lines, `STAGE-GATE-EXIT 0`, `STAGE-F-GATES OK m0=PENDING`, `M0-GATES
+PENDING passed=6/7 pending=1 failed=0`). The 86 gate stdout rows are
+identical to the baseline capture (`ROWS tag=fix-1 capture=86 log=86
+IDENTICAL`, `PINS tag=fix-1 ok=22 missing=0`, `RED-WATCH tag=fix-1
+hits=0`). Test rows: `Ran 28`, `Ran 23`, `Ran 18`, `Ran 17`, `Ran 36`
+and `Ran 19` tests, all OK. The baseline ladder (`gates-LSFP-baseline.log`,
+GREEN at 2026-09-14T08:20:38Z, 610 lines) carries the same 86 rows.

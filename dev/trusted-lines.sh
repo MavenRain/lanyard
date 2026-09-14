@@ -1,6 +1,6 @@
 #!/bin/zsh
 # dev/trusted-lines.sh [ROOT] [--output NEW_JSON]
-# The TRUSTED-LINES measurements and inventory. Whole-base rulings remain open.
+# The TRUSTED-LINES measurements and inventory, with explicit policy enforcement.
 # Example:
 #   zsh /Users/oobi/Documents/lanyard/dev/trusted-lines.sh
 #
@@ -17,12 +17,15 @@
 # base is the FORMULA below:  5481 is the twelve kernel files at 3997
 # plus lib/erase.ml at 1484, and A_rir, A_emit and A_sig are the three
 # allowances of the files Stage D, Stage E and Stage B write.  The three
-# allowances are open user rulings (S0-D1, D-M0-3), so this leg prints
-# the formula and NO total, and no agent guesses a number.
+# allowances are user rulings (S0-D1, D-M0-3). The inventory retains the
+# original formula while proposed, then records the approved total and scope.
 #
-# The leg always prints these three lines and exits 0 when the kernel fits:
+# The leg prints these three lines and exits 0 when the kernel fits and the
+# policy is PROPOSED, or when an approved policy passes. An approved policy
+# that overruns a group budget or a group file roster exits 1 and prints no
+# TRUSTED-LINES OK row, because the Python inventory gives the exit code:
 #   TRUSTED-LINES kernel=3997/4000
-#   M0 ceiling: 5481 + A_rir + A_emit + A_sig
+#   M0 original ceiling: 5481 + A_rir + A_emit + A_sig
 #   TRUSTED-LINES OK
 # The final inventory requires every current compiler source and the generated
 # signatures. It records additional sources as candidates with unassigned scope.
@@ -60,7 +63,7 @@ kernel_bound=4000
 # The M0 ceiling of the trusted base, as a formula with no total.  The
 # base is 3997 kernel lines plus lib/erase.ml at 1484.
 ceiling_base=5481
-ceiling_line="M0 ceiling: $ceiling_base + A_rir + A_emit + A_sig"
+ceiling_line="M0 original ceiling: $ceiling_base + A_rir + A_emit + A_sig"
 
 kernel_files=(
   $root/lib/shape.ml
@@ -106,7 +109,7 @@ line="TRUSTED-LINES kernel=$kernel/$kernel_bound"
 # The measured Rust path remains distinct from the pending numeric allowances.
 # The tree carries two erasers.  lib/erase_kan.ml serves the .kan command and
 # lib/eterm.ml serves only that carried eraser, so both get a measurement row.
-# Their place in the base is an open user ruling, so no row moves a bound.
+# Their place in the base comes from the explicit inventory policy.
 if [[ -f $root/lib/rir.ml ]]; then
   measured_files=(lib/erase.ml lib/erase_kan.ml lib/eterm.ml surface/lower.ml surface/specialize.ml surface/fuse.ml)
   for measured in $measured_files; do
@@ -130,14 +133,14 @@ if [[ -f $root/lib/rir.ml ]]; then
       exit 1
     fi
   done
-  print -r -- "TRUSTED-LINES rir=$rir_lines allowance=A_rir (pending user ruling)"
+  print -r -- "TRUSTED-LINES rir=$rir_lines allowance=A_rir (see inventory policy)"
   print -r -- "TRUSTED-LINES erase=$erase_lines baseline=1484"
-  print -r -- "TRUSTED-LINES erase-kan=$erase_kan_lines (ceiling treatment pending user ruling)"
-  print -r -- "TRUSTED-LINES eterm=$eterm_lines (ceiling treatment pending user ruling)"
-  print -r -- "TRUSTED-LINES target-bridge=$lower_lines (ceiling treatment pending user ruling)"
-  print -r -- "TRUSTED-LINES specialization=$specialize_lines (ceiling treatment pending user ruling)"
-  print -r -- "TRUSTED-LINES fusion=$fuse_lines (ceiling treatment pending user ruling)"
-  print -r -- "TRUSTED-LINES target-bridge-total=$((lower_lines + specialize_lines + fuse_lines)) (ceiling treatment pending user ruling)"
+  print -r -- "TRUSTED-LINES erase-kan=$erase_kan_lines (see inventory policy)"
+  print -r -- "TRUSTED-LINES eterm=$eterm_lines (see inventory policy)"
+  print -r -- "TRUSTED-LINES target-bridge=$lower_lines (see inventory policy)"
+  print -r -- "TRUSTED-LINES specialization=$specialize_lines (see inventory policy)"
+  print -r -- "TRUSTED-LINES fusion=$fuse_lines (see inventory policy)"
+  print -r -- "TRUSTED-LINES target-bridge-total=$((lower_lines + specialize_lines + fuse_lines)) (see inventory policy)"
 fi
 
 # Stage E measures the printer without assigning its pending allowance.
@@ -151,7 +154,7 @@ if [[ -d $root/rust ]]; then
     print -r -- 'TRUSTED-LINES FAIL: emitter has an empty line count'
     exit 1
   fi
-  print -r -- "TRUSTED-LINES emit=$emit_lines allowance=A_emit (pending user ruling)"
+  print -r -- "TRUSTED-LINES emit=$emit_lines allowance=A_emit (see inventory policy)"
   # Foreign policy and template expansion decide emitted Rust too. Include both
   # in the measured printer total; splitting files cannot hide trusted code.
   printer_lines=$emit_lines
@@ -166,9 +169,9 @@ if [[ -d $root/rust ]]; then
       exit 1
     fi
     printer_lines=$((printer_lines + part_lines))
-    print -r -- "TRUSTED-LINES $part=$part_lines allowance=A_emit (pending user ruling)"
+    print -r -- "TRUSTED-LINES $part=$part_lines allowance=A_emit (see inventory policy)"
   done
-  print -r -- "TRUSTED-LINES printer-total=$printer_lines allowance=A_emit (pending user ruling)"
+  print -r -- "TRUSTED-LINES printer-total=$printer_lines allowance=A_emit (see inventory policy)"
 fi
 
 # Stage B measures the generated module; S0-D1 leaves its allowance to the user.
@@ -179,7 +182,7 @@ if [[ -d $root/target ]]; then
     exit 1
   fi
   signature_lines=$(wc -l < $generated | tr -d ' ')
-  print -r -- "TRUSTED-LINES signature=$signature_lines allowance=A_sig (pending user ruling)"
+  print -r -- "TRUSTED-LINES signature=$signature_lines allowance=A_sig (see inventory policy)"
 fi
 
 if [[ $kernel -le $kernel_bound ]]; then

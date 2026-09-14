@@ -1,4 +1,4 @@
-"""Kill M0 assertion controls; expose the unresolved emitter ceiling control."""
+"""Kill M0 assertion controls; keep unapproved emitter ceilings pending."""
 import contextlib
 from dataclasses import replace
 import json
@@ -66,8 +66,11 @@ def main():
             print(f"M0-GATE-MUTATIONS {name}=KILLED diagnostic={diagnostic}")
 
         build()
+        trusted = GATES.TRUST.inventory(work)
+        trust_status = trusted["status"]
+        require(trust_status in ("PENDING", "PASS"), "baseline trusted policy failed")
         for name in GATES.LEG_NAMES[:-1]:
-            check(name, "PENDING" if name == "TRUSTED-LINES" else "PASS")
+            check(name, trust_status if name == "TRUSTED-LINES" else "PASS")
 
         census = work / "lib/spec_count.ml"
         original = census.read_text()
@@ -135,12 +138,17 @@ def main():
 
         emitter = work / "rust/emit.ml"
         original = emitter.read_bytes()
-        emitter.write_bytes(original + b"\n" * 50)
-        row = check("TRUSTED-LINES", "PENDING")
-        require(row["exit_code"] == 0, "emitter control no longer measures the open ceiling")
+        printer = next(row for row in trusted["policy"]["checks"] if row["name"] == "printer")
+        added = max(50, printer["limit"] - printer["lines"] + 1)
+        emitter.write_bytes(original + b"\n" * added)
+        if trust_status == "PASS":
+            kill("TRUSTED-LINES", "TRUSTED-POLICY group=printer")
+        else:
+            row = check("TRUSTED-LINES", "PENDING")
+            require(row["exit_code"] == 0, "emitter control no longer measures the open ceiling")
+            print(f"M0-GATE-MUTATIONS TRUSTED-LINES=PENDING added-lines={added} kernel-only-exit=0")
         emitter.write_bytes(original)
-        check("TRUSTED-LINES", "PENDING")
-        print("M0-GATE-MUTATIONS TRUSTED-LINES=PENDING added-lines=50 kernel-only-exit=0")
+        check("TRUSTED-LINES", trust_status)
 
         original = signature.read_text()
         lines = original.splitlines(keepends=True)
@@ -152,8 +160,10 @@ def main():
         signature.write_text(original)
         build()
         check("EMIT-DIFF", "PASS")
-    require(killed == ROSTER, f"control roster changed: {killed}")
-    print(f"M0-GATE-MUTATIONS OK killed={len(killed)} pending=1 informational=1 restored=GREEN")
+    expected = ROSTER if trust_status == "PENDING" else ROSTER[:-1] + ["TRUSTED-LINES", ROSTER[-1]]
+    require(killed == expected, f"control roster changed: {killed}")
+    pending = 1 if trust_status == "PENDING" else 0
+    print(f"M0-GATE-MUTATIONS OK killed={len(killed)} pending={pending} informational=1 restored=GREEN")
 
 
 if __name__ == "__main__":

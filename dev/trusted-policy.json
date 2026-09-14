@@ -1,0 +1,140 @@
+{
+  "format": 1,
+  "status": "PROPOSED",
+  "ruling": null,
+  "groups": [
+    {
+      "name": "kernel",
+      "scope": "included",
+      "limit": 3997,
+      "reason": "",
+      "files": [
+        "lib/bignum.ml",
+        "lib/check.ml",
+        "lib/conv.ml",
+        "lib/eval.ml",
+        "lib/global.ml",
+        "lib/order.ml",
+        "lib/positivity.ml",
+        "lib/rules.ml",
+        "lib/shape.ml",
+        "lib/term.ml",
+        "lib/totality.ml",
+        "lib/value.ml"
+      ]
+    },
+    {
+      "name": "erase",
+      "scope": "included",
+      "limit": 1519,
+      "reason": "",
+      "files": [
+        "lib/erase.ml"
+      ]
+    },
+    {
+      "name": "rir",
+      "scope": "included",
+      "limit": 155,
+      "reason": "",
+      "files": [
+        "lib/rir.ml"
+      ]
+    },
+    {
+      "name": "printer",
+      "scope": "included",
+      "limit": 1231,
+      "reason": "",
+      "files": [
+        "rust/connection.ml",
+        "rust/crate.ml",
+        "rust/effects.ml",
+        "rust/emit.ml",
+        "rust/foreign.ml",
+        "rust/model.ml",
+        "rust/reachable.ml",
+        "rust/template.ml"
+      ]
+    },
+    {
+      "name": "signatures",
+      "scope": "included",
+      "limit": 104,
+      "reason": "",
+      "files": [
+        "_build/default/target/target_generated.ml"
+      ]
+    },
+    {
+      "name": "carried-eraser",
+      "scope": "included",
+      "limit": 1601,
+      "reason": "",
+      "files": [
+        "lib/erase_kan.ml",
+        "lib/eterm.ml"
+      ]
+    },
+    {
+      "name": "target-bridge",
+      "scope": "included",
+      "limit": 409,
+      "reason": "",
+      "files": [
+        "surface/fuse.ml",
+        "surface/lower.ml",
+        "surface/specialize.ml"
+      ]
+    },
+    {
+      "name": "kernel-support",
+      "scope": "included",
+      "limit": 618,
+      "reason": "",
+      "files": [
+        "lib/budget.ml",
+        "lib/budget.mli",
+        "lib/error.ml",
+        "lib/level.ml",
+        "lib/level.mli",
+        "lib/literal.ml",
+        "lib/pp.ml",
+        "lib/prim.ml",
+        "lib/quantity.ml",
+        "lib/spec_count.ml"
+      ]
+    },
+    {
+      "name": "frontend",
+      "scope": "included",
+      "limit": 2920,
+      "reason": "",
+      "files": [
+        "surface/axioms.ml",
+        "surface/elab.ml",
+        "surface/lexer.ml",
+        "surface/parser.ml",
+        "surface/syntax.ml",
+        "surface/term_scope.ml",
+        "surface/token.ml"
+      ]
+    },
+    {
+      "name": "driver",
+      "scope": "included",
+      "limit": 212,
+      "reason": "",
+      "files": [
+        "bin/lanyard.ml"
+      ]
+    },
+    {
+      "name": "unassigned",
+      "scope": "included",
+      "limit": 0,
+      "reason": "",
+      "files": []
+    }
+  ]
+}

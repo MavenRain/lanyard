@@ -112,6 +112,7 @@ class Gates(unittest.TestCase):
                 data = GATES.TRUST.encoded(measured)
                 check.inventory.write_bytes(data)
                 stdout += f"TRUSTED-INVENTORY files=1 sha256={hashlib.sha256(data).hexdigest()}\n".encode()
+                stdout += f"TRUSTED-INVENTORY {measured['status']}\n".encode()
             stdout = replaced.get(check.name, stdout)
             return code, stdout, b"", ""
 
@@ -232,7 +233,7 @@ class Gates(unittest.TestCase):
         self.assertIn("trusted inventory unavailable", trust["reason"])
         self.assertEqual(seen[-3:], ["KERNEL-CARRY", "EMIT-DIFF", "M0-TIME"])
 
-    def test_inventory_status_other_than_pending_fails_the_leg(self):
+    def test_failing_inventory_status_fails_the_leg(self):
         # The data and the stdout hash match. Only the recorded status differs.
         failing = {"status": "FAIL", "files": [{"path": "test-source"}]}
         code, _, report = self.run_fake(None, report=failing)
@@ -240,7 +241,17 @@ class Gates(unittest.TestCase):
         trust = next(row for row in report["legs"] if row["name"] == "TRUSTED-LINES")
         self.assertEqual(trust["status"], "FAIL")
         self.assertIn("trusted inventory unavailable", trust["reason"])
+        # The reason names the status clause, not the source or hash clause.
+        self.assertIn("status FAIL is neither PENDING nor PASS", trust["reason"])
         self.assertNotIn("inventory", trust)
+
+    def test_approved_inventory_completes_all_seven_legs_without_stamping_exit(self):
+        approved = {"status": "PASS", "files": [{"path": "test-source"}]}
+        code, _, report = self.run_fake(None, report=approved)
+        self.assertEqual((code, report["summary"]["status"]), (0, "PASS"))
+        self.assertEqual(report["summary"]["passed_legs"], 7)
+        self.assertEqual(report["pending_rulings"], [])
+        self.assertEqual(report["m0_exit"], "not-stamped")
 
     def stage_log(self, summary, rows=()):
         report = self.work / "verify-report.json"
@@ -267,6 +278,45 @@ class Gates(unittest.TestCase):
         absent = self.work / "absent.log"
         absent.write_text(f"M0-REPORT {self.work / 'never-written.json'}\n")
         self.assertFalse(GATES.verify_stage_log(absent)[0])
+
+    def test_stage_verification_accepts_approved_gate_only_when_expected(self):
+        approved = dict(GATES.PASS_SUMMARY)
+        log = self.stage_log(approved)
+        self.assertFalse(GATES.verify_stage_log(log)[0])
+        self.assertTrue(GATES.verify_stage_log(log, "PASS")[0])
+        pending = self.stage_log(dict(GATES.PENDING_SUMMARY))
+        self.assertFalse(GATES.verify_stage_log(pending, "PASS")[0])
+        for key, value in (("exit_code", 2), ("passed_legs", 6), ("pending_legs", 1), ("failed_checks", 1)):
+            with self.subTest(key=key):
+                changed = self.stage_log({**approved, key: value})
+                self.assertFalse(GATES.verify_stage_log(changed, "PASS")[0])
+
+    def test_inventory_status_marker_must_match_the_evidence(self):
+        measured = {"status": "PASS", "files": [{"path": "test-source"}]}
+        digest = hashlib.sha256(GATES.TRUST.encoded(measured)).hexdigest()
+        stdout = (f"TRUSTED-LINES OK\nTRUSTED-INVENTORY PENDING\n"
+                  f"TRUSTED-INVENTORY files=1 sha256={digest}\n").encode()
+        code, _, report = self.run_fake(None, {"TRUSTED-LINES": stdout}, report=measured)
+        self.assertEqual((code, report["summary"]["status"]), (1, "FAIL"))
+        trust = next(row for row in report["legs"] if row["name"] == "TRUSTED-LINES")
+        self.assertIn("stdout status row TRUSTED-INVENTORY PASS is missing", trust["reason"])
+
+    def test_each_inventory_clause_names_itself(self):
+        current = {"status": "PENDING", "files": [{"path": "test-source"}]}
+        digest = hashlib.sha256(GATES.TRUST.encoded(current)).hexdigest()
+        rows = [f"TRUSTED-INVENTORY files=1 sha256={digest}".encode(),
+                b"TRUSTED-INVENTORY PENDING"]
+        self.assertEqual(GATES.inventory_reason(current, current, digest, rows), "")
+        cases = ((dict(current, files=[]), current, digest, rows,
+                  "differs from the measured compiler sources"),
+                 (dict(current, status="FAIL"), dict(current, status="FAIL"), digest, rows,
+                  "status FAIL is neither PENDING nor PASS"),
+                 (current, current, "wrong", rows, "stdout hash row is missing"),
+                 (current, current, digest, rows[:1],
+                  "stdout status row TRUSTED-INVENTORY PENDING is missing"))
+        for measured, actual, given, stdout, expected in cases:
+            with self.subTest(expected=expected):
+                self.assertIn(expected, GATES.inventory_reason(measured, actual, given, stdout))
 
     def test_stage_verification_takes_the_last_report_row(self):
         log = self.stage_log(dict(GATES.PENDING_SUMMARY),
@@ -297,6 +347,15 @@ class Gates(unittest.TestCase):
         self.assertIn("M0-GATES ERROR", result.stderr)
         self.assertEqual(list(output.iterdir()), [sentinel])
         self.assertEqual(sentinel.read_bytes(), b"keep")
+
+    def test_cli_rejects_an_expected_status_without_a_stage_log(self):
+        result = subprocess.run(["zsh", str(ROOT / "dev/gates.sh"), "M0",
+                                 "--expected-status", "PASS"],
+                                capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, "")
+        self.assertIn("usage:", result.stderr)
+        self.assertIn("--expected-status requires --verify-stage-log", result.stderr)
 
     def test_cli_rejects_unknown_arguments(self):
         result = subprocess.run(["zsh", str(ROOT / "dev/gates.sh"), "M0", "--ignore-failures"],

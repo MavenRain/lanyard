@@ -22,8 +22,10 @@ combined M0 gate records all seven legs and unresolved trust decisions,
 with a complete OCaml source inventory and per-file hashes.
 The M0-E2E gate builds the pinned Todo crate offline and checks its output.
 Other model field types, general recursive handlers and the M0 exit stamp
-remain ahead. The generated signature allowance is proposed at
-104 lines and awaits the user's ruling. See
+remain ahead. The [trusted-code policy](dev/STAGE-F-POLICY.md) proposes
+budgets for all 46 measured compiler sources, totaling 12766 lines.
+It stays proposed until the user rules; approved policies enforce each
+group's budget and source roster. A_sig is proposed at 104 lines. See
 [target documentation](target/README.md), the
 [Stage B build log](dev/M0-BUILD-LOG.md#lanyard-m0-stage-b-2026-09-09) and
 the [Stage C build log](dev/spikes/M0-BUILD-LOG.md#stage-c-2026-09-09) with

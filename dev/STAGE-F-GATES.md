@@ -1,5 +1,10 @@
 # Combined M0 gate
 
+The [trusted-code policy](STAGE-F-POLICY.md) now supplies explicit budgets
+and source scope. The checked-in proposal preserves the pending verdict
+described below. An approved passing policy permits seven passing legs;
+the stage wrapper verifies the matching JSON verdict for exit 0 or 2.
+
 Run the seven legs from M0-PLAN section 9:
 
 ```sh
@@ -54,7 +59,14 @@ print text that looks like a gate row. Take the report path from the LAST
 `M0-REPORT ` row, because that row is always the gate's own final row.
 Then read `summary` from that file. `python3 -P dev/m0-gates.py
 --verify-stage-log <log>` does exactly this: it exits 0 only for a saved
-gate log whose last report holds the pending ruling.
+gate log whose last report holds the expected verdict.
+
+`--expected-status PENDING|PASS` selects that verdict. The default is
+PENDING, the verdict of the current unruled tree: exit code 2, six passed
+legs, one pending leg and no failed check. PASS accepts only the report of
+an approved policy: exit code 0, seven passed legs, no pending leg and no
+failed check. The option needs `--verify-stage-log`. Alone it is an
+argument error with exit 2 and usage text on stderr.
 
 ## The trust decision remains open
 

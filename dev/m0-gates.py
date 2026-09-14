@@ -25,6 +25,8 @@ ERASE_MARKERS = ("erased Db", "erased Todo")
 # The pending M0 verdict a stage runner accepts, read from report.json only.
 PENDING_SUMMARY = {"status": "PENDING", "exit_code": 2, "passed_legs": 6,
                    "pending_legs": 1, "failed_checks": 0}
+PASS_SUMMARY = {"status": "PASS", "exit_code": 0, "passed_legs": 7,
+                "pending_legs": 0, "failed_checks": 0}
 
 
 @dataclass(frozen=True)
@@ -70,6 +72,23 @@ def invoke(check, root, grace=30):
         return 124, stdout, stderr, "deadline exceeded"
 
 
+def inventory_reason(measured, current, digest, rows):
+    """Name the clause that rejects the saved inventory. One message for every
+    clause sent the reader to the wrong evidence file."""
+    status = current["status"]
+    clauses = (
+        (measured != current,
+         "the saved inventory differs from the measured compiler sources"),
+        (status not in ("PENDING", "PASS"),
+         f"the inventory status {status} is neither PENDING nor PASS"),
+        (f"TRUSTED-INVENTORY files={len(current['files'])} sha256={digest}".encode() not in rows,
+         "the stdout hash row is missing"),
+        (f"TRUSTED-INVENTORY {status}".encode() not in rows,
+         f"the stdout status row TRUSTED-INVENTORY {status} is missing"),
+    )
+    return next((reason for failed, reason in clauses if failed), "")
+
+
 def run_check(check, root, output):
     started = time.monotonic()
     try:
@@ -90,15 +109,17 @@ def run_check(check, root, output):
         exact, reason = False, f"golden unavailable: {error}"
     good = code == 0 and markers and exact
     inventory_record = None
+    trust_state = "PENDING"
     if good and check.inventory is not None:
         try:
             data = TRUST.regular_bytes(check.inventory.parent, check.inventory.name)
             measured = json.loads(data)
             current = TRUST.inventory(root)
             digest = hashlib.sha256(data).hexdigest()
-            marker = f"TRUSTED-INVENTORY files={len(current['files'])} sha256={digest}".encode()
-            if measured != current or current["status"] != "PENDING" or marker not in stdout.splitlines():
-                raise ValueError("inventory differs from the measured compiler sources or stdout hash")
+            rejected = inventory_reason(measured, current, digest, stdout.splitlines())
+            if rejected:
+                raise ValueError(rejected)
+            trust_state = current["status"]
             inventory_record = {"path": check.inventory.name, "sha256": digest}
         except (OSError, ValueError) as error:
             good, reason = False, f"trusted inventory unavailable: {error}"
@@ -106,8 +127,8 @@ def run_check(check, root, output):
         reason = "child failed" if code else "required output differs"
     state = "PASS" if good else "FAIL"
     if good and check.name == "TRUSTED-LINES":
-        # Complete measurements cannot discharge the unruled whole-base ceiling.
-        state, reason = "PENDING", PENDING_TRUST
+        state = trust_state
+        reason = PENDING_TRUST if state == "PENDING" else ""
     streams = {}
     for name, content in (("stdout", stdout), ("stderr", stderr)):
         filename = f"{check.name}.{name}"
@@ -139,7 +160,7 @@ def seven_legs(root, output):
               "TARGET-PIN OK"),
         Check("TRUSTED-LINES", ("zsh", str(root / "dev/trusted-lines.sh"), str(root),
                                 "--output", str(output / "trusted-inventory.json")),
-              ("TRUSTED-LINES OK", "TRUSTED-INVENTORY PENDING"), expected_stderr=b"",
+              ("TRUSTED-LINES OK",), expected_stderr=b"",
               inventory=output / "trusted-inventory.json"),
         shell("KERNEL-CARRY", "kernel-carry.sh", "KERNEL-CARRY OK"),
         Check("EMIT-DIFF", (sys.executable, "-P", str(root / "dev/emit-diff.py")),
@@ -184,7 +205,7 @@ def run(root, output):
     summary = summarize(legs, support)
     report = {"format": 1, "root": str(root), "summary": summary,
               "legs": legs, "support": support, "m0_exit": "not-stamped",
-              "pending_rulings": [PENDING_TRUST]}
+              "pending_rulings": [row["reason"] for row in legs if row["status"] == "PENDING"]}
     (output / "report.json").write_text(json.dumps(report, indent=2) + "\n")
     print(f"M0-GATES {summary['status']} passed={summary['passed_legs']}/7 "
           f"pending={summary['pending_legs']} failed={summary['failed_checks']}")
@@ -193,8 +214,8 @@ def run(root, output):
     return summary["exit_code"]
 
 
-def verify_stage_log(log):
-    """Confirm the pending M0 ruling from report.json, never from a stdout row.
+def verify_stage_log(log, expected_status="PENDING"):
+    """Confirm the expected M0 verdict from report.json, never from a stdout row.
 
     A child stream is replayed into the gate's stdout, so a marker row can be
     forged. The report path is the LAST `M0-REPORT ` row: that row is always
@@ -211,9 +232,12 @@ def verify_stage_log(log):
         summary = json.loads(report.read_text())["summary"]
     except (OSError, ValueError, KeyError, TypeError) as error:
         return False, f"unreadable report {report}: {error}"
-    found = {key: summary.get(key) for key in PENDING_SUMMARY}
-    if found != PENDING_SUMMARY:
-        return False, f"report {report} is not the pending ruling: {found}"
+    if expected_status not in ("PENDING", "PASS") or not isinstance(summary, dict):
+        return False, f"report {report} or expected status is invalid"
+    expected = PENDING_SUMMARY if expected_status == "PENDING" else PASS_SUMMARY
+    found = {key: summary.get(key) for key in expected}
+    if found != expected:
+        return False, f"report {report} is not the expected {expected_status} verdict: {found}"
     return True, str(report)
 
 
@@ -221,13 +245,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, help="new directory for per-check logs and JSON")
     parser.add_argument("--verify-stage-log", type=Path,
-                        help="read a saved gate log and confirm the pending report")
+                        help="read a saved gate log and confirm its report")
+    parser.add_argument("--expected-status", choices=("PENDING", "PASS"),
+                        help="expected verdict for --verify-stage-log (default: PENDING)")
     args = parser.parse_args()
     if args.verify_stage_log is not None:
-        good, message = verify_stage_log(args.verify_stage_log)
+        good, message = verify_stage_log(args.verify_stage_log, args.expected_status or "PENDING")
         if not good:
             print(f"M0-VERIFY FAIL: {message}", file=sys.stderr)
         return 0 if good else 1
+    if args.expected_status is not None:
+        parser.error("--expected-status requires --verify-stage-log")
     try:
         if args.output is None:
             work = ROOT / ".gatework"

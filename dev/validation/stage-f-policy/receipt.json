@@ -1,0 +1,82 @@
+{
+  "format": 1,
+  "date": "2026-09-14",
+  "base_commit": "1f1b1fdfe4568b53f1618bdafe2b4f4c6c88999c",
+  "validation_root": "/Users/oobi/Documents/gpt2/lanyard-trust-policy",
+  "commands": [
+    {
+      "argv": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "F-gates"
+      ],
+      "exit_code": 0,
+      "capture": "/Users/oobi/Documents/gpt2/lanyard-trust-policy/.kanon-exec/run-Q6xzcc",
+      "verdict": "STAGE-F-GATES OK m0=PENDING"
+    },
+    {
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_approved_policy.py"
+      ],
+      "exit_code": 0,
+      "capture": "/Users/oobi/Documents/gpt2/lanyard-trust-policy/.kanon-exec/run-BS3Ffx",
+      "verdict": "LAN-APPROVED-POLICY OK",
+      "mutations": {
+        "killed": 6,
+        "pending": 0,
+        "informational": 1
+      }
+    }
+  ],
+  "m0_summary": {
+    "status": "PENDING",
+    "exit_code": 2,
+    "complete": true,
+    "passed_legs": 6,
+    "pending_legs": 1,
+    "failed_checks": 0
+  },
+  "m0_exit": "not-stamped",
+  "full_gate_report": {
+    "path": "/Users/oobi/Documents/gpt2/lanyard-trust-policy/.gatework/m0.c9ixhz49/report.json",
+    "sha256": "a70baf69d77902611a62d17d92f4915374e180606b226d30dcf1758a02a43eec"
+  },
+  "policy": {
+    "status": "PROPOSED",
+    "ruling": null,
+    "sha256": "8fca1f0fa91739665ba23994506cdee15fa6c2a05032951e01e82b55ae6b3c47"
+  },
+  "focused_tests": {
+    "inventory": 17,
+    "policy": 16,
+    "combined_gate": 34
+  },
+  "source_sha256": {
+    "README.md": "8b4a8e1b3eefa6bbec9e7cf8f596e20e30ad40da70072dc3b17e87d422bf1e19",
+    "dev/M0-BUILD-LOG.md": "71ebc65365a8452deeb9a957cca35b6851ecf5b03d77c164c21362a4e2050f66",
+    "dev/STAGE-F-GATES.md": "611ace677ee2df82afc206c08de94df76c520df9ca9d5f51aebf3b09aefddf94",
+    "dev/STAGE-F-POLICY.md": "6ac872f65d6d7f4fc7f93f7a85f291085b523d17b614e0bf279a97577fbe864d",
+    "dev/STAGE-F-TRUST.md": "b5396e5337640bbe9af4f36d806a20f4e460bf4913ab2f3a5bed0e833397e2c2",
+    "dev/m0-gates.py": "9dd34c0f8cd98c6397b883f89aef7d19a3c45b26fef6ad7a9ffb823b2042b34c",
+    "dev/stage-f-gates.sh": "5af8f52453251b86500ea5ce0e5129d48d782e9b8f6cb0f78999d867b9183f82",
+    "dev/trusted-inventory.py": "fec0ba71c5ceb18c6b356d0178bd60a7104b4d0f0b342528fd114b0a8d22fe13",
+    "dev/trusted-lines.sh": "e109b5e7dc6e9797a01a9645b13a5b0b5b1604b0cbe5fdab07fd62c1458c6cfa",
+    "dev/trusted-policy.json": "8fca1f0fa91739665ba23994506cdee15fa6c2a05032951e01e82b55ae6b3c47",
+    "dev/trusted-policy.py": "96df19d65e8d33df5cc2f40c9ceb21ba330c7d89ef0470d7c9ca66d5ecab7340",
+    "test/lan_approved_policy.py": "531c46765e32a8bcb61f4ec1d40feafbdf5d057465377d152a4e5c91419dbf2a",
+    "test/lan_m0_gate_mutations.py": "944cfa1cb3f312e4dc054bd5e1d2f3e88b631d69778da11e06235214226f0492",
+    "test/lan_m0_gates.py": "00e29c5882a380a4ddfb736606169081f8f519016dae3f3f8ac0df585888de02",
+    "test/lan_trusted_inventory.py": "5978d6f2c18b4adb68e2bc73b1034543100a1b0aff0559c2a71220f6373bbc95",
+    "test/lan_trusted_policy.py": "a0648dbb6227323f981b4823431d9b9b87e6d07636906349dcc67cfe3ceb95e8"
+  },
+  "capture_sha256": {
+    "approved.stderr": "ba33c3564636c876cf0e94261b624c2293ae81e430aceb6e49e84ebe7ed0cb7b",
+    "approved.stdout": "431b8f7a987098bd0ed6a7c4a2b19ab9864a2951cab54f8254942dbb87ea9f0d",
+    "gates.stderr": "245df99ab837439098f1d27f8fec14b4c7348897ed79332019feeffb0f6cb5f4",
+    "gates.stdout": "b9780b67d3c56b2c24e395f82681b6b0876bb46cb617e4e19de3488e8caf99cb",
+    "trusted-inventory.json": "5cbdad201eadb463646e9da710cde332682a5192e510bb944f8b55751e44393f"
+  }
+}

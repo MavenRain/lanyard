@@ -29,7 +29,7 @@ class Inventory(unittest.TestCase):
                 path.write_bytes(b"(* fixture *)\n")
         (self.work / "dev").mkdir()
         (self.work / "target").mkdir()
-        for name in ("trusted-lines.sh", "trusted-inventory.py"):
+        for name in ("trusted-lines.sh", "trusted-inventory.py", "trusted-policy.py", "trusted-policy.json"):
             shutil.copyfile(ROOT / "dev" / name, self.work / "dev" / name)
 
     def group(self, report, name):
@@ -211,6 +211,32 @@ class Inventory(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn(b"TRUSTED-LINES FAIL", result.stdout.splitlines())
         self.assertFalse(absent.exists())
+
+    def script_copy(self):
+        """Copy the inventory script into a root that holds no policy code.
+        The script loads the policy module from its OWN root, so the copy
+        exercises a missing or linked dev/trusted-policy.py."""
+        directory = tempfile.TemporaryDirectory(prefix="lanyard-trust-policy-")
+        self.addCleanup(directory.cleanup)
+        root = Path(directory.name)
+        (root / "dev").mkdir()
+        shutil.copyfile(ROOT / "dev/trusted-inventory.py", root / "dev/trusted-inventory.py")
+        return root
+
+    def test_an_unusable_policy_module_fails_the_report_without_a_traceback(self):
+        absent = self.script_copy()
+        linked = self.script_copy()
+        (linked / "dev/trusted-policy.py").symlink_to(ROOT / "dev/trusted-policy.py")
+        for root, fault in ((absent, "missing"), (linked, "symlink")):
+            with self.subTest(fault=fault):
+                result = subprocess.run(
+                    [sys.executable, "-P", str(root / "dev/trusted-inventory.py"), str(self.work)],
+                    capture_output=True, timeout=60)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn(b"TRUSTED-INVENTORY FAIL:", result.stderr)
+                self.assertIn(b"dev/trusted-policy.py", result.stderr)
+                self.assertNotIn(b"Traceback", result.stderr)
+                self.assertEqual(result.stdout, b"")
 
     @unittest.skipIf(os.geteuid() == 0, "root ignores directory modes")
     def test_an_unreadable_source_directory_fails_the_census(self):

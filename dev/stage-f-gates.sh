@@ -7,6 +7,7 @@ cd ${0:A:h}/..
 zsh dev/stage-f-axioms.sh
 python3 -P test/lan_bench.py
 python3 -P test/lan_trusted_inventory.py
+python3 -P test/lan_trusted_policy.py
 python3 -P test/lan_m0_gates.py
 python3 -P test/lan_m0_e2e.py
 python3 -P test/lan_m0_gate_mutations.py
@@ -21,12 +22,16 @@ trap 'rm -f $log' EXIT
 # from report.json, because a replayed child row can carry gate marker text.
 zsh dev/gates.sh M0 > $log || code=$?
 cat $log
-if [[ $code -ne 2 ]]; then
-  print -r -- "STAGE-F-GATES FAIL: expected the unresolved M0 ruling, exit=$code"
+if [[ $code -eq 2 ]]; then
+  expected=PENDING
+elif [[ $code -eq 0 ]]; then
+  expected=PASS
+else
+  print -r -- "STAGE-F-GATES FAIL: M0 gate failed, exit=$code"
   exit 1
 fi
-if ! python3 -P dev/m0-gates.py --verify-stage-log $log; then
-  print -r -- 'STAGE-F-GATES FAIL: the M0 report does not hold the pending ruling'
+if ! python3 -P dev/m0-gates.py --verify-stage-log $log --expected-status $expected; then
+  print -r -- 'STAGE-F-GATES FAIL: the M0 report does not match its exit status'
   exit 1
 fi
-print -r -- 'STAGE-F-GATES OK m0=PENDING'
+print -r -- "STAGE-F-GATES OK m0=$expected"
