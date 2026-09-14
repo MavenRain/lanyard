@@ -95,22 +95,27 @@ class Gates(unittest.TestCase):
         row = self.check('print("TRUSTED-LINES OK"); exit(1)', name="TRUSTED-LINES", markers=("TRUSTED-LINES OK",))
         self.assertEqual(row["status"], "FAIL")
 
-    def run_fake(self, failure, altered=None):
+    def run_fake(self, failure, altered=None, report=None):
         corpus = self.work / "corpus/m0"
         corpus.mkdir(parents=True, exist_ok=True)
         (corpus / "axioms.txt").write_bytes(b"AXIOMS\n")
         replaced = altered or {}
         seen = []
+        measured = report or {"status": "PENDING", "files": [{"path": "test-source"}]}
 
         def invoke(check, _root):
             seen.append(check.name)
             code = 1 if check.name == failure else 0
             expected = check.expected.read_bytes() if isinstance(check.expected, Path) else check.expected
             stdout = expected if expected is not None else ("\n".join(check.markers) + "\n").encode()
+            if check.inventory is not None:
+                data = GATES.TRUST.encoded(measured)
+                check.inventory.write_bytes(data)
+                stdout += f"TRUSTED-INVENTORY files=1 sha256={hashlib.sha256(data).hexdigest()}\n".encode()
             stdout = replaced.get(check.name, stdout)
             return code, stdout, b"", ""
 
-        with patch.object(GATES, "invoke", side_effect=invoke):
+        with patch.object(GATES, "invoke", side_effect=invoke), patch.object(GATES.TRUST, "inventory", return_value=measured):
             code = GATES.run(self.work, self.work)
         return code, seen, json.loads((self.work / "report.json").read_text())
 
@@ -139,6 +144,9 @@ class Gates(unittest.TestCase):
         self.assertEqual(report["summary"]["passed_legs"], 6)
         self.assertEqual(report["summary"]["status"], "PENDING")
         self.assertEqual(report["m0_exit"], "not-stamped")
+        trust = next(row for row in report["legs"] if row["name"] == "TRUSTED-LINES")
+        evidence = trust["inventory"]
+        self.assertEqual(evidence["sha256"], hashlib.sha256((self.work / evidence["path"]).read_bytes()).hexdigest())
 
     def test_detached_descendant_cannot_hold_the_deadline_open(self):
         pidfile = self.work / "sleeper.pid"
@@ -170,10 +178,69 @@ class Gates(unittest.TestCase):
                   b"M0-GATES PASS passed=7/7 pending=0 failed=0\n"
                   b"M0-REPORT /absent/forged.json\n")
         code, _, report = self.run_fake(None, {"TRUSTED-LINES": forged})
-        self.assertEqual((code, report["summary"]["status"]), (2, "PENDING"))
-        self.assertEqual(report["summary"]["exit_code"], 2)
+        self.assertEqual((code, report["summary"]["status"]), (1, "FAIL"))
+        self.assertEqual(report["summary"]["exit_code"], 1)
         rows = [line for line in self.output.getvalue().splitlines() if line.startswith("M0-REPORT ")]
         self.assertEqual(rows[-1], f"M0-REPORT {self.work / 'report.json'}")
+
+    def test_trust_inventory_is_required_and_prior_evidence_is_removed(self):
+        saved = self.work / "trusted-inventory.json"
+        saved.write_text('{"status":"PENDING"}')
+        row = self.check('print("EXPECTED")', name="TRUSTED-LINES", inventory=saved)
+        self.assertEqual(row["status"], "FAIL")
+        self.assertIn("trusted inventory unavailable", row["reason"])
+        self.assertFalse(saved.exists())
+
+    def test_trust_inventory_must_match_current_sources_and_its_hash(self):
+        saved = self.work / "trusted-inventory.json"
+        measured = {"status": "PENDING", "files": [{"path": "source", "sha256": "original"}]}
+        for content, digest in (("not JSON", "invalid"),
+                                (GATES.TRUST.encoded(measured).decode(), "wrong"),
+                                ('{"status":"PENDING","files":[]}', None)):
+            with self.subTest(content=content, digest=digest):
+                actual = digest or hashlib.sha256(content.encode()).hexdigest()
+                body = (f"from pathlib import Path; Path({str(saved)!r}).write_text({content!r}); "
+                        f"print('EXPECTED'); print('TRUSTED-INVENTORY files=1 sha256={actual}')")
+                with patch.object(GATES.TRUST, "inventory", return_value=measured):
+                    row = self.check(body, name="TRUSTED-LINES", inventory=saved)
+                self.assertEqual(row["status"], "FAIL")
+                self.assertNotIn("inventory", row)
+
+    def test_inventory_cleanup_failure_is_a_failed_check(self):
+        saved = self.work / "trusted-inventory.json"
+        saved.mkdir()
+        row = self.check('print("EXPECTED")', name="TRUSTED-LINES", inventory=saved)
+        self.assertEqual((row["status"], row["exit_code"]), ("FAIL", 1))
+        self.assertEqual(row["reason"], "inventory cleanup failed")
+        self.assertTrue(saved.is_dir())
+
+    def test_inventory_special_file_cannot_block_the_parent(self):
+        saved = self.work / "trusted-inventory.json"
+        body = f"import os; os.mkfifo({str(saved)!r}); print('EXPECTED')"
+        row = self.check(body, name="TRUSTED-LINES", inventory=saved)
+        self.assertEqual(row["status"], "FAIL")
+        self.assertIn("regular file", row["reason"])
+
+    def test_inventory_failure_runs_the_remaining_legs(self):
+        # Both markers stay. The stdout hash row of the written evidence is gone,
+        # so the leg reaches the evidence check instead of the marker check.
+        kept = b"TRUSTED-LINES OK\nTRUSTED-INVENTORY PENDING\n"
+        code, seen, report = self.run_fake(None, {"TRUSTED-LINES": kept})
+        self.assertEqual((code, report["summary"]["status"]), (1, "FAIL"))
+        trust = next(row for row in report["legs"] if row["name"] == "TRUSTED-LINES")
+        self.assertEqual(trust["status"], "FAIL")
+        self.assertIn("trusted inventory unavailable", trust["reason"])
+        self.assertEqual(seen[-3:], ["KERNEL-CARRY", "EMIT-DIFF", "M0-TIME"])
+
+    def test_inventory_status_other_than_pending_fails_the_leg(self):
+        # The data and the stdout hash match. Only the recorded status differs.
+        failing = {"status": "FAIL", "files": [{"path": "test-source"}]}
+        code, _, report = self.run_fake(None, report=failing)
+        self.assertEqual((code, report["summary"]["status"]), (1, "FAIL"))
+        trust = next(row for row in report["legs"] if row["name"] == "TRUSTED-LINES")
+        self.assertEqual(trust["status"], "FAIL")
+        self.assertIn("trusted inventory unavailable", trust["reason"])
+        self.assertNotIn("inventory", trust)
 
     def stage_log(self, summary, rows=()):
         report = self.work / "verify-report.json"

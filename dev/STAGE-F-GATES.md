@@ -84,6 +84,15 @@ The kernel plus Rust eraser measures 5516, which is 35 above the fixed
 These are inventories, not proposed or ratified limits. The base growth
 and the additional files need explicit treatment in the user ruling.
 
+Those measurements describe the original combined-gate slice. The
+[compiler source inventory](STAGE-F-TRUST.md) now also measures fusion
+(218 lines), other kernel-library sources (618), the frontend (2920)
+and the driver (212). The bridge group is now 409 lines. Its JSON lists
+all 46 current OCaml source files and their hashes without assigning
+the pending limits or extending the ratified kernel bucket.
+M0 saves this inventory beside its report and compares it against the
+current source bytes. Missing or stale evidence fails TRUSTED-LINES.
+
 ## Validation and controls
 
 ```sh
@@ -93,7 +102,8 @@ python3 -P test/lan_m0_gate_mutations.py
 ```
 
 The stage command retains the cumulative F-axioms compiler and emission
-tests, the timing tests, the gate tests, and the M0-E2E runner regressions.
+tests, the timing tests, the source inventory tests, the gate tests,
+and the M0-E2E runner regressions.
 It runs M0 once at the
 end. Its success line is `STAGE-F-GATES OK m0=PENDING`: this validates
 the implementation while preserving the unresolved M0 result.

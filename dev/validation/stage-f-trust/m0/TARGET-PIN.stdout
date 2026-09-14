@@ -1,0 +1,4 @@
+TARGET-PIN PIN OK libraries=2
+TARGET-PIN ANCHOR OK sites=4
+TARGET-PIN DIFF OK signatures=2 anchors=4
+TARGET-PIN OK

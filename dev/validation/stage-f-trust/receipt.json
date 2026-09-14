@@ -1,0 +1,161 @@
+{
+  "format": 1,
+  "base_commit": "db779ef36211665718a62ad83ab50e21a6fe8148",
+  "checkout": "/Users/oobi/Documents/gpt2/lanyard-trust",
+  "captures": {
+    "inventory-unit": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-trust/.kanon-exec/run-44RWJO",
+      "exit_code": 0,
+      "manifest": {
+        "path": "inventory-unit-capture.json",
+        "sha256": "f30af4a5847693242db3938c6eeda0d630f6f3a579cbbe6fb3668754c5b03200"
+      },
+      "streams": {
+        "stdout": {
+          "path": "inventory-unit.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "inventory-unit.stderr",
+          "sha256": "fb850a6222c6333bfdb9eb57cf8507dbd3175fe2989139ed8d5042b635b1ad2d"
+        }
+      }
+    },
+    "gate-unit": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-trust/.kanon-exec/run-AVfGLU",
+      "exit_code": 0,
+      "manifest": {
+        "path": "gate-unit-capture.json",
+        "sha256": "b6ed8205eba43f4f940c6e53b4b5ae29a5b6e3040a4e43297b6e6ddbaedb5ac9"
+      },
+      "streams": {
+        "stdout": {
+          "path": "gate-unit.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "gate-unit.stderr",
+          "sha256": "2f23bc4574ac0bce590e12326802e1a1d54272dc249f21192fba7ed81ecf7c1b"
+        }
+      }
+    },
+    "e2e-unit": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-trust/.kanon-exec/run-5MYtqI",
+      "exit_code": 0,
+      "manifest": {
+        "path": "e2e-unit-capture.json",
+        "sha256": "13cf6a85aec526d799b2c5e21fbab73618cdeb0cc8ce13132ad7100045c50d9a"
+      },
+      "streams": {
+        "stdout": {
+          "path": "e2e-unit.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "e2e-unit.stderr",
+          "sha256": "1f68dcb2ad3dc6da4002eb6d7cb00ea030c0acc8262a8fa2dd53155411d5bd1d"
+        }
+      }
+    },
+    "stage": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-trust/.kanon-exec/run-Dg7Fbz",
+      "exit_code": 0,
+      "manifest": {
+        "path": "stage-capture.json",
+        "sha256": "960a4a2b1eb36c9d73b5937ed2d23091d04d8336459eed9e2923168a867e0f21"
+      },
+      "streams": {
+        "stdout": {
+          "path": "stage.stdout",
+          "sha256": "1a3c4008402eb26f5c6764df7252aa44662ab98bc079e0813c00b3610103caa9"
+        },
+        "stderr": {
+          "path": "stage.stderr",
+          "sha256": "fc5677a1d238a0f4d9b6a8c92cb66f6e6da9851c89b0a8d7f43c3f481fd0fdb0"
+        }
+      }
+    },
+    "house": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-trust/.kanon-exec/run-LVC204",
+      "exit_code": 0,
+      "manifest": {
+        "path": "house-capture.json",
+        "sha256": "58561fa27b6d64244b2918fcd7210054632a723113c1ad12ceebeab02220baa1"
+      },
+      "streams": {
+        "stdout": {
+          "path": "house.stdout",
+          "sha256": "c72694d5491337521edbc7f0c4c1efcc5c9d0a0ef79eb3aa780ab7c587a67504"
+        },
+        "stderr": {
+          "path": "house.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  },
+  "m0_summary": {
+    "status": "PENDING",
+    "exit_code": 2,
+    "complete": true,
+    "passed_legs": 6,
+    "pending_legs": 1,
+    "failed_checks": 0
+  },
+  "trusted_inventory": {
+    "path": "m0/trusted-inventory.json",
+    "sha256": "15b0d96033c533a452e7b0ffc55eb38a9656d87c59faaeb0c8f1f25fd12ff751"
+  },
+  "notes": [
+    "The final stage and E2E unit suite ran outside the filesystem sandbox with the normal Apple Git launcher.",
+    "Sandboxed baseline E2E assertions failed on Apple's confstr and installation-template warnings. No E2E assertion or output comparison was changed.",
+    "The source inventory and gate unit captures cover 13 and 30 tests; the unchanged E2E suite covers 19 tests.",
+    "The cumulative stage retains five killed M0 assertion mutations; the fifty-line printer control remains pending and timing remains informational.",
+    "The inventory covers 46 OCaml sources and records all whole-base allowance and scope rulings as pending. No M0 exit stamp was written."
+  ],
+  "files": {
+    "e2e-unit-capture.json": "13cf6a85aec526d799b2c5e21fbab73618cdeb0cc8ce13132ad7100045c50d9a",
+    "e2e-unit.stderr": "1f68dcb2ad3dc6da4002eb6d7cb00ea030c0acc8262a8fa2dd53155411d5bd1d",
+    "e2e-unit.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gate-unit-capture.json": "b6ed8205eba43f4f940c6e53b4b5ae29a5b6e3040a4e43297b6e6ddbaedb5ac9",
+    "gate-unit.stderr": "2f23bc4574ac0bce590e12326802e1a1d54272dc249f21192fba7ed81ecf7c1b",
+    "gate-unit.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "house-capture.json": "58561fa27b6d64244b2918fcd7210054632a723113c1ad12ceebeab02220baa1",
+    "house.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "house.stdout": "c72694d5491337521edbc7f0c4c1efcc5c9d0a0ef79eb3aa780ab7c587a67504",
+    "inventory-unit-capture.json": "f30af4a5847693242db3938c6eeda0d630f6f3a579cbbe6fb3668754c5b03200",
+    "inventory-unit.stderr": "fb850a6222c6333bfdb9eb57cf8507dbd3175fe2989139ed8d5042b635b1ad2d",
+    "inventory-unit.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/BUILD.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/BUILD.stdout": "9e007d7a4010fcc271a69a2546c4c166962b8c019f48235eca93e8512b6a997b",
+    "m0/EMIT-DIFF.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/EMIT-DIFF.stdout": "e83419d200608a5f19d93114069302362462b323bbe068e277e80225bb8a8172",
+    "m0/HOUSE.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/HOUSE.stdout": "c72694d5491337521edbc7f0c4c1efcc5c9d0a0ef79eb3aa780ab7c587a67504",
+    "m0/KERNEL-CARRY.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/KERNEL-CARRY.stdout": "1bf386234e9293888a1c49e455bd91f1f0c8f8c6a7772a7aa31d8c75302533fd",
+    "m0/M0-AXIOMS.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/M0-AXIOMS.stdout": "4fed8439efacdf565cefce884232afe52b0d70df00498667e6d5471f71f3e4d8",
+    "m0/M0-CHECK.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/M0-CHECK.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/M0-ERASE.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/M0-ERASE.stdout": "87d03e9536ac97618e3f0df32ae2eb45faf14bcde620d269e80aad478fd5e3c2",
+    "m0/M0-TIME.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/M0-TIME.stdout": "eb61955ddabdc4683d1a28d60b742284c8f68a25eff83c8164773216b6cd7b9d",
+    "m0/R0-COUNT.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/R0-COUNT.stdout": "a2d5da77ba6be9fc6f442fb3970ab1523cfd348eec3a98f6c482957c23c4193e",
+    "m0/R0-TARGET.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/R0-TARGET.stdout": "1b5d4c33bdae81a5cf95b1eeb26d4555d62c9eaad3f7423d0781e05c84d033eb",
+    "m0/TARGET-PIN.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/TARGET-PIN.stdout": "f03fd02fc500e4df7e11079207a2b15306c4465f46b89085beb20573a4ab8d3c",
+    "m0/TRUSTED-LINES.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0/TRUSTED-LINES.stdout": "e2fea8b2f15a7c7d8af733c62bd5a356eeafaf0f0ad2160a6d6278e15abe25f7",
+    "m0/report.json": "81c085acef6a3e72f395b6bfebc6c8bae2546878913b5c6649133dc7027a3094",
+    "m0/timings.json": "a855edea370c33fa7ef3f02446b2066991056f5d26d30ff39c96651b83cf9d3b",
+    "m0/trusted-inventory.json": "15b0d96033c533a452e7b0ffc55eb38a9656d87c59faaeb0c8f1f25fd12ff751",
+    "source-sha256.json": "085b41aed3a9b7f78c8e25d27137f21747b021fd8f96afd4d19205db95436771",
+    "stage-capture.json": "960a4a2b1eb36c9d73b5937ed2d23091d04d8336459eed9e2923168a867e0f21",
+    "stage.stderr": "fc5677a1d238a0f4d9b6a8c92cb66f6e6da9851c89b0a8d7f43c3f481fd0fdb0",
+    "stage.stdout": "1a3c4008402eb26f5c6764df7252aa44662ab98bc079e0813c00b3610103caa9"
+  }
+}

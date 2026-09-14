@@ -1,0 +1,19 @@
+M0-TIME status=REPORTED binding=false
+METHOD warmups=1 runs=5 timer=perf_counter_ns emit=check+target-module
+LOAD max_1m=27.51 status=NOISY
+WINDOW seconds=33.284 same_minute=true
+BENCH check-100 lines=100 median_ms=21.245 min_ms=19.610 max_ms=33.901 runs=5
+BENCH emit-target-100 lines=100 median_ms=22.707 min_ms=21.269 max_ms=35.664 runs=5
+BENCH check-500 lines=500 median_ms=30.618 min_ms=28.095 max_ms=38.441 runs=5
+BENCH emit-target-500 lines=500 median_ms=65.222 min_ms=63.805 max_ms=71.207 runs=5
+BENCH check-1000 lines=1000 median_ms=47.291 min_ms=44.931 max_ms=51.110 runs=5
+BENCH emit-target-1000 lines=1000 median_ms=165.309 min_ms=162.396 max_ms=172.776 runs=5
+BENCH todo-check lines=17 median_ms=18.249 min_ms=15.444 max_ms=23.144 runs=5
+BENCH todo-crate lines=17 median_ms=17.513 min_ms=16.617 max_ms=21.829 runs=5
+FIT check F_ms=17.520597 m_ms_per_kloc=29.120079 r_squared=0.990741 points=3
+FIT emit-target F_ms=-1.003704 m_ms_per_kloc=160.156060 r_squared=0.973041 points=3
+FIT go F_ms=254.113407 m_ms_per_kloc=31.776212 r_squared=0.524639 points=13
+DENOMINATOR source=same-run-refit sha256=ba1293a3f8970531ab32490fc20d55fd8a04cb16ca7f45d2ca0956075f4bf03d status=NOISY
+RATIO check kloc=1.000 total=0.163142 slope=0.916411 status=REPORTED
+RATIO emit-target kloc=1.000 total=0.556692 slope=5.040124 status=REPORTED
+REPORTED: one Arc clone and its matching drop costs 22.4209 ns and one Rc clone and its matching drop costs 4.1950 ns, so the price of the atomic is 18.2259 ns per clone, median of five runs at 20000000 clones, NOISY at load average 16.85;  this number is reported at M0 and it binds at no milestone.

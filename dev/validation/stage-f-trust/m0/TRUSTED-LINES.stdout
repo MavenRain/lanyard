@@ -1,0 +1,23 @@
+TRUSTED-INVENTORY files=46 sha256=15b0d96033c533a452e7b0ffc55eb38a9656d87c59faaeb0c8f1f25fd12ff751
+TRUSTED-INVENTORY PENDING
+TRUSTED-LINES rir=155 allowance=A_rir (pending user ruling)
+TRUSTED-LINES erase=1519 baseline=1484
+TRUSTED-LINES erase-kan=1484 (ceiling treatment pending user ruling)
+TRUSTED-LINES eterm=117 (ceiling treatment pending user ruling)
+TRUSTED-LINES target-bridge=104 (ceiling treatment pending user ruling)
+TRUSTED-LINES specialization=87 (ceiling treatment pending user ruling)
+TRUSTED-LINES fusion=218 (ceiling treatment pending user ruling)
+TRUSTED-LINES target-bridge-total=409 (ceiling treatment pending user ruling)
+TRUSTED-LINES emit=658 allowance=A_emit (pending user ruling)
+TRUSTED-LINES foreign=65 allowance=A_emit (pending user ruling)
+TRUSTED-LINES template=71 allowance=A_emit (pending user ruling)
+TRUSTED-LINES effects=46 allowance=A_emit (pending user ruling)
+TRUSTED-LINES model=221 allowance=A_emit (pending user ruling)
+TRUSTED-LINES connection=66 allowance=A_emit (pending user ruling)
+TRUSTED-LINES crate=30 allowance=A_emit (pending user ruling)
+TRUSTED-LINES reachable=74 allowance=A_emit (pending user ruling)
+TRUSTED-LINES printer-total=1231 allowance=A_emit (pending user ruling)
+TRUSTED-LINES signature=104 allowance=A_sig (pending user ruling)
+TRUSTED-LINES kernel=3997/4000
+M0 ceiling: 5481 + A_rir + A_emit + A_sig
+TRUSTED-LINES OK

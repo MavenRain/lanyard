@@ -1,0 +1,12 @@
+{
+  "README.md": "d5fe3c83d0ed415500003e95317c191b384186b80ea596bc492632fdb0230045",
+  "dev/M0-BUILD-LOG.md": "ff689ce0b9ce6f9ef8d143742a2733069564bbdb6ae3f6371756a9985b82e3f0",
+  "dev/STAGE-F-GATES.md": "ba8eb059e76bdbd261a76853d78dc32ab9a8c8d98bf089b8458b490f40db6225",
+  "dev/STAGE-F-TRUST.md": "a02da4da04cfd9d3fcf82fbeb2a332358bd8829c57ca4be37c104aa8ee96b093",
+  "dev/m0-gates.py": "69aa998f109b3c2ed31b6798d7be4c426a59d0cd19b0b3185dfa46788cb39c85",
+  "dev/stage-f-gates.sh": "a3e2c3bc462589548484d0d221fc5d81f83e9db4b76ac49572ed418cbafdb820",
+  "dev/trusted-inventory.py": "871abf3fbe1536999a3b32470c2864a5c81446b906098ea360802175ad6dd129",
+  "dev/trusted-lines.sh": "95ead7ac2a90713bd5fbc3860691258c2f05a589e41e8b33665b2a396d2b30b2",
+  "test/lan_m0_gates.py": "0f7d7ccf6f7194c5129ec4299883c0b2f536defe7a7d300e7dd86f691aef0274",
+  "test/lan_trusted_inventory.py": "c19546b4e70c3ae721bff6326754dcb9b1a0b77b8b4a11fc6e930607561ef776"
+}

@@ -6,6 +6,7 @@ unfunction chpwd 2>/dev/null || true
 cd ${0:A:h}/..
 zsh dev/stage-f-axioms.sh
 python3 -P test/lan_bench.py
+python3 -P test/lan_trusted_inventory.py
 python3 -P test/lan_m0_gates.py
 python3 -P test/lan_m0_e2e.py
 python3 -P test/lan_m0_gate_mutations.py

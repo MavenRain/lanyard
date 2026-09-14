@@ -2735,3 +2735,130 @@ message.
 The frozen capture dev/validation/stage-f-e2e/e2e/report.json predates
 this round. It holds the old CRATE-INIT and CRATE-INDEX arguments and the
 old copied `libraries` block. It is not refreshed.
+
+## M0 Stage F: complete OCaml source inventory, 2026-09-13
+
+This slice starts at `db779ef36211665718a62ad83ab50e21a6fe8148` in a
+clean checkout and is validated under
+`/Users/oobi/Documents/gpt2/lanyard-trust`. It adds a deterministic
+inventory with relative paths, newline counts, byte counts and hashes
+for all 46 current OCaml compiler sources, including generated target
+signatures. The required roster matches the twelve-file shell kernel
+bucket. Missing required files and directories fail, and new source
+paths enter a separate group with pending scope.
+
+The inventory includes `surface/fuse.ml`, previously omitted from the
+bridge measurement. Its 218 lines bring lowering, specialization and
+fusion to 409 lines. It also records the remaining kernel-library
+sources, frontend and driver as scope candidates. The kernel remains
+3997/4000, the Rust eraser 1519, Rust IR 155, complete printer 1231 and
+generated signatures 104. The three allowance numbers and ceiling
+total stay null. Base growth, source scope and M0-EXIT remain open.
+
+TRUSTED-LINES checks file types before the shell counts them. Symlinks
+and special files fail without a blocking read. The M0 runner stores
+the inventory's path and hash, verifies its stdout hash and compares
+the saved data with a fresh source measurement. A stale report cannot
+satisfy a later mutation check. Inventory cleanup or read failures
+become failed checks and retain the later independent legs.
+
+Validation: 13 source inventory tests, 30 M0 runner tests and the 19
+unchanged E2E runner tests pass. The complete cumulative command
+`zsh dev/gates.sh --stage F-gates` exits zero with
+`STAGE-F-GATES OK m0=PENDING`. Its M0 report contains six passing legs,
+one pending leg and no failed check. All five existing assertion
+mutations are killed; the 50-line printer control remains pending and
+M0-TIME remains informational. The passing stage capture is
+`run-Dg7Fbz`, with its logs, final M0 report and inventory retained under
+`dev/validation/stage-f-trust/`.
+
+The first stage attempt exposed the broad HOUSE catch-site scan in the
+new Python test cleanup blocks; those blocks now use context-managed
+cleanup. A sandboxed cumulative attempt then reached the existing E2E
+tests and failed their exact stderr assertions on Apple's Git launcher
+`confstr()` warning. Direct invocation of the underlying Git binary
+also required its installation template lookup. The unchanged E2E suite
+and final cumulative gate passed outside the sandbox using normal Git.
+No E2E assertion, marker, deadline or output comparison was weakened.
+
+## M0 Stage F review fixes (tag LSFTR, 2026-09-13)
+
+### Round 1
+
+- F-1 (medium). dev/trusted-lines.sh:43. The root slot accepted an
+  option, so `zsh dev/trusted-lines.sh --output X` passed `--output X` to
+  the Python child, the child measured its own default root, wrote X, and
+  the shell then failed on `wc -l --output/lib/shape.ml`; every rerun
+  failed on the existing file. The script now rejects a first argument
+  that starts with `-`: it prints the usage row on stderr and the
+  `TRUSTED-LINES FAIL` row on stdout, and exits 1 before the child runs
+  and before any write. Test:
+  test_an_option_in_the_root_slot_is_rejected_before_any_write.
+- F-2 (low). dev/trusted-inventory.py:55. `sorted(base.rglob("*"))`
+  skipped an unreadable subdirectory in silence, so sources below it
+  dropped out of a census that claims every current OCaml source. The
+  census now walks with `base.walk(on_error=reraise,
+  follow_symlinks=False)`, which raises the OSError, checks every
+  directory name and file name for a symlink as the previous loop did,
+  and keeps the sorted, deterministic result. Test:
+  test_an_unreadable_source_directory_fails_the_census.
+- F-3 (low). test/lan_trusted_inventory.py:41. The shell() and cli()
+  helpers used `timeout=10` while test/lan_m0_e2e.py uses 30 and 60, and
+  the fixture leg measured 2.2 s at load 50. Both helper timeouts are now
+  30. Test: none new; the existing cases use the raised timeouts.
+- F-4 (low). dev/m0-gates.py:100. No test reached the
+  `current["status"] != "PENDING"` clause with matching data and a
+  matching stdout hash, so deleting the clause kept the suite green. The
+  product code is unchanged; run_fake now takes a `report` argument for
+  the inventory the fake child writes and the patched measurement
+  returns. Test: test_inventory_status_other_than_pending_fails_the_leg.
+- F-5 (low). test/lan_m0_gates.py:224. The replaced TRUSTED-LINES stdout
+  dropped the `TRUSTED-INVENTORY PENDING` marker, so the leg failed at
+  the marker check and never reached the inventory branch the test names.
+  The product code is unchanged; the replaced stdout keeps both markers
+  and drops the stdout hash row instead, and the case now asserts the
+  reason `trusted inventory unavailable` and the three later legs. Test:
+  test_inventory_failure_runs_the_remaining_legs.
+- F-6 (nit). dev/STAGE-F-TRUST.md:24. The "M0 evidence and validation"
+  section did not record that a successful TRUSTED-LINES child fails the
+  leg on any stderr byte (dev/m0-gates.py:142 `expected_stderr=b""`).
+  One sentence there now states the empty stderr requirement. Test: none.
+- F-7 (nit). test/lan_trusted_inventory.py:190. No case covered an
+  unknown option or an absent `--output` parent directory through the
+  shell. The product code is unchanged; two shell cases now assert exit
+  1, the `TRUSTED-LINES FAIL` row on stdout and that no file was written.
+  Tests: test_an_unknown_option_fails_the_shell_leg_without_a_write and
+  test_an_absent_output_parent_fails_the_shell_leg_without_a_write.
+
+Unit results with cwd at the repository root: `python3 -P
+test/lan_trusted_inventory.py` gave `Ran 17 tests` and OK with rc 0;
+`python3 -P test/lan_m0_gates.py` gave `Ran 31 tests` and OK with rc 0.
+`zsh -n dev/trusted-lines.sh` passed.
+
+Fix ladder fix-1 (2026-09-13 21:05 PDT, load 35): RED at `HOUSE
+one-catch-site FAIL`. The F-2 test restored the directory mode in a
+`try` and `finally` block, and dev/house.sh permits exactly one `try`
+site in the tree (test/sys_io.ml:19). Every row before HOUSE was OK,
+including TRUSTED-LINES with the 46-file inventory.
+
+### Round 2
+
+- HOUSE one-catch-site. test/lan_trusted_inventory.py:222. The mode
+  restore in test_an_unreadable_source_directory_fails_the_census now
+  uses `self.addCleanup(locked.chmod, 0o755)`. Cleanups run last-in
+  first-out, so the restore runs before the fixture directory cleanup.
+  No `try` keyword remains outside test/sys_io.ml. Product code is
+  unchanged.
+
+Unit results with cwd at the repository root: `python3 -P
+test/lan_trusted_inventory.py` gave `Ran 17 tests` and OK with rc 0.
+
+Fix ladder fix-2 (2026-09-13 21:19 PDT) was lost when its launcher
+process was killed before the verdict, with no source change after
+round 2. Fix ladder fix-3 (2026-09-13 22:03 PDT, load 25): GREEN.
+Verdict row `GATE LSFTR tag=fix-3 GREEN`, `STAGE-GATE-EXIT 0`, ROWS
+86/86 IDENTICAL against the frozen capture, PINS ok=21 missing=0,
+RED-WATCH hits=0, `M0-GATES PENDING passed=6/7 pending=1 failed=0`,
+`M0-GATE-MUTATIONS OK killed=5 pending=1 informational=1
+restored=GREEN`, TRUSTED-INVENTORY files=46, suites Ran 17 and Ran 31
+OK.

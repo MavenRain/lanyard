@@ -18,7 +18,8 @@ Crate emission specializes finite checked handlers into direct operation
 bodies. The M0 Todo corpus emits a complete crate that creates and prints
 a row. Stage F adds classified axiom reports, the AXIOM-RATIO inputs,
 and informational compiler timings with a Go denominator refit. The
-combined M0 gate records all seven legs and unresolved trust decisions.
+combined M0 gate records all seven legs and unresolved trust decisions,
+with a complete OCaml source inventory and per-file hashes.
 The M0-E2E gate builds the pinned Todo crate offline and checks its output.
 Other model field types, general recursive handlers and the M0 exit stamp
 remain ahead. The generated signature allowance is proposed at
@@ -201,6 +202,17 @@ exit 2 while the whole-base trust allowances and scope remain unruled;
 an actual failure returns exit 1. The stage command validates the gate
 implementation and retains that pending M0 result. The M0 exit stamp
 remains the user's decision.
+
+Inspect the [compiler source inventory](dev/STAGE-F-TRUST.md):
+
+```sh
+python3 -P dev/trusted-inventory.py --output /tmp/lanyard-trust.json
+```
+
+The saved JSON records 46 current OCaml sources, including handler
+fusion, and leaves the open limits and scope decisions pending. M0
+verifies the inventory against the current source bytes and retains it
+beside the gate report.
 
 Run the [M0 SQLite execution gate](dev/STAGE-F-E2E.md) with clean local
 checkouts of the pinned libraries and the locked dependencies cached:

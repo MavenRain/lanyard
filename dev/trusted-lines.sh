@@ -1,6 +1,6 @@
 #!/bin/zsh
-# dev/trusted-lines.sh [ROOT]
-# The TRUSTED-LINES leg of the gate battery, in its M0 Stage A form.
+# dev/trusted-lines.sh [ROOT] [--output NEW_JSON]
+# The TRUSTED-LINES measurements and inventory. Whole-base rulings remain open.
 # Example:
 #   zsh /Users/oobi/Documents/lanyard/dev/trusted-lines.sh
 #
@@ -24,8 +24,9 @@
 #   TRUSTED-LINES kernel=3997/4000
 #   M0 ceiling: 5481 + A_rir + A_emit + A_sig
 #   TRUSTED-LINES OK
-# One measurement row per Stage B and Stage D file joins them when that file
-# is present.  A measured file that is absent fails the leg.
+# The final inventory requires every current compiler source and the generated
+# signatures. It records additional sources as candidates with unassigned scope.
+# An absent source fails even when its older measurement block would be skipped.
 #
 # SA-D7: the root comes from this script's own path when no argument is
 # given, so a copy of the repository under a scratch directory measures
@@ -39,7 +40,20 @@ set -u
 chpwd_functions=()
 unfunction chpwd 2>/dev/null
 
+# SA-D8: the root slot holds a path only.  An option there reached the
+# Python child as an option and let the child write its output file
+# against its own default root, so every rerun failed on the existing
+# file.  Reject the option before the child runs and before any write.
+if [[ $# -gt 0 && $1 == -* ]]; then
+  print -r -- 'usage: trusted-lines.sh [ROOT] [--output NEW_JSON]' >&2
+  print -r -- 'TRUSTED-LINES FAIL'
+  exit 1
+fi
+
 root=${1:-${0:A:h}/..}
+if [[ $# -gt 0 ]]; then
+  shift
+fi
 
 kernel_bound=4000
 
@@ -69,6 +83,12 @@ kernel_files=(
   $root/lib/bignum.ml
 )
 
+# Check path types before wc can read a link or block on a special file.
+if ! python3 -P ${0:A:h}/trusted-inventory.py $root "$@"; then
+  print -r -- 'TRUSTED-LINES FAIL'
+  exit 1
+fi
+
 # wc -l over more than one file ends with a total row, which awk reads.
 kernel_out=$(wc -l $kernel_files)
 kernel_code=$?
@@ -88,7 +108,7 @@ line="TRUSTED-LINES kernel=$kernel/$kernel_bound"
 # lib/eterm.ml serves only that carried eraser, so both get a measurement row.
 # Their place in the base is an open user ruling, so no row moves a bound.
 if [[ -f $root/lib/rir.ml ]]; then
-  measured_files=(lib/erase.ml lib/erase_kan.ml lib/eterm.ml surface/lower.ml surface/specialize.ml)
+  measured_files=(lib/erase.ml lib/erase_kan.ml lib/eterm.ml surface/lower.ml surface/specialize.ml surface/fuse.ml)
   for measured in $measured_files; do
     if [[ ! -f $root/$measured ]]; then
       print -r -- "TRUSTED-LINES FAIL: $measured missing"
@@ -101,9 +121,10 @@ if [[ -f $root/lib/rir.ml ]]; then
   eterm_lines=$(wc -l < $root/lib/eterm.ml | tr -d ' ')
   lower_lines=$(wc -l < $root/surface/lower.ml | tr -d ' ')
   specialize_lines=$(wc -l < $root/surface/specialize.ml | tr -d ' ')
+  fuse_lines=$(wc -l < $root/surface/fuse.ml | tr -d ' ')
   # Quote each word.  An unquoted empty parameter drops out of the list, so
   # the guard could not see it.
-  for count in "$rir_lines" "$erase_lines" "$erase_kan_lines" "$eterm_lines" "$lower_lines" "$specialize_lines"; do
+  for count in "$rir_lines" "$erase_lines" "$erase_kan_lines" "$eterm_lines" "$lower_lines" "$specialize_lines" "$fuse_lines"; do
     if [[ -z $count ]]; then
       print -r -- "TRUSTED-LINES FAIL: a measured file has an empty line count"
       exit 1
@@ -115,7 +136,8 @@ if [[ -f $root/lib/rir.ml ]]; then
   print -r -- "TRUSTED-LINES eterm=$eterm_lines (ceiling treatment pending user ruling)"
   print -r -- "TRUSTED-LINES target-bridge=$lower_lines (ceiling treatment pending user ruling)"
   print -r -- "TRUSTED-LINES specialization=$specialize_lines (ceiling treatment pending user ruling)"
-  print -r -- "TRUSTED-LINES target-bridge-total=$((lower_lines + specialize_lines)) (ceiling treatment pending user ruling)"
+  print -r -- "TRUSTED-LINES fusion=$fuse_lines (ceiling treatment pending user ruling)"
+  print -r -- "TRUSTED-LINES target-bridge-total=$((lower_lines + specialize_lines + fuse_lines)) (ceiling treatment pending user ruling)"
 fi
 
 # Stage E measures the printer without assigning its pending allowance.

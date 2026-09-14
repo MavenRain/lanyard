@@ -2,6 +2,7 @@
 import argparse
 from dataclasses import dataclass
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -12,6 +13,9 @@ import tempfile
 import time
 
 ROOT = Path(__file__).resolve().parent.parent
+TRUST_SPEC = importlib.util.spec_from_file_location("trusted_inventory", ROOT / "dev/trusted-inventory.py")
+TRUST = importlib.util.module_from_spec(TRUST_SPEC)
+TRUST_SPEC.loader.exec_module(TRUST)
 PENDING_TRUST = "A_rir, A_emit, A_sig and trusted-file scope require user rulings"
 LEG_NAMES = ("R0-COUNT", "R0-TARGET", "TARGET-PIN", "TRUSTED-LINES",
              "KERNEL-CARRY", "EMIT-DIFF", "M0-TIME")
@@ -31,6 +35,7 @@ class Check:
     timeout: int = 120
     expected: bytes | Path | None = None
     expected_stderr: bytes | None = None
+    inventory: Path | None = None
 
 
 def drain(child, grace):
@@ -67,7 +72,15 @@ def invoke(check, root, grace=30):
 
 def run_check(check, root, output):
     started = time.monotonic()
-    code, stdout, stderr, reason = invoke(check, root)
+    try:
+        if check.inventory is not None:
+            # Repeated mutation checks reuse their output directory. Remove only
+            # this check's prior report, so a silent child cannot reuse old evidence.
+            check.inventory.unlink(missing_ok=True)
+    except OSError as error:
+        code, stdout, stderr, reason = 1, b"", str(error).encode(), "inventory cleanup failed"
+    else:
+        code, stdout, stderr, reason = invoke(check, root)
     markers = all(marker.encode() in stdout.splitlines() for marker in check.markers)
     try:
         expected = check.expected.read_bytes() if isinstance(check.expected, Path) else check.expected
@@ -76,12 +89,24 @@ def run_check(check, root, output):
     except OSError as error:
         exact, reason = False, f"golden unavailable: {error}"
     good = code == 0 and markers and exact
+    inventory_record = None
+    if good and check.inventory is not None:
+        try:
+            data = TRUST.regular_bytes(check.inventory.parent, check.inventory.name)
+            measured = json.loads(data)
+            current = TRUST.inventory(root)
+            digest = hashlib.sha256(data).hexdigest()
+            marker = f"TRUSTED-INVENTORY files={len(current['files'])} sha256={digest}".encode()
+            if measured != current or current["status"] != "PENDING" or marker not in stdout.splitlines():
+                raise ValueError("inventory differs from the measured compiler sources or stdout hash")
+            inventory_record = {"path": check.inventory.name, "sha256": digest}
+        except (OSError, ValueError) as error:
+            good, reason = False, f"trusted inventory unavailable: {error}"
     if not reason and not good:
         reason = "child failed" if code else "required output differs"
     state = "PASS" if good else "FAIL"
     if good and check.name == "TRUSTED-LINES":
-        # The carried script enforces only the kernel bound. A successful
-        # measurement cannot discharge the still-unruled whole-base ceiling.
+        # Complete measurements cannot discharge the unruled whole-base ceiling.
         state, reason = "PENDING", PENDING_TRUST
     streams = {}
     for name, content in (("stdout", stdout), ("stderr", stderr)):
@@ -91,6 +116,8 @@ def run_check(check, root, output):
     row = {"name": check.name, "status": state, "exit_code": code,
            "command": list(check.argv), "reason": reason, "streams": streams,
            "elapsed_ms": (time.monotonic() - started) * 1000}
+    if inventory_record is not None:
+        row["inventory"] = inventory_record
     print(f"M0 {check.name} {state}" + (f": {reason}" if reason else ""), flush=True)
     if check.name in ("TRUSTED-LINES", "M0-TIME"):
         print(stdout.decode(errors="replace"), end="", flush=True)
@@ -110,7 +137,10 @@ def seven_legs(root, output):
         shell("TARGET-PIN", "target-pin.sh", "TARGET-PIN PIN OK libraries=2",
               "TARGET-PIN ANCHOR OK sites=4", "TARGET-PIN DIFF OK signatures=2 anchors=4",
               "TARGET-PIN OK"),
-        shell("TRUSTED-LINES", "trusted-lines.sh", "TRUSTED-LINES OK"),
+        Check("TRUSTED-LINES", ("zsh", str(root / "dev/trusted-lines.sh"), str(root),
+                                "--output", str(output / "trusted-inventory.json")),
+              ("TRUSTED-LINES OK", "TRUSTED-INVENTORY PENDING"), expected_stderr=b"",
+              inventory=output / "trusted-inventory.json"),
         shell("KERNEL-CARRY", "kernel-carry.sh", "KERNEL-CARRY OK"),
         Check("EMIT-DIFF", (sys.executable, "-P", str(root / "dev/emit-diff.py")),
               ("EMIT-DIFF OK files=2 normalization=none",), 360),

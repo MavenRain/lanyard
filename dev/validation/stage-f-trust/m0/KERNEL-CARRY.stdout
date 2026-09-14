@@ -1,0 +1,16 @@
+KERNEL-CARRY lib/shape.ml 046689a VERBATIM diff=0 lines=60 OK
+KERNEL-CARRY lib/term.ml 046689a VERBATIM diff=0 lines=133 OK
+KERNEL-CARRY lib/rules.ml 046689a VERBATIM diff=0 lines=1481 OK
+KERNEL-CARRY lib/check.ml 046689a VERBATIM diff=0 lines=538 OK
+KERNEL-CARRY lib/value.ml 046689a VERBATIM diff=0 lines=137 OK
+KERNEL-CARRY lib/eval.ml 046689a VERBATIM diff=0 lines=297 OK
+KERNEL-CARRY lib/conv.ml 046689a VERBATIM diff=0 lines=396 OK
+KERNEL-CARRY lib/totality.ml 046689a VERBATIM diff=0 lines=146 OK
+KERNEL-CARRY lib/positivity.ml 046689a VERBATIM diff=0 lines=118 OK
+KERNEL-CARRY lib/global.ml 046689a VERBATIM diff=0 lines=130 OK
+KERNEL-CARRY lib/order.ml 046689a VERBATIM diff=0 lines=510 OK
+KERNEL-CARRY lib/bignum.ml 046689a VERBATIM diff=0 lines=51 OK
+KERNEL-CARRY lib/erase.ml 046689a EDITED diff=851 lines=1519 OK
+KERNEL-CARRY bucket files=12 expected=12 OK
+KERNEL-CARRY rows=13
+KERNEL-CARRY OK

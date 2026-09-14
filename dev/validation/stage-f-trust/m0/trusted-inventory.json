@@ -1,0 +1,485 @@
+{
+  "format": 1,
+  "status": "PENDING",
+  "counting": "newline bytes (wc -l), including comments and blank lines",
+  "kernel": {
+    "lines": 3997,
+    "limit": 4000,
+    "passed": true
+  },
+  "ceiling": {
+    "base": 5481,
+    "formula": "5481 + A_rir + A_emit + A_sig",
+    "total": null,
+    "A_rir": null,
+    "A_emit": null,
+    "A_sig": null
+  },
+  "groups": [
+    {
+      "name": "kernel",
+      "scope": "kernel",
+      "allowance": null,
+      "lines": 3997,
+      "files": [
+        "lib/bignum.ml",
+        "lib/check.ml",
+        "lib/conv.ml",
+        "lib/eval.ml",
+        "lib/global.ml",
+        "lib/order.ml",
+        "lib/positivity.ml",
+        "lib/rules.ml",
+        "lib/shape.ml",
+        "lib/term.ml",
+        "lib/totality.ml",
+        "lib/value.ml"
+      ]
+    },
+    {
+      "name": "erase",
+      "scope": "base",
+      "allowance": null,
+      "lines": 1519,
+      "files": [
+        "lib/erase.ml"
+      ]
+    },
+    {
+      "name": "rir",
+      "scope": "pending",
+      "allowance": "A_rir",
+      "lines": 155,
+      "files": [
+        "lib/rir.ml"
+      ]
+    },
+    {
+      "name": "printer",
+      "scope": "pending",
+      "allowance": "A_emit",
+      "lines": 1231,
+      "files": [
+        "rust/connection.ml",
+        "rust/crate.ml",
+        "rust/effects.ml",
+        "rust/emit.ml",
+        "rust/foreign.ml",
+        "rust/model.ml",
+        "rust/reachable.ml",
+        "rust/template.ml"
+      ]
+    },
+    {
+      "name": "signatures",
+      "scope": "pending",
+      "allowance": "A_sig",
+      "lines": 104,
+      "files": [
+        "_build/default/target/target_generated.ml"
+      ]
+    },
+    {
+      "name": "carried-eraser",
+      "scope": "pending",
+      "allowance": null,
+      "lines": 1601,
+      "files": [
+        "lib/erase_kan.ml",
+        "lib/eterm.ml"
+      ]
+    },
+    {
+      "name": "target-bridge",
+      "scope": "pending",
+      "allowance": null,
+      "lines": 409,
+      "files": [
+        "surface/fuse.ml",
+        "surface/lower.ml",
+        "surface/specialize.ml"
+      ]
+    },
+    {
+      "name": "kernel-support",
+      "scope": "pending",
+      "allowance": null,
+      "lines": 618,
+      "files": [
+        "lib/budget.ml",
+        "lib/budget.mli",
+        "lib/error.ml",
+        "lib/level.ml",
+        "lib/level.mli",
+        "lib/literal.ml",
+        "lib/pp.ml",
+        "lib/prim.ml",
+        "lib/quantity.ml",
+        "lib/spec_count.ml"
+      ]
+    },
+    {
+      "name": "frontend",
+      "scope": "pending",
+      "allowance": null,
+      "lines": 2920,
+      "files": [
+        "surface/axioms.ml",
+        "surface/elab.ml",
+        "surface/lexer.ml",
+        "surface/parser.ml",
+        "surface/syntax.ml",
+        "surface/term_scope.ml",
+        "surface/token.ml"
+      ]
+    },
+    {
+      "name": "driver",
+      "scope": "pending",
+      "allowance": null,
+      "lines": 212,
+      "files": [
+        "bin/lanyard.ml"
+      ]
+    },
+    {
+      "name": "unassigned",
+      "scope": "pending",
+      "allowance": null,
+      "lines": 0,
+      "files": []
+    }
+  ],
+  "files": [
+    {
+      "path": "_build/default/target/target_generated.ml",
+      "group": "signatures",
+      "lines": 104,
+      "bytes": 4013,
+      "sha256": "dbc645bae74cf176c76633df3f66c037b237eedfe76ba97d5da4ae3982236daa"
+    },
+    {
+      "path": "bin/lanyard.ml",
+      "group": "driver",
+      "lines": 212,
+      "bytes": 9302,
+      "sha256": "eeb3a4e5a78d4db476e570f79fbb6d5bee6de948d4bd231368d2d49dd5a71d35"
+    },
+    {
+      "path": "lib/bignum.ml",
+      "group": "kernel",
+      "lines": 51,
+      "bytes": 2220,
+      "sha256": "7159dd7e75fa08a5fc272cba76a8ec6214c7d190151dabf7db1a13bf5ecddd72"
+    },
+    {
+      "path": "lib/budget.ml",
+      "group": "kernel-support",
+      "lines": 27,
+      "bytes": 1310,
+      "sha256": "7d8b2afc86883415c892d6fea0e56c2115e4d859b6b6daa21c611b4e9517f028"
+    },
+    {
+      "path": "lib/budget.mli",
+      "group": "kernel-support",
+      "lines": 9,
+      "bytes": 317,
+      "sha256": "b830149c9eb6d9362786d2e92c2dc8322f4d31f7b4cfc960ac6e1681d385578f"
+    },
+    {
+      "path": "lib/check.ml",
+      "group": "kernel",
+      "lines": 538,
+      "bytes": 22959,
+      "sha256": "cdc3712bf5ed0fa49d8dae34ea946d85a195ea94b25235c821b155570010e335"
+    },
+    {
+      "path": "lib/conv.ml",
+      "group": "kernel",
+      "lines": 396,
+      "bytes": 17910,
+      "sha256": "e73e707bcdac54808d8f8a1d9e9a174062edf0afd970972dee2c6d024f6bbe39"
+    },
+    {
+      "path": "lib/erase.ml",
+      "group": "erase",
+      "lines": 1519,
+      "bytes": 65520,
+      "sha256": "794defe507c4d97910c2d92f925a7efa69433dc2ab67d2085340670886a95986"
+    },
+    {
+      "path": "lib/erase_kan.ml",
+      "group": "carried-eraser",
+      "lines": 1484,
+      "bytes": 63739,
+      "sha256": "a6d03447ab9dfedf8e53bceff26cd7da57f113bb4b5d1453aecd618fac508a88"
+    },
+    {
+      "path": "lib/error.ml",
+      "group": "kernel-support",
+      "lines": 82,
+      "bytes": 3602,
+      "sha256": "44c9c263479575ec04db5056404a5940d6bb5514a5b9e1ec6215385c6eccb5b6"
+    },
+    {
+      "path": "lib/eterm.ml",
+      "group": "carried-eraser",
+      "lines": 117,
+      "bytes": 4280,
+      "sha256": "028ff6e790f9c391463b961f7a3eac12e105d484285cfde1597e52c5b9ac69c7"
+    },
+    {
+      "path": "lib/eval.ml",
+      "group": "kernel",
+      "lines": 297,
+      "bytes": 13151,
+      "sha256": "155ddf7578d4ad68352505064616bed6afa7a260a88f3ddf1722b95fa6a6bd18"
+    },
+    {
+      "path": "lib/global.ml",
+      "group": "kernel",
+      "lines": 130,
+      "bytes": 5476,
+      "sha256": "2e5d2d932dfddcb329bcfdf237df87a70f2d79820470dc236e337ec6d275c329"
+    },
+    {
+      "path": "lib/level.ml",
+      "group": "kernel-support",
+      "lines": 11,
+      "bytes": 395,
+      "sha256": "344bb9819870d8c459154ac8109ba1d69a4ee4312670f3887c6ed30d3dbca448"
+    },
+    {
+      "path": "lib/level.mli",
+      "group": "kernel-support",
+      "lines": 13,
+      "bytes": 327,
+      "sha256": "c143b2b97e417724a81f8e83548b946d3339917488758b4d5fbf9da9e72e6811"
+    },
+    {
+      "path": "lib/literal.ml",
+      "group": "kernel-support",
+      "lines": 14,
+      "bytes": 527,
+      "sha256": "80554b1d98c8dde3b474023a01ac57cc4abcaba2a5f20b707041cc5f0361b617"
+    },
+    {
+      "path": "lib/order.ml",
+      "group": "kernel",
+      "lines": 510,
+      "bytes": 21354,
+      "sha256": "d2cc3258fde25b61ba33093eaf19112c319329dc5b46ba029b3f042c14388e94"
+    },
+    {
+      "path": "lib/positivity.ml",
+      "group": "kernel",
+      "lines": 118,
+      "bytes": 5467,
+      "sha256": "97cb5fc9484ecaec360b4be1ac42f0668ae767aad25efc10ddbc1d4143185471"
+    },
+    {
+      "path": "lib/pp.ml",
+      "group": "kernel-support",
+      "lines": 102,
+      "bytes": 4869,
+      "sha256": "69618578ebb33a3d9803e604760252c77c64681aef2d847f3e1b40f9464e3895"
+    },
+    {
+      "path": "lib/prim.ml",
+      "group": "kernel-support",
+      "lines": 139,
+      "bytes": 5349,
+      "sha256": "5224df4f75e499b8fb962fad2a256b31086fcc9de5ab2f353eb90f61a8408aaa"
+    },
+    {
+      "path": "lib/quantity.ml",
+      "group": "kernel-support",
+      "lines": 158,
+      "bytes": 6631,
+      "sha256": "bf3f633c40a0dbb362cf85ca41b798ae0c9e1d4eca7e09f9b6f482bab2bfbb8b"
+    },
+    {
+      "path": "lib/rir.ml",
+      "group": "rir",
+      "lines": 155,
+      "bytes": 7028,
+      "sha256": "6dbaa88a61863938d62e099a339277ecde0b2cace633fea5912b95bc248a9f1c"
+    },
+    {
+      "path": "lib/rules.ml",
+      "group": "kernel",
+      "lines": 1481,
+      "bytes": 65612,
+      "sha256": "b625cec31061ca79f77669889039e4ae2658393911e39076dc65189022f702ab"
+    },
+    {
+      "path": "lib/shape.ml",
+      "group": "kernel",
+      "lines": 60,
+      "bytes": 2105,
+      "sha256": "dafd7741b4332dcab6faba9cb9afb131fb3654172e0d375b1edd1046e69f7f7b"
+    },
+    {
+      "path": "lib/spec_count.ml",
+      "group": "kernel-support",
+      "lines": 63,
+      "bytes": 2848,
+      "sha256": "87aa1bad45716737bfeca13986b58332245d252ba0f9ddda55cb7d402eec8c92"
+    },
+    {
+      "path": "lib/term.ml",
+      "group": "kernel",
+      "lines": 133,
+      "bytes": 4788,
+      "sha256": "2de6729958bfbc3af10ed2e9c51d6591ab40fa16bd19b7acea1fbf37adf60690"
+    },
+    {
+      "path": "lib/totality.ml",
+      "group": "kernel",
+      "lines": 146,
+      "bytes": 6703,
+      "sha256": "046c608584ac21d465d46b05119a89dca5488a15113359eea30ed318a3f7c028"
+    },
+    {
+      "path": "lib/value.ml",
+      "group": "kernel",
+      "lines": 137,
+      "bytes": 4573,
+      "sha256": "997f4634df60744c49555e896c1de8d60e51a1086e731e547b48450def9c68c7"
+    },
+    {
+      "path": "rust/connection.ml",
+      "group": "printer",
+      "lines": 66,
+      "bytes": 4492,
+      "sha256": "cf65e905ebc278aac762cfd117b5aacf33fbc8ce06ba5e514a2be247c3246c85"
+    },
+    {
+      "path": "rust/crate.ml",
+      "group": "printer",
+      "lines": 30,
+      "bytes": 1342,
+      "sha256": "99a6aee960f1bd897f76e539b3c633fa274ad41970513c2616727b3fa530bf59"
+    },
+    {
+      "path": "rust/effects.ml",
+      "group": "printer",
+      "lines": 46,
+      "bytes": 2874,
+      "sha256": "0cd1e0d6caf5474f7845725341a316b7fc79c8a8ac41bb16d81a4038c7f79d42"
+    },
+    {
+      "path": "rust/emit.ml",
+      "group": "printer",
+      "lines": 658,
+      "bytes": 40403,
+      "sha256": "a4b61b9f938f6227c8447edca2c62331d4d26b145f65905cad169f5f8e315a37"
+    },
+    {
+      "path": "rust/foreign.ml",
+      "group": "printer",
+      "lines": 65,
+      "bytes": 4091,
+      "sha256": "7104df6a0161c6faff6971a6a3fcf38c9a19db74f5fef18b3e2db297abc834c4"
+    },
+    {
+      "path": "rust/model.ml",
+      "group": "printer",
+      "lines": 221,
+      "bytes": 12432,
+      "sha256": "c1ad78b56f22763fc044e96cbd832473fca50acc9ecee7089e5c8f6d39ae64c2"
+    },
+    {
+      "path": "rust/reachable.ml",
+      "group": "printer",
+      "lines": 74,
+      "bytes": 3943,
+      "sha256": "cdcf89897628f1e5bc8e437496ab36063d049776ac1c9fb7e9e75f6731859be2"
+    },
+    {
+      "path": "rust/template.ml",
+      "group": "printer",
+      "lines": 71,
+      "bytes": 3991,
+      "sha256": "3a721565fbb8993bd24d55de30d159222af165f4e01f6cd63a570abfafa5ebda"
+    },
+    {
+      "path": "surface/axioms.ml",
+      "group": "frontend",
+      "lines": 71,
+      "bytes": 3339,
+      "sha256": "cafba7079f9f1db8deb250eba6ee8a1c631214334f127c851937a2ad61f47aed"
+    },
+    {
+      "path": "surface/elab.ml",
+      "group": "frontend",
+      "lines": 1544,
+      "bytes": 70721,
+      "sha256": "4abe85308c9db0de80ed1d8685cd02d728df3fbfc7a329fe4e0bc66a4ee91c46"
+    },
+    {
+      "path": "surface/fuse.ml",
+      "group": "target-bridge",
+      "lines": 218,
+      "bytes": 12990,
+      "sha256": "07a38565139f31e319b4a262b919da7d5c251a759421d53b25d3cebca5f79b16"
+    },
+    {
+      "path": "surface/lexer.ml",
+      "group": "frontend",
+      "lines": 183,
+      "bytes": 8543,
+      "sha256": "bb524f0202a01ab0b7a2e94745c9af50c5eede2a4c7d3fa450be785e2eb14254"
+    },
+    {
+      "path": "surface/lower.ml",
+      "group": "target-bridge",
+      "lines": 104,
+      "bytes": 5364,
+      "sha256": "3ee2543c860f0e242405a83996357ba483b88094243bd82d474c56fabc00dcb5"
+    },
+    {
+      "path": "surface/parser.ml",
+      "group": "frontend",
+      "lines": 620,
+      "bytes": 31123,
+      "sha256": "107bb45cfba1335a41cf0268e6c28e05dbb961c1c454c47ef364683d6e04d977"
+    },
+    {
+      "path": "surface/specialize.ml",
+      "group": "target-bridge",
+      "lines": 87,
+      "bytes": 5377,
+      "sha256": "7d674a16e7d75e78d9cb4dbf5b4d802c200e8fb8f840a5350ae8bef11025f27e"
+    },
+    {
+      "path": "surface/syntax.ml",
+      "group": "frontend",
+      "lines": 302,
+      "bytes": 11409,
+      "sha256": "774c0c713f2cdfe493656131b446eb10614e9415ef4d3a0d7cf8a64d2da04c5a"
+    },
+    {
+      "path": "surface/term_scope.ml",
+      "group": "frontend",
+      "lines": 57,
+      "bytes": 3011,
+      "sha256": "ac95883cd2672c3695099115d1d5b57314048132be6e1d7adba7a6112ad3e5d7"
+    },
+    {
+      "path": "surface/token.ml",
+      "group": "frontend",
+      "lines": 143,
+      "bytes": 3557,
+      "sha256": "cd93b520f023f2aa80f42a4e352b47e63fd0c05e399f4c2344af898054fbb6db"
+    }
+  ],
+  "pending_rulings": [
+    "A_rir",
+    "A_emit",
+    "A_sig",
+    "base growth",
+    "trusted-file scope"
+  ],
+  "m0_exit": "not-stamped"
+}
