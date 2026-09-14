@@ -32,6 +32,19 @@ the [Stage C build log](dev/spikes/M0-BUILD-LOG.md#stage-c-2026-09-09) with
 its [Stage C mutation log](dev/spikes/MUTATION-LOG.md#stage-c-2026-09-09).
 The two stages record their work in separate log families.
 
+The [M1 build command](dev/STAGE-M1-BUILD.md) checks a program, writes its
+crate into a fresh directory and invokes Cargo there:
+
+```sh
+_build/default/bin/lanyard.exe build --out /tmp/todo-build --print-model Todo corpus/m0/todo.lan
+```
+
+Add `--release` for an optimized build or `--offline` to use cached
+dependencies. Cargo output and normal exit codes pass through; a separate
+`LANYARD-BUILD REPORTED` row reports Cargo wall time. The command compiles
+the program without running it. Its driver growth is measured against
+the existing proposed budget; no trust allowance or M0 exit is approved.
+
 Build and validate through Stage D:
 
 ```sh

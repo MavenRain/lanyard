@@ -1,0 +1,11 @@
+{
+  "README.md": "76110181674e486a298edea88209fae9f887a03ed4f07cd5d4fa5b6d4ea68214",
+  "bin/dune": "f6b79f7bb4125194c2f088e58cebfc4e6ac040f0eaccac58e2ee135469a5461f",
+  "bin/lanyard.ml": "855c2aed0003176252e566ee236974cad91aeaa1b697fdf677d0dbeb8948b5c5",
+  "dev/M1-BUILD-LOG.md": "dce9f72b99d2da54aebcbdadab474054be50e11614b5b7ee18298fef061cd3b4",
+  "dev/STAGE-F-POLICY.md": "54b103a619f399fa8c36955aa878bbac78cb78ccb44257233ea0923fdcb592fc",
+  "dev/STAGE-M1-BUILD.md": "b2edd11a29b6b94d3baeb9c20294d3138d914e733bf928c7442490a77005874d",
+  "dev/gates.sh": "b11a7d48ab260ad5ac79860e78c8f91d10e48f53faf89f04b8da87e0d40d0d1e",
+  "dev/stage-m1-build.sh": "f77a438c3e832a132cace180c0951c2c0c2a1851ca210f787e2f23f693defe17",
+  "test/lan_build.py": "5b4141f0c3a900aea179fac5cebe297b9397e71522ecfbd9ce3e96764480db5c"
+}

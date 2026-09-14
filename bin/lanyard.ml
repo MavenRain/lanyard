@@ -3,11 +3,15 @@
     The first Stage E slice also prints native Rust through emit --native.
     Target slices print synchronous and async foreign constants through --target.
     The crate command writes a standalone target program with a main entry point.
+    The build command emits that crate and reports the Cargo subprocess time.
 
     Exit codes.  0 is a file that checks, 1 is a file that does not and
     64 is a usage error or a missing file.  A check failure writes one
     [Error.to_string] line to stderr and nothing to stdout, so a caller
-    reads stdout as the answer alone (SB-D5).
+    reads stdout as the answer alone (SB-D5).  The build command forwards
+    Cargo's own exit status after the crate is written, so 1, 64, 101, 127
+    and 255 can come from Cargo; the refusals before Cargo keep the 0, 1
+    and 64 meanings.
 
     Reading a file.  The whole repository holds one catch site, in
     test/main.ml, so this file reaches [In_channel] behind a
@@ -21,7 +25,10 @@
 
 let usage () : unit =
   prerr_endline
-    "usage: lanyard check [--print|--erased] FILE | emit [--native|--target|--crate DIR [--print-model MODEL]] FILE.lan | axioms [--names] FILE | spec-count"
+    ("usage: lanyard check [--print|--erased] FILE"
+    ^ " | emit [--native|--target|--crate DIR [--print-model MODEL]] FILE.lan"
+    ^ " | build --out DIR [--release] [--offline] [--print-model MODEL] FILE.lan"
+    ^ " | axioms [--names] FILE | spec-count")
 
 let read_file (path : string) : string =
   if Sys.file_exists path then In_channel.with_open_bin path In_channel.input_all
@@ -141,21 +148,95 @@ let run_crate (output : Lanyard_rust.Model.output) (directory : string)
   |> Fun.flip Result.bind (Lanyard_rust.Crate.files ~output)
   |> Result.fold ~ok:(write_crate directory) ~error:(fun error ->
       prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
+
+(** A source path names a .lan file with a stem, so a bare ".lan" is a
+    usage error in every arm that takes a source path. *)
+let lan_file (path : string) : bool =
+  Filename.check_suffix path ".lan" && String.length (Filename.basename path) > 4
+
+(** The flags the build command passes on. They are complete on their own,
+    so the consumer never reads the parse accumulator. *)
+type build_flags = {
+  output : Lanyard_rust.Model.output;
+  release : bool;
+  offline : bool;
+}
+
+(** The parse accumulator. The output directory stays an option here to
+    detect a repeat, and it leaves the parse as its own result, so no
+    stale copy of it travels with the flags. *)
+type build_options = {
+  directory : string option;
+  flags : build_flags;
+}
+
+(** Parse all options before checking or publishing the crate. Paths beginning
+    with a dash can be written with an explicit relative or absolute prefix. *)
+let rec build_options options args =
+  let value text = not (String.starts_with ~prefix:"-" text) && text <> "" in
+  match args with
+  | "--out" :: directory :: rest when value directory && Option.is_none options.directory ->
+      build_options { options with directory = Some directory } rest
+  | "--print-model" :: model :: rest when value model ->
+      (match options.flags.output with
+       | Lanyard_rust.Model.Discard ->
+           build_options
+             { options with
+               flags = { options.flags with output = Lanyard_rust.Model.Print_model model } }
+             rest
+       | Lanyard_rust.Model.Print_model _model -> Error ())
+  | "--release" :: rest when not options.flags.release ->
+      build_options { options with flags = { options.flags with release = true } } rest
+  | "--offline" :: rest when not options.flags.offline ->
+      build_options { options with flags = { options.flags with offline = true } } rest
+  | [ path ] when value path && lan_file path ->
+      options.directory |> Option.to_result ~none:()
+      |> Result.map (fun directory -> options.flags, directory, path)
+  | [] | _ :: _ -> Error ()
+
+(** Cargo runs inside the fresh crate, so Cargo configuration follows the
+    output directory. The command consists only of fixed, quoted arguments;
+    source paths and output paths never become shell text. Sys.command keeps
+    the child's streams and normal exit status; signals remain unsuccessful.
+    A missing executable returns 127.
+    The wall time is informational and excludes checking and emission.
+    An I/O failure after the guards is loud, so the process exits 2 with
+    the system error text, the same as the crate command. *)
+let dispatch_build args =
+  let initial = { directory = None;
+                  flags = { output = Lanyard_rust.Model.Discard;
+                            release = false; offline = false } } in
+  build_options initial args
+  |> Result.fold ~error:(fun () -> usage (); exit 64)
+       ~ok:(fun (flags, directory, path) ->
+         run_crate flags.output directory path;
+         Sys.chdir directory;
+         let command = ["cargo"; "build"]
+           @ (if flags.release then ["--release"] else [])
+           @ (if flags.offline then ["--offline"] else [])
+           |> List.map Filename.quote |> String.concat " " in
+         let started = Unix.gettimeofday () in
+         let code = Sys.command command in
+         let milliseconds = (Unix.gettimeofday () -. started) *. 1000. in
+         Printf.eprintf "LANYARD-BUILD REPORTED cargo_exit=%d cargo_ms=%.3f\n%!"
+           code milliseconds;
+         exit code)
+
 (** Source goes to stdout, or crate files to a fresh directory, only after
     the entire module prints. Emission never invokes Cargo or the program. *)
 let dispatch_emit args =
   match args with
-  | [ "--crate"; directory; "--print-model"; model; path ] when Filename.check_suffix path ".lan" ->
+  | [ "--crate"; directory; "--print-model"; model; path ] when lan_file path ->
       run_crate (Lanyard_rust.Model.Print_model model) directory path
-  | [ "--crate"; directory; path ] when Filename.check_suffix path ".lan" ->
+  | [ "--crate"; directory; path ] when lan_file path ->
       run_crate Lanyard_rust.Model.Discard directory path
-  | [ "--native"; path ] when Filename.check_suffix path ".lan" ->
+  | [ "--native"; path ] when lan_file path ->
       Kanon_surface.Elab.check_lanyard (read_file path)
       |> Fun.flip Result.bind Kanon_surface.Lower.program
       |> Fun.flip Result.bind Lanyard_rust.Emit.native
       |> Result.fold ~ok:print_string ~error:(fun error ->
           prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
-  | [ "--target"; path ] when Filename.check_suffix path ".lan" ->
+  | [ "--target"; path ] when lan_file path ->
       Kanon_surface.Elab.check_lanyard (read_file path)
       |> Fun.flip Result.bind Lanyard_rust.Model.source
       |> Result.fold ~ok:print_string ~error:(fun error ->
@@ -195,6 +276,7 @@ let dispatch (cmd : string) (args : string list) : unit =
   | "check" -> dispatch_check args
   | "axioms" -> dispatch_axioms args
   | "emit" -> dispatch_emit args
+  | "build" -> dispatch_build args
   | _unknown ->
       usage ();
       exit 64

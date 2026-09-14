@@ -2306,3 +2306,93 @@ scope; the external semantic models do not establish compiler preservation.
 M1 exit ratification remains open. This record does not fill the user's
 M1-EXIT stamp or claim full Lean parity, general arithmetic agreement,
 or source-to-Wasm preservation.
+
+## Lanyard M1: Cargo build command (2026-09-14)
+
+`lanyard build --out DIR [--release] [--offline] [--print-model MODEL]
+FILE.lan` checks and emits a fresh crate, then invokes Cargo in that
+directory. It forwards Cargo streams and normal exit codes and reports
+subprocess wall time in a separate `LANYARD-BUILD REPORTED` stderr row.
+Paths remain outside shell text. Invalid arguments, invalid programs and
+occupied output paths refuse before Cargo starts. Cargo failures retain
+the emitted files. The generated program is never run by the build command.
+
+The cumulative `--stage M1-build` gate passed, including the Stage F gate,
+its five killed assertion mutations, the pending trust mutation and the
+informational timing control. The new command has 16 process-boundary tests.
+The full gate required execution outside the filesystem sandbox because
+macOS Git's launcher writes a warning in the existing E2E environment test;
+the 19 E2E assertions passed without changes. Final review corrected the
+new gate's usage text and changed the missing-entry program, the inline
+source in test/lan_build.py, to a valid program without `main`; the
+focused build tests were rerun afterward.
+
+A real `build --offline --print-model Todo` compiled the unmodified Todo
+golden with Rust 1.98.1, using the installed `1.98` toolchain alias. Cargo
+reported 198908.987 ms for the first compilation, with two existing generated
+code warnings. The generated Cargo.toml and Rust source were byte-identical
+to the golden. Running the executable separately returned the exact corpus
+output with exit 0 and empty stderr.
+
+The probe used a private Cargo home and target directory. Its Git sources
+were fetched from the local checkouts at the pinned commits, preserving
+the generated Git dependency declarations. Two missing crate archives,
+time-macros 0.2.32 and zerocopy-derive 0.8.57, were downloaded into that
+private cache and checked against Cargo.lock hashes before the offline
+build. The emitted crate's resolved lockfile is retained with the captures.
+
+The source inventory measures 268 driver lines and 12822 total lines.
+The existing proposal keeps its 212-line driver and 12766-line total
+limits. Its candidate driver check therefore fails, while M0 reports six
+passing legs and one pending leg with no failed leg. No numeric allowance,
+policy approval or milestone exit is recorded. See STAGE-M1-BUILD.md and
+the receipt under `dev/validation/stage-m1-build/` for commands and hashes.
+
+## Stage M1 BUILD review fixes (tag LSM1B, 2026-09-14)
+
+F-1 bin/lanyard.ml. The header exit-code paragraph now states that the
+build command forwards Cargo's own exit status after the crate is
+written, so 1, 64, 101, 127 and 255 can come from Cargo, and that the
+refusals before Cargo keep the 0, 1 and 64 meanings.
+
+F-2 bin/lanyard.ml. The `dispatch_build` doc comment now states that an
+I/O failure after the guards is loud. The process exits 2 with the
+system error text, the same as the crate command.
+
+F-3 test/lan_build.py. Two assertions could not fail. The signalled test
+now reports against an independent code, 255 or 128 plus SIGTERM, and no
+longer compares the exit code with itself. The missing-cargo test now
+removes the driver's own report row from stderr and asserts the shell
+diagnostic `not found` in what remains.
+
+F-4 bin/lanyard.ml, test/lan_build.py. A new `lan_file` helper requires a
+stem before the `.lan` suffix, so a bare `.lan` is a usage error. The
+build arm and the four emit arms share the helper. The build arm keeps
+its own dash guard, so the emit arms accept the same paths as before. A
+new `bad` usage row covers `build --out DIR .lan`.
+
+F-5 dev/M1-BUILD-LOG.md. The M1 build entry named a missing-entry fixture
+file that is not staged. The sentence now names the inline source in
+test/lan_build.py.
+
+F-6 bin/lanyard.ml. The 246-character usage line is split across four
+source lines with `^`. The printed text stays byte-identical.
+
+F-7 bin/lanyard.ml. The output directory was carried twice. The flags
+`output`, `release` and `offline` move to their own `build_flags` record
+nested in the parse accumulator. The parse returns that record with the
+directory and the path, so no stale directory travels with the flags.
+The repeat detection for every option stays. The doc comments describe
+the two records.
+
+The fix ladder (tag fix-1) ran the full Stage M1-build gate on the
+staged tree and reported STAGE-M1-BUILD OK and STAGE-GATE-EXIT 0. The
+status rows matched the baseline capture exactly, 87 rows against 87
+rows, and all 23 pinned rows were present with 0 missing; no row read
+RED, FAIL or SURVIVED. The trusted-code line count in the proposed
+policy row moved from 12822 to 12848 total lines because of the new
+doc comments; the row stays PROPOSED with candidate=FAIL, which is the
+expected state until the user rules on the policy. The four Python
+suites ran: lan_trusted_inventory.py 18 tests OK, lan_trusted_policy.py
+17 tests OK, lan_m0_gates.py 36 tests OK, and lan_build.py 16 tests
+OK. The usage text is byte-identical to the text before the fixes.

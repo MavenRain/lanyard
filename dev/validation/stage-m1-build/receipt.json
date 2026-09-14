@@ -1,0 +1,235 @@
+{
+  "format": 1,
+  "date": "2026-09-14",
+  "base_commit": "05047ca08a506fbd6f31eb84f8eeb26177d22c85",
+  "checkout": "/Users/oobi/Documents/gpt2/lanyard-build",
+  "captures": {
+    "gates": {
+      "command": [
+        "gateledger",
+        "run",
+        "--ledger",
+        ".gatework/gateledger",
+        "--dir",
+        ".",
+        "--toolchain",
+        "1.98",
+        "--",
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-build"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-build",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-build/.kanon-exec/run-wWwES6",
+      "manifest": {
+        "path": "dev/validation/stage-m1-build/gates-capture.json",
+        "sha256": "4aebb05efb925ece5598dc484bb4a4621a5f2314dd4feeaaa80c3e08fcbbf15a"
+      },
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-m1-build/gates.stdout",
+          "sha256": "4b82f8c31c63015ecfe03135e73fef413eeb28227e04892b5ffd19441cc975ef"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-m1-build/gates.stderr",
+          "sha256": "ed89667df97c43e0d958e8aa46eac4683d131eb141ca44bd02723479fc2e983e"
+        }
+      }
+    },
+    "unit": {
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_build.py"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-build",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-build/.kanon-exec/run-sYqtGp",
+      "manifest": {
+        "path": "dev/validation/stage-m1-build/unit-capture.json",
+        "sha256": "eeba8e695958540ba424182a48dbcabf75f433988b5e56adca5b0f28cf740d87"
+      },
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-m1-build/unit.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-m1-build/unit.stderr",
+          "sha256": "4b6b4e6c560804ed40b8c4f7738f660fde4243ffead01fc2130fa1fdb1f812c8"
+        }
+      }
+    },
+    "build": {
+      "command": [
+        "gateledger",
+        "run",
+        "--force",
+        "--ledger",
+        ".gatework/gateledger",
+        "--dir",
+        ".",
+        "--scope",
+        "bin",
+        "--scope",
+        "lib",
+        "--scope",
+        "surface",
+        "--scope",
+        "rust",
+        "--scope",
+        "target",
+        "--scope",
+        "corpus/m0",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "CARGO_HOME=/Users/oobi/Documents/gpt2/lanyard-build/.gatework/build-cargo-home",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_BUILD_JOBS=2",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_TARGET_DIR=/Users/oobi/Documents/gpt2/lanyard-build/.gatework/build-cargo-target",
+        "_build/default/bin/lanyard.exe",
+        "build",
+        "--out",
+        ".gatework/build-offline",
+        "--offline",
+        "--print-model",
+        "Todo",
+        "corpus/m0/todo.lan"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-build",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-build/.kanon-exec/run-V6sYOP",
+      "manifest": {
+        "path": "dev/validation/stage-m1-build/build-capture.json",
+        "sha256": "75ca4c9c31f87981d14854395eb25a1b631b742b78d3163ef91d1a770051f2a8"
+      },
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-m1-build/build.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-m1-build/build.stderr",
+          "sha256": "b4375230f08baefb24b407faebe44e81b06975b82583e1acc2ef575ed2c26dcb"
+        }
+      }
+    },
+    "program": {
+      "command": [
+        ".gatework/build-cargo-target/debug/lanyard-program"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-build",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-build/.kanon-exec/run-wAWMyC",
+      "manifest": {
+        "path": "dev/validation/stage-m1-build/program-capture.json",
+        "sha256": "6d4c9d714010c97ee0130a1e755cdeedb8d6d6adca65d12fc39c6e8cb2ac30ce"
+      },
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-m1-build/program.stdout",
+          "sha256": "efe789298e7521a059f9b565e2c7c4efe9cd29a5bb211f112af52f9f52bd6899"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-m1-build/program.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  },
+  "unit_tests": 16,
+  "after_cumulative_gate": [
+    "dev/gates.sh usage text includes M1-build",
+    "test/lan_build.py uses valid syntax for semantic refusals; focused suite rerun",
+    "documentation and validation record"
+  ],
+  "shell_syntax": {
+    "command": [
+      "zsh",
+      "-n",
+      "dev/gates.sh",
+      "dev/stage-m1-build.sh"
+    ],
+    "exit_code": 0
+  },
+  "environment_note": "Cumulative gate ran outside the sandbox for the existing macOS Git-isolation test; assertions unchanged.",
+  "rust_toolchain": "1.98",
+  "rust_version": "1.98.1",
+  "cargo_ms_reported": 198908.987,
+  "real_build": {
+    "offline": true,
+    "source_and_manifest_equal_golden": true,
+    "golden_files": {
+      "Cargo.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+      "src/main.rs": "0dd7a289b7d860666e43a26af40d40a8737d829804e2c98e4852cd51e64fdef6"
+    },
+    "executable_sha256": "f19c78aba493e0ba42941cffc2df8a667da13fcc1cdbc596df62fa51f87edc12",
+    "expected_stdout": "corpus/m0/todo.stdout",
+    "stdout_equal_expected": true,
+    "cargo_home": "/Users/oobi/Documents/gpt2/lanyard-build/.gatework/build-cargo-home",
+    "git_cache_origin": {
+      "toasty": "/Users/oobi/Documents/toasty",
+      "topcoat": "/Users/oobi/Documents/topcoat"
+    },
+    "source_pins": {
+      "toasty": {
+        "commit": "7bd502cbf44cc47f70db9f2b27ab35d77a096364",
+        "crate_version": "0.6.1",
+        "release_tag": "toasty-v0.6.1",
+        "release_commit": "c2e8cfbc163bab76cf27309f1a92eea4eaf91834",
+        "signature_sha256": "9b3a6ec3ad2c365cec6bbdd8767ba144a295bbe60affeb418c42dad65952a7fc"
+      },
+      "topcoat": {
+        "commit": "51caa01dca3a8f20bdacfa771b1b8ac8b6f2668a",
+        "crate_version": "0.6.2",
+        "release_tag": "v0.7.0",
+        "release_commit": "8ef6d803bf8bc4e269c4566a959d190a9ae21896",
+        "signature_sha256": "40ee029ce9885b1402d76cc4d0340545c24b9932649cec031c10075b1a21504d"
+      }
+    }
+  },
+  "m0_summary": {
+    "status": "PENDING",
+    "exit_code": 2,
+    "complete": true,
+    "passed_legs": 6,
+    "pending_legs": 1,
+    "failed_checks": 0
+  },
+  "m0_exit": "not-stamped",
+  "policy_status": "PROPOSED",
+  "measured_lines": {
+    "driver": 268,
+    "total": 12822
+  },
+  "proposed_limits": {
+    "driver": 212,
+    "total": 12766
+  },
+  "normalization": "none",
+  "files_sha256": {
+    "Cargo.lock": "4e104bde2c3eab03abab297a06bb1f3edcb760f2ed81163cd84c061f7bc616ab",
+    "build-capture.json": "75ca4c9c31f87981d14854395eb25a1b631b742b78d3163ef91d1a770051f2a8",
+    "build.stderr": "b4375230f08baefb24b407faebe44e81b06975b82583e1acc2ef575ed2c26dcb",
+    "build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "downloaded-archives.json": "3ded3100f1c1d980d60f30e83c2a8004bb9b6060db84815f9f852fb3fecfb20a",
+    "gates-capture.json": "4aebb05efb925ece5598dc484bb4a4621a5f2314dd4feeaaa80c3e08fcbbf15a",
+    "gates.stderr": "ed89667df97c43e0d958e8aa46eac4683d131eb141ca44bd02723479fc2e983e",
+    "gates.stdout": "4b82f8c31c63015ecfe03135e73fef413eeb28227e04892b5ffd19441cc975ef",
+    "m0-report.json": "93fda61ff5d7099f709baecca4a01e03f88ae23093ef8d8da9dfc102463054d1",
+    "program-capture.json": "6d4c9d714010c97ee0130a1e755cdeedb8d6d6adca65d12fc39c6e8cb2ac30ce",
+    "program.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "program.stdout": "efe789298e7521a059f9b565e2c7c4efe9cd29a5bb211f112af52f9f52bd6899",
+    "source-sha256.json": "9173f254432d905ae50b37c49f06a88f702dafe204312d60f3946afa710365ce",
+    "trusted-inventory.json": "07bbf83c3890954c7c8cb6febac996c209f50acd32e7424c1793dfa481b47c8c",
+    "unit-capture.json": "eeba8e695958540ba424182a48dbcabf75f433988b5e56adca5b0f28cf740d87",
+    "unit.stderr": "4b6b4e6c560804ed40b8c4f7738f660fde4243ffead01fc2130fa1fdb1f812c8",
+    "unit.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

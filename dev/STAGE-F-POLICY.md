@@ -4,8 +4,8 @@
 Its checked-in status is `PROPOSED`, and its ruling is `null`. No allowance
 or scope has been approved by this slice. M0-EXIT remains unstamped.
 
-The proposal includes all 46 inventoried compiler sources, at their current
-line counts, with no additional margin:
+The proposal includes all 46 inventoried compiler sources at their Stage F
+policy baseline line counts, with no additional margin:
 
 | Group | Proposed limit |
 | --- | ---: |
@@ -91,3 +91,9 @@ Validation on 2026-09-14 passed the cumulative Stage F gate, including
 six assertion controls with no pending control; timing stayed informational.
 Captures, source hashes and the measured inventory are retained under
 `dev/validation/stage-f-policy/`.
+
+The subsequent [M1 build command](STAGE-M1-BUILD.md) adds 56 driver lines.
+Its measured total is 12822, while this proposal remains 12766 with a
+212-line driver limit. The candidate driver check now fails, and the
+unapproved whole-base gate remains pending. The Stage F captures above
+record the earlier policy baseline and are not refreshed by the M1 slice.
