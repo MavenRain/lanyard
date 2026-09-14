@@ -1,0 +1,252 @@
+{
+  "format": 1,
+  "root": "/Users/oobi/Documents/gpt2/lanyard-e2e",
+  "summary": {
+    "status": "PASS",
+    "exit_code": 0,
+    "complete": true,
+    "error": ""
+  },
+  "checks": [
+    {
+      "name": "BUILD",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "zsh",
+        "/Users/oobi/Documents/gpt2/lanyard-e2e/dev/dunecho.sh",
+        "build"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "BUILD.stdout",
+          "sha256": "9e007d7a4010fcc271a69a2546c4c166962b8c019f48235eca93e8512b6a997b"
+        },
+        "stderr": {
+          "path": "BUILD.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 571.5777496807277
+    },
+    {
+      "name": "PREPARE",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-P",
+        "/Users/oobi/Documents/gpt2/lanyard-e2e/dev/prepare-crate.py",
+        "--toasty",
+        "/Users/oobi/Documents/toasty",
+        "--topcoat",
+        "/Users/oobi/Documents/topcoat",
+        "--source",
+        "/Users/oobi/Documents/gpt2/lanyard-e2e/corpus/m0/todo.lan",
+        "--print-model",
+        "Todo",
+        "--lock",
+        "/Users/oobi/Documents/gpt2/lanyard-e2e/dev/validation/stage-e-todo/Cargo.lock",
+        "--output",
+        "/Users/oobi/Documents/gpt2/lanyard-e2e/.gatework/m0-e2e-pinned/crate"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "PREPARE.stdout",
+          "sha256": "c70ccee1cc4d25f9c2ca5320360a513b6134fd09aa53ac066bb0d3c93cbe0b73"
+        },
+        "stderr": {
+          "path": "PREPARE.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 329.7857502475381
+    },
+    {
+      "name": "CRATE-INIT",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "git",
+        "-C",
+        "/Users/oobi/Documents/gpt2/lanyard-e2e/.gatework/m0-e2e-pinned/crate",
+        "init",
+        "--quiet"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "CRATE-INIT.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "CRATE-INIT.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 45.14654213562608
+    },
+    {
+      "name": "CRATE-INDEX",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "git",
+        "-C",
+        "/Users/oobi/Documents/gpt2/lanyard-e2e/.gatework/m0-e2e-pinned/crate",
+        "add",
+        "--",
+        "Cargo.toml",
+        "Cargo.git.toml",
+        "Cargo.lock",
+        "src/main.rs"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "CRATE-INDEX.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "CRATE-INDEX.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 37.376875057816505
+    },
+    {
+      "name": "RUSTC",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "rustup",
+        "run",
+        "1.98",
+        "rustc",
+        "-vV"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "RUSTC.stdout",
+          "sha256": "e2211d4c0760a2a3b03eab88e42f8848952b7aa2ed649277a8fdbf3ce1838fd4"
+        },
+        "stderr": {
+          "path": "RUSTC.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 296.2272921577096
+    },
+    {
+      "name": "CARGO-BUILD",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "gateledger",
+        "run",
+        "--force",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-e2e/.gatework/gateledger",
+        "--dir",
+        "/Users/oobi/Documents/gpt2/lanyard-e2e/.gatework/m0-e2e-pinned/crate",
+        "--scope",
+        "Cargo.toml",
+        "--scope",
+        "Cargo.lock",
+        "--scope",
+        "src",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_INCREMENTAL=0",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-e2e/.gatework/m0-e2e-pinned/crate/Cargo.toml",
+        "--target-dir",
+        "/Users/oobi/Documents/gpt2/lanyard-e2e/.gatework/cargo-target",
+        "--target",
+        "aarch64-apple-darwin",
+        "--bin",
+        "lanyard-program",
+        "--profile",
+        "dev",
+        "--jobs",
+        "2"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "CARGO-BUILD.stdout",
+          "sha256": "cd7d26c244102e1a45a9cfa4883ba0a5fcf3cbc61b197691a35e70747e50ad2d"
+        },
+        "stderr": {
+          "path": "CARGO-BUILD.stderr",
+          "sha256": "e1a81e9cbff5681da75423a6234478067ba31a45854355663877a50fc645e33b"
+        }
+      },
+      "elapsed_ms": 231719.6939997375
+    },
+    {
+      "name": "RUN",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "/Users/oobi/Documents/gpt2/lanyard-e2e/.gatework/cargo-target/aarch64-apple-darwin/debug/lanyard-program"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "RUN.stdout",
+          "sha256": "efe789298e7521a059f9b565e2c7c4efe9cd29a5bb211f112af52f9f52bd6899"
+        },
+        "stderr": {
+          "path": "RUN.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 1647.340334020555
+    }
+  ],
+  "inputs": {
+    "corpus/m0/todo.lan": "df23ca0c8e46a13acc8c1e2c42cccc672b62b104b11c8ea2a575af4fd69a3064",
+    "corpus/m0/todo.stdout": "efe789298e7521a059f9b565e2c7c4efe9cd29a5bb211f112af52f9f52bd6899",
+    "target/PIN.json": "79acb0c0e756de89d15d483abf295cff74e11465b9c1e061e5d25a4041853718",
+    "dev/validation/stage-e-todo/Cargo.lock": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "corpus/m0/golden/Cargo.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "corpus/m0/golden/src/main.rs": "0dd7a289b7d860666e43a26af40d40a8737d829804e2c98e4852cd51e64fdef6"
+  },
+  "crate_sha256": {
+    "Cargo.toml": "f542ef1107feceb9f68626d4d27917d6515db34c404ffbaef5475bf03fe58efe",
+    "Cargo.git.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "Cargo.lock": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "src/main.rs": "0dd7a289b7d860666e43a26af40d40a8737d829804e2c98e4852cd51e64fdef6"
+  },
+  "executable": {
+    "path": "/Users/oobi/Documents/gpt2/lanyard-e2e/.gatework/cargo-target/aarch64-apple-darwin/debug/lanyard-program",
+    "sha256": "625f941e94ebe3d28e57a24cae69e9c4dd1c38b8d9f5e022f4e5d83b58de1a4c"
+  },
+  "libraries": {
+    "toasty": {
+      "path": "/Users/oobi/Documents/toasty",
+      "commit": "7bd502cbf44cc47f70db9f2b27ab35d77a096364"
+    },
+    "topcoat": {
+      "path": "/Users/oobi/Documents/topcoat",
+      "commit": "51caa01dca3a8f20bdacfa771b1b8ac8b6f2668a"
+    }
+  },
+  "target_dir": "/Users/oobi/Documents/gpt2/lanyard-e2e/.gatework/cargo-target",
+  "toolchain": "1.98",
+  "m0_exit": "not-stamped"
+}

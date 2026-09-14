@@ -93,7 +93,8 @@ python3 -P test/lan_m0_gate_mutations.py
 ```
 
 The stage command retains the cumulative F-axioms compiler and emission
-tests, the timing tests, and the new gate tests. It runs M0 once at the
+tests, the timing tests, the gate tests, and the M0-E2E runner regressions.
+It runs M0 once at the
 end. Its success line is `STAGE-F-GATES OK m0=PENDING`: this validates
 the implementation while preserving the unresolved M0 result.
 
@@ -122,3 +123,7 @@ informational leg. M0-EXIT remains open.
 
 Captures and source hashes are under `dev/validation/stage-f-gates/`.
 Earlier stage captures retain their historical bytes.
+
+The separate [M0-E2E command](STAGE-F-E2E.md) builds and runs the Todo
+crate against local target pins. It supplements the seven legs and
+retains its own execution report.

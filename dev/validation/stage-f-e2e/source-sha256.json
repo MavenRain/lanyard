@@ -1,0 +1,14 @@
+{
+  "README.md": "30b9b36ca41a09961933642a1a5813ff96d1c438326e31b121234f83c5d623e4",
+  "corpus/m0/todo.stdout": "efe789298e7521a059f9b565e2c7c4efe9cd29a5bb211f112af52f9f52bd6899",
+  "dev/M0-BUILD-LOG.md": "d5068f6da0e9c4ee0e3526d430902fe6a468b657d37033811c5cf7b3d8f114fa",
+  "dev/MUTATION-LOG.md": "8fc253aa5b5c1374aff2881179bd38f81b827df787e5d2213d8fd2326144e168",
+  "dev/STAGE-E-TODO.md": "fbcf5bc3556a83ea6154fa8687580aa256f051b7f4714574dc02fd8d8290470a",
+  "dev/STAGE-F-E2E.md": "3044b3c62c909a5faccb2d9a35c2609eb2d125d2f4601e636dc74b4ac00093f8",
+  "dev/STAGE-F-GATES.md": "53ade01210701eb0ddcd45091fda9cff2f606c9b0cdd85a7be8a19dcbfe05cc5",
+  "dev/gates.sh": "861752454f29a67b6a72c906ecea21503723768694cfd8811d4b236bc758230d",
+  "dev/m0-e2e.py": "cc48f8d5079611672533f81538bf0bc707e5b38a3be7a1cd2c8f1dc1d5b7034d",
+  "dev/m0-gates.py": "f5ecced92312eaa70edb7538b2c9b1b195ac4f3647f5f331bc688a5f76469076",
+  "dev/stage-f-gates.sh": "5de51bfeaa3f2525c1c169206e1f1c47db6aa6d56ae17c91aebf031df5dcc95f",
+  "test/lan_m0_e2e.py": "6c4871419527540e2fb7ea23292dd3acaf827d2a1c6f690bdc7772175dd2eb3b"
+}

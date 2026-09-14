@@ -19,6 +19,7 @@ bodies. The M0 Todo corpus emits a complete crate that creates and prints
 a row. Stage F adds classified axiom reports, the AXIOM-RATIO inputs,
 and informational compiler timings with a Go denominator refit. The
 combined M0 gate records all seven legs and unresolved trust decisions.
+The M0-E2E gate builds the pinned Todo crate offline and checks its output.
 Other model field types, general recursive handlers and the M0 exit stamp
 remain ahead. The generated signature allowance is proposed at
 104 lines and awaits the user's ruling. See
@@ -200,6 +201,18 @@ exit 2 while the whole-base trust allowances and scope remain unruled;
 an actual failure returns exit 1. The stage command validates the gate
 implementation and retains that pending M0 result. The M0 exit stamp
 remains the user's decision.
+
+Run the [M0 SQLite execution gate](dev/STAGE-F-E2E.md) with clean local
+checkouts of the pinned libraries and the locked dependencies cached:
+
+```sh
+zsh dev/gates.sh M0-E2E --toasty /path/to/toasty --topcoat /path/to/topcoat
+```
+
+This rebuilds the compiler and emitted crate, runs the program, and
+requires exactly `Todo { id: 1, title: "hi", completed: false }` plus a
+newline. The retained report records build and runtime failures as well
+as successful output. The seven-leg M0 verdict keeps its pending ruling.
 
 See [Stage C](dev/STAGE-C.md) for the `.lan` declaration grammar and checked
 Todo example, and [Stage D](dev/STAGE-D.md) for Rust erasure, its current

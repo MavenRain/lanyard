@@ -55,6 +55,10 @@ captures and source hashes are in `dev/validation/stage-e-todo/`.
 
 To repeat the pinned validation with local checkouts:
 
+The [M0-E2E gate](STAGE-F-E2E.md) now automates preparation, the offline
+build and the exact output assertion in one command. The individual
+preparation and build steps below remain available.
+
 ```sh
 mkdir -p .gatework
 python3 -P dev/prepare-crate.py --toasty /path/to/toasty --topcoat /path/to/topcoat \

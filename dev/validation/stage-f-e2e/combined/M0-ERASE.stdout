@@ -1,0 +1,23 @@
+data [mu<Bytes>; leg<mu<Bytes>,0>; leg<mu<Bytes>,1,union nat,union mu<Bytes>>]
+fun __lan_connect_0 (Arc<union mu<Bytes>>) : foreign Db := RForeign Db_connect [RClone (RVar 0)]
+erased Db
+erased Deferred
+erased toasty_Error
+erased Cx
+erased Uri
+erased Response
+erased SeeOther
+erased Form
+erased topcoat_Error
+axiom Db_connect : func fn<Arc<foreign #0>;foreign Db>
+axiom Db_push_schema : func fn<Arc<foreign Db>;struct tuple<>>
+axiom Model_create : func fn<Arc<foreign #0>,Arc<foreign Db>;foreign #2>
+axiom Model_get_by_id : func fn<Arc<foreign #0>,Arc<foreign Db>;foreign #3>
+axiom topcoat_db : func fn<Arc<foreign Cx>;foreign Db>
+axiom topcoat_see_other : func fn<Arc<foreign Uri>;foreign SeeOther>
+erased Bool
+erased Todo
+axiom Todo_create : func fn<Arc<struct tuple<union nat,union mu<Bytes>,union sum<struct tuple<>|struct tuple<>>>>,Arc<foreign Db>;struct tuple<union nat,union mu<Bytes>,union sum<struct tuple<>|struct tuple<>>>>
+axiom Todo_get_by_id : func fn<Arc<union nat>,Arc<foreign Db>;struct tuple<union nat,union mu<Bytes>,union sum<struct tuple<>|struct tuple<>>>>
+data [tuple<union nat,union mu<Bytes>,union sum<struct tuple<>|struct tuple<>>>; mu<Bytes>; sum<struct tuple<>|struct tuple<>>; leg<mu<Bytes>,0>; leg<mu<Bytes>,1,union nat,union mu<Bytes>>]
+fun main () : struct tuple<union nat,union mu<Bytes>,union sum<struct tuple<>|struct tuple<>>> := RLet db (RCall __lan_connect_0 [RTag mu<Bytes> 1 [RLit 115; RTag mu<Bytes> 1 [RLit 113; RTag mu<Bytes> 1 [RLit 108; RTag mu<Bytes> 1 [RLit 105; RTag mu<Bytes> 1 [RLit 116; RTag mu<Bytes> 1 [RLit 101; RTag mu<Bytes> 1 [RLit 58; RTag mu<Bytes> 1 [RLit 58; RTag mu<Bytes> 1 [RLit 109; RTag mu<Bytes> 1 [RLit 101; RTag mu<Bytes> 1 [RLit 109; RTag mu<Bytes> 1 [RLit 111; RTag mu<Bytes> 1 [RLit 114; RTag mu<Bytes> 1 [RLit 121; RTag mu<Bytes> 1 [RLit 58; RTag mu<Bytes> 0 []]]]]]]]]]]]]]]]]) (RLet ready (RForeign Db_push_schema [RClone (RVar 0)]) (RForeign Todo_create [RStruct tuple<union nat,union mu<Bytes>,union sum<struct tuple<>|struct tuple<>>> [RLit 1; RTag mu<Bytes> 1 [RLit 104; RTag mu<Bytes> 1 [RLit 105; RTag mu<Bytes> 0 []]]; RTag sum<struct tuple<>|struct tuple<>> 0 [RUnit]]; RClone (RVar 1)]))

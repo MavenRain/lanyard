@@ -695,3 +695,48 @@ dev/spikes/denominators.json holds the bytes of ROOT. The harness also
 compares the killed list
 with the five control names in run order before it prints the summary, so
 a deleted control fails the harness instead of printing a smaller count.
+
+## M0 Stage F execution gate controls (2026-09-13)
+
+`test/lan_m0_e2e.py` adds 12 runner tests. Injected process results exercise
+the command dependencies without rebuilding Rust. Failed compiler,
+preparer, local-index, toolchain and Cargo steps must stop before runtime,
+even when an old executable exists. A successful build without an
+executable also fails. Empty, duplicated or newline-trimmed output,
+stderr bytes, nonzero exits and deadline results all fail the runtime
+assertion. A real subprocess confirms the exact stderr check.
+
+Prepared Rust, original Git manifest, lock and file-set drift must stop
+before Cargo. Source changes during a build and corpus changes during a
+run must fail the report. Invalid host output never starts Cargo. The
+real crate preparer rejects a wrong target pin before emission. CLI
+controls reject missing arguments, zero jobs and an existing output
+directory. These runner tests supplement the real pinned SQLite run;
+their injected Cargo result is not a compiled-program observation.
+
+The full cumulative Stage F run passed with the existing controls still
+at five killed, one pending and one informational. The unresolved
+TRUSTED-LINES mutation retains its pending status. Raw suite and runtime
+captures are under `dev/validation/stage-f-e2e/`.
+
+Review round 1 (tag LSFE) adds six runner controls and sharpens three.
+The Git configuration control runs the measured CRATE-INIT and
+CRATE-INDEX arguments for real under a hostile Git configuration: a
+scratch HOME, no system configuration and a global ignore file that
+covers Cargo.lock. It rejects a gate that inherits the operator's
+settings, which prints branch advice on stderr or refuses the lock. Two
+library-movement controls return a changed HEAD on the second HEAD read
+and a dirty status on the second status read; each rejects a gate that
+trusts one pre-build measurement, and each requires that the program
+never runs. A pin control returns a HEAD that differs from the pin before
+the build; it rejects a gate that copies the pin file instead of
+measuring the checkout. A pin-file control removes the topcoat entry; it
+rejects the raw KeyError text. A golden-tree control places a .DS_Store
+beside the golden crate; it rejects a file-set error that names no file,
+and it must stop before Cargo. A relative-path control calls the CLI from
+another directory with relative `--output` and `--target-dir`; it rejects
+resolution against the caller's directory. The CLI control now pins the
+exit codes: 2 for argparse cases, 1 with `M0-E2E ERROR` on stderr for a
+reused output directory. The invalid-host control now also rejects a
+started Cargo build, and the prepared-drift control requires the drifted
+file name in the error.

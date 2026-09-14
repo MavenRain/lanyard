@@ -30,6 +30,7 @@ class Check:
     markers: tuple = ()
     timeout: int = 120
     expected: bytes | Path | None = None
+    expected_stderr: bytes | None = None
 
 
 def drain(child, grace):
@@ -70,7 +71,8 @@ def run_check(check, root, output):
     markers = all(marker.encode() in stdout.splitlines() for marker in check.markers)
     try:
         expected = check.expected.read_bytes() if isinstance(check.expected, Path) else check.expected
-        exact = expected is None or stdout == expected
+        exact = ((expected is None or stdout == expected)
+                 and (check.expected_stderr is None or stderr == check.expected_stderr))
     except OSError as error:
         exact, reason = False, f"golden unavailable: {error}"
     good = code == 0 and markers and exact

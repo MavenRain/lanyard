@@ -2575,3 +2575,163 @@ captured stage-gate.stdout (`ROWS tag=fix-3 capture=86 log=86 IDENTICAL`,
 `PINS tag=fix-3 ok=21 missing=0`, `RED-WATCH tag=fix-3 hits=0`). The
 captures under dev/validation/stage-f-gates/ are frozen by design and were
 not refreshed; the fix-3 ladder log is the post-fix evidence.
+
+## M0 Stage F: pinned SQLite execution gate (2026-09-13)
+
+`zsh dev/gates.sh M0-E2E --toasty PATH --topcoat PATH` now performs the
+Stage F execution check as one reproducible command. It rebuilds the
+compiler, prepares the corpus Todo crate against clean tracked target
+pins, compares the emitted source and original manifest with the golden,
+and seeds the existing validation lock. Cargo builds offline and locked
+for the installed compiler's explicit host target. The executable must
+exit zero, print `corpus/m0/todo.stdout` byte for byte and leave stderr
+empty. Source and lock hashes must remain unchanged through the run.
+
+The generated crate has a local Git index because the compiler repository
+ignores `.gatework`. This lets gateledger hash the prepared inputs without
+creating a commit. The ledger always invokes Cargo for each fresh crate;
+Cargo can reuse the selected target directory. The gate keeps its command
+captures, source hashes, crate files and report. The shared M0 check
+record gains an optional exact stderr assertion. Existing checks keep
+their prior behavior when that field is absent.
+
+Validation on base `7622c1ff4935b236fc39abcef53d6924ec57d043`:
+
+- `diffclass` required a build and `buildplan` selected the complete dune
+  workspace. The compiler build passed with zero errors and warnings.
+- The new runner suite passed all 12 tests, including failed producer,
+  missing executable, exact output, pin refusal and artifact drift cases.
+- The real `M0-E2E` run passed against Toasty `7bd502cb` and Topcoat
+  `51caa01d`, using Rust 1.98.1 and two Cargo jobs. Cargo reported zero
+  errors and two warnings in the unchanged golden source. The program
+  printed `Todo { id: 1, title: "hi", completed: false }` plus a newline.
+- `zsh dev/gates.sh --stage F-gates` exited zero and printed
+  `STAGE-F-GATES OK m0=PENDING`. The combined M0 result retained six
+  passing legs and one pending trust ruling. Its controls retained five
+  killed mutations, one pending assertion and one informational leg.
+
+The new records live under `dev/validation/stage-f-e2e/`. Original Git
+manifest, Rust source and lock bytes reuse the existing golden and Stage E
+lock through recorded hashes. Earlier captures remain historical. This
+slice assigns no trusted-code allowance and does not stamp M0-EXIT.
+
+## M0 Stage F review fixes (tag LSFE, 2026-09-13)
+
+### Round 1
+
+F-1 (medium). dev/m0-e2e.py:76-80 ran the two crate Git steps with the
+operator's global configuration. `git init --quiet` prints the multi-line
+`hint: Using 'master' as the name for the initial branch` block on stderr
+when init.defaultBranch is unset, and `git add -- Cargo.lock` prints `The
+following paths are ignored` and exits 1 when a global core.excludesFile
+covers the lock. A probe measured exit 1 and 198 stderr bytes for the
+second case. Both steps carry `expected_stderr=b""`, so a correct crate
+failed on the operator's settings. CRATE-INIT now runs with `-c
+init.defaultBranch=main -c advice.defaultBranchName=false`, and
+CRATE-INDEX runs with `-c core.excludesFile=/dev/null` and `add --force`.
+Control: test_git_steps_ignore_the_operator_configuration takes the two
+argv from a mocked run and executes them for real against the prepared
+crate under a scratch HOME, GIT_CONFIG_NOSYSTEM=1 and a
+GIT_CONFIG_GLOBAL that ignores Cargo.lock. It requires exit 0, empty
+stdout and empty stderr from both, and the four prepared files in `git
+ls-files`.
+
+F-2 (medium). dev/m0-e2e.py:57-59 copied both library commits from
+target/PIN.json into the report. No step measured the checkouts, and
+nothing re-read them after the Cargo build of about 230 seconds. The new
+helpers library_state and library_unmoved run `git rev-parse HEAD` and
+`git status --porcelain --untracked-files=no`, the same status arguments
+dev/prepare-crate.py uses, through CHECKS.invoke with the check names
+`<NAME>-HEAD` and `<NAME>-STATUS`. An unreadable HEAD raises `<name> HEAD
+is unreadable`, a failed or non-empty status raises `<name> checkout is
+not clean`, and a measured HEAD that differs from the pin raises `<name>
+HEAD differs from its pin`. The gate measures both checkouts before
+BUILD, records the measured HEAD in the report `libraries` block, and
+measures them again after CARGO-BUILD before it hashes the executable;
+any difference raises `<name> changed during its build`. The measurements
+use CHECKS.invoke directly, so report["checks"] keeps the seven named
+steps. Controls: test_complete_run_preserves_inputs_and_output_bytes now
+compares both reported commits with target/PIN.json;
+test_moved_library_during_the_build_never_runs_the_program returns a
+different sha on the second TOASTY-HEAD call;
+test_dirty_library_after_the_build_never_runs_the_program returns ` M
+src/lib.rs` from the second TOPCOAT-STATUS call; both require exit 1, the
+`changed during its build` error and no RUN call.
+test_library_head_must_match_its_pin returns a wrong sha before the build
+and requires exit 1, `differs from its pin` and no BUILD call.
+
+F-3 (low). dev/m0-e2e.py:57 read `pins[name]["commit"]` directly, so a
+PIN.json without a library entry surfaced as `M0-E2E FAIL: 'topcoat'`.
+The new helper pin_commit validates the entry and raises `target/PIN.json
+lacks the <name> commit` before any child runs. Control:
+test_pin_file_without_a_library_commit_stops_the_run removes the topcoat
+entry and requires exit 1, an error naming PIN.json and topcoat, and an
+empty call list.
+
+F-4 (low). dev/STAGE-F-E2E.md:63 claimed argparse exit 2 for a reused or
+unreachable `--output`. That path exits 1 and prints `M0-E2E ERROR: ...`
+on stderr; exit 2 covers invalid flags only. The document now separates
+the two cases. Control: test_cli_rejects_reused_output_and_invalid_arguments
+now asserts exit 2 for the empty argument list and for `--jobs 0`, and
+exit 1 with `M0-E2E ERROR` on stderr for the reused output directory.
+
+F-5 (low). dev/m0-e2e.py:146-153 resolved a relative `--output` or
+`--target-dir` against the caller's directory, while the default landed
+under ROOT/.gatework and dev/gates.sh execs the gate without changing
+directory. Both now join the argument to ROOT before resolve, which
+leaves an absolute argument unchanged, and the help strings and
+dev/STAGE-F-E2E.md state the rule. Control:
+test_relative_paths_resolve_against_the_repository_root patches ROOT and
+run, calls main from another directory with relative paths, and requires
+the recorded output and target under the patched root and the created
+output directory.
+
+F-6 (low). dev/m0-e2e.py:32-36 raised file-set errors that named no file,
+and the golden comparison respelled the golden path. Both messages now
+carry the sorted symmetric difference, the golden set is the new constant
+GOLDEN_FILES, and the comparison loop reuses golden_root. Controls:
+test_prepared_drift_stops_before_cargo now requires `extra.txt` in the
+error for that case, and test_unexpected_golden_file_stops_the_run places
+a .DS_Store in the golden directory and requires exit 1, `.DS_Store` in
+the error and no CARGO-BUILD call.
+
+F-7 (low). test/lan_m0_e2e.py:157-166 test_invalid_host_never_starts_cargo
+asserted the error only, never the ordering in its name. It now also
+requires that no CARGO-BUILD call is recorded.
+
+test_empty_build_success_fails_before_preparation changed with F-2. Its
+mock returned an empty result for every check, which now fails the
+pre-build pin comparison instead of the BUILD markers. The mock now
+returns the empty result for BUILD only, so the test still requires one
+check row.
+
+### Evidence
+
+`python3 -m py_compile dev/m0-e2e.py test/lan_m0_e2e.py` exits 0.
+`python3 -P test/lan_m0_e2e.py` reports `Ran 19 tests in 1.997s` and `OK`
+(12 tests before the round, 6 added).
+`python3 -P test/lan_m0_gates.py` reports `Ran 25 tests in 2.476s` and
+`OK`. `python3 -P test/lan_m0_gate_mutations.py` reports
+`M0-GATE-MUTATIONS OK killed=5 pending=1 informational=1 restored=GREEN`.
+The em-dash scan over the edited files reports no hit.
+
+Two baseline ladders ran before this round and both went RED on
+committed tests outside the slice under machine load. The first ladder
+(2026-09-13T22:16Z to 22:25Z, one-minute load 36 to 92) failed only
+test/lan_m0_gates.py test_timeout_captures_partial_output with `b'' !=
+b'EXPECTED\n'`, and 85 of its 86 stage stdout rows stayed identical to
+the capture. The second ladder (22:26Z to 22:33Z, one-minute load 70 to
+397) failed in the committed rir mutation harness dev/stage-f-axioms.sh,
+which raised `OSError: [Errno 66] Directory not empty` from
+shutil.rmtree under `.gatework/rir-mutations-*/root/_build`. Neither
+failure touches a file of this slice.
+
+The closing stage ladder `zsh dev/gates.sh --stage F-gates` and one real
+`M0-E2E` run start after this block is final, so the tree they validate
+is the staged tree. Their verdict rows live in the review work directory
+logs gates-LSFE-fix-1.log and m0-e2e-fix-1.log, and in the commit
+message.
+
+The frozen capture dev/validation/stage-f-e2e/e2e/report.json predates
+this round. It holds the old CRATE-INIT and CRATE-INDEX arguments and the
+old copied `libraries` block. It is not refreshed.

@@ -1,0 +1,166 @@
+{
+  "format": 1,
+  "base_commit": "7622c1ff4935b236fc39abcef53d6924ec57d043",
+  "checkout": "/Users/oobi/Documents/gpt2/lanyard-e2e",
+  "captures": {
+    "e2e": {
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "M0-E2E",
+        "--toasty",
+        "/Users/oobi/Documents/toasty",
+        "--topcoat",
+        "/Users/oobi/Documents/topcoat",
+        "--output",
+        ".gatework/m0-e2e-pinned"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-e2e",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-e2e/.kanon-exec/run-Dnb3av",
+      "manifest": {
+        "path": "dev/validation/stage-f-e2e/e2e-capture.json",
+        "sha256": "472f34874d7184ad502f34d13fd658f23d19bf1a95326e207cf9411d3fd87c1f"
+      },
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-f-e2e/e2e.stdout",
+          "sha256": "8e31866b99aeb654f440e2383c74e8f70d4a2bc15d3cbd08f73d407376836962"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-f-e2e/e2e.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    "unit": {
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_m0_e2e.py"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-e2e",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-e2e/.kanon-exec/run-Tw8MZd",
+      "manifest": {
+        "path": "dev/validation/stage-f-e2e/unit-capture.json",
+        "sha256": "63cb4cacd23427878e33f09e1ea95babe8457eb61476040630e9bfebfc8b27e6"
+      },
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-f-e2e/unit.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-f-e2e/unit.stderr",
+          "sha256": "1193a70a9d6b9e79947f447bfcdc9e4367f568def1649362fa56a66f6bcf9eea"
+        }
+      }
+    },
+    "stage": {
+      "command": [
+        "env",
+        "LANYARD_UPSTREAM=/Users/oobi/Documents",
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "F-gates"
+      ],
+      "cwd": "/Users/oobi/Documents/gpt2/lanyard-e2e",
+      "exit_code": 0,
+      "capture_artifact": "/Users/oobi/Documents/gpt2/lanyard-e2e/.kanon-exec/run-Cwc4j0",
+      "manifest": {
+        "path": "dev/validation/stage-f-e2e/stage-capture.json",
+        "sha256": "bc165ebdce5b16e63cd140233d038e467a396c2fd406893d1a16a7ec4e47bd72"
+      },
+      "streams": {
+        "stdout": {
+          "path": "dev/validation/stage-f-e2e/stage.stdout",
+          "sha256": "97163dcc71091b2f64a1c03b548ce693c54c4d97818de71455672b363347cdf2"
+        },
+        "stderr": {
+          "path": "dev/validation/stage-f-e2e/stage.stderr",
+          "sha256": "3531c3529d6c7aae332da1fd93e11014fb757bda833b9b32e85d10fff499823c"
+        }
+      }
+    }
+  },
+  "prepared_file_references": {
+    "Cargo.toml": "dev/validation/stage-f-e2e/e2e/Cargo.toml",
+    "Cargo.git.toml": "corpus/m0/golden/Cargo.toml",
+    "Cargo.lock": "dev/validation/stage-e-todo/Cargo.lock",
+    "src/main.rs": "corpus/m0/golden/src/main.rs"
+  },
+  "unit_tests": 12,
+  "e2e_summary": {
+    "status": "PASS",
+    "exit_code": 0,
+    "complete": true,
+    "error": ""
+  },
+  "m0_summary": {
+    "status": "PENDING",
+    "exit_code": 2,
+    "complete": true,
+    "passed_legs": 6,
+    "pending_legs": 1,
+    "failed_checks": 0
+  },
+  "m0_exit": "not-stamped",
+  "normalization": "none",
+  "files_sha256": {
+    "combined/BUILD.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "combined/BUILD.stdout": "9e007d7a4010fcc271a69a2546c4c166962b8c019f48235eca93e8512b6a997b",
+    "combined/EMIT-DIFF.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "combined/EMIT-DIFF.stdout": "e83419d200608a5f19d93114069302362462b323bbe068e277e80225bb8a8172",
+    "combined/HOUSE.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "combined/HOUSE.stdout": "3b9671aa0ae3bd160e9910a2fba68f44f3b4d4b31d23858f7b8d1a8df317c445",
+    "combined/KERNEL-CARRY.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "combined/KERNEL-CARRY.stdout": "1bf386234e9293888a1c49e455bd91f1f0c8f8c6a7772a7aa31d8c75302533fd",
+    "combined/M0-AXIOMS.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "combined/M0-AXIOMS.stdout": "4fed8439efacdf565cefce884232afe52b0d70df00498667e6d5471f71f3e4d8",
+    "combined/M0-CHECK.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "combined/M0-CHECK.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "combined/M0-ERASE.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "combined/M0-ERASE.stdout": "87d03e9536ac97618e3f0df32ae2eb45faf14bcde620d269e80aad478fd5e3c2",
+    "combined/M0-TIME.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "combined/M0-TIME.stdout": "638a6b178989c0a0a5c44980e53fce5c1fe445407497764f69e1f3558c5f4dd5",
+    "combined/R0-COUNT.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "combined/R0-COUNT.stdout": "a2d5da77ba6be9fc6f442fb3970ab1523cfd348eec3a98f6c482957c23c4193e",
+    "combined/R0-TARGET.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "combined/R0-TARGET.stdout": "1b5d4c33bdae81a5cf95b1eeb26d4555d62c9eaad3f7423d0781e05c84d033eb",
+    "combined/TARGET-PIN.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "combined/TARGET-PIN.stdout": "f03fd02fc500e4df7e11079207a2b15306c4465f46b89085beb20573a4ab8d3c",
+    "combined/TRUSTED-LINES.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "combined/TRUSTED-LINES.stdout": "7a1fa203493328b07c7fafa727cb938f645d5a22568505052169ccbdcab24023",
+    "combined/report.json": "56fd5cee5874b9858285e962aff3f05debed7eaf89bfda46a1defe6e669ffb03",
+    "combined/timings.json": "5aa34b7cbc96419f6ce0f2e72a9d60d04b8f48623a560c64b7800dddddfd6e30",
+    "e2e/BUILD.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "e2e/BUILD.stdout": "9e007d7a4010fcc271a69a2546c4c166962b8c019f48235eca93e8512b6a997b",
+    "e2e/CARGO-BUILD.stderr": "e1a81e9cbff5681da75423a6234478067ba31a45854355663877a50fc645e33b",
+    "e2e/CARGO-BUILD.stdout": "cd7d26c244102e1a45a9cfa4883ba0a5fcf3cbc61b197691a35e70747e50ad2d",
+    "e2e/CRATE-INDEX.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "e2e/CRATE-INDEX.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "e2e/CRATE-INIT.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "e2e/CRATE-INIT.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "e2e/Cargo.toml": "f542ef1107feceb9f68626d4d27917d6515db34c404ffbaef5475bf03fe58efe",
+    "e2e/PREPARE.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "e2e/PREPARE.stdout": "c70ccee1cc4d25f9c2ca5320360a513b6134fd09aa53ac066bb0d3c93cbe0b73",
+    "e2e/RUN.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "e2e/RUN.stdout": "efe789298e7521a059f9b565e2c7c4efe9cd29a5bb211f112af52f9f52bd6899",
+    "e2e/RUSTC.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "e2e/RUSTC.stdout": "e2211d4c0760a2a3b03eab88e42f8848952b7aa2ed649277a8fdbf3ce1838fd4",
+    "e2e/program.expected": "efe789298e7521a059f9b565e2c7c4efe9cd29a5bb211f112af52f9f52bd6899",
+    "e2e/report.json": "cc1da94bd73166273eeac987764a0e768915676fe6aa2260a2c55397eb99b0bc",
+    "e2e-capture.json": "472f34874d7184ad502f34d13fd658f23d19bf1a95326e207cf9411d3fd87c1f",
+    "e2e.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "e2e.stdout": "8e31866b99aeb654f440e2383c74e8f70d4a2bc15d3cbd08f73d407376836962",
+    "source-sha256.json": "beccc56b16c9263d94db340c308c2c1b60f6143d17c69c4b376876bd9753ec09",
+    "stage-capture.json": "bc165ebdce5b16e63cd140233d038e467a396c2fd406893d1a16a7ec4e47bd72",
+    "stage.stderr": "3531c3529d6c7aae332da1fd93e11014fb757bda833b9b32e85d10fff499823c",
+    "stage.stdout": "97163dcc71091b2f64a1c03b548ce693c54c4d97818de71455672b363347cdf2",
+    "unit-capture.json": "63cb4cacd23427878e33f09e1ea95babe8457eb61476040630e9bfebfc8b27e6",
+    "unit.stderr": "1193a70a9d6b9e79947f447bfcdc9e4367f568def1649362fa56a66f6bcf9eea",
+    "unit.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

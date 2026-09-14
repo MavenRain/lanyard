@@ -7,6 +7,7 @@ cd ${0:A:h}/..
 zsh dev/stage-f-axioms.sh
 python3 -P test/lan_bench.py
 python3 -P test/lan_m0_gates.py
+python3 -P test/lan_m0_e2e.py
 python3 -P test/lan_m0_gate_mutations.py
 code=0
 # The scratch log lives under .gatework, like the gate report directories, so
