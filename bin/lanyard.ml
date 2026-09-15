@@ -5,6 +5,10 @@
     The crate command writes a standalone target program with a main entry point.
     The build command emits that crate and reports the Cargo subprocess time.
     The run command interprets checked IR with a private in-memory model store.
+    With --request URI the same command runs request mode: it validates the
+    URI before any source I/O and exits 64 on a malformed one, calls the
+    checked [Cx -> Uri -> SeeOther] entry point, exits 1 when the handler
+    yields no response, and exits 0 with the 303 response on stdout.
 
     Exit codes.  0 is a file that checks, 1 is a file that does not and
     64 is a usage error or a missing file.  A check failure writes one
@@ -29,7 +33,7 @@ let usage () : unit =
     ("usage: lanyard check [--print|--erased] FILE"
     ^ " | emit [--native|--target|--crate DIR [--print-model MODEL]] FILE.lan"
     ^ " | build --out DIR [--release] [--offline] [--print-model MODEL] FILE.lan"
-    ^ " | run [--steps N] [--print-model MODEL] FILE.lan"
+    ^ " | run [--steps N] [--print-model MODEL | --request URI] FILE.lan"
     ^ " | axioms [--names] FILE | spec-count")
 
 let read_file (path : string) : string =
@@ -246,8 +250,11 @@ let dispatch_emit args =
   | [] | _ :: _ -> usage (); exit 64
 
 (** A run checks and lowers the file before evaluating main. Options are
-    validated before source I/O, and no output is printed on a failed run. *)
-let rec run_options output steps args =
+    validated before source I/O, and no output is printed on a failed run.
+    --request URI selects request mode: a malformed URI is a usage error
+    here, before any file is read, and a run that yields no response
+    exits 1 while a 303 response is printed on stdout with exit 0. *)
+let rec run_options output request steps args =
   let value text = not (String.starts_with ~prefix:"-" text) && text <> "" in
   match args with
   | "--steps" :: amount :: rest when Option.is_none steps && value amount ->
@@ -255,21 +262,29 @@ let rec run_options output steps args =
         then int_of_string_opt amount else None in
       number |> Option.to_result ~none:() |> Fun.flip Result.bind (fun number ->
         if number <= 0 || number > Lanyard_rust.Interp.max_steps then Error ()
-        else run_options output (Some number) rest)
-  | "--print-model" :: model :: rest when value model ->
+        else run_options output request (Some number) rest)
+  | "--request" :: uri :: rest when Option.is_none request && value uri ->
       (match output with
        | Lanyard_rust.Model.Discard ->
-           run_options (Lanyard_rust.Model.Print_model model) steps rest
+           Lanyard_rust.Run_http.uri uri |> Result.map_error (fun _error -> ())
+           |> Fun.flip Result.bind (fun uri -> run_options output (Some uri) steps rest)
        | Lanyard_rust.Model.Print_model _model -> Error ())
-  | [path] when value path && lan_file path -> Ok (output, steps, path)
+  | "--print-model" :: model :: rest when Option.is_none request && value model ->
+      (match output with
+       | Lanyard_rust.Model.Discard ->
+           run_options (Lanyard_rust.Model.Print_model model) request steps rest
+       | Lanyard_rust.Model.Print_model _model -> Error ())
+  | [path] when value path && lan_file path -> Ok (output, request, steps, path)
   | [] | _ :: _ -> Error ()
 
 let dispatch_run args =
-  run_options Lanyard_rust.Model.Discard None args
+  run_options Lanyard_rust.Model.Discard None None args
   |> Result.fold ~error:(fun () -> usage (); exit 64)
-       ~ok:(fun (output, steps, path) ->
+       ~ok:(fun (output, request, steps, path) ->
          Kanon_surface.Elab.check_lanyard (read_file path)
-         |> Fun.flip Result.bind (Lanyard_rust.Interp.run ?steps ~output)
+         |> Fun.flip Result.bind (fun checked ->
+              Option.fold ~none:(fun () -> Lanyard_rust.Interp.run ?steps ~output checked)
+                ~some:(fun uri () -> Lanyard_rust.Interp.request ?steps ~uri checked) request ())
          |> Result.fold ~ok:(fun (_value, text) -> print_string text)
               ~error:(fun error ->
                 prerr_endline (Kanon_kernel.Error.to_string error); exit 1))

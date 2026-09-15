@@ -2498,3 +2498,81 @@ hold. test/lan_run.py now reports `Ran 26 tests`, where the frozen
 capture shows 25. The closing run repeats this gate with the same
 expectations; its log stays in the review kit as
 gates-LSM1R-close.log.
+
+## Lanyard M1 scripted requests (2026-09-14)
+
+This slice adds `lanyard run --request URI FILE.lan`, the scripted request
+portion of M0-PLAN section 8. A checked `Cx -> Uri -> SeeOther` entry point
+receives a fresh in-memory database context and an origin-form URI. The
+interpreter implements the pinned `topcoat.db` and `topcoat.see_other`
+operations and renders an empty HTTP 303 response with CRLF headers.
+
+The context registers reachable model layouts. Repeated context lookups
+share the database; separate requests and explicit connections stay
+isolated. Schema initialization remains explicit. The driver validates
+request options before source I/O and refuses combination with
+`--print-model`. Handler type errors and runtime failures print no response.
+URI validation rejects control characters, malformed escapes and locations
+outside the documented origin-form subset. The existing step and nesting
+bounds apply.
+
+`dev/STAGE-M1-REQUEST.md` describes the interface and limits. The example
+under `test/fixtures/request.lan` creates and reads a row before redirecting.
+The new `--stage M1-request` gate retains M1-run and adds 23 interpreter
+checks, 18 CLI tests and four mutation controls. The previous foreign
+refusal test now uses a synthetic future operation, since `topcoat.db` is
+implemented. It still kills the unsupported-operation mutation.
+
+The source inventory measures the new runtime module and driver changes
+under the existing proposed policy. No policy roster, budget, target
+signature, Rust golden or carried kernel file changes in this slice.
+M0 remains pending. Validation captures, the inventory and source
+hashes are retained under `dev/validation/stage-m1-request/`.
+
+The complete cumulative gate passed with normal filesystem access: 23
+request interpreter checks, 18 request CLI tests and four killed request
+mutations, retaining the 40 interpreter checks, 26 CLI tests and five
+mutations of M1-run. An earlier attempt hit the existing benchmark-driver
+test's 30-second timeout under high machine load. That unchanged test
+passed alone in 4.408 seconds before the final cumulative run passed.
+The passing capture includes expected FAIL rows from negative controls.
+
+## Stage M1 REQUEST review fixes (tag LSM1Q, 2026-09-14)
+
+The fixes come from the LSM1Q review kit: prober hypotheses H1-H14 and the
+ctxcat-review Workflow run wf_7f8df44c-271 (raw 4, upheld 2, survivors 2).
+
+- F-1 nit bin/lanyard.ml: the driver header and the `run_options` comment now
+  state request mode, the checked `Cx -> Uri -> SeeOther` entry point, the
+  `--request URI` option, exit 64 for a malformed URI before source I/O,
+  exit 1 for a run with no response and exit 0 with the 303 on stdout.
+- F-2 nit rust/interp.ml: `run` and `request` share one `checked_steps`
+  helper. The refusal text stays byte-identical.
+- F-3 nit dev/STAGE-M1-REQUEST.md and README.md: the accepted-URI sentences
+  drop "optional query". They now state that after the leading slash `?` is
+  an ordinary path byte and the interpreter never splits or counts it.
+- F-4 nit test/lan_request.py: the two unfalsifiable assertions in
+  `test_no_cargo_or_shell` become one comment. The PATH-only environment and
+  the `$(id)` URI stay, so the suite still runs 18 tests.
+- F-5 low rust/interp.ml: the `request` entry-point pattern binds `cx_type`
+  and `uri_type`, so the name `uri` means the validated string alone.
+
+Proof: the fix suites ran on a copy of the tree under `$TMPDIR`. Observed
+rows: build rc=0; `test/lan_trusted_inventory.py` Ran 18; `test/lan_trusted_policy.py`
+Ran 17; `test/lan_m0_gates.py` Ran 36; `test/lan_build.py` Ran 16;
+`test/lan_run.py` Ran 26; `test/lan_request.py` Ran 18 (floor 18 OK);
+`lan_run.exe` LAN-RUN OK observations=40; `lan_request.exe` LAN-REQUEST OK
+observations=23. Every suite exited 0. The mutation needles of
+`test/lan_run_mutations.py` that target `rust/interp.ml` are unchanged:
+`(List.rev arguments) fn.body` and `state.steps <= 0`, one occurrence each.
+
+Ladder verdicts: the baseline ladder on the unfixed staged tree was GREEN at
+2026-09-14 16:41 PDT (GATE LSM1Q tag=baseline GREEN, STAGE-GATE-EXIT 0,
+RED-WATCH 0, PINS 40/40, ROWS 104/104 IDENTICAL against
+dev/validation/stage-m1-request/stage.stdout). The fix-1 ladder on the fixed
+tree was GREEN at 17:29 PDT with the same rows (tag=fix-1). Both logs live
+in the review kit at ~/Documents/lanyard-stage-m1-request-review
+(gates-LSM1Q-baseline.log, gates-LSM1Q-fix-1.log). The census rows above
+were observed again at 17:3x on the fixed tree (probes/fix-suites-2.log).
+The close ladder runs after this block is staged; its rows stay in the kit
+(gates-LSM1Q-close.log).

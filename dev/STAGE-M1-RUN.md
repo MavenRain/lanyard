@@ -3,8 +3,10 @@
 `lanyard run` checks and lowers a `.lan` file, then evaluates its `main`
 function over the Rust erasure IR. This implements the in-memory execution
 part of M0-PLAN section 8. A source program can script database operations
-and finite handlers in one run. HTTP request parsing and a server harness
-remain future work.
+and finite handlers in one run. The subsequent
+[scripted request slice](STAGE-M1-REQUEST.md) supplies a context and URI to
+a redirect handler. Raw HTTP parsing and a server listener remain future
+work.
 
 ```sh
 zsh dev/dunecho.sh build

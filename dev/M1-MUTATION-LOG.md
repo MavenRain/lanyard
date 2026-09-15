@@ -565,3 +565,32 @@ mutations under `dev/validation/stage-m1-run/`.
 The complete stage passed: clean controls OK, arguments KILLED, steps
 KILLED, foreign KILLED, connection-isolation KILLED and lookup-key KILLED.
 The observed final count was `killed=5/5`.
+
+## Lanyard M1 scripted requests (2026-09-14)
+
+`test/lan_request_mutations.py` builds an isolated compiler copy and
+requires clean interpreter and CLI controls before changing one source
+site at a time. Builds retain the existing unbounded cold-build policy;
+mutant executions retain the 120-second limit. Each mutant must compile,
+exit 1 and fail its named behavioral assertion.
+
+| Mutation | Required failing observation |
+| --- | --- |
+| Change the redirect status from 303 to 307 | The response matches the required HTTP status and exact header bytes |
+| Accept CR and LF in a URI | A redirect location cannot inject an HTTP header |
+| Offset the database handle returned from a context | A handler can initialize, create and read through its shared context database |
+| Remove the foreign-metadata membership check | Foreign execution rejects a target row absent from the checked catalog |
+
+The cumulative command is `zsh dev/gates.sh --stage M1-request`. It also
+retains all five M1-run controls. Since `topcoat.db` now executes, the
+earlier unsupported-operation observation uses a synthetic
+`future.operation` row in its test catalog. The refusal assertion and
+mutation site still exercise the fallback for unsupported foreign calls.
+
+Captures and the validation receipt live under
+`dev/validation/stage-m1-request/`.
+
+The complete stage passed: clean controls OK, redirect-status KILLED,
+header-injection KILLED, context-handle KILLED and foreign-metadata KILLED.
+The observed request count was `killed=4/4`; the retained M1-run controls
+reported `killed=5/5`.

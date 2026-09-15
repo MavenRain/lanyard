@@ -6,21 +6,29 @@ type database = { id : int; models : string list; ready : bool;
 type t = { next : int; databases : database list }
 let empty = { next = 0; databases = [] }
 
+let allocate models store =
+  let database = { id = store.next; models; ready = false; rows = [] } in
+  database, { next = store.next + 1; databases = database :: store.databases }
+
+let context models store =
+  let database, store = allocate models store in
+  Context database.id, store
+
 let connect (connection : Connection.t) arguments store = match arguments with
   | [url] ->
       let* url = text ~what:"connection URL" connection.family url in
       if not (String.equal url "sqlite::memory:") then
         refuse "in-memory connection requires sqlite::memory:"
       else
-        let database = { id = store.next; models = connection.models; ready = false; rows = [] } in
-        Ok (Database database.id,
-          { next = store.next + 1; databases = database :: store.databases })
+        let database, store = allocate connection.models store in
+        Ok (Database database.id, store)
   | [] | _ :: _ -> invalid "connection argument count"
 
 let database value store = match value with
   | Database id -> List.find_opt (fun database -> database.id = id) store.databases
       |> Option.to_result ~none:(Error.Mismatch "run: unknown database handle")
-  | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ -> invalid "expected a database"
+  | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _
+  | Context _ | Uri _ | See_other _ -> invalid "expected a database"
 
 let replace database store = { store with databases =
   List.map (fun previous -> if previous.id = database.id then database else previous) store.databases }
@@ -59,6 +67,18 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
         |> Option.to_result ~none:(Error.Mismatch "run: connection metadata differs") in
       connect connection arguments store
   | () when not (List.mem row catalog.constants) -> invalid "foreign metadata differs"
+  | () when String.equal row.schema "topcoat.db" ->
+      (match arguments with
+       | [Context id] ->
+           let* _database = database (Database id) store in
+           Ok (Database id, store)
+       | [] | _ :: _ -> invalid "expected a request context")
+  | () when String.equal row.schema "topcoat.see_other" ->
+      (match arguments with
+       | [Uri location] ->
+           let* location = Run_http.uri location in
+           Ok (See_other location, store)
+       | [] | _ :: _ -> invalid "expected a request URI")
   | () when String.equal row.schema "Db.push_schema" -> push arguments store
   | () when String.equal row.schema "Model.create" || String.equal row.schema "Model.get_by_id" ->
       let* selected = List.find_opt (fun (model : Model.t) -> List.mem row model.instances) catalog.models

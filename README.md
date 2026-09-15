@@ -60,6 +60,21 @@ Each connection starts empty, and the program initializes its schema with
 `Db.push_schema`. `--steps N` sets the interpreter's reduction limit.
 This command runs without Cargo, a database service or an HTTP listener.
 
+The [M1 scripted request harness](dev/STAGE-M1-REQUEST.md) supplies a
+private database context and URI to a checked `Cx -> Uri -> SeeOther`
+handler and prints its HTTP redirect:
+
+```sh
+_build/default/bin/lanyard.exe run --request /next test/fixtures/request.lan
+zsh dev/gates.sh --stage M1-request
+```
+
+Request URIs use an origin-form path with valid percent escapes. After the
+leading slash, `?` is an ordinary path byte from the accepted set. The
+interpreter never splits the URI at `?` and never counts the occurrences. Each invocation starts with an empty database, and the handler
+initializes its schema with `Db.push_schema`. Request mode supports
+`--steps` and is mutually exclusive with `--print-model`.
+
 Build and validate through Stage D:
 
 ```sh

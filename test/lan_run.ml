@@ -94,8 +94,9 @@ let tests = [
     let* constants = Kanon_surface.Lower.catalog checked in
     let* row = List.find_opt (fun (row : Rir.foreign) -> row.schema = "topcoat.db") constants
       |> Option.to_result ~none:(Error.Mismatch "missing target row") in
-    refuses "foreign operation topcoat.db"
-      (Store.foreign { Store.models = []; connections = []; constants } row [V.Unit] Store.empty) ());
+    let row = { row with schema = "future.operation" } in
+    refuses "foreign operation future.operation"
+      (Store.foreign { Store.models = []; connections = []; constants = [row] } row [V.Unit] Store.empty) ());
 ]
 
 let () =

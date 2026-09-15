@@ -1,0 +1,52 @@
+{
+  "base": "8c62fcf5403cbe679adeaa65e41ce97eec636c78",
+  "benchmark_retry": {
+    "artifact": "/Users/oobi/Documents/gpt2/lanyard-m1-http/.kanon-exec/run-Wsp9ge",
+    "exit_code": 0,
+    "test_seconds": 4.408
+  },
+  "captures_sha256": {
+    "source-inventory.json": "c9d772bc10d9152b7db114f277465807423560d59366fe9e2f1ea0932040a26f",
+    "source-sha256.json": "41d2bd371f630e0d5e2434c71f65feae3d2123b2abe47f07923d4fa6620ac414",
+    "stage.stderr": "3a56e3af823e9973d997b4bf10859045ba046269c6283fca9f02842bd9b23cd7",
+    "stage.stdout": "23b24bcde2fe8e734301e18bc79d47ae0a46bfb80f413b6d48ec68aa63ab2d01"
+  },
+  "cli_tests": 18,
+  "command": "zsh dev/gates.sh --stage M1-request",
+  "compiler_checks": 23,
+  "earlier_attempts": [
+    {
+      "artifact": "/Users/oobi/Documents/gpt2/.kanon-exec/run-Hm1r7u",
+      "exit_code": 1,
+      "reason": "HOUSE rejected two catch-all character predicates, subsequently corrected."
+    },
+    {
+      "artifact": "/Users/oobi/Documents/gpt2/.kanon-exec/run-P0emns",
+      "exit_code": 1,
+      "reason": "The unchanged benchmark-driver test exceeded its 30-second limit."
+    }
+  ],
+  "exit_code": 0,
+  "format": 1,
+  "inventory_files": 50,
+  "inventory_lines": 13293,
+  "m0_status": "PENDING",
+  "mutations_killed": 4,
+  "normal_access_artifact": "/Users/oobi/Documents/gpt2/.kanon-exec/run-uXbxTV",
+  "notes": [
+    "The cumulative gate passed with normal filesystem access and unchanged earlier gate assertions.",
+    "Expected FAIL rows in the passing capture come from negative controls.",
+    "The gate was invoked by absolute path from outside the checkout, exercising its path handling.",
+    "The initial attempt stopped at HOUSE for two catch-all character predicates; the predicates were corrected before this run.",
+    "A later attempt hit the existing benchmark-driver test's 30-second timeout under high machine load; the unchanged test passed alone in 4.408 seconds before this final cumulative run.",
+    "The trust policy remains proposed, and M0 remains pending.",
+    "Request mode supplies one context and URI and renders a redirect; raw HTTP parsing and listeners remain future work."
+  ],
+  "policy_status": "PROPOSED",
+  "recorded_at": "2026-09-14T22:42:29.655217+00:00",
+  "retained_run_checks": 40,
+  "retained_run_cli_tests": 26,
+  "retained_run_mutations": 5,
+  "stage": "M1-request",
+  "status": "PASS"
+}

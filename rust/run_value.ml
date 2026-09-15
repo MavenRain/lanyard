@@ -11,6 +11,9 @@ type t =
   | Tag of Rir.tid * int * t list
   | Closure of Rir.fid * int * t list
   | Database of int
+  | Context of int
+  | Uri of string
+  | See_other of string
 
 let rec at index = function
   | [] -> invalid "value index out of bounds"
@@ -26,7 +29,8 @@ let rec zip left right = match left, right with
 
 let natural = function
   | Nat number when Bignum.sign number >= 0 -> Ok number
-  | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _ ->
+  | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _
+  | Context _ | Uri _ | See_other _ ->
       invalid "expected a natural number"
 
 let scalar_nat value =
@@ -40,7 +44,8 @@ let scalar_nat value =
 let boolean = function
   | Tag (tid, tag, [Unit]) when Rir.TyUnion tid = Model.bool_repr && (tag = 0 || tag = 1) ->
       Ok (tag = 1)
-  | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _ ->
+  | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _
+  | Context _ | Uri _ | See_other _ ->
       invalid "expected a two-unit Boolean"
 
 (* A total byte lookup avoids a partial integer-to-character conversion. *)
@@ -69,14 +74,16 @@ let text ?(what = "model text") family value =
         else
           let* character = at byte byte_characters in
           bytes (character :: reversed) tail
-    | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _ ->
+    | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _
+    | Context _ | Uri _ | See_other _ ->
         invalid "expected a model byte list" in
   bytes [] value
 
 let fields (model : Model.t) = function
   | Product (tid, fields) when model.repr = Rir.TyStruct tid &&
       List.length fields = List.length model.fields -> Ok fields
-  | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _ ->
+  | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _
+  | Context _ | Uri _ | See_other _ ->
       invalid ("model result layout differs: " ^ model.name)
 
 let scalar kind value = match kind with

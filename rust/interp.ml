@@ -67,7 +67,8 @@ let rec evaluate context depth state env term =
        | Closure (fid, arity, captures) ->
            if List.length arguments <> arity then invalid "closure call argument count"
            else call context (depth + 1) state (fid_text fid) (captures @ arguments)
-       | Nat _ | Text _ | Unit | Product _ | Tag _ | Database _ -> invalid "expected a closure")
+       | Nat _ | Text _ | Unit | Product _ | Tag _ | Database _
+       | Context _ | Uri _ | See_other _ -> invalid "expected a closure")
   | RStruct (tid, terms) ->
       let* fields, state = values state terms in
       let value = if tid = Tid "tuple<>" && List.is_empty fields then Unit else Product (tid, fields) in
@@ -77,7 +78,8 @@ let rec evaluate context depth state env term =
       (match value with
        | Product (actual, fields) when tid = actual ->
            at index fields |> Result.map (fun value -> value, state)
-       | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _ -> invalid "projection layout differs")
+       | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _
+       | Context _ | Uri _ | See_other _ -> invalid "projection layout differs")
   | RTag (tid, tag, terms) ->
       let* fields, state = values state terms in Ok (Tag (tid, tag, fields), state)
   | RCase (tid, term, branches) ->
@@ -88,7 +90,8 @@ let rec evaluate context depth state env term =
              |> Option.to_result ~none:(Error.Mismatch "run: missing case branch") in
            if branch.arity <> List.length fields then invalid "case binder count"
            else evaluate context (depth + 1) state (List.rev fields @ env) branch.body
-       | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _ -> invalid "case layout differs")
+       | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _
+       | Context _ | Uri _ | See_other _ -> invalid "case layout differs")
   | RForeign (row, terms) ->
       let* arguments, state = values state terms in
       let* value, store = Run_store.foreign context.foreign row arguments state.store in
@@ -133,8 +136,11 @@ let prepare checked =
   let* rows = Lower.program_with instances specialized in
   Ok { functions = functions rows; foreign = { Run_store.models; connections; constants } }
 
+let checked_steps steps =
+  if steps <= 0 || steps > max_steps then invalid "steps must be in 1..1000000" else Ok ()
+
 let run ?(steps = default_steps) ?(output = Model.Discard) checked =
-  if steps <= 0 || steps > max_steps then invalid "steps must be in 1..1000000" else
+  let* () = checked_steps steps in
   let* context = prepare checked in
   let* main = find context "main" in
   let* () = if List.is_empty main.params then Ok () else invalid "entry point requires runtime arguments: main" in
@@ -146,4 +152,23 @@ let run ?(steps = default_steps) ?(output = Model.Discard) checked =
         if main.result = model.repr then Ok (Some model) else invalid "entry point result differs from printed model" in
   let* value, _state = call context 0 { steps; store = Run_store.empty } "main" [] in
   let* text = Option.fold ~none:(Ok "") ~some:(fun model -> print_model model value) printed in
+  Ok (value, text)
+
+let foreign_repr name = function
+  | TyForeign (actual, []) | TyArc (TyForeign (actual, [])) -> String.equal name actual
+  | TyI31 | TyStruct _ | TyUnion _ | TyFunc _ | TyThunk _ | TyArc _ | TyForeign _ -> false
+
+let request ?(steps = default_steps) ~uri checked =
+  let* () = checked_steps steps in
+  let* uri = Run_http.uri uri in
+  let* context = prepare checked in
+  let* main = find context "main" in
+  let* () = match main.params with
+    | [cx_type; uri_type] when foreign_repr "Cx" cx_type && foreign_repr "Uri" uri_type
+        && foreign_repr "SeeOther" main.result -> Ok ()
+    | [] | _ :: _ -> invalid "request entry point must have type Cx -> Uri -> SeeOther" in
+  let cx, store = Run_store.context
+    (List.map (fun (model : Model.t) -> model.name) context.foreign.models) Run_store.empty in
+  let* value, _state = call context 0 { steps; store } "main" [cx; Uri uri] in
+  let* text = Run_http.response value in
   Ok (value, text)

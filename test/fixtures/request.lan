@@ -1,0 +1,13 @@
+-- One scripted request creates and reads a row before redirecting.
+model Counter with
+| id : Nat
+| value : Nat
+end
+
+def main : Cx -> Uri -> SeeOther := fun (cx : Cx) (uri : Uri) =>
+  let db : Db := topcoat.db cx in
+  let ready : prod () := Db.push_schema db in
+  let created : Counter := Counter.create (tuple (1, 23)) db in
+  let shared : Db := topcoat.db cx in
+  let found : Counter := Counter.get_by_id 1 shared in
+  topcoat.see_other uri
