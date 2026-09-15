@@ -13,10 +13,10 @@ let create_schema () =
             | Target.Type_constant | Target.Constant -> false)
 
 let () =
-  if List.length Target.entries = 15
+  if List.length Target.entries = 16
      && List.length Target.foreign_types = 9
      && Option.is_none (Target.find "streaming_ssr")
      && Option.is_none (Target.find "missing")
      && create_schema ()
-  then print_endline "TARGET-CATALOG OK rows=15 foreign_types=9"
+  then print_endline "TARGET-CATALOG OK rows=16 foreign_types=9"
   else (prerr_endline "TARGET-CATALOG FAIL"; exit 1)

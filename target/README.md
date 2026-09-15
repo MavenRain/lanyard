@@ -1,13 +1,16 @@
 # Target signatures
 
-Stage B provides 15 proposed foreign declarations: nine type constants and
-six constant or model schemas. The target layer builds as `lanyard_target`;
-its `Target_generated` module exposes immutable metadata and total lookup.
-Stage C instantiates schemas and checks their types before adding axioms.
-Stage E applies synchronous, async, model and connection print rules
-through `emit --target`. The [crate command](../dev/STAGE-E-CRATE.md) uses
-the same printer with a checked main entry point. Stage B does not establish Rust
-compilation or kernel soundness for a schema merely by generating metadata.
+The target catalog provides 16 proposed foreign declarations: nine type
+constants and seven constant or schema declarations. M1 deletion adds
+`Model.delete_by_id` to the original Stage B catalog. The target layer
+builds as `lanyard_target`; its `Target_generated` module exposes immutable
+metadata and total lookup. Stage C instantiates schemas and checks their
+types before adding axioms. Stage E applies synchronous, async, model and
+connection print rules through `emit --target`. The
+[crate command](../dev/STAGE-E-CRATE.md) uses the same printer with a
+checked main entry point. Stage B does not establish Rust compilation or
+kernel soundness
+for a schema merely by generating metadata.
 
 Run `zsh dev/gates.sh --stage B` from the repository. It builds the compiler
 and generated library, checks the target pins, runs the mutation suite and
@@ -90,7 +93,9 @@ files and `dev/gen-target.py`. It is deterministic, records a semantic digest,
 and carries no absolute source paths. It is compiled into an OCaml library,
 so a consumer does not parse signature files at runtime.
 
-The generated module has 104 lines. S0-D1 requires the user to rule the
-numeric `A_sig` allowance; the proposed allowance is exactly 104, without
-margin. `dev/trusted-lines.sh` reports that measurement and keeps the ruled
-formula `5481 + A_rir + A_emit + A_sig`. It does not claim an approved total.
+The generated module has 110 lines after adding the deletion schema. S0-D1
+requires the user to rule the numeric `A_sig` allowance; the proposed
+allowance is exactly 104, without margin. The additional six measured lines
+exceed that proposed allowance; the proposal is unchanged.
+`dev/trusted-lines.sh` reports the measurement and keeps the ruled formula
+`5481 + A_rir + A_emit + A_sig`. It does not claim an approved total.

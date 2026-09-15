@@ -75,6 +75,18 @@ interpreter never splits the URI at `?` and never counts the occurrences. Each i
 initializes its schema with `Db.push_schema`. Request mode supports
 `--steps` and is mutually exclusive with `--print-model`.
 
+The [M1 model deletion slice](dev/STAGE-M1-DELETE.md) adds
+`Model.delete_by_id`, exposed as `Counter.delete_by_id key db` for each
+declared model. It returns unit, accepts a missing key, and preserves other
+rows, models and connections. The interpreter and emitted Rust share the
+checked key range and asynchronous database metadata.
+
+```sh
+_build/default/bin/lanyard.exe run --print-model Counter test/fixtures/delete.lan
+# Counter { id: 7, value: 23 }
+zsh dev/gates.sh --stage M1-delete
+```
+
 Build and validate through Stage D:
 
 ```sh

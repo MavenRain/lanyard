@@ -1,0 +1,2 @@
+gateledger: MISS 97ad4243: env RUSTUP_TOOLCHAIN=1.98 RUSTC_WRAPPER= CARGO_INCREMENTAL=0 CARGO_HOME=/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home cargocho --warn build -- --offline --locked --manifest-path /Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-pinned/Cargo.toml --target-dir /Users/oobi/Documents/gpt2/lanyard-build/.gatework/build-cargo-target --jobs 2
+gateledger: green but verdict not recorded (EPERM: operation not permitted, mkdtemp '/Users/oobi/Library/Caches/gateledger/v1/.write-XXXXXX')

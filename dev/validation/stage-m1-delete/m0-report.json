@@ -1,0 +1,289 @@
+{
+  "format": 1,
+  "root": "/Users/oobi/Documents/gpt2/lanyard-delete",
+  "summary": {
+    "status": "PENDING",
+    "exit_code": 2,
+    "complete": true,
+    "passed_legs": 6,
+    "pending_legs": 1,
+    "failed_checks": 0
+  },
+  "legs": [
+    {
+      "name": "R0-COUNT",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "zsh",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/dev/r0-count.sh"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "R0-COUNT.stdout",
+          "sha256": "a2d5da77ba6be9fc6f442fb3970ab1523cfd348eec3a98f6c482957c23c4193e"
+        },
+        "stderr": {
+          "path": "R0-COUNT.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 50.56462483480573
+    },
+    {
+      "name": "R0-TARGET",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "zsh",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/dev/r0-target.sh"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "R0-TARGET.stdout",
+          "sha256": "ae18b4ea935ed15b06490626730e2cc8ced6c2d70d9c7a3d99404c31d7a56dd2"
+        },
+        "stderr": {
+          "path": "R0-TARGET.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 85.88366629555821
+    },
+    {
+      "name": "TARGET-PIN",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "zsh",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/dev/target-pin.sh"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "TARGET-PIN.stdout",
+          "sha256": "f03fd02fc500e4df7e11079207a2b15306c4465f46b89085beb20573a4ab8d3c"
+        },
+        "stderr": {
+          "path": "TARGET-PIN.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 137.43104180321097
+    },
+    {
+      "name": "TRUSTED-LINES",
+      "status": "PENDING",
+      "exit_code": 0,
+      "command": [
+        "zsh",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/dev/trusted-lines.sh",
+        "/Users/oobi/Documents/gpt2/lanyard-delete",
+        "--output",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/m0.ydpr5ggk/trusted-inventory.json"
+      ],
+      "reason": "A_rir, A_emit, A_sig and trusted-file scope require user rulings",
+      "streams": {
+        "stdout": {
+          "path": "TRUSTED-LINES.stdout",
+          "sha256": "1002520587552cd00c2658c59762b47fbb44818f186a85f9a0b4fdc1ef6d6f15"
+        },
+        "stderr": {
+          "path": "TRUSTED-LINES.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 147.80341600999236,
+      "inventory": {
+        "path": "trusted-inventory.json",
+        "sha256": "a2d3170f37080c5a3636cfdbc783e379f0634c502a2291f8201be9bbb99d7d23"
+      }
+    },
+    {
+      "name": "KERNEL-CARRY",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "zsh",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/dev/kernel-carry.sh"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "KERNEL-CARRY.stdout",
+          "sha256": "1bf386234e9293888a1c49e455bd91f1f0c8f8c6a7772a7aa31d8c75302533fd"
+        },
+        "stderr": {
+          "path": "KERNEL-CARRY.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 656.3425408676267
+    },
+    {
+      "name": "EMIT-DIFF",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-P",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/dev/emit-diff.py"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "EMIT-DIFF.stdout",
+          "sha256": "e83419d200608a5f19d93114069302362462b323bbe068e277e80225bb8a8172"
+        },
+        "stderr": {
+          "path": "EMIT-DIFF.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 310.3337502107024
+    },
+    {
+      "name": "M0-TIME",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-P",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/dev/bench.py",
+        "--refit-go",
+        "--output",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/m0.ydpr5ggk/timings.json"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "M0-TIME.stdout",
+          "sha256": "666c46276bce0966f580f44ccea6753e805f49e7398def675af5384d3806e446"
+        },
+        "stderr": {
+          "path": "M0-TIME.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 26188.846374861896
+    }
+  ],
+  "support": [
+    {
+      "name": "BUILD",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "zsh",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/dev/dunecho.sh",
+        "build"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "BUILD.stdout",
+          "sha256": "9e007d7a4010fcc271a69a2546c4c166962b8c019f48235eca93e8512b6a997b"
+        },
+        "stderr": {
+          "path": "BUILD.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 590.6939157284796
+    },
+    {
+      "name": "M0-CHECK",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "/Users/oobi/Documents/gpt2/lanyard-delete/_build/default/bin/lanyard.exe",
+        "check",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/corpus/m0/todo.lan"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "M0-CHECK.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "M0-CHECK.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 31.74129081889987
+    },
+    {
+      "name": "M0-ERASE",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "/Users/oobi/Documents/gpt2/lanyard-delete/_build/default/bin/lanyard.exe",
+        "check",
+        "--erased",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/corpus/m0/todo.lan"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "M0-ERASE.stdout",
+          "sha256": "35f3f413905012396651899622ebfac7874f19e908fbeef71b97503f22c81cad"
+        },
+        "stderr": {
+          "path": "M0-ERASE.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 7.486582733690739
+    },
+    {
+      "name": "M0-AXIOMS",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "/Users/oobi/Documents/gpt2/lanyard-delete/_build/default/bin/lanyard.exe",
+        "axioms",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/corpus/m0/todo.lan"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "M0-AXIOMS.stdout",
+          "sha256": "5fe2c9b169b78734680727930efbde0f61fd233e7dea7f1d6611b22462b25623"
+        },
+        "stderr": {
+          "path": "M0-AXIOMS.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 8.78966599702835
+    },
+    {
+      "name": "HOUSE",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": [
+        "zsh",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/dev/house.sh"
+      ],
+      "reason": "",
+      "streams": {
+        "stdout": {
+          "path": "HOUSE.stdout",
+          "sha256": "098fcfa663f47c1adc310317ce713d49de081ffe7a0b0df28deb15ca0280bc22"
+        },
+        "stderr": {
+          "path": "HOUSE.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "elapsed_ms": 580.5500410497189
+    }
+  ],
+  "m0_exit": "not-stamped",
+  "pending_rulings": [
+    "A_rir, A_emit, A_sig and trusted-file scope require user rulings"
+  ]
+}

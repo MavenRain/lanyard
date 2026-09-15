@@ -46,17 +46,23 @@ let model (model : Model.t) schema arguments store = match arguments with
         | () when not (List.mem model.name db.models) -> invalid ("model not registered: " ^ model.name)
         | () when not db.ready -> invalid "database schema has not been initialized"
         | () -> Ok () in
-      let creating = String.equal schema "Model.create" in
-      let* key = if creating then key model value else scalar_nat value in
-      let previous = List.find_opt (fun (name, stored_key, _row) ->
+      let* operation = Model.operation schema in
+      let* key = match operation with
+        | Model.Create -> key model value
+        | Model.Get | Model.Delete -> scalar_nat value in
+      let previous () = List.find_opt (fun (name, stored_key, _row) ->
         String.equal name model.name && Bignum.equal key stored_key) db.rows in
-      (match () with
-       | () when creating && Option.is_some previous ->
+      (match operation with
+       | Model.Create when Option.is_some (previous ()) ->
            invalid ("duplicate model key: " ^ model.name)
-       | () when creating ->
+       | Model.Create ->
            Ok (value, replace { db with rows = (model.name, key, value) :: db.rows } store)
-       | () -> previous |> Option.to_result ~none:(Error.Mismatch ("run: model row not found: " ^ model.name))
-           |> Result.map (fun (_name, _key, row) -> row, store))
+       | Model.Get -> previous () |> Option.to_result ~none:(Error.Mismatch ("run: model row not found: " ^ model.name))
+           |> Result.map (fun (_name, _key, row) -> row, store)
+       | Model.Delete ->
+           let rows = List.filter (fun (name, stored_key, _row) ->
+             not (String.equal name model.name && Bignum.equal stored_key key)) db.rows in
+           Ok (Unit, replace { db with rows } store))
   | [] | _ :: _ -> invalid "model argument count"
 
 type catalog = { models : Model.t list; connections : Connection.t list; constants : Rir.foreign list }
@@ -80,7 +86,7 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
            Ok (See_other location, store)
        | [] | _ :: _ -> invalid "expected a request URI")
   | () when String.equal row.schema "Db.push_schema" -> push arguments store
-  | () when String.equal row.schema "Model.create" || String.equal row.schema "Model.get_by_id" ->
+  | () when Result.is_ok (Model.operation row.schema) ->
       let* selected = List.find_opt (fun (model : Model.t) -> List.mem row model.instances) catalog.models
         |> Option.to_result ~none:(Error.Mismatch "run: unknown model instance") in
       model selected row.schema arguments store

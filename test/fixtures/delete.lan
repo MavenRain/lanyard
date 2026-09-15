@@ -1,0 +1,20 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+model Counter with
+| id : Nat
+| value : Nat
+end
+
+def main : Counter :=
+  let db : Db := Db.connect Counter Bytes b"sqlite::memory:" in
+  let ready : prod () := Db.push_schema db in
+  let created : Counter := Counter.create (tuple (7, 42)) db in
+  let other : Counter := Counter.create (tuple (8, 99)) db in
+  let deleted : prod () := Counter.delete_by_id 7 db in
+  let repeated : prod () := Counter.delete_by_id 7 db in
+  let missing : prod () := Counter.delete_by_id 90 db in
+  let replaced : Counter := Counter.create (tuple (7, 23)) db in
+  let preserved : Counter := Counter.get_by_id 8 db in
+  Counter.get_by_id 7 db

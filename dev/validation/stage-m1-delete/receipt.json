@@ -1,0 +1,177 @@
+{
+  "format": 1,
+  "stage": "M1-delete",
+  "base": "1e45fb81f5da6a0f1a959eb930297bb86046b8b1",
+  "status": "PASS",
+  "exit_code": 0,
+  "recorded_at": "2026-09-15T01:26:07.754122+00:00",
+  "captures": {
+    "stage": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-delete/.kanon-exec/run-VbvZZX",
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-delete"
+      ],
+      "exit_code": 0
+    },
+    "cli": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-delete/.kanon-exec/run-YdKk5g",
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_delete.py"
+      ],
+      "exit_code": 0
+    },
+    "native-build": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-delete/.kanon-exec/run-q39x82",
+      "command": [
+        "gateledger",
+        "run",
+        "--dir",
+        ".gatework/delete-pinned",
+        "--scope",
+        "Cargo.toml",
+        "--scope",
+        "Cargo.lock",
+        "--scope",
+        "src",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_HOME=/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-pinned/Cargo.toml",
+        "--target-dir",
+        "/Users/oobi/Documents/gpt2/lanyard-build/.gatework/build-cargo-target",
+        "--jobs",
+        "2"
+      ],
+      "exit_code": 0
+    },
+    "ledger-build": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-delete/.kanon-exec/run-oFyBXJ",
+      "command": [
+        "gateledger",
+        "run",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/gateledger",
+        "--dir",
+        ".gatework/delete-pinned",
+        "--scope",
+        "Cargo.toml",
+        "--scope",
+        "Cargo.lock",
+        "--scope",
+        "src",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_HOME=/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-pinned/Cargo.toml",
+        "--target-dir",
+        "/Users/oobi/Documents/gpt2/lanyard-build/.gatework/build-cargo-target",
+        "--jobs",
+        "2"
+      ],
+      "exit_code": 0
+    },
+    "native-run": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-delete/.kanon-exec/run-Onb1MX",
+      "command": [
+        "/Users/oobi/Documents/gpt2/lanyard-build/.gatework/build-cargo-target/debug/lanyard-program"
+      ],
+      "exit_code": 0
+    }
+  },
+  "unit_checks": 23,
+  "cli_tests": 9,
+  "cumulative_cli_tests": 8,
+  "mutations_killed": 4,
+  "after_cumulative_gate": [
+    "Added request-deletion-only reachability test and reran all nine CLI tests.",
+    "Completed documentation and evidence. Compiler sources unchanged."
+  ],
+  "native_output_matches_interpreter": true,
+  "native_warnings": 11,
+  "rust_toolchain": "1.98",
+  "source_pins": {
+    "toasty": {
+      "commit": "7bd502cbf44cc47f70db9f2b27ab35d77a096364",
+      "crate_version": "0.6.1",
+      "release_tag": "toasty-v0.6.1",
+      "release_commit": "c2e8cfbc163bab76cf27309f1a92eea4eaf91834",
+      "signature_sha256": "bfb8da7948482b7073eac844d3ee5496bfc04e7f2cc72df776a3f3a07c4779c4"
+    },
+    "topcoat": {
+      "commit": "51caa01dca3a8f20bdacfa771b1b8ac8b6f2668a",
+      "crate_version": "0.6.2",
+      "release_tag": "v0.7.0",
+      "release_commit": "8ef6d803bf8bc4e269c4566a959d190a9ae21896",
+      "signature_sha256": "40ee029ce9885b1402d76cc4d0340545c24b9932649cec031c10075b1a21504d"
+    }
+  },
+  "cache_archives_verified": 210,
+  "m0_summary": {
+    "status": "PENDING",
+    "exit_code": 2,
+    "complete": true,
+    "passed_legs": 6,
+    "pending_legs": 1,
+    "failed_checks": 0
+  },
+  "policy_status": "PROPOSED",
+  "sandbox_attempt": {
+    "artifact": "/Users/oobi/Documents/gpt2/lanyard-delete/.kanon-exec/run-1SwLdH",
+    "exit_code": 1,
+    "reason": "Existing macOS Git-isolation assertions received a sandbox confstr warning."
+  },
+  "captures_sha256": {
+    "cli-capture.json": "6d1f978b1c88d9aecdb86dbd0bb5056469141efa8a7afa44e738968b601f26e8",
+    "cli.stderr": "094229866179a6a511b6844fae01fda535cc06f3daa769f2228ca882f6eca658",
+    "cli.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "interpreter.stdout": "1f31a4e1794cdefb3ab5b19b7a4d9b912efa0755952e6de002d4eb848b78e2b6",
+    "ledger-build-capture.json": "b82705fae8f45ad023fe5f92f06b7a7a58ab5384a2bdd5a60dd151546fc4104f",
+    "ledger-build.stderr": "f91dacf055d2eb2068e53461737b856ec1d9a2c8bf8f94e507f6d16ab97c79d5",
+    "ledger-build.stdout": "0d21a7a42cfb55481ce06eb261b2ce48fb6cc751c64f91d0026ff794723eaf82",
+    "m0-report.json": "f5bcf9be5f03b85c765ae18fdf1d859613c92380ab841c03742f7e184a6f4e3c",
+    "native/Cargo.git.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "native/Cargo.lock": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "native/Cargo.toml": "f542ef1107feceb9f68626d4d27917d6515db34c404ffbaef5475bf03fe58efe",
+    "native/src/main.rs": "89ec81582126c3c35390e2a45318cdc0b97292de911c38c30c53b977039f2624",
+    "native-build-capture.json": "de147e71536e48f634147afdc6cf6e66086edb973788b4dfa94ee87282eeec3c",
+    "native-build.stderr": "88de30d59e25477a8c9a36b3f60d7ea9c3d09f24c1f3fb6ed161979dd3e5cc12",
+    "native-build.stdout": "0d21a7a42cfb55481ce06eb261b2ce48fb6cc751c64f91d0026ff794723eaf82",
+    "native-run-capture.json": "ba973cec2c5961d7eae7a49d97552eaba1846b211c4df625d3855f778f1f1d95",
+    "native-run.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-run.stdout": "1f31a4e1794cdefb3ab5b19b7a4d9b912efa0755952e6de002d4eb848b78e2b6",
+    "source-inventory.json": "a2d3170f37080c5a3636cfdbc783e379f0634c502a2291f8201be9bbb99d7d23",
+    "source-sha256.json": "730d8f231a5048e6267448ffd9e8eef8aba3d9fea673550290773ea1e5256cca",
+    "stage-capture.json": "008d3ec708056b3ad0deed38cbbda21a911ab6a59ed444f925650573f1ed0687",
+    "stage.stderr": "8e403c16dc893d5737dfeb0989c131ec5ddf1504a89572e0022ec92eb5becf3c",
+    "stage.stdout": "9bd00954e882fc163f03400036d73e9d52a61048cbf5af167bbc2a3650aed533"
+  }
+}

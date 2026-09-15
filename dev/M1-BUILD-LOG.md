@@ -2576,3 +2576,112 @@ in the review kit at ~/Documents/lanyard-stage-m1-request-review
 were observed again at 17:3x on the fixed tree (probes/fix-suites-2.log).
 The close ladder runs after this block is staged; its rows stay in the kit
 (gates-LSM1Q-close.log).
+
+## Lanyard M1 DELETE (2026-09-14)
+
+Added `Model.delete_by_id` as a checked foreign schema and generated
+`ModelName.delete_by_id` instance. Rust emission calls the pinned Toasty
+method with a checked Nat key and an asynchronous unit result. The
+interpreter removes only the matching model/key in the selected connection.
+Missing keys and repeated deletion succeed, and deleted keys are reusable.
+
+The target catalog grows from 15 to 16 rows, retaining nine foreign types.
+The Todo axiom report grows from 17 to 19 foreign constants, adding the
+schema and its model instance. Exact catalog assertions and the report
+golden now require those entries. Toasty and Topcoat source commits and
+Topcoat anchors stay unchanged; the Toasty signature digest covers the
+additional row.
+
+Validation: `zsh dev/gates.sh --stage M1-delete` passed through the cumulative
+M1 request gate, 23 deletion unit checks and all four deletion mutations.
+Clean and restored mutation controls passed. The final CLI suite passed
+nine tests, including a deletion-only request that must retain its model
+through reachability. That ninth test was added after the cumulative gate
+had run its eight-test CLI suite; the final nine-test suite was captured
+separately. Compiler sources were unchanged after the cumulative gate.
+
+The emitted create/delete/recreate crate built offline against both clean
+local target pins with Rust 1.98.1. Its real SQLite run printed exactly
+`Counter { id: 7, value: 23 }` and a newline, matching the interpreter,
+with exit 0 and no stderr. The build retained 11 unused-code or unused-value
+warnings. A private Cargo cache copied 210 locally available archives only
+after checking their lockfile checksums. The successful build is recorded
+in the workspace gateledger. Captures, generated crate, lockfile, inventory
+and source hashes live under `dev/validation/stage-m1-delete/`.
+
+The first cumulative run encountered the existing macOS `git` confstr
+warning in two Git-isolation tests under the sandbox. The complete gate
+passed with normal filesystem access and the original assertions.
+
+Trust remains pending. The measured printer group is 1237 lines and the
+generated signature module is 110 lines. The proposed allowances remain
+1231 and 104 respectively, and no M0 exit or policy ruling is recorded.
+Deletion inside model-returning closures is covered; function values whose
+unit result has an erased layout retain the existing erasure refusal.
+
+## Stage M1 DELETE review fixes (tag LSM1D, 2026-09-14)
+
+F-1 (low, rust/run_store.ml:89). The foreign dispatch arm for the model
+schemas used a three-space indent and repeated the three schema names.
+The arm now reads `| () when Result.is_ok (Model.operation row.schema) ->`
+at the two-space indent of every sibling arm. `Model.operation` returns a
+result whose Error is the refusal, so the schema name list stays in
+rust/model.ml only and cannot drift from the dispatch.
+
+F-2 (nit, rust/run_store.ml:53). `previous` scanned all `db.rows` for every
+operation although the Delete arm never reads it. The binding is now the
+thunk `let previous () = ...`, and only the Create duplicate-key guard and
+the Get arm force it. Delete makes one pass over the rows. The predicate
+keeps the spelling `Bignum.equal key stored_key` with the reversed operands,
+which the lookup-key mutant of test/lan_run_mutations.py needs.
+
+F-3 (nit, rust/model.ml:108). The `result` field projection string was built
+for Delete as well, and the Delete body discarded it. The projection now
+builds inside the `Create | Get` branch of `body`. `| Delete -> call in`
+stays byte-identical for the erased-delete mutant.
+
+F-4 (nit, test/lan_delete_mutations.py:55). A survivor exited inside the
+mutation loop, so the harness skipped the restored control and reported no
+restored state. The loop now records the survivor message, breaks, restores
+the source, runs the restored control, prints the survivor summary and exits
+non-zero with `LAN-DELETE-MUTATIONS FAILED killed=<n>/4 restored=GREEN`. The
+green path prints the same rows as before: `LAN-DELETE-MUTATIONS CONTROL OK`,
+four `LAN-DELETE-MUTATIONS <name> KILLED` rows and
+`LAN-DELETE-MUTATIONS OK killed=4/4 restored=GREEN`.
+
+F-5 (nit, target/README.md:3-11 and :95-100). The two edited paragraphs
+appended sentences onto existing lines and ran past the file wrap. Both
+paragraphs are re-wrapped at 76 columns with no wording change. The counts
+16, nine, seven, 110 and 104 are unchanged, and the markdown link
+`[crate command](../dev/STAGE-E-CRATE.md)` is not split.
+
+Proof. The fix suites ran on a copy of the tree with the ladder build recipe
+and printed: `_build/default/test/lan_request.exe observations=23`,
+`_build/default/test/lan_run.exe observations=40`,
+`_build/default/test/lan_delete.exe checks=23 failures=0`,
+`test/lan_request.py Ran 18`, `test/lan_run.py Ran 26`,
+`test/lan_build.py Ran 16` and `test/lan_delete.py Ran 9`. All seven rows are
+OK at their floors and the run exit code is 0.
+
+Needles. Each mutation needle occurs exactly once after the fixes. In
+rust/run_store.ml: `Ok (Unit, replace { db with rows } store)` 1,
+`Bignum.equal stored_key key` 1,
+`String.equal name model.name && Bignum.equal stored_key key` 1,
+`Bignum.equal key stored_key` 1, `refuse ("foreign operation " ^ row.schema)`
+1, `Ok (Database database.id,` 1, `Ok (Database id, store)` 1,
+`not (List.mem row catalog.constants)` 1. In rust/model.ml:
+`| Delete -> call in` 1. In rust/interp.ml: `(List.rev arguments) fn.body` 1,
+`state.steps <= 0` 1. In rust/run_http.ml: `HTTP/1.1 303 See Other` 1,
+`when uri_character character` 1.
+
+Ladders. The baseline ladder ran on the unfixed staged tree and reported
+GREEN at 19:18 PDT (GATE-END 02:18:34Z, stage_rc=0). The compare-rows
+probe on the baseline tag showed RED-WATCH 0, PINS 48/48 and ROWS 112/112
+IDENTICAL. The fix-1 ladder ran on the fixed tree and reported GREEN at
+19:4x PDT (LADDER-DETACHED 02:41:52Z), with rows
+`LAN-DELETE OK checks=23 failures=0`,
+`LAN-DELETE-MUTATIONS OK killed=4/4 restored=GREEN`, `STAGE-M1-DELETE OK`
+and `STAGE-GATE-EXIT 0`. The compare-rows probe on the fix-1 tag showed
+RED-WATCH 0, PINS 48/48 and ROWS 112/112 IDENTICAL. The close ladder
+re-runs `zsh dev/gates.sh --stage M1-delete` on the final tree after the
+close, and its verdict is recorded in the review kit, not in this file.

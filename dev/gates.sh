@@ -38,10 +38,15 @@
 #   zsh dev/gates.sh --stage M1-build
 #   zsh dev/gates.sh --stage M1-run
 #   zsh dev/gates.sh --stage M1-request
+#   zsh dev/gates.sh --stage M1-delete
 #   zsh dev/gates.sh M0
 #   zsh dev/gates.sh M0-E2E --toasty PATH --topcoat PATH
 
 set -u
+
+if [[ $# -eq 2 && $1 == "--stage" && $2 == "M1-delete" ]]; then
+  exec zsh ${0:A:h}/stage-m1-delete.sh
+fi
 
 if [[ $# -eq 2 && $1 == "--stage" && $2 == "M1-request" ]]; then
   exec zsh ${0:A:h}/stage-m1-request.sh
