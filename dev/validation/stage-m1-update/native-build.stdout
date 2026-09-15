@@ -1,0 +1,6 @@
+W src/main.rs:45:8  dead_code  methods `compare`, `sub`, and `mul` are never used
+W src/main.rs:105:1232  unused_variables  unused variable: `v1`
+W src/main.rs:105:1324  unused_variables  unused variable: `v2`
+W src/main.rs:105:2662  unused_variables  unused variable: `v3`
+W src/main.rs:105:6149  unused_variables  unused variable: `v5`
+OK build: 0 errors, 5 warnings

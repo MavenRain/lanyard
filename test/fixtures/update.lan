@@ -1,0 +1,21 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+
+model Task with
+| title : Bytes
+| id : Nat
+| completed : Bool
+| value : Nat
+end
+
+def main : Task :=
+  let db : Db := Db.connect Task Bytes b"sqlite::memory:" in
+  let ready : prod () := Db.push_schema db in
+  let first : Task := Task.create (tuple (b"old", 7, inj 0 of 2 (), 42)) db in
+  let other : Task := Task.create (tuple (b"keep", 8, inj 0 of 2 (), 99)) db in
+  let updated : Task := Task.update (tuple (b"updated", 7, inj 1 of 2 (), 23)) db in
+  let repeated : Task := Task.update updated db in
+  Task.get_by_id 7 db

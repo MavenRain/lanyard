@@ -2685,3 +2685,119 @@ and `STAGE-GATE-EXIT 0`. The compare-rows probe on the fix-1 tag showed
 RED-WATCH 0, PINS 48/48 and ROWS 112/112 IDENTICAL. The close ladder
 re-runs `zsh dev/gates.sh --stage M1-delete` on the final tree after the
 close, and its verdict is recorded in the review kit, not in this file.
+
+## Stage M1 UPDATE (2026-09-14)
+
+Every model now exposes `ModelName.update fields db : ModelName`. The full
+checked model value supplies its primary key and replacement scalar fields.
+The interpreter validates the complete value, requires an existing row,
+and replaces only that model and key in the selected connection. Missing
+and deleted rows fail. Repeated updates succeed. The operation remains
+observable when its returned model is unused, and works through closures
+and scripted request database handles.
+
+The Rust printer shares the existing model input and output conversions.
+The new pinned signature validates the supplied scalar fields, fetches the
+existing row with `get_by_id`, and applies Toasty's instance `update!`
+macro. Its primary key is assigned the same value used by the lookup.
+Lookup and update are separate calls without a transaction guarantee.
+The target catalog grows from 16 to 17 rows, still with nine foreign types.
+Todo's axiom report grows from 19 to 21 foreign constants. Exact catalog,
+instance-list and axiom expectations include the new schema and instance.
+The Toasty signature digest changes; both library source pins stay fixed.
+
+The update suite passes 28 unit checks and 11 CLI tests. Five mutations
+are killed with named behavioral failures, and clean and restored controls
+pass. The tests cover missing rows, key and field ranges, invalid text,
+model layout and metadata, other keys/models/connections, key-only models,
+closures, unused results and request reachability. The fixture deliberately
+places its key after the text field and replaces text, Bool and Nat values.
+
+The emitted fixture builds offline with Rust 1.98.1 against the clean
+pinned Toasty and Topcoat sources. Real SQLite prints exactly
+`Task { title: "updated", id: 7, completed: true, value: 23 }` and a newline,
+matching the interpreter, with exit 0 and empty stderr. The build reports
+five unused-code or unused-variable warnings and is recorded in gateledger.
+The final evidence includes the emitted crate, lockfile, source inventory,
+source hashes and captures under `dev/validation/stage-m1-update/`.
+
+An initial cumulative run timed out on two inherited CLI rejection checks
+with a 10-second limit. Both checks passed in isolation in 0.266 seconds;
+the measured host load average was 148.45. Their assertions and timeouts
+stay unchanged. Trust remains pending: generated signatures measure 116
+lines against the proposed 104-line allowance. No policy or M0 exit ruling
+is added.
+
+The sandboxed retry passed those rejection checks, then encountered macOS
+Git `confstr` warnings in the two existing Git-isolation tests. Validation
+was rerun with normal filesystem access and the original assertions.
+
+The final inventory measures 1240 printer lines and 13338 compiler lines
+across 50 source files. The existing proposed budgets remain 1231 printer
+lines and 12766 compiler lines; their status remains proposed.
+
+Final validation: `zsh dev/gates.sh --stage M1-update` passed with exit 0,
+including the cumulative M1 deletion gate, all 28 update unit checks,
+all 11 update CLI tests and all five update mutations. Clean and restored
+controls passed. The combined M0 report records six of seven legs passing,
+one pending trust decision and zero failed checks. Compiler sources stayed
+unchanged after this run; only documentation and evidence were completed.
+
+## Stage M1 UPDATE review fixes (tag LSM1U, 2026-09-14)
+
+The review kit LSM1U ran on base 3c3f2c1. An opus prober judged 20
+hypotheses and reported CONFIRMED-DEFECT 2, REFUTED 2 and NOT-A-FINDING 16.
+A ctxcat-review Workflow, run wf_4ad9f6af-7b2, ran 3 agents with 0 errors
+and produced 2 raw findings, of which 1 was upheld. The upheld finding is
+the same defect as F-1. Fable subagents died on the
+`[reasoning_extraction]` classifier, so the finder and builder tiers ran on
+opus and the closer runs on sonnet.
+
+F-1 (nit, target/toasty-7bd502cb.sig:11 and dev/STAGE-M1-UPDATE.md:50).
+The `Model.update` print rule expands `#{fields}` two times, once to build
+`__lan_fields` whose `id` selects the row and once inside `update!`, so the
+emitted block repeats each field conversion. The conversions are pure, so
+the behavior does not change. The rule is pinned by the erased-update
+needle, by the signature digest in target/PIN.json and by the frozen native
+capture, so the fix is a disclosure and not a rule change. A new paragraph
+in dev/STAGE-M1-UPDATE.md states the double expansion, its reason, and the
+later signature change that can bind the converted key one time. The .sig
+row, target/PIN.json, rust/model.ml and rust/run_store.ml are unchanged.
+target/README.md lists the catalog entry only and does not explain the
+rule, so it is unchanged too.
+
+F-2 (nit, README.md:91). The M1 update paragraph said "exposed as
+`Counter.update fields db`" without the "for each model" qualifier that the
+delete paragraph at README.md:79 carries, although the update example runs
+the Task model. The paragraph now reads "exposed as `Counter.update fields
+db` for each declared model", with the placement and the wording of the
+delete paragraph. The two edited lines are re-wrapped at the width of their
+neighbors. No other wording changed.
+
+Proof. The fix suites ran on a copy of the tree with the ladder build
+recipe and printed nine OK rows at their floors:
+`_build/default/test/lan_request.exe observations=23`,
+`_build/default/test/lan_run.exe observations=40`,
+`_build/default/test/lan_delete.exe checks=23`,
+`_build/default/test/lan_update.exe checks=28`, `test/lan_request.py Ran
+18`, `test/lan_run.py Ran 26`, `test/lan_build.py Ran 16`,
+`test/lan_delete.py Ran 9` and `test/lan_update.py Ran 11`. The run exit
+code is 0. Each mutation needle still occurs exactly once in the tree: the
+no-update, all-keys, all-models and missing-row-success needles in
+rust/run_store.ml, and the erased-update needle in
+target/toasty-7bd502cb.sig. Both fixes touch documentation only.
+
+Ladders. The baseline ladder ran on the unfixed staged tree and reported
+GREEN (W/gates-LSM1U-baseline.log: GATE-START 2026-09-15T06:01:11Z, load1
+38.84; GATE-END 06:25:41Z, load1 46.41; stage_rc=0). The compare-rows probe
+on the baseline tag showed RED-WATCH 0, PINS 57/57 and ROWS 121/121
+IDENTICAL. The fix-1 ladder ran on the fixed tree and reported GREEN
+(W/gates-LSM1U-fix-1.log: GATE-START 06:35:03Z, load1 26.12; GATE-END
+07:02:11Z, load1 38.51; stage_rc=0), with rows
+`LAN-UPDATE OK checks=28 failures=0`,
+`LAN-UPDATE-MUTATIONS OK killed=5/5 restored=GREEN`, `STAGE-M1-UPDATE OK`
+and `STAGE-GATE-EXIT 0`. The compare-rows probe on the fix-1 tag showed
+RED-WATCH 0, PINS 57/57 and ROWS 121/121 IDENTICAL. The close ladder
+re-runs `zsh dev/gates.sh --stage M1-update` on this exact staged tree
+after the close, and its verdict is recorded in the review kit, not in
+this file.

@@ -1,0 +1,14 @@
+[package]
+name = "lanyard-program"
+version = "0.0.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[workspace]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1", features = ["rt", "macros"] }
+toasty = { path = "/Users/oobi/Documents/toasty/crates/toasty", default-features = false, features = ["sqlite"] }
+topcoat = { path = "/Users/oobi/Documents/topcoat/crates/topcoat", default-features = false, features = ["router"] }

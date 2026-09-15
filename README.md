@@ -87,6 +87,18 @@ _build/default/bin/lanyard.exe run --print-model Counter test/fixtures/delete.la
 zsh dev/gates.sh --stage M1-delete
 ```
 
+The [M1 model update slice](dev/STAGE-M1-UPDATE.md) adds
+`Model.update`, exposed as `Counter.update fields db` for each declared
+model. It replaces the existing row with the supplied `id` and returns the
+updated model. Missing rows fail. Nat, Bool and checked byte-list fields
+work in the interpreter and emitted Rust.
+
+```sh
+_build/default/bin/lanyard.exe run --print-model Task test/fixtures/update.lan
+# Task { title: "updated", id: 7, completed: true, value: 23 }
+zsh dev/gates.sh --stage M1-update
+```
+
 Build and validate through Stage D:
 
 ```sh

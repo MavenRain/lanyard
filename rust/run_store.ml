@@ -48,7 +48,7 @@ let model (model : Model.t) schema arguments store = match arguments with
         | () -> Ok () in
       let* operation = Model.operation schema in
       let* key = match operation with
-        | Model.Create -> key model value
+        | Model.Create | Model.Update -> key model value
         | Model.Get | Model.Delete -> scalar_nat value in
       let previous () = List.find_opt (fun (name, stored_key, _row) ->
         String.equal name model.name && Bignum.equal key stored_key) db.rows in
@@ -59,6 +59,14 @@ let model (model : Model.t) schema arguments store = match arguments with
            Ok (value, replace { db with rows = (model.name, key, value) :: db.rows } store)
        | Model.Get -> previous () |> Option.to_result ~none:(Error.Mismatch ("run: model row not found: " ^ model.name))
            |> Result.map (fun (_name, _key, row) -> row, store)
+       | Model.Update ->
+           let* _previous = previous () |> Option.to_result
+             ~none:(Error.Mismatch ("run: model row not found: " ^ model.name)) in
+           let rows = List.map (fun (name, stored_key, stored_row) ->
+             let updated = if String.equal model.name name && Bignum.compare key stored_key = 0
+               then value else stored_row in
+             name, stored_key, updated) db.rows in
+           Ok (value, replace { db with rows } store)
        | Model.Delete ->
            let rows = List.filter (fun (name, stored_key, _row) ->
              not (String.equal name model.name && Bignum.equal stored_key key)) db.rows in
