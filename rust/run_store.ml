@@ -40,6 +40,18 @@ let push arguments store = match arguments with
   | [] | _ :: _ -> invalid "schema argument count"
 
 let model (model : Model.t) schema arguments store = match arguments with
+  | [handle] when String.equal schema "Model.all" ->
+      let* db = database handle store in
+      let* () = match () with
+        | () when not (List.mem model.name db.models) -> invalid ("model not registered: " ^ model.name)
+        | () when not db.ready -> invalid "database schema has not been initialized"
+        | () -> Ok () in
+      let rows = List.filter (fun (name, _key, _row) -> String.equal name model.name) db.rows
+        |> List.sort (fun (_left_name, left, _left_row) (_right_name, right, _right_row) -> Bignum.compare left right) in
+      let tid = Erase.mu_tid (Model.rows_name model) in
+      let value = List.fold_left (fun tail (_name, _key, row) -> Tag (tid, 1, [row; tail]))
+        (Tag (tid, 0, [])) (List.rev rows) in
+      Ok (value, store)
   | [value; handle] ->
       let* db = database handle store in
       let* () = match () with
@@ -49,7 +61,8 @@ let model (model : Model.t) schema arguments store = match arguments with
       let* operation = Model.operation schema in
       let* key = match operation with
         | Model.Create | Model.Update -> key model value
-        | Model.Get | Model.Delete -> scalar_nat value in
+        | Model.Get | Model.Delete -> scalar_nat value
+        | Model.All -> invalid "model argument count" in
       let previous () = List.find_opt (fun (name, stored_key, _row) ->
         String.equal name model.name && Bignum.equal key stored_key) db.rows in
       (match operation with
@@ -70,7 +83,8 @@ let model (model : Model.t) schema arguments store = match arguments with
        | Model.Delete ->
            let rows = List.filter (fun (name, stored_key, _row) ->
              not (String.equal name model.name && Bignum.equal stored_key key)) db.rows in
-           Ok (Unit, replace { db with rows } store))
+           Ok (Unit, replace { db with rows } store)
+       | Model.All -> invalid "model argument count")
   | [] | _ :: _ -> invalid "model argument count"
 
 type catalog = { models : Model.t list; connections : Connection.t list; constants : Rir.foreign list }

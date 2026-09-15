@@ -99,6 +99,17 @@ _build/default/bin/lanyard.exe run --print-model Task test/fixtures/update.lan
 zsh dev/gates.sh --stage M1-update
 ```
 
+The [M1 model listing slice](dev/STAGE-M1-ALL.md) adds `Model.all`, exposed
+as `Counter.all db : Counter.rows` for each declared model. Lists contain
+every row in ascending primary-key order and can be matched with the
+generated `Counter.nil` and `Counter.cons head tail` constructors.
+
+```sh
+_build/default/bin/lanyard.exe run --print-model Task test/fixtures/all.lan
+# Task { title: "updated", id: 3, completed: true, value: 122 }
+zsh dev/gates.sh --stage M1-all
+```
+
 Build and validate through Stage D:
 
 ```sh

@@ -1,0 +1,30 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+
+model Task with
+| title : Bytes
+| id : Nat
+| completed : Bool
+| value : Nat
+end
+
+def rec total : Task.rows -> Nat := fun (rows : Task.rows) =>
+  match rows as self in Task.rows return Nat with
+  | Task.nil => 0
+  | Task.cons head tail => natAdd head.3 (total tail)
+
+def main : Task :=
+  let db : Db := Db.connect Task Bytes b"sqlite::memory:" in
+  let ready : prod () := Db.push_schema db in
+  let last : Task := Task.create (tuple (b"last", 20, inj 0 of 2 (), 99)) db in
+  let first : Task := Task.create (tuple (b"old", 3, inj 0 of 2 (), 42)) db in
+  let middle : Task := Task.create (tuple (b"middle", 7, inj 0 of 2 (), 11)) db in
+  let updated : Task := Task.update (tuple (b"updated", 3, inj 1 of 2 (), 23)) db in
+  let deleted : prod () := Task.delete_by_id 7 db in
+  let rows : Task.rows := Task.all db in
+  match rows as self in Task.rows return Task with
+  | Task.nil => tuple (b"empty", 0, inj 0 of 2 (), 0)
+  | Task.cons head tail => tuple (head.0, head.1, head.2, total rows)

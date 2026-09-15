@@ -26,6 +26,8 @@ let from_storage scalar value = match scalar with
   | Bool_field -> "if " ^ value ^ " { " ^ bool_type ^ "::V1(()) } else { " ^ bool_type ^ "::V0(()) }"
   | Text_field name -> text_from name ^ "(" ^ value ^ ")"
 let rust_name model = Printer.identifier "LanModel" model.name
+let rows_name model = Elab.model_rows model.name
+let rows_repr model = Rir.TyUnion (Erase.mu_tid (rows_name model))
 let field_name name = if String.equal name "id" then "id" else Printer.identifier "f_" name
 let catalog (checked : Elab.lan_program) =
   if List.is_empty checked.models then Ok [] else
@@ -39,8 +41,15 @@ let catalog (checked : Elab.lan_program) =
     let* ty = evaluate (Kanon_surface.Syntax.SVar model.model_name) in
     let* repr = Erase.repr_of ec ty in
     let* tid = Erase.tid_of ec ty in
-    let* data = Erase.complete_groups ec [tid] in
+    let rows_family = Elab.model_rows model.model_name in
+    let list_tid = Erase.mu_tid rows_family in
+    let* data = Erase.complete_groups ec [tid; list_tid] in
     let* families = Printer.family_catalog [model.model_name, Erase.Code [Rir.RData data]] in
+    let* element = Printer.repr repr in
+    let* () = if List.exists (fun (family : Printer.family) ->
+      String.equal family.family_name rows_family
+      && family.variants = [[]; [element; Printer.Nominal family.family_name]]) families
+      then Ok () else invalid "model rows layout" in
     let* fields = Rules.all_ok (List.map (fun (field, syntax) ->
       let* ty = evaluate syntax in
       let* repr = Erase.repr_of ec ty in
@@ -62,12 +71,13 @@ let catalog (checked : Elab.lan_program) =
       List.assoc_opt "M" row.type_arguments = Some model.model_name) instances in
     Ok { name = model.model_name; fields; repr; data; instances }) checked.models)
 
-type operation = Create | Get | Delete | Update
+type operation = Create | Get | Delete | Update | All
 let operation name = match () with
   | () when String.equal name "Model.create" -> Ok Create
   | () when String.equal name "Model.get_by_id" -> Ok Get
   | () when String.equal name "Model.delete_by_id" -> Ok Delete
   | () when String.equal name "Model.update" -> Ok Update
+  | () when String.equal name "Model.all" -> Ok All
   | () -> refuse ("foreign schema " ^ name)
 let specification = function
   | Create | Update -> "(0 M : Type 0) -> (fields : M) -> (db : Db) -> M", [Catalog.Zero; Catalog.Many; Catalog.Many]
@@ -75,6 +85,8 @@ let specification = function
       [Catalog.Zero; Catalog.Zero; Catalog.Many; Catalog.Many]
   | Delete -> "(0 M : Type 0) -> (0 Key : Type 0) -> (key : Key) -> (db : Db) -> prod ()",
       [Catalog.Zero; Catalog.Zero; Catalog.Many; Catalog.Many]
+  | All -> "(0 M : Type 0) -> (0 Rows : Type 0) -> (db : Db) -> Rows",
+      [Catalog.Zero; Catalog.Zero; Catalog.Many]
 let foreign_call entries models (row : Rir.foreign) =
   let* op = operation row.schema in
   let* model = List.find_opt (fun model -> List.exists (fun (instance : Rir.foreign) ->
@@ -90,35 +102,52 @@ let foreign_call entries models (row : Rir.foreign) =
   let* actual = Elab.target_type entry.kernel_type in
   let* () = if expected = actual && entry.quantities = quantities
       && entry.effects = ["DbExec"; "toasty::Error"] && row.effects = entry.effects
-      && String.equal row.print_rule entry.print_rule && row.arity = 2
+      && String.equal row.print_rule entry.print_rule
+      && row.arity = (match op with All -> 1 | Create | Get | Delete | Update -> 2)
     then Ok () else invalid "model schema metadata" in
   let* native = Printer.repr model.repr in
   let native = Printer.rust_type native in
   let* template = Template.parse entry.print_rule in
-  let slots = match op with Create | Update -> ["M"; "fields"; "db"] | Get | Delete -> ["M"; "key"; "db"] in
+  let slots = match op with Create | Update -> ["M"; "fields"; "db"]
+    | Get | Delete -> ["M"; "key"; "db"] | All -> ["M"; "db"] in
   let* () = if List.sort_uniq String.compare (Template.slots template) = List.sort String.compare slots
     then Ok () else invalid "model schema placeholders" in
-  let render arguments = match arguments with
-    | [value; db] ->
+  let converted () =
+    let result = List.mapi (fun index (field, scalar) -> "f" ^ string_of_int index
+      ^ ": " ^ from_storage scalar ("__lan_row." ^ field_name field)) model.fields
+      |> String.concat ", " in
+    native ^ " { " ^ result ^ " }" in
+  let render arguments = match op, arguments with
+    | All, [db] ->
+      let* call = Template.render template ["M", rust_name model; "db", "__lan_db"] in
+      let list_type = Printer.rust_type (Printer.Nominal (rows_name model)) in
+      Ok ("{ let __lan_db_arg = " ^ db ^ "; let mut __lan_db = (*__lan_db_arg).clone(); "
+        ^ "let __lan_rows = " ^ call ^ "; __lan_rows.into_iter().rev().try_fold("
+        ^ list_type ^ "::V0, |tail, __lan_row| -> Result<" ^ list_type ^ ", Error> { Ok("
+        ^ list_type ^ "::V1(Box::new((" ^ converted () ^ ", tail)))) })? }")
+    | (Create | Get | Delete | Update), [value; db] ->
       let fields = List.mapi (fun index (field, scalar) -> field_name field ^ ": "
         ^ to_storage scalar ("__lan_value.f" ^ string_of_int index)) model.fields |> String.concat ", " in
-      let value_slot, value_code = match op with
-        | Create | Update -> "fields", fields
-        | Get | Delete -> "key", "lan_model_to_i64(&__lan_value)?" in
+      let* value_slot, value_code = match op with
+        | Create | Update -> Ok ("fields", fields)
+        | Get | Delete -> Ok ("key", "lan_model_to_i64(&__lan_value)?")
+        | All -> invalid "model argument count" in
       let* call = Template.render template ["M", rust_name model; value_slot, value_code; "db", "__lan_db"] in
-      let body = match op with
+      let* body = match op with
         | Create | Get | Update ->
-          let result = List.mapi (fun index (field, scalar) -> "f" ^ string_of_int index
-            ^ ": " ^ from_storage scalar ("__lan_row." ^ field_name field)) model.fields
-            |> String.concat ", " in
-          "let __lan_row = " ^ call ^ "; " ^ native ^ " { " ^ result ^ " }"
-        | Delete -> call in
+          Ok ("let __lan_row = " ^ call ^ "; " ^ converted ())
+        | Delete -> Ok call
+        | All -> invalid "model argument count" in
       Ok ("{ let __lan_value = " ^ value ^ "; let __lan_db_arg = " ^ db
         ^ "; let mut __lan_db = (*__lan_db_arg).clone(); " ^ body ^ " }")
-    | [] | _ :: _ -> invalid "model argument count" in
-  let input = match op with Create | Update -> model.repr | Get | Delete -> Rir.TyUnion (Rir.Tid "nat") in
-  let output = match op with Create | Get | Update -> model.repr | Delete -> Rir.TyStruct (Rir.Tid "tuple<>") in
-  Ok ([Rir.TyArc input; Rir.TyArc (Rir.TyForeign ("Db", []))], output, render, Effects.Async_db)
+    | (All | Create | Get | Delete | Update), ([] | _ :: _) -> invalid "model argument count" in
+  let inputs = match op with
+    | Create | Update -> [Rir.TyArc model.repr]
+    | Get | Delete -> [Rir.TyArc (Rir.TyUnion (Rir.Tid "nat"))]
+    | All -> [] in
+  let output = match op with Create | Get | Update -> model.repr
+    | Delete -> Rir.TyStruct (Rir.Tid "tuple<>") | All -> rows_repr model in
+  Ok (inputs @ [Rir.TyArc (Rir.TyForeign ("Db", []))], output, render, Effects.Async_db)
 
 let declaration model =
   "#[derive(Debug, toasty::Model)]\nstruct " ^ rust_name model ^ " {\n"

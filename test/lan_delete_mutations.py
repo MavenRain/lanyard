@@ -14,7 +14,7 @@ MUTATIONS = [
      "Bignum.equal stored_key stored_key", "other key preserved:"),
     ("all-models", "rust/run_store.ml", "String.equal name model.name && Bignum.equal stored_key key",
      "String.equal name name && Bignum.equal stored_key key", "other model preserved:"),
-    ("erased-delete", "rust/model.ml", "| Delete -> call in", '| Delete -> "()" in',
+    ("erased-delete", "rust/model.ml", "| Delete -> Ok call", '| Delete -> Ok "()"',
      "checked unit result:"),
 ]
 

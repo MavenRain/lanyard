@@ -1,0 +1,21 @@
+W src/main.rs:45:8  dead_code  methods `compare`, `sub`, and `mul` are never used
+W src/main.rs:108:365  unused_variables  unused variable: `p0`
+W src/main.rs:108:373  unused_variables  unused variable: `p1`
+W src/main.rs:108:381  unused_variables  unused variable: `p2`
+W src/main.rs:112:1232  unused_variables  unused variable: `v1`
+W src/main.rs:112:1324  unused_variables  unused variable: `v2`
+W src/main.rs:112:2736  unused_variables  unused variable: `v3`
+W src/main.rs:112:4074  unused_variables  unused variable: `v4`
+W src/main.rs:112:5634  unused_variables  unused variable: `v5`
+W src/main.rs:112:7699  unused_variables  unused variable: `v6`
+W src/main.rs:112:9533  unused_variables  unused variable: `v9`
+W src/main.rs:112:9796  unused_variables  unused variable: `p1`
+W src/main.rs:112:9804  unused_variables  unused variable: `p2`
+W src/main.rs:112:9812  unused_variables  unused variable: `p3`
+W src/main.rs:112:9971  unused_variables  unused variable: `p0`
+W src/main.rs:112:9987  unused_variables  unused variable: `p2`
+W src/main.rs:112:9995  unused_variables  unused variable: `p3`
+W src/main.rs:112:10154  unused_variables  unused variable: `p0`
+W src/main.rs:112:10162  unused_variables  unused variable: `p1`
+W src/main.rs:112:10178  unused_variables  unused variable: `p3`
+OK build: 0 errors, 20 warnings

@@ -1,4 +1,4 @@
-AXIOMS scope=checked-module target-sha256=f9d28db9876ffb381ed2f9c50788fdba7255a7875efae3cb00eae66141750fbe
+AXIOMS scope=checked-module target-sha256=a142afa57d3acb8e201c8e095344388328a6d49c7fd3946fcc3f16dd9072cd80
 Framework imax_zero : imax l zero = zero
 Foreign Cx : Type 1 [schema=Cx]
 Foreign Db : Type 1 [schema=Db]
@@ -6,12 +6,14 @@ Foreign Db_connect : (Ran SPi 0 Models Type 1 (Ran SPi 0 Text Type 1 (Ran SPi w 
 Foreign Db_push_schema : (Ran SPi w db Db (Ran SColl 0 (Sec SColl 0 []))) [schema=Db.push_schema]
 Foreign Deferred : (Ran SPi 0 T Type 1 Type 1) [schema=Deferred]
 Foreign Form : (Ran SPi 0 T Type 1 Type 1) [schema=Form]
+Foreign Model_all : (Ran SPi 0 M Type 1 (Ran SPi 0 Rows Type 1 (Ran SPi w db Db Rows))) [schema=Model.all]
 Foreign Model_create : (Ran SPi 0 M Type 1 (Ran SPi w fields M (Ran SPi w db Db M))) [schema=Model.create]
 Foreign Model_delete_by_id : (Ran SPi 0 M Type 1 (Ran SPi 0 Key Type 1 (Ran SPi w key Key (Ran SPi w db Db (Ran SColl 0 (Sec SColl 0 [])))))) [schema=Model.delete_by_id]
 Foreign Model_get_by_id : (Ran SPi 0 M Type 1 (Ran SPi 0 Key Type 1 (Ran SPi w key Key (Ran SPi w db Db M)))) [schema=Model.get_by_id]
 Foreign Model_update : (Ran SPi 0 M Type 1 (Ran SPi w fields M (Ran SPi w db Db M))) [schema=Model.update]
 Foreign Response : Type 1 [schema=Response]
 Foreign SeeOther : Type 1 [schema=SeeOther]
+Foreign Todo_all : (Ran SPi w db Db (Lan SMu Todo_rows [] (Sec SColl 0 []))) [schema=Model.all]
 Foreign Todo_create : (Ran SPi w fields (Ran SColl 3 (Sec SColl 3 [ => Nat;  => (Lan SMu Bytes [] (Sec SColl 0 []));  => (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))])) (Ran SPi w db Db (Ran SColl 3 (Sec SColl 3 [ => Nat;  => (Lan SMu Bytes [] (Sec SColl 0 []));  => (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))])))) [schema=Model.create]
 Foreign Todo_delete_by_id : (Ran SPi w key Nat (Ran SPi w db Db (Ran SColl 0 (Sec SColl 0 [])))) [schema=Model.delete_by_id]
 Foreign Todo_get_by_id : (Ran SPi w key Nat (Ran SPi w db Db (Ran SColl 3 (Sec SColl 3 [ => Nat;  => (Lan SMu Bytes [] (Sec SColl 0 []));  => (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))])))) [schema=Model.get_by_id]
@@ -22,8 +24,8 @@ Foreign topcoat_Error : Type 1 [schema=topcoat::Error]
 Foreign topcoat_db : (Ran SPi w cx Cx Db) [schema=topcoat.db]
 Foreign topcoat_see_other : (Ran SPi w uri Uri SeeOther) [schema=topcoat.see_other]
 COUNT Framework=1
-COUNT Foreign=21
+COUNT Foreign=23
 COUNT Classical=0
 COUNT Div=0
-AXIOMS total=22
-AXIOM-RATIO constants=21 definitions=3 status=REPORTED
+AXIOMS total=24
+AXIOM-RATIO constants=23 definitions=3 status=REPORTED

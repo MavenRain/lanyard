@@ -27,7 +27,7 @@ let model_conversion () =
   let* value = Eval.eval program.globals [] term |> Result.map_error Error.to_string in
   let* same = Conv.conv_type Check.ops c actual value |> Result.map_error Error.to_string in
   if same && List.map (fun i -> i.Elab.instance_name) program.instances =
-             [ "Todo_create"; "Todo_get_by_id"; "Todo_delete_by_id"; "Todo_update" ] then Ok ()
+             [ "Todo_create"; "Todo_get_by_id"; "Todo_delete_by_id"; "Todo_update"; "Todo_all" ] then Ok ()
   else Error "model representation or instances differ"
 
 let catalog_refuses name ty kind expected () =
@@ -41,7 +41,7 @@ let catalog_refuses name ty kind expected () =
 
 let catalog () =
   let* _g, rows, atoms = Elab.target_environment () |> Result.map_error Error.to_string in
-  if List.length rows = 17 && List.length atoms = 9 then Ok ()
+  if List.length rows = 18 && List.length atoms = 9 then Ok ()
   else Error "catalog inventory differs"
 
 let cases = [

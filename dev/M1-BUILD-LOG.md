@@ -2801,3 +2801,114 @@ RED-WATCH 0, PINS 57/57 and ROWS 121/121 IDENTICAL. The close ladder
 re-runs `zsh dev/gates.sh --stage M1-update` on this exact staged tree
 after the close, and its verdict is recorded in the review kit, not in
 this file.
+
+## Stage M1 ALL (2026-09-15)
+
+Added `Model.all`, specialized as `ModelName.all db : ModelName.rows`.
+Model elaboration generates the nominal list family with `nil` and `cons`
+constructors and refuses collisions with its generated names. The checked
+bridge verifies the two-constructor layout and reuses scalar conversions
+for Nat, Bool and byte-list fields. The interpreter filters by model and
+connection, sorts numeric keys and returns an immutable list. The emitted
+query orders by `id`, then converts the returned vector with a reverse
+`try_fold` that propagates row-conversion failures.
+
+The pinned Topcoat Todo example supplies the query shape. Library source
+pins and anchors remain the same; the signature digest includes the new
+schema. The catalog has 18 rows, nine foreign types and 122 generated
+lines. Todo's axiom report has 23 foreign constants and three definitions.
+Existing Rust goldens gain the generated model list declarations.
+
+Focused validation passed 23 listing unit checks and 12 CLI tests. All five
+listing mutations were killed and restored controls passed. The retained
+deletion and update mutation suites passed 4/4 and 5/5 respectively. The
+emitted fixture built offline with Rust 1.98.1 and ran on real in-memory
+SQLite. Both backends printed:
+
+```text
+Task { title: "updated", id: 3, completed: true, value: 122 }
+```
+
+Both runs exited 0 with empty stderr. Cargo reported 20 unused-code or
+unused-variable warnings. The fixture inserts out of order, updates one
+row, deletes another, reads the first remaining row and totals the complete
+list through a checked recursive function.
+
+The initial cumulative run stopped on sandboxed Git `confstr` warnings
+in two M0 end-to-end stderr assertions. All 19 harness tests passed with
+normal Git access and unchanged assertions. The next run reached the
+deletion mutations, where the old emitter source target no longer matched
+the branch's `Result` wrapper. The mutation now replaces `Ok call` with
+`Ok "()"` and retains the same `checked unit result` failure assertion.
+The isolated deletion, update and listing mutation suites then passed.
+
+The cumulative command is `zsh dev/gates.sh --stage M1-all`. Its final
+capture, the earlier diagnostic captures, emitted crate, lockfile and
+source hashes are recorded under `dev/validation/stage-m1-all/`.
+The compiler inventory measures 50 files and 13398 lines against the
+existing proposed budget of 12766. Trust remains pending; this slice
+introduces no policy ruling or M0 exit stamp.
+
+## Stage M1 ALL review fixes (tag LSM1A, 2026-09-15)
+
+The review kit LSM1A ran on base 6e69b74 over a 64-path slice, that is 28
+review paths and 36 frozen captures under `dev/validation/stage-m1-all/`.
+A ctxcat-review Workflow and an opus prober supplied the raw findings. Six
+findings passed the judge: one low and five nits. The baseline ladder was
+green before any edit.
+
+F-1 (nit, rust/run_store.ml:86). The result line of the `Model.Delete` arm
+carried a 12-space indent while its sibling lines in the same arm carry
+11. The line now carries the 11-space indent that `git show HEAD` records
+for the neighbouring arms. The expression is unchanged.
+
+F-2 (low, test/lan_all.py:109-116). `test_generated_name_collisions_are_-
+rejected` asserted the exit code and an empty stdout only, so any failing
+`check`, for any reason, satisfied the eight subTests. The subTest now
+also asserts `b"duplicate declaration"` in stderr, the way
+`test_wrong_list_type_is_rejected` pins `b"mismatch"`. The text comes from
+the `fresh_names` check in surface/elab.ml:1250 and covers the four
+generated names and both source orders. The test count stays 12.
+
+F-3 (nit, target/README.md:3-5). The third line of the catalog paragraph
+ran to 86 columns while the file wraps at 71 to 76. The paragraph is
+rewrapped at 76 columns with the same words in the same order. No sentence
+and no catalog count changes.
+
+F-4 (nit, rust/model.ml:114-117). `foreign_call` built the row conversion
+string for every operation although the `Delete` render arm discards it.
+The conversion is now a thunk, `converted ()`, called in the `All` arm and
+in the `Create | Get | Update` arm only. Every emitted string stays
+byte-identical, so the goldens and the lan_all.ml needles do not move.
+
+F-5 (nit, rust/model.ml:44-48). `Elab.model_rows model.model_name` was
+evaluated for `list_tid` and again inside the layout predicate. The
+catalog binds `rows_family` once above `list_tid` and uses the binding in
+both places. The `rows_name` helper near line 29 takes a `Model.t`, not
+the `Elab.model_info` value used here, so it is not reused.
+
+F-6 (nit, rust/run_store.ml:48-49). The sort comparator bound the sort key
+as `left` and the ignored row as `_left`, which reads as a pair of names
+for one value. The ignored row binders are now `_left_row` and
+`_right_row`. `Bignum.compare left right`, a mutation needle, is
+unchanged.
+
+Proof. The fix suites ran on a copy of the tree, never in the repository.
+The unit suites report lan_request.exe observations=23, lan_run.exe
+observations=40, lan_delete.exe checks=23, lan_update.exe checks=28 and
+lan_all.exe checks=23, each at its floor. The CLI suites report
+lan_request.py 18 tests, lan_run.py 26, lan_build.py 16, lan_delete.py 9,
+lan_update.py 11 and lan_all.py 12, each at its floor. Every row is OK and
+the script exits 0. The needle sweep over the five mutation suites reports
+NEEDLES ok=23 bad=0.
+
+Ladders. The baseline ladder ran on the unfixed staged tree and reported
+GREEN (GATE-END tag=baseline 2026-09-15T13:13:54Z, stage_rc=0; GATE LSM1A
+tag=baseline GREEN). The compare-rows probe on the baseline tag showed
+RED-WATCH 0, PINS 66/66 and ROWS 130/130 IDENTICAL. The fix-1 ladder ran
+on the fixed tree and reported GREEN (GATE-END tag=fix-1
+2026-09-15T13:38:21Z, stage_rc=0; GATE LSM1A tag=fix-1 GREEN). The
+compare-rows probe on the fix-1 tag showed RED-WATCH 0, PINS 66/66 and
+ROWS 130/130 IDENTICAL. The close ladder re-runs `zsh dev/gates.sh --stage
+M1-all` on this exact staged tree after the close, and its verdict is
+recorded in the review kit, not in this file.

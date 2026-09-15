@@ -1,0 +1,148 @@
+{
+  "base": "6e69b748a24020b68432a990a2a27e84b3a7242a",
+  "captures": {
+    "cli": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-all/.kanon-exec/run-hX3GJ4",
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_all.py"
+      ],
+      "exit_code": 0
+    },
+    "git-harness-recheck": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-all/.kanon-exec/run-DcNEjz",
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_m0_e2e.py"
+      ],
+      "exit_code": 0
+    },
+    "native-build": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-all/.kanon-exec/run-TKvle0",
+      "command": [
+        "gateledger",
+        "run",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/gateledger",
+        "--dir",
+        ".gatework/all-pinned",
+        "--scope",
+        "Cargo.toml",
+        "--scope",
+        "Cargo.lock",
+        "--scope",
+        "src",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_HOME=/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-pinned/Cargo.toml",
+        "--target-dir",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target",
+        "--jobs",
+        "2"
+      ],
+      "exit_code": 0
+    },
+    "native-run": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-all/.kanon-exec/run-XillHi",
+      "command": [
+        ".gatework/all-cargo-target/debug/lanyard-program"
+      ],
+      "exit_code": 0
+    },
+    "stage": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-all/.kanon-exec/run-mmLpt6",
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-all"
+      ],
+      "exit_code": 0
+    },
+    "unit": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-all/.kanon-exec/run-bRddUd",
+      "command": [
+        "_build/default/test/lan_all.exe"
+      ],
+      "exit_code": 0
+    }
+  },
+  "captures_sha256": {
+    "cli-capture.json": "5cffb767e98cdc111315b39167ab0e7711de54d56d819f6c21e4bcff3b04f5d4",
+    "cli.stderr": "156c26037229f5da6987be818db2e5627f364607058dada3e6ff4bdbd54590bd",
+    "cli.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "diff-check.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "git-harness-recheck-capture.json": "a2174b7871a0b24b9fd1fcb877230383e2ad317090748d51b38bbf5ecea9c1f3",
+    "git-harness-recheck.stderr": "65c6e27e2a09fe847fa5987101162117b0ae3c1ddaaf2634e9c12e2a3d2808ce",
+    "git-harness-recheck.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "interpreter.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "interpreter.stdout": "91ec96d920310f14117c22f3e81941c335fd65e9b16bcdca4dcd5b33e05aac75",
+    "mutation-target-stage-capture.json": "feb2c578fac62fae2ab23a17a7d3e461d4b7a8f9735377c30e204a08c33e93dd",
+    "mutation-target-stage.stderr": "d48f95ceac2695c930a6eb38aa845c6c88313decea5efbe2eded9dc9bf0adeee",
+    "mutation-target-stage.stdout": "e604992154c6761011a1384a6fe86cab5fc62aea13722f5c1ecaf2ed391734fa",
+    "native-build-capture.json": "a8dd628cb78567da276d128e80f8c36976f4ed4a23fb1796b36667d185dfbcf0",
+    "native-build.stderr": "59aef6a360cf97806a275ad9f59a4105f62c548993ed2bbeb315f09bf5d31e24",
+    "native-build.stdout": "d27a890a71b4dac5cd227b4f6f277ca58a2f9b9eacc113b7da40c3b034caf700",
+    "native-run-capture.json": "baada2f95360a83c0c5a1688ebaf77069229e3f96965453ceedf1ecf43e1b1d2",
+    "native-run.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-run.stdout": "91ec96d920310f14117c22f3e81941c335fd65e9b16bcdca4dcd5b33e05aac75",
+    "native/Cargo.git.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "native/Cargo.lock": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "native/Cargo.toml": "f542ef1107feceb9f68626d4d27917d6515db34c404ffbaef5475bf03fe58efe",
+    "native/src/main.rs": "588ed8cad275ece5ee44d414bae138e9d7a4ba88f0df47b08a9606d783c8852f",
+    "sandbox-stage-capture.json": "ea0fe81ca543b7baf86dcec08181eeecf90f0ad0308700ff3907cb1dacb104f9",
+    "sandbox-stage.stderr": "a74d3047589e77ce2c0f5544cda039ab564b34f5eadc44ee9965570459c08ba7",
+    "sandbox-stage.stdout": "d08cc5e44a3c0d112987d62152dbe2308eeb25a15151fc2ab0dae1f53b15d92e",
+    "source-sha256.json": "486e0cdd88c2d2b352c37c1da7db768ccb7087615959d6a8fd0225c6d7fd40ca",
+    "stage-capture.json": "62bfc719f8cb2fc451c609f7263834df1ef9c26cda8eb1bcb4f323b944bf49d4",
+    "stage.stderr": "96c4a1ae1bc18e5c5e38e45243eb4e939bce7592eda56251cec7f1984685fbb4",
+    "stage.stdout": "c447575fc799db5667ac3d790623ca8f9601b6c6f85a10440eb598965904660c",
+    "trusted-inventory.json": "1ae307a330f2ed9d062bc363ff384a9ff68379191dd4d2e798ea9b66cbb5eaff",
+    "trusted-inventory.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "trusted-inventory.stdout": "c51af5a1f1f881cc4a149bfcca9300331ce2eed5059ccbd0db2f5cf972bac31e",
+    "unit-capture.json": "c250b1d2b1265686d3804eb16f23958a6126c11972c9a027d95b8dfec6237ea6",
+    "unit.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "unit.stdout": "f911b86dc7eddd488953a7ce99e4010af28550ac5deb61a90f6c88440ee24fc9"
+  },
+  "counts": {
+    "catalog_rows": 18,
+    "cli_tests": 12,
+    "foreign_types": 9,
+    "generated_lines": 122,
+    "mutations_killed": 5,
+    "unit_checks": 23
+  },
+  "environment_retry": {
+    "artifact": "/Users/oobi/Documents/gpt2/lanyard-all/.kanon-exec/run-i00qpR",
+    "exit_code": 1,
+    "reason": "Sandboxed Git confstr warnings failed two M0 end-to-end stderr assertions",
+    "resolution": "Unchanged 19-test harness and complete stage rerun outside the sandbox"
+  },
+  "exit_code": 0,
+  "mutation_target_retry": {
+    "artifact": "/Users/oobi/Documents/gpt2/lanyard-all/.kanon-exec/run-6ipvWX",
+    "exit_code": 1,
+    "reason": "Deletion emitter mutation still named the old unwrapped result branch",
+    "resolution": "Updated source target and replacement; preserved the same named failure assertion"
+  },
+  "native_binary_sha256": "23bbef2ec72381625ccebbb6b1d538f235cac94d13b7f80e5fdd3ce5345eb3ed",
+  "native_stdout_matches_interpreter": true,
+  "recorded_utc": "2026-09-15T11:46:05.480553+00:00",
+  "status": "PASS",
+  "trust": "PENDING; no policy ruling or M0 exit stamp"
+}

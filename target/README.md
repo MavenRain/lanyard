@@ -1,15 +1,14 @@
 # Target signatures
 
-The target catalog provides 17 proposed foreign declarations: nine type
-constants and eight constant or schema declarations. M1 deletion and update
-add `Model.delete_by_id` and `Model.update` to the catalog. The target layer
-builds as `lanyard_target`; its `Target_generated` module exposes immutable
-metadata and total lookup. Stage C instantiates schemas and checks their
-types before adding axioms. Stage E applies synchronous, async, model and
-connection print rules through `emit --target`. The
-[crate command](../dev/STAGE-E-CRATE.md) uses the same printer with a
-checked main entry point. Stage B does not establish Rust compilation or
-kernel soundness
+The target catalog provides 18 proposed foreign declarations: nine type
+constants and nine constant or schema declarations. M1 adds
+`Model.delete_by_id`, `Model.update` and `Model.all` to the catalog. The
+target layer builds as `lanyard_target`; its `Target_generated` module
+exposes immutable metadata and total lookup. Stage C instantiates schemas
+and checks their types before adding axioms. Stage E applies synchronous,
+async, model and connection print rules through `emit --target`. The [crate
+command](../dev/STAGE-E-CRATE.md) uses the same printer with a checked main
+entry point. Stage B does not establish Rust compilation or kernel soundness
 for a schema merely by generating metadata.
 
 Run `zsh dev/gates.sh --stage B` from the repository. It builds the compiler

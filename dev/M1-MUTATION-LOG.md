@@ -594,3 +594,27 @@ The complete stage passed: clean controls OK, redirect-status KILLED,
 header-injection KILLED, context-handle KILLED and foreign-metadata KILLED.
 The observed request count was `killed=4/4`; the retained M1-run controls
 reported `killed=5/5`.
+
+## Lanyard M1 ordered model lists (2026-09-15)
+
+`test/lan_all_mutations.py` builds an isolated compiler copy and requires
+a clean listing control before changing one source site at a time. Each
+mutant must compile, exit 1 and trigger its named assertion. The restored
+control must pass.
+
+| Mutation | Required failing observation |
+| --- | --- |
+| Sort stored keys in descending order | Listed rows have ascending numeric keys and contain only the selected model |
+| Include every model in the selected database | Listed rows contain only the selected model |
+| Drop a row while constructing the list | The complete ordered list matches the stored rows |
+| Change the native query to descending order | The printer retains the pinned ascending query |
+| Reverse native list construction | The printer retains the conversion that preserves vector order |
+
+All five mutants were killed and the restored control passed. The
+cumulative command is `zsh dev/gates.sh --stage M1-all`.
+
+The shared emitter now wraps the deletion body in `Ok`. Its existing
+`erased-delete` mutation targets that current branch and replaces its
+body with `Ok "()"`. The named `checked unit result` assertion is
+unchanged. All four deletion controls and all five update controls passed
+with restored controls green.

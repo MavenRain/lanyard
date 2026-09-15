@@ -1471,6 +1471,17 @@ let elab_signature (budget : Budget.t) (g : Global.t) (name : string)
 
 (** Specialization asks the kernel for the application type. The instance
     retains its source row and type arguments for print-rule selection. *)
+let model_rows name = name ^ "_rows"
+let model_list name =
+  let rows = Syntax.SVar (model_rows name) in
+  let arrow field ty rest = Syntax.SArrow
+    ({ Syntax.b_q = Quantity.Many; b_name = field; b_ty = ty }, rest) in
+  Syntax.DMu [{ Syntax.fm_name = model_rows name; fm_params = []; fm_ty = Syntax.SType 0;
+    fm_ctors = [
+      { Syntax.fc_name = name ^ "_nil"; fc_ty = rows };
+      { Syntax.fc_name = name ^ "_cons";
+        fc_ty = arrow "head" (Syntax.SVar name) (arrow "tail" rows rows) } ] }]
+
 let elab_model (budget : Budget.t) (g : Global.t) (name : string)
     (fields : (string * Syntax.t) list) :
     (Global.t * (string * Global.entry) list * foreign_instance list, Error.t) result =
@@ -1478,7 +1489,7 @@ let elab_model (budget : Budget.t) (g : Global.t) (name : string)
   let* _checks = Rules.all_ok (List.map (fun (field, ty) ->
     check_first_order budget g ("model field " ^ name ^ "." ^ field) ty) fields) in
   let* g, rows = add_lan_core budget g
-    [ Syntax.DDef (name, Syntax.SType 0, Syntax.SProd (List.map snd fields)) ] in
+    [ Syntax.DDef (name, Syntax.SType 0, Syntax.SProd (List.map snd fields)); model_list name ] in
   let schemas = List.filter (fun (row : Target.entry) ->
     String.starts_with ~prefix:"Model." row.name) Target.entries in
   List.fold_left (fun acc (schema : Target.entry) ->
@@ -1489,11 +1500,13 @@ let elab_model (budget : Budget.t) (g : Global.t) (name : string)
       match body with
       | Syntax.SArrow (arg, rest) when Quantity.equal arg.Syntax.b_q Quantity.Zero ->
           let* actual =
-            if String.equal arg.Syntax.b_name "M" then Ok (Syntax.SVar name)
-            else if String.equal arg.Syntax.b_name "Key" then
+            match () with
+            | () when String.equal arg.Syntax.b_name "M" -> Ok (Syntax.SVar name)
+            | () when String.equal arg.Syntax.b_name "Rows" -> Ok (Syntax.SVar (model_rows name))
+            | () when String.equal arg.Syntax.b_name "Key" ->
               List.assoc_opt "id" fields
               |> Option.to_result ~none:(Error.Cannot_infer ("model " ^ name ^ " needs an id field"))
-            else lan_error ("unsupported model schema parameter " ^ arg.Syntax.b_name) in
+            | () -> lan_error ("unsupported model schema parameter " ^ arg.Syntax.b_name) in
           arguments rest ((arg.Syntax.b_name, actual) :: acc)
       | Syntax.SArrow (_, _) | Syntax.SVar _ | Syntax.SNat _ | Syntax.SProp | Syntax.SType _
       | Syntax.SPrim _ | Syntax.SUnit | Syntax.SAuto | Syntax.SPair (_, _) | Syntax.STuple _
