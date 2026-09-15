@@ -3049,3 +3049,109 @@ RED-WATCH 0, PINS 76/76 and ROWS 140/140 IDENTICAL. The close ladder
 re-runs `zsh dev/gates.sh --stage M1-text` on this exact staged tree
 after the close, and its verdict is recorded in the review kit, not
 in this file.
+
+## Stage M1 URI (2026-09-15)
+
+`Uri.from_text` converts a checked byte-list family into an origin-form
+URI. It uses the existing request grammar and byte limit, preserving
+percent escapes and URI text. Todo-style handlers can now redirect to
+the fixed home path. Closed direct calls, aliases and captures use the
+text specialization boundary; invalid values remain observable when
+unused. The Rust adapter validates before calling the pinned Topcoat
+URI parser, with `InvalidUri` in both generated error variants.
+
+`zsh dev/gates.sh --stage M1-uri` passed the cumulative gate, 41 new
+unit checks, five CLI test groups and three isolated mutations with
+clean and restored controls. Two emitted native executables compiled
+offline against the checked target pins with Rust 1.98 and passed 58
+observations. Their synchronous and database-using modules cover URI
+preservation, the 8192-byte boundary, invalid encodings and redirects.
+
+The first gate exposed a retained catalog-count assertion. Catalog and
+axiom assertions now account for 21 declarations and Todo's 26 foreign
+constants. The next run hit two existing stderr assertions because
+sandboxed macOS Git emitted `confstr()` warnings. The unchanged gate
+passed outside the sandbox. The native compile reported 14 unused-code
+warnings from generated helpers. Captures, exact inputs and hashes are
+in `dev/validation/stage-m1-uri/receipt.json`.
+
+The target signature digest and axiom golden include the new schema.
+Foreign atoms remain nine; library commits, anchor hashes and trust
+budget proposals retain their existing values. Trust and M0 exit remain
+pending.
+
+## Stage M1 URI review fixes (tag LSM1I, 2026-09-15)
+
+The review kit LSM1I ran on base 73cedd0 over a 57-path slice, that is
+25 review paths and 32 frozen captures under
+`dev/validation/stage-m1-uri/`. A ctxcat-review Workflow and an opus
+prober supplied the raw findings. Six findings passed the judge: one
+medium, three low and two nits. The baseline ladder was green before
+any edit.
+
+F-1 (medium, dev/M0-BUILD-LOG.md:2980). The slice block was appended
+to the M0 log, and its heading words were reversed against the
+sibling shape. The 30 lines now stand at the end of this file under
+`## Stage M1 URI (2026-09-15)`. dev/M0-BUILD-LOG.md is byte-identical
+to HEAD again. The body of the moved block does not change; only the
+heading line changes.
+
+F-2 (low, test/lan_uri.ml:12). `contains` rebuilt the whole suffix at
+every index, so each substring test was quadratic over the
+36706-byte emitted module. The helper now scans indexes with
+`Seq.init` and compares with `String.sub`, under a `limit >= 0` guard
+that keeps the slice in bounds. The scan allocates nothing per index.
+
+F-3 (low, test/lan_uri.ml:80). Nothing tied the emitted
+`value.len() > 8192` to `Run_http.max_uri_bytes`. The existing
+"emitted validation" check gains one conjunct inside the same
+boolean, `contains code ("value.len() > " ^ string_of_int
+Lanyard_rust.Run_http.max_uri_bytes)`. The count `checks=41` is
+unchanged.
+
+F-4 (low, target/README.md:5). The catalog sentence carried two `and`
+conjunctions in one list. The first `and` is now a comma. Line 6 stays
+byte-identical.
+
+F-5 (nit, rust/model.ml:250). The added clause read `row.schema` next
+to `row.Rir.schema` in one boolean. The clause is now qualified as its
+neighbour is.
+
+F-6 (nit, rust/text_ops.ml:72). The binder `_path` held a foreign
+type, not a path. It is renamed `_uri_type`, and the rest of the line
+stays verbatim.
+
+Carried. C-1 (low, rust/model.ml:250 and rust/run_store.ml:98). The
+two dispatch sites want a shared `Text_ops.handles` predicate. That
+refactor widens the Text_ops interface and edits the run_store arm the
+mutation harness keys on, so it takes its own slice. C-2 (low,
+test/lan_uri.ml:40 and test/lan_uri_native.py:19). The accepted and
+refused path lists are duplicated across the OCaml and the Python
+harness. No shared source spans the two languages, and a generator
+moves counts that frozen captures pin. C-3 (nit,
+target/README.md:6). The line is 78 columns after the F-4 comma fix. A
+reflow cascades through the rest of the paragraph and needs judgment
+about wrap points. C-4 (low, rust/text_ops.ml:80). The emitter-side
+byte limit still repeats the interpreter bound. The mutation needle on
+that line must stay byte-identical, so the tie is made on the test
+side as F-3 instead.
+
+Proof. The fix suites report 16 of 16 rows OK: `lan_uri.exe
+checks=41`, `lan_uri.py Ran=5`, and the M1 TEXT, RUN, REQUEST, DELETE,
+UPDATE and ALL suites at their floors. The five mutation needles count
+1 each in the staged blobs. The fix run staged 25 review paths
+(`FIX-RUN paths=25`). The 32 frozen captures are untouched, because
+the cached numstat is identical to the capture taken before the edits.
+The em-dash sweep counts 0.
+
+Ladders. The baseline ladder ran on the unfixed staged tree and
+reported GREEN (GATE-END tag=baseline 2026-09-15T20:18:58Z,
+stage_rc=0; GATE LSM1I tag=baseline GREEN). The compare-rows probe on
+the baseline tag showed RED-WATCH 0, PINS 83/83 and ROWS 147/147
+IDENTICAL. The fix-1 ladder ran on the fixed tree and reported GREEN
+(GATE-END tag=fix-1 2026-09-15T21:00:32Z, stage_rc=0; GATE LSM1I
+tag=fix-1 GREEN). The compare-rows probe on the fix-1 tag showed
+RED-WATCH 0, PINS 83/83 and ROWS 147/147 IDENTICAL. The close ladder
+re-runs `zsh dev/gates.sh --stage M1-uri` on this exact staged tree
+after the close, and its verdict is recorded in the review kit, not
+in this file.

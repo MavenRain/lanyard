@@ -1,0 +1,189 @@
+{
+  "base": "73cedd0a92df3be4bada18eee8964191c9d651f1",
+  "captures": {
+    "catalog-count-stage": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-uri/.kanon-exec/run-rQgjIx",
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-uri"
+      ],
+      "exit_code": 1
+    },
+    "cli": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-uri/.kanon-exec/run-qyVkyS",
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_uri.py"
+      ],
+      "exit_code": 0
+    },
+    "native-build": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-uri/.kanon-exec/run-dvxJmf",
+      "command": [
+        "gateledger",
+        "run",
+        "--ledger",
+        ".gatework/gateledger",
+        "--dir",
+        ".gatework/uri-pinned-final",
+        "--scope",
+        "Cargo.toml",
+        "--scope",
+        "Cargo.lock",
+        "--scope",
+        "src",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_HOME=/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-uri/.gatework/uri-pinned-final/Cargo.toml",
+        "--target-dir",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target",
+        "--jobs",
+        "2"
+      ],
+      "exit_code": 0
+    },
+    "native-check": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-uri/.kanon-exec/run-95ikyN",
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_uri_native.py",
+        "--check",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target/debug/lanyard-program",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target/debug/async_uri"
+      ],
+      "exit_code": 0
+    },
+    "native-prepare": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-uri/.kanon-exec/run-HG692w",
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_uri_native.py",
+        "--prepare",
+        ".gatework/uri-pinned",
+        "--toasty",
+        "/Users/oobi/Documents/toasty",
+        "--topcoat",
+        "/Users/oobi/Documents/topcoat",
+        "--lock",
+        "dev/validation/stage-m1-all/native/Cargo.lock"
+      ],
+      "exit_code": 0
+    },
+    "pre-style-stage": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-uri/.kanon-exec/run-bBXfxf",
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-uri"
+      ],
+      "exit_code": 0
+    },
+    "sandbox-stage": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-uri/.kanon-exec/run-5N03Fo",
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-uri"
+      ],
+      "exit_code": 1
+    },
+    "stage": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-uri/.kanon-exec/run-KlHINP",
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-uri"
+      ],
+      "exit_code": 0
+    }
+  },
+  "captures_sha256": {
+    "catalog-count-stage-capture.json": "466fdf22c8b693e6a3c7563080fdbe6aa642234759de6dd6030b41d05af7914e",
+    "catalog-count-stage.stderr": "996499183298f486c666995bbce5c8cb6b32097e99a8e10c364f814cf161d371",
+    "catalog-count-stage.stdout": "196588edd875657755d93fefafd11e391b4097313751ac6c5d5c5bacd23f9b18",
+    "cli-capture.json": "992d16226c0d291fa57c611925f14be6c78abfd68ad4735b2946b19a45f391a0",
+    "cli.stderr": "3b27e4eda29f9f8693067e7be6836d20cbe9eb7b876166f0ed47fb4aa405f5ae",
+    "cli.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-build-capture.json": "c14f05bccab210e6961fb2a17662c9ec5b1c41c0b218e83b2f1ad55cd83576cb",
+    "native-build.stderr": "d95451b535886c0e08d57366507f0b16b4b080bfd5ad5929ef26ba0ff3d8b143",
+    "native-build.stdout": "e827565b1fcbf4e71b6d944ff3c21a9f7b72fdd8b7f92b0b780ae583487fc28d",
+    "native-check-capture.json": "61c91c76aa6c10d06673c6a9809f2472bce3104a0c6b2e17a4dcc9f1ae3ff8ee",
+    "native-check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-check.stdout": "36ed418a7852224f522fc5136909cb05552827ff423242794a757fff640fc3ee",
+    "native-prepare-capture.json": "2dd80bd6a14d7a7324bdac6e16c90b439e0f7fe484904f6b7efb12c106d05c9b",
+    "native-prepare.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-prepare.stdout": "39f8fd981084320c49b8ceb34b98fb24482ee07a0805ced90ad001c23e105a76",
+    "native/Cargo.git.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "native/Cargo.lock": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "native/Cargo.toml": "f542ef1107feceb9f68626d4d27917d6515db34c404ffbaef5475bf03fe58efe",
+    "native/cases.json": "13b8860f7d50e03fc609e73aa2ccf9b1d0050e6ec4a9d5cd58de9e74ba4786de",
+    "native/src/bin/async_uri.rs": "adcaab245e6b382e01b90e3c706ffc7c63af2b8aab512f14af471cb07d391e2b",
+    "native/src/main.rs": "8f0ac8232e28bd069e2af9f7b9209ff22d3b8049aab51bd1d862c670d4b97ce1",
+    "pre-style-stage-capture.json": "045cf1876e662c36e90a9790c67e75587f808bf572f2f639ec845b74f6638ec0",
+    "pre-style-stage.stderr": "f92686d1b6d423ddd9ec33c928419aad43290daa7ce8fde3bacc742236b2ac11",
+    "pre-style-stage.stdout": "45efd99c95ac01ae43ec7b8302c1854cd3fa78e1ea6f2591e7d47e5b1ac4c23a",
+    "sandbox-stage-capture.json": "cca9e423805e398c14e9f9e75043ab387227f94f47b720088a6fb1c630116767",
+    "sandbox-stage.stderr": "ba49a88855091c9785fa4615cd5a36656c3d170cfbbe9b37d17070f7320541c9",
+    "sandbox-stage.stdout": "bff0e50fa5f124119917cfb0ef9bf1b2a91bece438e1b16906e0f8f966f43b19",
+    "source-sha256.json": "86c97066035d96f14e061e4bbe672a53b5706892ae9de3d536d6a80e00f2111f",
+    "stage-capture.json": "cbeecacff87b6dd1f9cb120a5473c9337203a17733701b5dffa999dcaab69114",
+    "stage.stderr": "e67e4230b14ac024a80857de3e452ae77d1860b6a1827ee26ecc54c2aaea7e1f",
+    "stage.stdout": "444179d6fce01dcbc46843c0a4a66ba3f47d9b98772acb4fb745fa6a07e45ac7"
+  },
+  "counts": {
+    "catalog_rows": 21,
+    "cli_test_groups": 5,
+    "foreign_types": 9,
+    "generated_lines": 140,
+    "mutations_killed": 3,
+    "native_binaries": 2,
+    "native_observations": 58,
+    "unit_checks": 41
+  },
+  "exit_code": 0,
+  "native_binary_sha256": {
+    "async_uri": "a214040328a65710a01fc9a303097e2d1ef15856623047c7a6b0cf7d79e2dbb6",
+    "lanyard-program": "4fbf983b8a906bc2535ed6a1af1fcb5166d3bf0b09455b3de37caf58e959f547"
+  },
+  "recorded_utc": "2026-09-15T19:30:48.794993+00:00",
+  "retries": [
+    {
+      "capture": "catalog-count-stage",
+      "reason": "A retained surface catalog assertion still expected 20 declarations.",
+      "resolution": "Updated catalog and axiom assertions for the added declaration; full gate rerun."
+    },
+    {
+      "capture": "sandbox-stage",
+      "reason": "Sandboxed macOS Git emitted confstr warnings in two existing stderr assertions.",
+      "resolution": "Full gate passed outside the sandbox without weakening the tests."
+    },
+    {
+      "capture": "pre-style-stage",
+      "reason": "Staging identified an early return in the emitted URI validator.",
+      "resolution": "Rewrote the guard as a Result expression, regenerated both native programs and reran the full gate and native checks. The native-prepare capture records the initial library pin verification."
+    }
+  ],
+  "status": "PASS",
+  "trust": "PENDING; no trust budget ruling or M0 exit stamp"
+}

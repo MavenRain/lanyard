@@ -15,3 +15,4 @@
 {"name":"topcoat.see_other","type":"(uri : Uri) -> SeeOther","quantities":["w"],"effects":[],"print":"topcoat::router::error::see_other(#{uri}.to_string())","kind":"constant","status":"PROPOSED"}
 {"name":"Text.trim","type":"(0 Text : Type 0) -> (text : Text) -> Text","quantities":["0","w"],"effects":[],"print":"#{text}.trim().to_owned()","kind":"schema","status":"PROPOSED"}
 {"name":"Text.is_empty","type":"(0 Text : Type 0) -> (text : Text) -> sum ((prod () : Type 0), (prod () : Type 0))","quantities":["0","w"],"effects":[],"print":"#{text}.is_empty()","kind":"schema","status":"PROPOSED"}
+{"name":"Uri.from_text","type":"(0 Text : Type 0) -> (text : Text) -> Uri","quantities":["0","w"],"effects":["topcoat::Error"],"print":"#{text}.parse::<topcoat::router::Uri>().map_err(|_error| Error::InvalidUri)?","kind":"schema","status":"PROPOSED"}

@@ -6,10 +6,11 @@ module Catalog = Lanyard_target.Target_generated
 module Printer = Foreign.Printer
 let ( let* ) = Result.bind
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
-type operation = Trim | Is_empty
+type operation = Trim | Is_empty | Uri_from_text
 let operation name = match () with
   | () when String.equal name "Text.trim" -> Ok Trim
   | () when String.equal name "Text.is_empty" -> Ok Is_empty
+  | () when String.equal name "Uri.from_text" -> Ok Uri_from_text
   | () -> Error (Error.Not_yet ("Rust emission: text schema " ^ name))
 let bool_tid = Rir.Tid "sum<struct tuple<>|struct tuple<>>"
 let bool_repr = Rir.TyUnion bool_tid
@@ -34,6 +35,8 @@ let catalog (checked : Elab.lan_program) (instances : Lower.text_operation list)
 let specification = function
   | Trim -> "(0 Text : Type 0) -> (text : Text) -> Text"
   | Is_empty -> "(0 Text : Type 0) -> (text : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
+  | Uri_from_text -> "(0 Text : Type 0) -> (text : Text) -> Uri"
+let effects = function Trim | Is_empty -> [] | Uri_from_text -> ["topcoat::Error"]
 let foreign_call entries operations (row : Rir.foreign) =
   let* text = List.find_opt (fun text -> text.row = row) operations
     |> Option.to_result ~none:(Error.Mismatch "Rust emission: text metadata differs") in
@@ -45,7 +48,7 @@ let foreign_call entries operations (row : Rir.foreign) =
   let* expected = Elab.target_type (specification operation) in
   let* actual = Elab.target_type entry.kernel_type in
   let* () = if actual = expected && entry.quantities = [Catalog.Zero; Catalog.Many]
-      && entry.effects = [] && row.effects = entry.effects && row.arity = 1
+      && entry.effects = effects operation && row.effects = entry.effects && row.arity = 1
       && row.name = Elab.target_name entry.name && row.print_rule = entry.print_rule
     then Ok () else invalid "text schema metadata" in
   let* template = Template.parse entry.print_rule in
@@ -58,12 +61,48 @@ let foreign_call entries operations (row : Rir.foreign) =
           | Trim -> Printer.identifier "lan_model_text_from_" text.family ^ "(" ^ call ^ ")"
           | Is_empty ->
               let ty = Printer.rust_type (Printer.Sum [Printer.Unit; Printer.Unit]) in
-              "if " ^ call ^ " { " ^ ty ^ "::V1(()) } else { " ^ ty ^ "::V0(()) }" in
+              "if " ^ call ^ " { " ^ ty ^ "::V1(()) } else { " ^ ty ^ "::V0(()) }"
+          | Uri_from_text -> "lan_uri_validate(&__lan_text)?; " ^ call in
         Ok ("{ let __lan_text_arg = " ^ value ^ "; let __lan_text = "
           ^ Printer.identifier "lan_model_text_to_" text.family ^ "(&__lan_text_arg)?; " ^ converted ^ " }")
     | [] | _ :: _ -> invalid "text argument count" in
-  let result = match operation with Trim -> text.repr | Is_empty -> bool_repr in
+  let* result = match operation with
+    | Trim -> Ok text.repr | Is_empty -> Ok bool_repr
+    | Uri_from_text ->
+        let* _uri_type = Foreign.foreign_type entries "Uri" [] in
+        Ok (Rir.TyForeign ("Uri", [])) in
   Ok ([Rir.TyArc text.repr], result, render, Effects.Sync)
+
+(** Match Run_http.uri before the pinned HTTP parser can accept another URI form. *)
+let uri_runtime = {|
+enum LanUriEscape { Ready, FirstHex, SecondHex }
+fn lan_uri_validate(value: &str) -> Result<(), Error> {
+    let initial = if value.len() > 8192 || !value.starts_with('/') || value.starts_with("//") {
+        Err(Error::InvalidUri)
+    } else { Ok(LanUriEscape::Ready) };
+    initial.and_then(|initial| value.bytes().try_fold(initial, |state, byte| {
+        match state {
+            LanUriEscape::Ready => {
+                if byte == b'%' { Ok(LanUriEscape::FirstHex) }
+                else if byte.is_ascii_alphanumeric() || b"-._~!$&'()*+,;=:@/?".contains(&byte) {
+                    Ok(LanUriEscape::Ready)
+                } else { Err(Error::InvalidUri) }
+            }
+            LanUriEscape::FirstHex => {
+                if byte.is_ascii_hexdigit() { Ok(LanUriEscape::SecondHex) }
+                else { Err(Error::InvalidUri) }
+            }
+            LanUriEscape::SecondHex => {
+                if byte.is_ascii_hexdigit() { Ok(LanUriEscape::Ready) }
+                else { Err(Error::InvalidUri) }
+            }
+        }
+    })).and_then(|state| match state {
+        LanUriEscape::Ready => Ok(()),
+        LanUriEscape::FirstHex | LanUriEscape::SecondHex => Err(Error::InvalidUri),
+    })
+}
+|}
 
 (* Unicode White_Space, the property used by Rust's str::trim. The checked
    decoder supplies valid scalar boundaries, including four-byte scalars. *)

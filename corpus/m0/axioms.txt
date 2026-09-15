@@ -1,4 +1,4 @@
-AXIOMS scope=checked-module target-sha256=d62a8e47331e82bab0e159637d4ba1d03f002054cfe658c739a5aad3d02b337e
+AXIOMS scope=checked-module target-sha256=68c0c274135ebbe6ddeba9dae9a1d7386c21fb4cda5341086d3f6493eb635f4b
 Framework imax_zero : imax l zero = zero
 Foreign Cx : Type 1 [schema=Cx]
 Foreign Db : Type 1 [schema=Db]
@@ -21,13 +21,14 @@ Foreign Todo_delete_by_id : (Ran SPi w key Nat (Ran SPi w db Db (Ran SColl 0 (Se
 Foreign Todo_get_by_id : (Ran SPi w key Nat (Ran SPi w db Db (Ran SColl 3 (Sec SColl 3 [ => Nat;  => (Lan SMu Bytes [] (Sec SColl 0 []));  => (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))])))) [schema=Model.get_by_id]
 Foreign Todo_update : (Ran SPi w fields (Ran SColl 3 (Sec SColl 3 [ => Nat;  => (Lan SMu Bytes [] (Sec SColl 0 []));  => (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))])) (Ran SPi w db Db (Ran SColl 3 (Sec SColl 3 [ => Nat;  => (Lan SMu Bytes [] (Sec SColl 0 []));  => (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))])))) [schema=Model.update]
 Foreign Uri : Type 1 [schema=Uri]
+Foreign Uri_from_text : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Uri)) [schema=Uri.from_text]
 Foreign toasty_Error : Type 1 [schema=toasty::Error]
 Foreign topcoat_Error : Type 1 [schema=topcoat::Error]
 Foreign topcoat_db : (Ran SPi w cx Cx Db) [schema=topcoat.db]
 Foreign topcoat_see_other : (Ran SPi w uri Uri SeeOther) [schema=topcoat.see_other]
 COUNT Framework=1
-COUNT Foreign=25
+COUNT Foreign=26
 COUNT Classical=0
 COUNT Div=0
-AXIOMS total=26
-AXIOM-RATIO constants=25 definitions=3 status=REPORTED
+AXIOMS total=27
+AXIOM-RATIO constants=26 definitions=3 status=REPORTED

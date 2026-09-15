@@ -1,0 +1,15 @@
+W src/bin/async_uri.rs:8:58  dead_code  variant `ModelRange` is never constructed
+W src/bin/async_uri.rs:46:8  dead_code  methods `compare`, `sub`, and `mul` are never used
+W src/bin/async_uri.rs:96:6  dead_code  enum `T73756d28756e69742c756e697429` is never used
+W src/bin/async_uri.rs:114:4  dead_code  function `f_6d61696e` is never used
+W src/bin/async_uri.rs:118:10  dead_code  function `f_776974684461746162617365` is never used
+W src/bin/async_uri.rs:119:14  unused_variables  unused variable: `v1`
+W src/bin/async_uri.rs:123:4  dead_code  function `lan_model_to_i64` is never used
+W src/bin/async_uri.rs:129:4  dead_code  function `lan_model_from_i64` is never used
+W src/main.rs:8:33  dead_code  variant `ModelRange` is never constructed
+W src/main.rs:35:8  dead_code  methods `compare`, `sub`, and `mul` are never used
+W src/main.rs:85:6  dead_code  enum `T73756d28756e69742c756e697429` is never used
+W src/main.rs:103:4  dead_code  function `f_6d61696e` is never used
+W src/main.rs:108:4  dead_code  function `lan_model_to_i64` is never used
+W src/main.rs:114:4  dead_code  function `lan_model_from_i64` is never used
+OK build: 0 errors, 14 warnings

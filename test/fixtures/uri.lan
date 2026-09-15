@@ -1,0 +1,7 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def home : Uri := Uri.from_text Bytes b"/"
+def main : Cx -> Uri -> SeeOther :=
+  fun (cx : Cx) (request : Uri) => topcoat.see_other home

@@ -122,6 +122,17 @@ _build/default/bin/lanyard.exe run --print-model Title test/fixtures/text-ops.la
 zsh dev/gates.sh --stage M1-text
 ```
 
+The [M1 URI conversion](dev/STAGE-M1-URI.md) adds `Uri.from_text Bytes value`
+for checked byte lists. Request handlers can construct an origin-form URI
+and redirect to it. Invalid UTF-8, malformed escapes, absolute URLs and
+paths longer than 8192 bytes fail in the interpreter and emitted Rust.
+
+```sh
+_build/default/bin/lanyard.exe run --request /todos test/fixtures/uri.lan
+# HTTP/1.1 303 See Other, with Location: /
+zsh dev/gates.sh --stage M1-uri
+```
+
 Build and validate through Stage D:
 
 ```sh

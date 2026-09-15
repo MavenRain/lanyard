@@ -247,7 +247,8 @@ let source ?entrypoint ?(output = Discard) (checked : Elab.lan_program) =
     let foreign_call row = match () with
       | () when String.starts_with ~prefix:"Model." row.Rir.schema -> foreign_call Catalog.entries models row
       | () when String.equal row.Rir.schema "Db.connect" -> Connection.foreign_call Catalog.entries connections row
-      | () when String.starts_with ~prefix:"Text." row.Rir.schema -> Text_ops.foreign_call Catalog.entries operations row
+      | () when String.starts_with ~prefix:"Text." row.Rir.schema || String.equal row.Rir.schema "Uri.from_text" ->
+          Text_ops.foreign_call Catalog.entries operations row
       | () -> Foreign.foreign_call Catalog.entries row
   end) in
   let data = List.concat_map (fun model -> model.data) models
@@ -258,7 +259,10 @@ let source ?entrypoint ?(output = Discard) (checked : Elab.lan_program) =
     @ List.map (fun (connection : Connection.t) -> connection.family) connections
     @ List.map (fun (operation : Text_ops.t) -> operation.family) operations
     |> List.sort_uniq String.compare in
-  let* source = Target.native ?entrypoint ~entry_output ~model_errors:true ~text_errors:(text <> [])
+  let uri_errors = List.exists (fun (operation : Text_ops.t) ->
+    operation.operation = Text_ops.Uri_from_text) operations in
+  let* source = Target.native ?entrypoint ~entry_output ~model_errors:true ~text_errors:(text <> []) ~uri_errors
     (("", Erase.Code [Rir.RData data]) :: rows) in
   Ok (source ^ "\n" ^ String.concat "\n" (List.map declaration models) ^ conversions
-    ^ (List.map text_conversions text |> String.concat "") ^ output_code)
+    ^ (List.map text_conversions text |> String.concat "")
+    ^ (if uri_errors then Text_ops.uri_runtime else "") ^ output_code)

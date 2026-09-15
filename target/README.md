@@ -1,9 +1,9 @@
 # Target signatures
 
-The target catalog provides 20 proposed foreign declarations: nine type
-constants and eleven constant or schema declarations. M1 adds
-`Model.delete_by_id`, `Model.update`, `Model.all`, `Text.trim` and
-`Text.is_empty` to the catalog. The target layer builds as
+The target catalog provides 21 proposed foreign declarations: nine type
+constants and twelve constant or schema declarations. M1 adds
+`Model.delete_by_id`, `Model.update`, `Model.all`, `Text.trim`,
+`Text.is_empty` and `Uri.from_text` to the catalog. The target layer builds as
 `lanyard_target`; its `Target_generated` module exposes immutable
 metadata and total lookup. Stage C instantiates schemas and checks their
 types before adding axioms. Stage E applies synchronous, async, model and
