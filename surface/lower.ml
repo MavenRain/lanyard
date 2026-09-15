@@ -59,6 +59,19 @@ let connections (source : specialized) =
         Ok { wrapper; models; text; row = { row with name = "Db_connect" } })
         (Specialize.arguments definition.Global.def)) program.rows)
 
+type text_operation = { wrapper : string; text : Term.t; row : Rir.foreign }
+let text_operations (source : specialized) =
+  let program = source.specialized in
+  Rules.all_ok (List.filter_map (fun (wrapper, entry) -> match entry with
+    | Global.Axiom _ | Global.Prim _ -> None
+    | Global.Def definition -> Option.map (fun (name, text) ->
+        let* schema = List.find_opt (fun (entry : Elab.Target.entry) ->
+          String.equal entry.name name) Elab.Target.entries
+          |> Option.to_result ~none:(Error.Unbound name) in
+        let* row = foreign_row program.globals wrapper schema ["Text", Pp.term [] text] in
+        Ok { wrapper; text; row = { row with name = Elab.target_name name } })
+        (Specialize.text_arguments definition.Global.def)) program.rows)
+
 (** The emitted parameter count of every function item, lifted ones included.
     A direct call to a native name is checked against this count. *)
 let emitted_arities rows =
@@ -75,6 +88,7 @@ let emitted_arities rows =
     repeats the whole program scan and builds equal but distinct rows. *)
 let program_with (connections : connection list) (source : specialized) =
   let checked = source.specialized in
+  let* texts = text_operations source in
   let* foreign = catalog checked in
   let* rows = Erase.program checked.globals checked.rows in
   let emitted = emitted_arities rows in
@@ -93,8 +107,10 @@ let program_with (connections : connection list) (source : specialized) =
     match entry with
     | Erase.Dropped | Erase.Postulate _ -> Ok (name, entry)
     | Erase.Code decls ->
-        let foreign = List.filter_map (fun connection ->
-          if String.equal connection.wrapper name then Some connection.row else None) connections @ foreign in
+        let foreign = List.filter_map (fun (connection : connection) ->
+          if String.equal connection.wrapper name then Some connection.row else None) connections
+          @ List.filter_map (fun (operation : text_operation) ->
+            if String.equal operation.wrapper name then Some operation.row else None) texts @ foreign in
         let* decls = Rules.all_ok (List.map (Rir.resolve_decl ~known:table foreign) decls) in
         Ok (name, Erase.Code decls)) rows)
 

@@ -237,21 +237,26 @@ let source ?entrypoint ?(output = Discard) (checked : Elab.lan_program) =
         output_source model in
   let* instances = Lower.connections specialized in
   let* connections = Connection.catalog checked (List.map (fun model -> model.name, rust_name model) models) instances in
+  let* text_instances = Lower.text_operations specialized in
+  let* operations = Text_ops.catalog checked text_instances in
   let* rows = Lower.program_with instances specialized in
-  if List.is_empty models && List.is_empty connections then Foreign.source ?entrypoint rows else
+  if List.is_empty models && List.is_empty connections && List.is_empty operations then Foreign.source ?entrypoint rows else
   let module Target = Emit.Make (struct
     let foreign_type = Foreign.foreign_type Catalog.entries
     let foreign_layout = foreign_type
-    let foreign_call row =
-      if String.starts_with ~prefix:"Model." row.Rir.schema then foreign_call Catalog.entries models row
-      else if String.equal row.Rir.schema "Db.connect" then Connection.foreign_call Catalog.entries connections row
-      else Foreign.foreign_call Catalog.entries row
+    let foreign_call row = match () with
+      | () when String.starts_with ~prefix:"Model." row.Rir.schema -> foreign_call Catalog.entries models row
+      | () when String.equal row.Rir.schema "Db.connect" -> Connection.foreign_call Catalog.entries connections row
+      | () when String.starts_with ~prefix:"Text." row.Rir.schema -> Text_ops.foreign_call Catalog.entries operations row
+      | () -> Foreign.foreign_call Catalog.entries row
   end) in
   let data = List.concat_map (fun model -> model.data) models
-    @ List.concat_map (fun (connection : Connection.t) -> connection.data) connections in
+    @ List.concat_map (fun (connection : Connection.t) -> connection.data) connections
+    @ List.concat_map (fun (operation : Text_ops.t) -> operation.data) operations in
   let text = List.concat_map (fun model -> List.filter_map (fun (_field, scalar) ->
     match scalar with Nat_field | Bool_field -> None | Text_field name -> Some name) model.fields) models
     @ List.map (fun (connection : Connection.t) -> connection.family) connections
+    @ List.map (fun (operation : Text_ops.t) -> operation.family) operations
     |> List.sort_uniq String.compare in
   let* source = Target.native ?entrypoint ~entry_output ~model_errors:true ~text_errors:(text <> [])
     (("", Erase.Code [Rir.RData data]) :: rows) in

@@ -21,7 +21,7 @@ let catalog =
   let* checked = Kanon_surface.Elab.check_lanyard (base ^ "model Other with | id : Nat | value : Nat end") in
   let* models = Model.catalog checked in
   let* constants = Kanon_surface.Lower.catalog checked in
-  Ok { Store.models; connections = []; constants }
+  Ok { Store.models; connections = []; texts = []; constants }
 let foreign catalog name = List.find_opt (fun (row : Rir.foreign) -> row.name = name) catalog.Store.constants
   |> Option.to_result ~none:(Error.Unbound name)
 let call catalog name arguments store =

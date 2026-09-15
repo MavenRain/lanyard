@@ -70,7 +70,7 @@ let text ?(what = "model text") family value =
         let* number = natural head in
         let* byte = Bignum.to_int number
           |> Option.to_result ~none:(Error.Mismatch "run: model byte outside 0..255") in
-        if byte < 0 || byte > 255 then invalid "model byte outside 0..255"
+        if byte > 255 then invalid "model byte outside 0..255"
         else
           let* character = at byte byte_characters in
           bytes (character :: reversed) tail
@@ -78,6 +78,12 @@ let text ?(what = "model text") family value =
     | Context _ | Uri _ | See_other _ ->
         invalid "expected a model byte list" in
   bytes [] value
+
+let of_text family text =
+  let tid = Erase.mu_tid family in
+  String.to_seq text |> List.of_seq |> List.rev
+  |> List.fold_left (fun tail character ->
+    Tag (tid, 1, [Nat (Bignum.of_int (Char.code character)); tail])) (Tag (tid, 0, []))
 
 let fields (model : Model.t) = function
   | Product (tid, fields) when model.repr = Rir.TyStruct tid &&

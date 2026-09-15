@@ -132,9 +132,11 @@ let prepare checked =
   let* models = Model.catalog checked in
   let* instances = Lower.connections specialized in
   let* connections = Connection.catalog checked (List.map (fun (model : Model.t) -> model.name, model.name) models) instances in
+  let* text_instances = Lower.text_operations specialized in
+  let* texts = Text_ops.catalog checked text_instances in
   let* constants = Lower.catalog checked in
   let* rows = Lower.program_with instances specialized in
-  Ok { functions = functions rows; foreign = { Run_store.models; connections; constants } }
+  Ok { functions = functions rows; foreign = { Run_store.models; connections; texts; constants } }
 
 let checked_steps steps =
   if steps <= 0 || steps > max_steps then invalid "steps must be in 1..1000000" else Ok ()

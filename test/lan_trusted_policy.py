@@ -64,11 +64,11 @@ class Policy(unittest.TestCase):
         self.approved()
         report = TRUST.inventory(self.work)
         self.assertEqual((report["status"], report["policy"]["lines"], report["policy"]["limit"]),
-                         ("PASS", 46, 46))
+                         ("PASS", 47, 47))
         self.assertEqual(report["pending_rulings"], [])
         self.assertEqual(report["m0_exit"], "not-stamped")
-        self.assertEqual(report["ceiling"]["total"], 46)
-        self.assertEqual(report["ceiling"]["A_emit"], 8)
+        self.assertEqual(report["ceiling"]["total"], 47)
+        self.assertEqual(report["ceiling"]["A_emit"], 9)
         self.assertEqual(self.gate()["status"], "PASS")
 
     def test_growth_in_every_group_fails_approved_budget(self):
@@ -124,8 +124,8 @@ class Policy(unittest.TestCase):
         (self.work / "surface/elab.ml").write_bytes(b"\n" * 100)
         report = TRUST.inventory(self.work)
         self.assertEqual(report["status"], "PASS")
-        self.assertEqual(len(report["files"]), 46)
-        self.assertEqual(report["ceiling"]["total"], 39)
+        self.assertEqual(len(report["files"]), 47)
+        self.assertEqual(report["ceiling"]["total"], 40)
         self.assertTrue(any(row["path"] == "surface/elab.ml" for row in report["files"]))
 
     def test_kernel_cannot_be_excluded_or_budgeted_above_ratified_bound(self):
@@ -211,7 +211,7 @@ class Policy(unittest.TestCase):
         policy = self.approved()
         data = TRUST.encoded(policy).decode()
         for changed in (data.replace('"format": 1', '"format": 1, "format": 1'),
-                        data.replace('"limit": 8', '"limit": NaN')):
+                        data.replace(f'"limit": {policy["groups"][0]["limit"]}', '"limit": NaN', 1)):
             with self.subTest(data=changed[:50]):
                 (self.work / POLICY_PATH).write_text(changed)
                 with self.assertRaises(ValueError):

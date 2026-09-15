@@ -1,4 +1,4 @@
-(** Retain closed connection arguments before quantity erasure. Each distinct
+(** Retain closed target arguments before quantity erasure. Each distinct
     application gets a checked private wrapper in the lowering environment. *)
 open Kanon_kernel
 let ( let* ) = Result.bind
@@ -7,20 +7,29 @@ let arguments = function
       Term.Out (_, Term.APt (Quantity.Zero, models), Term.Global "Db_connect")) -> Some (models, text)
   | Term.Var _ | Term.Univ _ | Term.Lan _ | Term.Ran _ | Term.In _ | Term.Elim _
   | Term.Sec _ | Term.Out _ | Term.Let _ | Term.Ann _ | Term.Global _ | Term.Lit _ | Term.Auto -> None
+let text_arguments = function
+  | Term.Out (_, Term.APt (Quantity.Zero, text), Term.Global name)
+      when String.equal name "Text_trim" || String.equal name "Text_is_empty" ->
+      Some ((if String.equal name "Text_trim" then "Text.trim" else "Text.is_empty"), text)
+  | Term.Var _ | Term.Univ _ | Term.Lan _ | Term.Ran _ | Term.In _ | Term.Elim _
+  | Term.Sec _ | Term.Out _ | Term.Let _ | Term.Ann _ | Term.Global _ | Term.Lit _ | Term.Auto -> None
+let specialized source = Option.is_some (arguments source) || Option.is_some (text_arguments source)
 type state = { globals : Global.t; wrappers : (Term.t * string * Global.entry) list; next : int }
-let rec fresh globals index =
-  let name = "__lan_connect_" ^ string_of_int index in
+let rec fresh kind globals index =
+  let name = "__lan_" ^ kind ^ "_" ^ string_of_int index in
   if Option.is_some (Global.find name globals) || Option.is_some (Global.find_family name globals)
-  then fresh globals (index + 1) else name, index + 1
+  then fresh kind globals (index + 1) else name, index + 1
 let instance state term =
+  let kind = if Option.is_some (arguments term) then "connect" else "text" in
+  let operation = if String.equal kind "connect" then "connection" else "text" in
   List.find_opt (fun (source, _name, _entry) -> source = term) state.wrappers
   |> Option.fold ~some:(fun (_source, name, _entry) () -> Ok (state, Term.Global name))
     ~none:(fun () ->
       let c = Check.make state.globals Budget.unlimited in
       let* ty = Check.infer c Quantity.Many term |> Result.map_error (fun _error ->
-        Error.Not_yet "Rust emission: connection type arguments must be closed") in
+        Error.Not_yet ("Rust emission: " ^ operation ^ " type arguments must be closed")) in
       let* ty = Eval.quote state.globals 0 ty in
-      let name, next = fresh state.globals state.next in
+      let name, next = fresh kind state.globals state.next in
       let* entry = Check.check_decl state.globals Budget.unlimited
         { Check.d_name = name; d_kind = Check.Definition; d_ty = ty; d_body = Some term } in
       Ok ({ globals = Global.add name entry state.globals;
@@ -32,7 +41,7 @@ let rec map transform state sources = match sources with
       let* state, value = transform state source in
       let* state, rest = map transform state rest in Ok (state, value :: rest)
 let rec term state source =
-  if Option.is_some (arguments source) then instance state source else
+  if specialized source then instance state source else
   match source with
   | Term.Var _ | Term.Global _ | Term.Lit _ | Term.Auto | Term.Univ _
   | Term.Lan _ | Term.Ran _ -> Ok (state, source)
@@ -78,7 +87,7 @@ let program (checked : Elab.lan_program) =
   let* state, rows = map (fun state (name, entry) -> match entry with
     | Global.Axiom _ | Global.Prim _ -> Ok (state, (name, entry))
     | Global.Def definition ->
-        if Option.is_some (arguments definition.def) then Ok (state, (name, entry)) else
+        if specialized definition.def then Ok (state, (name, entry)) else
         let* state, body = term state definition.def in
         let entry = Global.Def { definition with def = body } in
         Ok ({ state with globals = Global.add name entry state.globals }, (name, entry)))

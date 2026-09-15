@@ -1,0 +1,19 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+
+model Title with
+| id : Nat
+| text : Bytes
+| blank : Bool
+end
+
+def trim : Bytes -> Bytes := Text.trim Bytes
+def isEmpty : Bytes -> Bool := Text.is_empty Bytes
+
+def main : Title :=
+  let title : Bytes := trim b"  write tests  " in
+  let blank : Bool := isEmpty (Text.trim Bytes b"   ") in
+  tuple (1, title, blank)

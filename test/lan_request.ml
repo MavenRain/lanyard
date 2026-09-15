@@ -22,7 +22,7 @@ let row name =
   let* constants = Kanon_surface.Lower.catalog checked in
   let* row = List.find_opt (fun (row : Rir.foreign) -> row.schema = name) constants
     |> Option.to_result ~none:(Error.Mismatch "missing request target row") in
-  Ok (row, { S.models = []; connections = []; constants })
+  Ok (row, { S.models = []; connections = []; texts = []; constants })
 let invoke name arguments store =
   let* row, catalog = row name in S.foreign catalog row arguments store
 let expected = "HTTP/1.1 303 See Other\r\nLocation: /next\r\nContent-Length: 0\r\n\r\n"

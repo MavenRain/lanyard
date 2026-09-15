@@ -13,3 +13,5 @@
 {"name":"topcoat::Error","type":"Type 0","quantities":[],"effects":[],"print":"topcoat::Error","kind":"type","status":"PROPOSED"}
 {"name":"topcoat.db","type":"(cx : Cx) -> Db","quantities":["w"],"effects":[],"print":"topcoat::context::app_context::<toasty::Db>(#{cx}).clone()","kind":"constant","status":"PROPOSED"}
 {"name":"topcoat.see_other","type":"(uri : Uri) -> SeeOther","quantities":["w"],"effects":[],"print":"topcoat::router::error::see_other(#{uri}.to_string())","kind":"constant","status":"PROPOSED"}
+{"name":"Text.trim","type":"(0 Text : Type 0) -> (text : Text) -> Text","quantities":["0","w"],"effects":[],"print":"#{text}.trim().to_owned()","kind":"schema","status":"PROPOSED"}
+{"name":"Text.is_empty","type":"(0 Text : Type 0) -> (text : Text) -> sum ((prod () : Type 0), (prod () : Type 0))","quantities":["0","w"],"effects":[],"print":"#{text}.is_empty()","kind":"schema","status":"PROPOSED"}

@@ -23,10 +23,10 @@ with a complete OCaml source inventory and per-file hashes.
 The M0-E2E gate builds the pinned Todo crate offline and checks its output.
 Other model field types, general recursive handlers and the M0 exit stamp
 remain ahead. The [trusted-code policy](dev/STAGE-F-POLICY.md) proposes
-budgets for all 46 measured compiler sources, totaling 12766 lines.
-It stays proposed until the user rules; approved policies enforce each
-group's budget and source roster. A_sig is proposed at 104 lines. See
-[target documentation](target/README.md), the
+per-group source budgets. The inventory reports source growth against
+that pending proposal. It stays proposed until the user rules; approved
+policies enforce each group's budget and source roster. A_sig is
+proposed at 104 lines. See [target documentation](target/README.md), the
 [Stage B build log](dev/M0-BUILD-LOG.md#lanyard-m0-stage-b-2026-09-09) and
 the [Stage C build log](dev/spikes/M0-BUILD-LOG.md#stage-c-2026-09-09) with
 its [Stage C mutation log](dev/spikes/MUTATION-LOG.md#stage-c-2026-09-09).
@@ -108,6 +108,18 @@ generated `Counter.nil` and `Counter.cons head tail` constructors.
 _build/default/bin/lanyard.exe run --print-model Task test/fixtures/all.lan
 # Task { title: "updated", id: 3, completed: true, value: 122 }
 zsh dev/gates.sh --stage M1-all
+```
+
+The [M1 text operations](dev/STAGE-M1-TEXT.md) add `Text.trim Bytes value`
+and `Text.is_empty Bytes value` for a checked byte-list family. Trimming
+removes Unicode whitespace at both ends. Empty checks return the usual
+two-unit Boolean sum. Both operations reject malformed UTF-8 and bytes
+outside `0..255` in the interpreter and emitted Rust.
+
+```sh
+_build/default/bin/lanyard.exe run --print-model Title test/fixtures/text-ops.lan
+# Title { id: 1, text: "write tests", blank: true }
+zsh dev/gates.sh --stage M1-text
 ```
 
 Build and validate through Stage D:
@@ -289,7 +301,7 @@ Inspect the [compiler source inventory](dev/STAGE-F-TRUST.md):
 python3 -P dev/trusted-inventory.py --output /tmp/lanyard-trust.json
 ```
 
-The saved JSON records 46 current OCaml sources, including handler
+The saved JSON records 47 current OCaml sources, including handler
 fusion, and leaves the open limits and scope decisions pending. M0
 verifies the inventory against the current source bytes and retains it
 beside the gate report.

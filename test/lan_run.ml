@@ -10,7 +10,7 @@ let nat_repr = TyUnion (Tid "nat")
 let fn name arity body : I.fn = { name; params = List.init arity (fun _index -> nat_repr);
   result = nat_repr; body }
 let context functions : I.context = { functions;
-  foreign = { Store.models = []; connections = []; constants = [] } }
+  foreign = { Store.models = []; connections = []; texts = []; constants = [] } }
 let eval ?(steps = I.default_steps) ?(functions = []) term =
   I.evaluate (context functions) 0 { I.steps; store = Store.empty } [] term |> Result.map fst
 let source text = Kanon_surface.Elab.check_lanyard text
@@ -96,7 +96,7 @@ let tests = [
       |> Option.to_result ~none:(Error.Mismatch "missing target row") in
     let row = { row with schema = "future.operation" } in
     refuses "foreign operation future.operation"
-      (Store.foreign { Store.models = []; connections = []; constants = [row] } row [V.Unit] Store.empty) ());
+      (Store.foreign { Store.models = []; connections = []; texts = []; constants = [row] } row [V.Unit] Store.empty) ());
 ]
 
 let () =

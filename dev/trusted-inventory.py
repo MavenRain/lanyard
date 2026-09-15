@@ -19,7 +19,7 @@ GROUPS = {
     "erase": ("lib/erase.ml",),
     "rir": ("lib/rir.ml",),
     "printer": tuple("rust/" + name + ".ml" for name in (
-        "emit", "effects", "foreign", "connection", "template", "model", "crate", "reachable")),
+        "emit", "effects", "foreign", "connection", "template", "model", "crate", "reachable", "text_ops")),
     "signatures": (GENERATED,),
     "carried-eraser": ("lib/erase_kan.ml", "lib/eterm.ml"),
     "target-bridge": ("surface/lower.ml", "surface/specialize.ml", "surface/fuse.ml"),

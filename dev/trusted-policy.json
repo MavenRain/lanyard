@@ -54,7 +54,8 @@
         "rust/foreign.ml",
         "rust/model.ml",
         "rust/reachable.ml",
-        "rust/template.ml"
+        "rust/template.ml",
+        "rust/text_ops.ml"
       ]
     },
     {

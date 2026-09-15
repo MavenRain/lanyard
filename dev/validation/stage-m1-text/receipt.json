@@ -1,0 +1,44 @@
+{
+  "base": "661c0f56b1b8af36a27c52a8d01d31e447f68caa",
+  "captures_sha256": {
+    "diff-check.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "interpreter.stdout": "bea05dd7d4fc7d395b897ce73b2a9f1852fd9eb404a01a0621b6c12cf02b2b1c",
+    "source-sha256.json": "70a3a35aa88695a11763dab1f9af8a68aacd1ff21fd47307b7528502553fefd8",
+    "stage-capture.json": "f870f42a04e8976b507c35594991eb1c4ed77b31de2793bfd581b0bbeb2d8bcd",
+    "stage.stderr": "7f7b48000b9049dcf3f29af600c60f12317933ed8af301b556a08c57e5b0bcc4",
+    "stage.stdout": "9ef983eec1d1126c2844eb15c33bf5acdbc23b9c08e906569771f10212b91d8e",
+    "trusted-inventory.json": "3309f0cbc3f4b344339b39209eefa200c489c8430a666a6e009d5e32acef2e8f",
+    "trusted-inventory.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "trusted-inventory.stdout": "bd0e919d3b587b868a6e8fc66ade7dc5ccea2e51e7cd62f2871f5fafd7ddada6"
+  },
+  "cli_test_groups": 4,
+  "exit_code": 0,
+  "input_scope": "Changed build, compiler, fixture and gate inputs plus generated signatures; documentation excluded",
+  "m0_status": "PENDING",
+  "mutation_controls": "PASS",
+  "mutations_killed": 5,
+  "native_observations": 111,
+  "recorded_utc": "2026-09-15T15:39:51.405261+00:00",
+  "stage": {
+    "artifact": "/Users/oobi/Documents/gpt2/lanyard-text-ops/.kanon-exec/run-xYPJf8",
+    "command": [
+      "zsh",
+      "dev/gates.sh",
+      "--stage",
+      "M1-text"
+    ],
+    "exit_code": 0
+  },
+  "status": "PASS",
+  "unit_checks": 63,
+  "validation_environment": {
+    "reason": "macOS sandbox adds Git confstr warnings to two strict stderr probes",
+    "sandbox_probe_artifact": "/Users/oobi/Documents/gpt2/lanyard-text-ops/.kanon-exec/run-tLCMBi",
+    "sandboxed": false,
+    "unchanged_probe_pass_artifact": "/Users/oobi/Documents/gpt2/lanyard-text-ops/.kanon-exec/run-NmlvwW",
+    "unchanged_probe_tests": 19
+  },
+  "versions": {
+    "rust": "rustc 1.98.1 (48a229cea 2026-09-01)"
+  }
+}

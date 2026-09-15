@@ -2912,3 +2912,140 @@ compare-rows probe on the fix-1 tag showed RED-WATCH 0, PINS 66/66 and
 ROWS 130/130 IDENTICAL. The close ladder re-runs `zsh dev/gates.sh --stage
 M1-all` on this exact staged tree after the close, and its verdict is
 recorded in the review kit, not in this file.
+
+
+## Stage M1 TEXT (2026-09-15)
+
+The pinned Topcoat Todo create handler trims its title and checks whether
+the result is empty. This slice adds `Text.trim Bytes value` and
+`Text.is_empty Bytes value` to the checked target catalog. Both operations
+accept the existing nominal byte-list representation and validate byte
+ranges and UTF-8. Trimming preserves interior text and removes all 25
+Unicode whitespace scalars at either end. Empty checks return the existing
+two-unit Boolean sum. Shared inputs retain their original contents.
+
+Closed erased text arguments survive specialization for direct calls,
+aliases and captured calls. The Rust adapter checks the family layout and
+the complete foreign-call metadata before printing the pinned string
+idioms. The interpreter uses the same layout and conversion boundaries.
+Unsupported layouts and open text arguments fail before execution or
+emission. Conversion errors still propagate when a result is unused.
+
+The catalog grows from 18 to 20 declarations, while the foreign type
+census remains nine. Todo's axiom golden grows from 23 to 25 foreign
+constants. The generated signature module measures 134 lines against the
+existing proposed allowance of 104. Library commits and Topcoat source
+anchors retain their pins. The new adapter joins both printer accounting
+paths and the proposed roster; no budget, trust ruling or exit stamp is
+approved by this slice.
+
+`dev/STAGE-M1-TEXT.md` documents the API and target contract. The fixture
+prints `Title { id: 1, text: "write tests", blank: true }`. The stage gate
+retains all prior M1 model listing checks and adds 63 unit checks, four
+CLI/native test groups, 111 native observations and five isolated
+mutations with clean and restored controls. Tests include Unicode
+whitespace, preserved non-whitespace scalars, embedded NULs, malformed
+UTF-8, byte ranges, family separation, metadata tampering and unused
+results. Validation evidence is recorded in `dev/validation/stage-m1-text/`.
+
+The final `zsh dev/gates.sh --stage M1-text` run exited 0 with
+`STAGE-M1-TEXT OK`. All 33 frozen build and test input hashes still matched
+after completion. The unchanged 19-test Git integration harness and the
+complete gate ran outside the macOS sandbox after sandboxed Git emitted
+`confstr()` warnings into two strict stderr checks. The receipt records
+that environment retry. M0 remains `PENDING`, with six passing legs and
+the existing trust decision outstanding.
+
+## Stage M1 TEXT review fixes (tag LSM1T, 2026-09-15)
+
+The review kit LSM1T ran on base 661c0f5 over a 46-path slice, that is
+36 review paths and 10 frozen captures under
+`dev/validation/stage-m1-text/`. A ctxcat-review Workflow and an opus
+prober supplied the raw findings. Seven findings passed the judge: two
+medium and five low, one of which carries five nits. The baseline ladder
+was green before any edit.
+
+F-1 (medium, dev/M0-BUILD-LOG.md:2981). The slice block was appended to
+the M0 log although every M1 stage block lives in this file under `##
+Stage M1 <NAME> (date)`. The 42 appended lines now stand at the end of
+this file under `## Stage M1 TEXT (2026-09-15)`, and dev/M0-BUILD-LOG.md
+carries its HEAD bytes again and leaves the staged set. The words of the
+block do not change; only the heading is retitled.
+
+F-2 (medium, README.md:304). The saved-JSON sentence read 46 current
+OCaml sources while the staged dev/trusted-policy.json roster grew to 47
+when rust/text_ops.ml joined the printer group. The sentence now reads
+47 current OCaml sources. test/lan_trusted_inventory.py rebuilds that
+roster in the M1-text gate.
+
+F-3 (low, rust/run_store.ml:108). The interpreter spelled `Rir.Tid
+"sum<struct tuple<>|struct tuple<>>"` a third time as a bare literal.
+rust/text_ops.ml:14 now binds `bool_tid` and defines `bool_repr` as
+`Rir.TyUnion bool_tid`, and the store arm uses `Text_ops.bool_tid`.
+rust/model.ml:14 stays as it is, because routing it through Text_ops
+risks a module cycle. The mutation needle `(if String.equal text "" then
+1 else 0)` on that line is byte-identical, so the invert-empty mutant of
+test/lan_text_ops_mutations.py still finds its site.
+test/lan_text_ops.ml and the M1-text gate row cover the change.
+
+F-4 (low, rust/text_ops.ml:73). `trim` reported a runtime UTF-8 failure
+through `invalid`, which prefixes "Rust emission: ", for a value that is
+never emitted. The failure now returns `Error (Error.Mismatch "invalid
+UTF-8 in text operation")` with the same message text. No test, golden
+or capture pins the prefixed form. The M1-text unit suite covers the
+path.
+
+F-5 (low, test/lan_text_ops_mutations.py:62). The `break` after the
+first survivor left the remaining mutants unrun, so the harness reported
+one survivor even when several survived. The loop now runs all five
+mutants and the failure report lists every survivor. The MUTATIONS table
+at :11-22 and the count guard stay byte-identical. The five KILLED rows
+and the restored control of the M1-text gate cover the change.
+
+F-6 (low, test/lan_trusted_policy.py:214). The NaN corruption case keyed
+on the raw `"limit": 9` literal, which this slice had to bump from 8.
+The case now derives the literal from the policy object the test already
+builds, through `policy["groups"][0]["limit"]`, and rewrites the first
+occurrence only. The file adds no import. The subTest still raises
+ValueError in the M1-text gate and in the M0 trust leg.
+
+F-7 (low with five nits, dev/gates.sh:325). The usage string omitted
+`M1-text` although the header comment at :43-44 and the dispatch at :50
+both accept `--stage M1-text`; the tail now ends `|M1-all|M1-text]`. The
+five nits: README.md:26-28 is rewrapped inside the file column band with
+the same words, so no 93-column line stands in a 67 to 73 column
+paragraph; target/README.md:3-13 is rewrapped for the same reason, with
+the same 20, nine and eleven counts; rust/run_value.ml:73 drops the dead
+`byte < 0 ||` disjunct, because the `natural` helper admits non-negative
+numbers only; test/lan_text_ops.ml:56 extends the "Unicode neighbors
+preserved" row with U+2060 WORD JOINER on the input and on the expected
+output, so the disclosed 63 unit checks stay 63; test/lan_text_ops.py:26
+renames the `negative_utf8` case to `invalid_utf8`, because the byte
+list `[255]` is a valid byte with an invalid UTF-8 encoding. The M1-text
+gate covers the usage row, run_value, the unit row and the case name;
+the two rewraps are prose.
+
+Carried. C-1 (low, surface/lower.ml:91). `program_with` calls
+`text_operations source` although both production callers already bound
+`Lower.text_operations specialized`. The fix changes the signature at
+:89 and all three call sites, a cross-file refactor with no behavior
+change that no staged test asserts, so it takes its own slice. C-2 (low,
+rust/run_store.ml:98-100). A `Text.`-prefixed schema that the catalog
+does not carry enters the prefix arm and dies with `Error.Mismatch "run:
+text metadata differs"` instead of the `Error.Not_yet "Rust emission:
+text schema <name>"` that rust/text_ops.ml:13 reserves. The arm is
+unreachable today, because the staged target catalog holds `Text.trim`
+and `Text.is_empty` only, and a review round never edits the target
+catalog or target/PIN.json.
+
+Ladders. The baseline ladder ran on the unfixed staged tree and
+reported GREEN (GATE-END tag=baseline 2026-09-15T16:03:09Z,
+stage_rc=0; GATE LSM1T tag=baseline GREEN). The compare-rows probe on
+the baseline tag showed RED-WATCH 0, PINS 76/76 and ROWS 140/140
+IDENTICAL. The fix-1 ladder ran on the fixed tree and reported GREEN
+(GATE-END tag=fix-1 2026-09-15T17:14:59Z, stage_rc=0; GATE LSM1T
+tag=fix-1 GREEN). The compare-rows probe on the fix-1 tag showed
+RED-WATCH 0, PINS 76/76 and ROWS 140/140 IDENTICAL. The close ladder
+re-runs `zsh dev/gates.sh --stage M1-text` on this exact staged tree
+after the close, and its verdict is recorded in the review kit, not
+in this file.
