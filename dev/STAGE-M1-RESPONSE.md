@@ -57,8 +57,9 @@ zsh dev/gates.sh --stage M1-response
 The form fixture trims the title, creates a Todo in the private request
 database and returns the stored title. The native adapter constructs a
 Topcoat response value; the scripted interpreter supplies HTTP wire
-framing. Routing, listeners, streaming bodies, HTML rendering, custom
-statuses and native request entry points remain future work.
+framing. The [HTML adapters](STAGE-M1-HTML.md) add text-node escaping
+and HTML bodies. Routing, listeners, streaming bodies, custom statuses
+and native request entry points remain future work.
 
 ## Validation
 

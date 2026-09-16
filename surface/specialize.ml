@@ -12,7 +12,8 @@ let text_arguments = function
       Option.map (fun schema -> schema, text)
         (List.assoc_opt name ["Text_trim", "Text.trim"; "Text_is_empty", "Text.is_empty";
           "Uri_from_text", "Uri.from_text"; "Form_field", "Form.field";
-          "Response_text", "Response.text"])
+          "Response_text", "Response.text"; "Html_text", "Html.text";
+          "Response_html", "Response.html"])
   | Term.Var _ | Term.Univ _ | Term.Lan _ | Term.Ran _ | Term.In _ | Term.Elim _
   | Term.Sec _ | Term.Out _ | Term.Let _ | Term.Ann _ | Term.Global _ | Term.Lit _ | Term.Auto -> None
 let specialized source = Option.is_some (arguments source) || Option.is_some (text_arguments source)

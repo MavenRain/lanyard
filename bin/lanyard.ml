@@ -10,7 +10,7 @@
     checked [Cx -> Uri -> SeeOther] or [Cx -> Uri -> Response] entry
     point, exits 1 when the handler yields no response, and exits 0 with
     the serialized response on stdout, 303 for SeeOther and 200
-    text/plain for Response.
+    text/plain or text/html for Response.
 
     Exit codes.  0 is a file that checks, 1 is a file that does not and
     64 is a usage error or a missing file.  A check failure writes one

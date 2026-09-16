@@ -1,0 +1,17 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+def raw : Bytes -> Response := Response.html Bytes
+def render : Bytes -> Response := fun (text : Bytes) => Response.html Bytes (Html.text Bytes text)
+def captured : Response :=
+  let text : Bytes := b"<captured>" in
+  let read : prod () -> Bytes := fun (u : prod ()) => Html.text Bytes text in Response.html Bytes (read ())
+def nested : Response :=
+  let clean : Bytes -> Bytes := fun (text : Bytes) => Html.text Bytes (Text.trim Bytes text) in Response.html Bytes (clean b" <nested> ")
+def plain : Response := Response.text Bytes b"<plain>"
+def badByte : Response := raw (bytesCons 256 bytesNil)
+def badUtf8 : Response := raw (bytesCons 255 bytesNil)
+def badEscape : Response := render (bytesCons 255 bytesNil)
+def unused : Response := let ignored : Bytes := Html.text Bytes (bytesCons 255 bytesNil) in raw b"ok"
+def main : Response := render b"<hello>"
+def withDatabase : Db -> Response := fun (db : Db) => let ready : prod () := Db.push_schema db in render b"database"

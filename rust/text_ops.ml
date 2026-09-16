@@ -6,13 +6,15 @@ module Catalog = Lanyard_target.Target_generated
 module Printer = Foreign.Printer
 let ( let* ) = Result.bind
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
-type operation = Trim | Is_empty | Uri_from_text | Form_field | Response_text
+type operation = Trim | Is_empty | Uri_from_text | Form_field | Response_text | Html_text | Response_html
 let operation name = match () with
   | () when String.equal name "Text.trim" -> Ok Trim
   | () when String.equal name "Text.is_empty" -> Ok Is_empty
   | () when String.equal name "Uri.from_text" -> Ok Uri_from_text
   | () when String.equal name "Form.field" -> Ok Form_field
   | () when String.equal name "Response.text" -> Ok Response_text
+  | () when String.equal name "Html.text" -> Ok Html_text
+  | () when String.equal name "Response.html" -> Ok Response_html
   | () -> Error (Error.Not_yet ("Rust emission: text schema " ^ name))
 let bool_tid = Rir.Tid "sum<struct tuple<>|struct tuple<>>"
 let bool_repr = Rir.TyUnion bool_tid
@@ -38,13 +40,15 @@ let catalog (checked : Elab.lan_program) (instances : Lower.text_operation list)
     Ok { row = instance.row; operation; family = family.family_name; repr; data }) instances)
 
 let specification = function
-  | Trim -> "(0 Text : Type 0) -> (text : Text) -> Text"
+  | Trim | Html_text -> "(0 Text : Type 0) -> (text : Text) -> Text"
   | Is_empty -> "(0 Text : Type 0) -> (text : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
   | Uri_from_text -> "(0 Text : Type 0) -> (text : Text) -> Uri"
   | Form_field -> "(0 Text : Type 0) -> (text : Text) -> (field : Text) -> Text"
-  | Response_text -> "(0 Text : Type 0) -> (text : Text) -> Response"
-let effects = function Trim | Is_empty | Response_text -> [] | Uri_from_text | Form_field -> ["topcoat::Error"]
-let parameters = function Trim | Is_empty | Uri_from_text | Response_text -> ["text"] | Form_field -> ["text"; "field"]
+  | Response_text | Response_html -> "(0 Text : Type 0) -> (text : Text) -> Response"
+let effects = function Trim | Is_empty | Response_text | Html_text | Response_html -> []
+  | Uri_from_text | Form_field -> ["topcoat::Error"]
+let parameters = function Trim | Is_empty | Uri_from_text | Response_text | Html_text | Response_html -> ["text"]
+  | Form_field -> ["text"; "field"]
 let foreign_call entries operations (row : Rir.foreign) =
   let* text = List.find_opt (fun text -> text.row = row) operations
     |> Option.to_result ~none:(Error.Mismatch "Rust emission: text metadata differs") in
@@ -68,12 +72,12 @@ let foreign_call entries operations (row : Rir.foreign) =
         let bindings = List.map (fun name -> name, "__lan_" ^ name) parameters in
         let* call = Template.render template bindings in
         let converted = match operation with
-          | Trim | Form_field -> Printer.identifier "lan_model_text_from_" text.family ^ "(" ^ call ^ ")"
+          | Trim | Form_field | Html_text -> Printer.identifier "lan_model_text_from_" text.family ^ "(" ^ call ^ ")"
           | Is_empty ->
               let ty = Printer.rust_type (Printer.Sum [Printer.Unit; Printer.Unit]) in
               "if " ^ call ^ " { " ^ ty ^ "::V1(()) } else { " ^ ty ^ "::V0(()) }"
           | Uri_from_text -> "lan_uri_validate(&__lan_text)?; " ^ call
-          | Response_text -> call in
+          | Response_text | Response_html -> call in
         let evaluated = Seq.zip (List.to_seq bindings) (List.to_seq arguments)
           |> Seq.map (fun ((_name, local), value) -> "let " ^ local ^ "_arg = " ^ value ^ "; ")
           |> List.of_seq |> String.concat "" in
@@ -82,14 +86,23 @@ let foreign_call entries operations (row : Rir.foreign) =
           |> String.concat "" in
         Ok ("{ " ^ evaluated ^ conversions ^ converted ^ " }") in
   let* result = match operation with
-    | Trim | Form_field -> Ok text.repr | Is_empty -> Ok bool_repr
+    | Trim | Form_field | Html_text -> Ok text.repr | Is_empty -> Ok bool_repr
     | Uri_from_text ->
         let* _uri_type = Foreign.foreign_type entries "Uri" [] in
         Ok (Rir.TyForeign ("Uri", []))
-    | Response_text ->
+    | Response_text | Response_html ->
         let* _response_type = Foreign.foreign_type entries "Response" [] in
         Ok (Rir.TyForeign ("Response", [])) in
   Ok (List.map (fun _name -> Rir.TyArc text.repr) parameters, result, render, Effects.Sync)
+
+(** Topcoat's TEXT_ESCAPES table applies only to HTML text nodes. *)
+let html_text text =
+  if not (String.is_valid_utf_8 text) then Error (Error.Mismatch "invalid UTF-8 in HTML text") else
+  Ok (String.to_seq text |> Seq.map (fun character -> match () with
+    | () when Char.equal character '&' -> "&amp;"
+    | () when Char.equal character '<' -> "&lt;"
+    | () when Char.equal character '>' -> "&gt;"
+    | () -> String.make 1 character) |> List.of_seq |> String.concat "")
 
 (** Match Run_http.uri before the pinned HTTP parser can accept another URI form. *)
 let uri_runtime = {|

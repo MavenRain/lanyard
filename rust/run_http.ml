@@ -23,11 +23,14 @@ let uri text =
       | _character :: _rest -> invalid "request URI has an invalid character" in
     scan (List.of_seq (String.to_seq text))
 
+let content_response content_type body =
+  if not (String.is_valid_utf_8 body) then invalid "invalid UTF-8 in response body" else
+  Ok ("HTTP/1.1 200 OK\r\nContent-Type: " ^ content_type ^ "; charset=utf-8\r\nContent-Length: "
+      ^ string_of_int (String.length body) ^ "\r\n\r\n" ^ body)
+
 let response = function
-  | Response_text body ->
-      if not (String.is_valid_utf_8 body) then invalid "invalid UTF-8 in response body" else
-      Ok ("HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: "
-          ^ string_of_int (String.length body) ^ "\r\n\r\n" ^ body)
+  | Response_text body -> content_response "text/plain" body
+  | Response_html body -> content_response "text/html" body
   | See_other location ->
       let* location = uri location in
       Ok ("HTTP/1.1 303 See Other\r\nLocation: " ^ location ^

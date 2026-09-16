@@ -155,6 +155,19 @@ _build/default/bin/lanyard.exe run --request /todos --form 'title=write+tests' t
 zsh dev/gates.sh --stage M1-response
 ```
 
+The [M1 HTML adapters](dev/STAGE-M1-HTML.md) add escaped text fragments
+and HTML responses. Use `Html.text Bytes value` for text-node content,
+then `Response.html Bytes body` to return a UTF-8 HTML body:
+
+```sh
+_build/default/bin/lanyard.exe run --request /todos --form 'title=%3Chello%3E' test/fixtures/html-form.lan
+zsh dev/gates.sh --stage M1-html
+```
+
+The form example stores the title and returns `&lt;hello&gt;`. HTML
+responses preserve markup supplied by the program. Text-node escaping
+does not make values safe for attributes, scripts, styles or URLs.
+
 Build and validate through Stage D:
 
 ```sh

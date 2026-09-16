@@ -1,0 +1,41 @@
+{
+  "bodies": [
+    [
+      "",
+      ""
+    ],
+    [
+      "hello",
+      "hello"
+    ],
+    [
+      "caf\u00e9",
+      "caf\u00e9"
+    ],
+    [
+      "\u65e5\ud83d\ude00",
+      "\u65e5\ud83d\ude00"
+    ],
+    [
+      "a\u0000b",
+      "a\u0000b"
+    ],
+    [
+      "a\r\n\r\nX-Header:yes",
+      "a\r\n\r\nX-Header:yes"
+    ],
+    [
+      "<b>&</b>",
+      "&lt;b&gt;&amp;&lt;/b&gt;"
+    ],
+    [
+      "&lt;&amp;",
+      "&amp;lt;&amp;amp;"
+    ],
+    [
+      "\"'=/",
+      "\"'=/"
+    ]
+  ],
+  "observations": 25
+}

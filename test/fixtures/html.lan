@@ -1,0 +1,6 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def main : Cx -> Uri -> Response := fun (cx : Cx) (uri : Uri) =>
+  Response.html Bytes b"<h1>Hello from Lanyard!</h1>"

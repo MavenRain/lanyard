@@ -1,4 +1,4 @@
-AXIOMS scope=checked-module target-sha256=2c83e556712369c41c36e10681c3e130d65143951a69d237f5f464737b497a0e
+AXIOMS scope=checked-module target-sha256=0af315c1a65b0578641ec1096bfd9e3089add0ac2368bd948d0dbfe907e19117
 Framework imax_zero : imax l zero = zero
 Foreign Cx : Type 1 [schema=Cx]
 Foreign Db : Type 1 [schema=Db]
@@ -7,12 +7,14 @@ Foreign Db_push_schema : (Ran SPi w db Db (Ran SColl 0 (Sec SColl 0 []))) [schem
 Foreign Deferred : (Ran SPi 0 T Type 1 Type 1) [schema=Deferred]
 Foreign Form : (Ran SPi 0 T Type 1 Type 1) [schema=Form]
 Foreign Form_field : (Ran SPi 0 Text Type 1 (Ran SPi w text Text (Ran SPi w field Text Text))) [schema=Form.field]
+Foreign Html_text : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Text)) [schema=Html.text]
 Foreign Model_all : (Ran SPi 0 M Type 1 (Ran SPi 0 Rows Type 1 (Ran SPi w db Db Rows))) [schema=Model.all]
 Foreign Model_create : (Ran SPi 0 M Type 1 (Ran SPi w fields M (Ran SPi w db Db M))) [schema=Model.create]
 Foreign Model_delete_by_id : (Ran SPi 0 M Type 1 (Ran SPi 0 Key Type 1 (Ran SPi w key Key (Ran SPi w db Db (Ran SColl 0 (Sec SColl 0 [])))))) [schema=Model.delete_by_id]
 Foreign Model_get_by_id : (Ran SPi 0 M Type 1 (Ran SPi 0 Key Type 1 (Ran SPi w key Key (Ran SPi w db Db M)))) [schema=Model.get_by_id]
 Foreign Model_update : (Ran SPi 0 M Type 1 (Ran SPi w fields M (Ran SPi w db Db M))) [schema=Model.update]
 Foreign Response : Type 1 [schema=Response]
+Foreign Response_html : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Response)) [schema=Response.html]
 Foreign Response_text : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Response)) [schema=Response.text]
 Foreign SeeOther : Type 1 [schema=SeeOther]
 Foreign Text_is_empty : (Ran SPi 0 Text Type 1 (Ran SPi w text Text (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)])))) [schema=Text.is_empty]
@@ -29,8 +31,8 @@ Foreign topcoat_Error : Type 1 [schema=topcoat::Error]
 Foreign topcoat_db : (Ran SPi w cx Cx Db) [schema=topcoat.db]
 Foreign topcoat_see_other : (Ran SPi w uri Uri SeeOther) [schema=topcoat.see_other]
 COUNT Framework=1
-COUNT Foreign=28
+COUNT Foreign=30
 COUNT Classical=0
 COUNT Div=0
-AXIOMS total=29
-AXIOM-RATIO constants=28 definitions=3 status=REPORTED
+AXIOMS total=31
+AXIOM-RATIO constants=30 definitions=3 status=REPORTED

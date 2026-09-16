@@ -1,0 +1,159 @@
+{
+  "base": "22ac8d03274f242bcc221febd747c96b1dfd0118",
+  "captures": {
+    "axioms": {
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_axioms.py"
+      ],
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-html/.kanon-exec/run-E4byaC",
+      "exit_code": 0
+    },
+    "dune-tests": {
+      "argv": [
+        "zsh",
+        "dev/dune.sh",
+        "runtest",
+        "--force"
+      ],
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-html/.kanon-exec/run-slTFi0",
+      "exit_code": 0
+    },
+    "e2e-local": {
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_m0_e2e.py"
+      ],
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-html/.kanon-exec/run-KCuyF2",
+      "exit_code": 0
+    },
+    "native-build": {
+      "argv": [
+        "gateledger",
+        "run",
+        "--ledger",
+        ".gatework/gateledger",
+        "--dir",
+        "dev/validation/stage-m1-html/native",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_HOME=/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-html/dev/validation/stage-m1-html/native/Cargo.toml",
+        "--target-dir",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target",
+        "--jobs",
+        "2"
+      ],
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-html/.kanon-exec/run-yGagoH",
+      "exit_code": 0
+    },
+    "native-check": {
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_html_native.py",
+        "--check",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target/debug/lanyard-program",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target/debug/async_html"
+      ],
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-html/.kanon-exec/run-7TJoVb",
+      "exit_code": 0
+    },
+    "native-prepare": {
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_html_native.py",
+        "--prepare",
+        "dev/validation/stage-m1-html/native",
+        "--toasty",
+        "/Users/oobi/Documents/toasty",
+        "--topcoat",
+        "/Users/oobi/Documents/topcoat",
+        "--lock",
+        "dev/validation/stage-m1-response/native/Cargo.lock"
+      ],
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-html/.kanon-exec/run-BZfIjd",
+      "exit_code": 0
+    },
+    "stage": {
+      "argv": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-html"
+      ],
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-html/.kanon-exec/run-ApYbYA",
+      "exit_code": 0
+    }
+  },
+  "counts": {
+    "catalog_rows": 25,
+    "cli_groups": 6,
+    "foreign_types": 9,
+    "generated_lines": 164,
+    "mutations_killed": 5,
+    "native_binaries": 2,
+    "native_observations": 50,
+    "unit_checks": 43
+  },
+  "files_sha256": {
+    "axioms-capture.json": "46c361bf129832f9cb174cc5f724e35aac2767446192ae522137e9ac4c348077",
+    "axioms.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "axioms.stdout": "cafc0fe8450cbfc84b24cd5df110095db8cdab69d24d01698ea36281892208ea",
+    "diff-check.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dune-tests-capture.json": "5e255f0156943184c161639d3913b5bbd949e9bd08ded29aaf15378d7d3e7852",
+    "dune-tests.stderr": "3e3d9b949a5001b85b95d12947f2517b43a0bd5713dd0d6fb1706f45eb115879",
+    "dune-tests.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "e2e-local-capture.json": "1bfea121fbd286d874d14e226cd03ceda536731cee8d0e66714b357bd4ed8ba6",
+    "e2e-local.stderr": "2aff4020f6efacf071e279ba700ff285d02a20a2363f9aedff05b748bf27c8d9",
+    "e2e-local.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-build-capture.json": "b06f40d52ced111553673aeea13d1cdf8fae525a96942c8a335cb188a61d6a03",
+    "native-build.stderr": "50625369118d8c12a7068f3de7cde8ad705d1f56eb124d9ec2e0cde51b8e7ac3",
+    "native-build.stdout": "037240f4cb554cc644dc4a9663b9b20769ddd3e3d2ea10b2f21eccc6a8423c84",
+    "native-check-capture.json": "cae832a145a0d0f967f704573962df9abc3d13611d3e6974134dbb034f5245a5",
+    "native-check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-check.stdout": "6544955a3051c43f7934769be732884a4660b0c937d5522195ac5690f2226df9",
+    "native-prepare-capture.json": "2f19f79d71c1d2bd765bc9301d30a33874f10a4075d9ebecc943e488fe333a31",
+    "native-prepare.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-prepare.stdout": "1598b5bd0e93fbb39a4227503903b10f0c7af3401c9f8002ce280c4824e376db",
+    "native.lan": "952f7484fba55ae7087b26448161c1c2c6703db75b6c5351679ded016950cce3",
+    "native/Cargo.git.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "native/Cargo.lock": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "native/Cargo.toml": "f542ef1107feceb9f68626d4d27917d6515db34c404ffbaef5475bf03fe58efe",
+    "native/cases.json": "07bb7ce1b054a5fa59e705b9df7c89fedcf43fdf44e3b135093d317aef5b494c",
+    "native/src/bin/async_html.rs": "36e8beb0b5cb2a8d1b4fe7432696e87592b1708223bb30dda486f3888c31a9e5",
+    "native/src/main.rs": "c51cc4d70116f1b171e08e9acb7fecf6cba4f6a7e7e9a915e073f1345bfbe09a",
+    "source-sha256.json": "7c368ba505304a6a67b84566a5c765ff44abd980ef0bdcec699787b19ab20bc8",
+    "stage-capture.json": "5f4467bce4c23d1f472073dd3b6f34fb0612be53e5bff9a29cf2b3f914c30334",
+    "stage.stderr": "59f4e3f0141a27d4c8b2787e6b9704b21ba8fc6541915737fa67a41dca20edcd",
+    "stage.stdout": "a258ea8efb440e269352ab02004f3693f37b7ad8a1c89e0cc72c46236ce1f613"
+  },
+  "limits": "Text-node escaping only. Existing foreign ownership and recursive byte-list stack limits remain.",
+  "native_binary_sha256": {
+    "async_html": "99027d210810f2a2aaddaf6f50463504b2ef60358a3b05ca8159716e4dc0edae",
+    "lanyard-program": "6d366f44a473f0f8dd4c556adebc0316a494def866d6fdee7209c9ca0a6ae267"
+  },
+  "native_build_warnings": "18 unused-code warnings, no errors.",
+  "native_scope": "Status, content type, raw and escaped bodies, captures, rejected bytes and both generated error variants.",
+  "recorded_utc": "2026-09-16T17:01:39.751914+00:00",
+  "status": "PASS",
+  "trust": "PENDING; the proposed signature allowance of 104 is exceeded by 60 lines. No approval or exit stamp changed.",
+  "validation_environment": "The cumulative gate and all 19 end-to-end checks passed with normal local permissions. Sandboxed macOS Git emits a warning that fails two strict stderr checks."
+}

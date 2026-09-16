@@ -3418,3 +3418,117 @@ RED-WATCH 0, PINS 99/99 and ROWS 163/163 IDENTICAL. The close ladder
 re-runs `zsh dev/gates.sh --stage M1-response` on this exact staged
 tree after the close, and its verdict is recorded in the review kit,
 not in this file.
+
+## Stage M1 HTML (2026-09-16)
+
+This slice continues from the reviewed response commit `22ac8d0`.
+`Html.text Bytes value` adds checked HTML text-node escaping, and
+`Response.html Bytes body` adds a status 200 UTF-8 HTML response.
+Ampersand, less-than and greater-than escape according to the pinned
+Topcoat text table. Quotes and Unicode remain unchanged, and existing
+entities are escaped again. Raw HTML responses preserve their input.
+
+Both operations specialize through the existing byte-list path and
+validate complete foreign metadata before native emission. The
+interpreter adds an explicit HTML response variant and shares response
+framing with plain text. The form fixture trims and stores a Todo title,
+then returns the escaped stored value. Byte range and UTF-8 failures
+propagate even when the result is unused.
+
+The default Dune alias includes 43 HTML unit checks. Six CLI groups
+cover exact response bytes, escaped form fields, failures, native
+emission and ownership refusals. The stage gate retains the response
+gate and adds five HTML mutations with clean and restored controls.
+The separate native harness checks 25 observations with each of the
+two generated error variants, for 50 observations. Its Rust 1.98 build
+has no errors and 18 unused-code warnings. The default Dune suite and
+all 19 end-to-end tests passed. macOS Git emits a sandbox-only warning
+in two strict end-to-end checks; those tests and the cumulative gate
+run with normal local permissions.
+
+The catalog grows from 23 to 25 declarations, with nine foreign types.
+Todo's foreign count grows from 28 to 30. Catalog inventory assertions,
+legacy name order, axiom totals and the axiom golden are updated.
+The generated catalog has 164 lines, 60 above the proposed allowance
+of 104. No allowance, library pin, source anchor, trust approval or
+M0 exit stamp is changed.
+
+Text-node escaping does not validate attributes, scripts, styles or
+URLs. Existing foreign ownership restrictions and recursive byte-list
+stack limits remain. The stage contract is in `STAGE-M1-HTML.md`.
+Validation captures, native sources and checked input hashes are in
+`validation/stage-m1-html/`.
+
+## Stage M1 HTML review fixes (tag LSM1H, 2026-09-16)
+
+The review kit LSM1H ran on base 22ac8d0 over a 31-path slice. An opus
+drafter supplied 7 hypotheses. An opus prober confirmed four of them,
+refuted one, ruled two not a finding and swept 26 more rows. One
+ctxcat-review Workflow run, wf_8b61f9a0-d3a, supplied 7 raw findings,
+of which 3 were upheld and 3 survived. An opus judge passed four
+findings, one low and three nits, under a judge cap of 7. Three more
+are carried.
+
+F-1 (low, dev/STAGE-M1-HTML.md:87-90 and
+dev/M1-MUTATION-LOG.md:642-648). The mutation leg was the one check of
+this slice with no standalone evidence record, and the gap was also
+silent, because the response and form receipts each list a mutation
+capture key and ship a trio. The predecessor trios are capture-harness
+artifacts of the author's worktree, and no script of this tree makes
+one, so both documents now state the deviation and name the record:
+`validation/stage-m1-html/stage.stdout` rows 677 to 683, which hold
+the control row, the five KILLED rows and the `killed=5/5
+restored=GREEN` row. The edits are prose only. The receipt, the 31
+captures and the porcelain count are unchanged.
+
+F-2 (nit, dev/M1-MUTATION-LOG.md:627). The HTML table header read
+`| Mutation | Required failure |`, while the three earlier M1 tables
+at lines 553, 577 and 605 read `| Mutation | Required failing
+observation |`. The header now uses the earlier wording.
+
+F-3 (nit, dev/M1-MUTATION-LOG.md:637-638). The cumulative-command
+sentence said that the stage gate "also retains the four response
+mutations", which understates the retained set, because
+dev/stage-m1-html.sh:7 chains the response stage and one recorded run
+retains thirteen mutation families before LAN-HTML. The sentence now
+reads that the gate retains every earlier stage gate, including the
+four response mutations.
+
+F-4 (nit, target/README.md:3-14). The catalog paragraph was not
+reflowed after the two new names, so line 7 was a 34-column fragment
+between lines of 64 and 61 columns. The paragraph is re-wrapped at 71
+columns or less, from 13 lines to 12. No word changes.
+
+Carried. C-1: the stage gate never runs `test/lan_html_native.py`, so
+the native row is a manual recording, which dev/STAGE-M1-HTML.md:75-83
+documents at least as fully as the predecessor slice, where LSM1F and
+LSM1P ruled the identical gap a carry. C-2: the bare phrase "18
+unused-code warnings" over 13 dead_code rows plus 5 unused_variables
+rows matches the precedent of this file at dev/M1-BUILD-LOG.md:3074
+for the uri slice, so it is pre-existing, not a new defect. C-3: the
+`contains` helper at test/lan_html.ml:13 is a third spelling, not a
+second, because test/lan_form.ml:12-15 already diverges from
+test/lan_response.ml:13-16 in the pre-image tree; per suite copies of
+the small helpers are the house shape at HEAD, so a share-one-helper
+change is a repo-wide refactor and is out of slice scope.
+
+Proof. Every fix is documentation. No source file, no receipt and no
+capture under `dev/validation/stage-m1-html/` is changed, so the 31
+frozen captures, the pinned source hashes and the recorded stage
+stdout keep their values. The fix suites ran on a copy of the tree
+outside the repository: `_build/default/test/lan_html.exe` reports 43
+checks, `test/lan_html.py` reports 6 checks, and
+`test/lan_html_mutations.py` reports `killed=5/5 restored=GREEN` with
+a green restored control.
+
+Ladders. The baseline ladder ran on the unfixed staged tree and
+reported GREEN (GATE-END tag=baseline 2026-09-16T19:09:20Z,
+stage_rc=0; GATE LSM1H tag=baseline GREEN). The compare-rows probe on
+the baseline tag showed RED-WATCH 0, PINS 108/108 and ROWS 172/172
+IDENTICAL. The fix-1 ladder ran on the fixed tree and reported GREEN
+(GATE-END tag=fix-1 2026-09-16T21:22:59Z, stage_rc=0; GATE LSM1H
+tag=fix-1 GREEN). The compare-rows probe on the fix-1 tag showed
+RED-WATCH 0, PINS 108/108 and ROWS 172/172 IDENTICAL. The close
+ladder re-runs `zsh dev/gates.sh --stage M1-html` on this exact staged
+tree after the close, and its verdict is recorded in the review kit,
+not in this file.

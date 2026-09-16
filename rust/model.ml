@@ -248,7 +248,8 @@ let source ?entrypoint ?(output = Discard) (checked : Elab.lan_program) =
       | () when String.starts_with ~prefix:"Model." row.Rir.schema -> foreign_call Catalog.entries models row
       | () when String.equal row.Rir.schema "Db.connect" -> Connection.foreign_call Catalog.entries connections row
       | () when String.starts_with ~prefix:"Text." row.Rir.schema || String.equal row.Rir.schema "Uri.from_text"
-          || String.equal row.Rir.schema "Form.field" || String.equal row.Rir.schema "Response.text" ->
+          || String.equal row.Rir.schema "Form.field" || String.equal row.Rir.schema "Response.text"
+          || String.equal row.Rir.schema "Html.text" || String.equal row.Rir.schema "Response.html" ->
           Text_ops.foreign_call Catalog.entries operations row
       | () -> Foreign.foreign_call Catalog.entries row
   end) in

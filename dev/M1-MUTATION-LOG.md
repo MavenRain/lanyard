@@ -618,3 +618,31 @@ The shared emitter now wraps the deletion body in `Ok`. Its existing
 body with `Ok "()"`. The named `checked unit result` assertion is
 unchanged. All four deletion controls and all five update controls passed
 with restored controls green.
+
+## HTML text and responses (2026-09-16)
+
+`test/lan_html_mutations.py` builds an isolated source copy and
+requires the named behavioral failure for each source mutation.
+
+| Mutation | Required failing observation |
+| --- | --- |
+| Preserve a less-than delimiter | `escape delimiters` |
+| Preserve ampersands in existing entities | `escape existing entities` |
+| Give HTML responses the plain-text content type | `html raw markup` |
+| Bypass the public HTML helper's UTF-8 check | `escape public UTF-8 guard` |
+| Bypass the schema effects contract | `Html.text metadata effects` |
+
+Each edit must match exactly one source site. Compile failures do not
+count as kills. Clean and restored controls must pass. The cumulative
+command is `zsh dev/gates.sh --stage M1-html`, which retains every
+earlier stage gate, including the four response mutations. Native
+escaping, content types and failures are exercised separately by
+`test/lan_html_native.py`.
+
+This slice records the mutation observations only in the cumulative
+capture. dev/validation/stage-m1-html/stage.stdout rows 677 to 683
+hold the control row, the five KILLED rows and the `killed=5/5
+restored=GREEN` row, with `EXIT stage 0`. No standalone
+`html-mutations` trio or receipt key is shipped: the form and
+response trios are capture-harness artifacts of the author's
+worktree, and no command of this tree makes them.

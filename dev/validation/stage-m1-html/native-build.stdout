@@ -1,0 +1,19 @@
+W src/bin/async_html.rs:8:58  dead_code  variant `ModelRange` is never constructed
+W src/bin/async_html.rs:45:8  dead_code  methods `compare`, `sub`, and `mul` are never used
+W src/bin/async_html.rs:117:6  dead_code  enum `T73756d28756e69742c756e697429` is never used
+W src/bin/async_html.rs:158:71  unused_variables  unused variable: `a1`
+W src/bin/async_html.rs:191:14  unused_variables  unused variable: `v0`
+W src/bin/async_html.rs:194:4  dead_code  function `f_6d61696e` is never used
+W src/bin/async_html.rs:198:10  dead_code  function `f_776974684461746162617365` is never used
+W src/bin/async_html.rs:199:14  unused_variables  unused variable: `v1`
+W src/bin/async_html.rs:203:4  dead_code  function `lan_model_to_i64` is never used
+W src/bin/async_html.rs:209:4  dead_code  function `lan_model_from_i64` is never used
+W src/main.rs:8:33  dead_code  variant `ModelRange` is never constructed
+W src/main.rs:34:8  dead_code  methods `compare`, `sub`, and `mul` are never used
+W src/main.rs:106:6  dead_code  enum `T73756d28756e69742c756e697429` is never used
+W src/main.rs:147:71  unused_variables  unused variable: `a1`
+W src/main.rs:180:14  unused_variables  unused variable: `v0`
+W src/main.rs:183:4  dead_code  function `f_6d61696e` is never used
+W src/main.rs:188:4  dead_code  function `lan_model_to_i64` is never used
+W src/main.rs:194:4  dead_code  function `lan_model_from_i64` is never used
+OK build: 0 errors, 18 warnings
