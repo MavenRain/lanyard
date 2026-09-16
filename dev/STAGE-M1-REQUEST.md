@@ -53,6 +53,9 @@ select routes, decode forms, produce HTML bodies or open a listener.
 Database effects stay in memory. The pinned target signatures and emitted
 Rust are unchanged. Plain `run` still invokes a nullary `main`.
 
+The later [form slice](STAGE-M1-FORM.md) adds `--form BODY` and explicit
+URL-encoded field decoding through `Form.field`.
+
 Validation is reproducible with:
 
 ```sh

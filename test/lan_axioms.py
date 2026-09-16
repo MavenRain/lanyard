@@ -58,7 +58,7 @@ def main():
         return text, names
 
     todo = ROOT / "corpus/m0/todo.lan"
-    text, names = report(todo, 26, 3)
+    text, names = report(todo, 27, 3)
     require(text == (ROOT / "corpus/m0/axioms.txt").read_text(), "Todo report golden drift")
     require("Todo_create" in names and "Todo_get_by_id" in names
             and "Todo_delete_by_id" in names and "Todo_update" in names and "Todo_all" in names and "Todo" not in names,
@@ -74,7 +74,7 @@ def main():
                 "Db", "Deferred", "toasty_Error", "Cx", "Uri", "Response", "SeeOther",
                 "Form", "topcoat_Error", "Db_connect", "Db_push_schema", "Model_create",
                 "Model_get_by_id", "Model_delete_by_id", "Model_update", "Model_all", "topcoat_db", "topcoat_see_other",
-                "Text_trim", "Text_is_empty", "Uri_from_text",
+                "Text_trim", "Text_is_empty", "Uri_from_text", "Form_field",
                 "Todo_create", "Todo_get_by_id", "Todo_delete_by_id", "Todo_update", "Todo_all"],
             "legacy names or declaration order differ")
     observations.append("legacy Todo names")
@@ -82,15 +82,15 @@ def main():
     with tempfile.TemporaryDirectory(prefix="lanyard-axioms-") as directory:
         source = Path(directory) / "module.lan"
         for content, foreign, definitions in [
-            ("", 21, 0),
-            ("def main : Nat := 1\n", 21, 1),
+            ("", 22, 0),
+            ("def main : Nat := 1\n", 22, 1),
             ("model Zed with | id : Nat end\nmodel Alpha with | id : Nat end\n"
-             "def Alias : Type 0 := Zed\n", 31, 3),
-            ("def ghost_create : Nat := 7\ndef propext : Nat := 9\n", 21, 2),
-            ("signature Ops : Nat with | Ping : Nat end\n", 21, 0),
+             "def Alias : Type 0 := Zed\n", 32, 3),
+            ("def ghost_create : Nat := 7\ndef propext : Nat := 9\n", 22, 2),
+            ("signature Ops : Nat with | Ping : Nat end\n", 22, 0),
             ("mu Tree : Type 0 := | leaf : Tree\n"
              "def rec size : Tree -> Nat := fun (t : Tree) => "
-             "match t as self in Tree return Nat with | leaf => 1\n", 21, 1),
+             "match t as self in Tree return Nat with | leaf => 1\n", 22, 1),
         ]:
             source.write_text(content)
             report(source, foreign, definitions)

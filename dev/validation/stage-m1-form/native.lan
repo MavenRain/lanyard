@@ -1,0 +1,16 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+def lookup : Bytes -> Bytes -> Bytes := Form.field Bytes
+def captured : Bytes :=
+  let body : Bytes := b"title=captured" in
+  let read : Bytes -> Bytes := fun (name : Bytes) => Form.field Bytes body name in
+  read b"title"
+def badByte : Bytes := lookup (bytesCons 256 bytesNil) b"title"
+def badUtf8 : Bytes := lookup (bytesCons 255 bytesNil) b"title"
+def badName : Bytes := lookup b"title=x" (bytesCons 255 bytesNil)
+def unused : Bytes := let ignored : Bytes := lookup b"title=%" b"title" in b"ok"
+def argumentOrder : Bytes := Form.field Bytes (bytesCons 255 bytesNil)
+  (let invalid : Uri := Uri.from_text Bytes b"//host" in b"title")
+def main : Bytes := lookup b"title=x" b"title"
+def withDatabase : Db -> Bytes := fun (db : Db) => let ready : prod () := Db.push_schema db in lookup b"title=x" b"title"

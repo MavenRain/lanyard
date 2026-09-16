@@ -133,6 +133,18 @@ _build/default/bin/lanyard.exe run --request /todos test/fixtures/uri.lan
 zsh dev/gates.sh --stage M1-uri
 ```
 
+The [M1 form adapter](dev/STAGE-M1-FORM.md) adds
+`Form.field Bytes body name` for explicit URL-encoded text fields.
+`run --request URI --form BODY` supplies the encoded body to a checked
+`Cx -> Uri -> Bytes -> SeeOther` handler. Bodies are limited to 8 KiB
+and 128 fields; malformed encoding, duplicate names and missing fields
+fail.
+
+```sh
+_build/default/bin/lanyard.exe run --request /todos --form 'title=write+tests' test/fixtures/form-request.lan
+zsh dev/gates.sh --stage M1-form
+```
+
 Build and validate through Stage D:
 
 ```sh

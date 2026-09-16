@@ -95,18 +95,25 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
       let* connection = List.find_opt (fun (connection : Connection.t) -> connection.row = row) catalog.connections
         |> Option.to_result ~none:(Error.Mismatch "run: connection metadata differs") in
       connect connection arguments store
-  | () when String.starts_with ~prefix:"Text." row.schema || String.equal row.schema "Uri.from_text" ->
+  | () when String.starts_with ~prefix:"Text." row.schema || String.equal row.schema "Uri.from_text"
+      || String.equal row.schema "Form.field" ->
       let* operation = List.find_opt (fun (text : Text_ops.t) -> text.row = row) catalog.texts
         |> Option.to_result ~none:(Error.Mismatch "run: text metadata differs") in
       let* _contract = Text_ops.foreign_call Lanyard_target.Target_generated.entries catalog.texts row in
       (match arguments with
+       | [body; name] when operation.operation = Text_ops.Form_field ->
+           let* body = text ~what:"form body" operation.family body in
+           let* name = text ~what:"form field name" operation.family name in
+           let* value = Form_data.field body name in
+           Ok (of_text operation.family value, store)
        | [value] ->
            let* text = text ~what:"text operation" operation.family value in
            let* value = match operation.operation with
              | Text_ops.Trim -> Text_ops.trim text |> Result.map (of_text operation.family)
              | Text_ops.Is_empty ->
                  Ok (Tag (Text_ops.bool_tid, (if String.equal text "" then 1 else 0), [Unit]))
-             | Text_ops.Uri_from_text -> Run_http.uri text |> Result.map (fun uri -> Uri uri) in
+             | Text_ops.Uri_from_text -> Run_http.uri text |> Result.map (fun uri -> Uri uri)
+             | Text_ops.Form_field -> invalid "form argument count" in
            Ok (value, store)
        | [] | _ :: _ -> invalid "text argument count")
   | () when not (List.mem row catalog.constants) -> invalid "foreign metadata differs"

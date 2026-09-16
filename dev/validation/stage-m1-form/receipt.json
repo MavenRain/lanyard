@@ -1,0 +1,206 @@
+{
+  "base": "37c59036cc0629a85f0f3a35492195da8aeb8f88",
+  "captures": {
+    "focused": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-form/.kanon-exec/run-xm33hc",
+      "command": [
+        "zsh",
+        "-c",
+        "zsh dev/dunecho.sh build && _build/default/test/lan_form.exe && python3 -P test/lan_form.py && python3 -P test/lan_axioms.py"
+      ],
+      "exit_code": 0
+    },
+    "form-mutations": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-form/.kanon-exec/run-tnhYwB",
+      "command": [
+        "zsh",
+        "-c",
+        "zsh dev/dunecho.sh build && _build/default/test/lan_axioms_report.exe && python3 -P test/lan_form_mutations.py"
+      ],
+      "exit_code": 0
+    },
+    "inventory-policy": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-form/.kanon-exec/run-U5S4xq",
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_trusted_policy.py"
+      ],
+      "exit_code": 0
+    },
+    "m0-tail": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-form/.kanon-exec/run-axsCbp",
+      "command": [
+        "zsh",
+        "-c",
+        "python3 -P test/lan_m0_e2e.py && python3 -P test/lan_m0_gate_mutations.py"
+      ],
+      "exit_code": 0
+    },
+    "m1-tail": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-form/.kanon-exec/run-ndY7WJ",
+      "command": [
+        "zsh",
+        "-c",
+        "python3 -P test/lan_build.py && _build/default/test/lan_run.exe && python3 -P test/lan_run.py && _build/default/test/lan_request.exe && python3 -P test/lan_request.py && _build/default/test/lan_delete.exe && python3 -P test/lan_delete.py && _build/default/test/lan_update.exe && python3 -P test/lan_update.py && _build/default/test/lan_all.exe && python3 -P test/lan_all.py && _build/default/test/lan_text_ops.exe && python3 -P test/lan_text_ops.py && _build/default/test/lan_uri.exe && python3 -P test/lan_uri.py"
+      ],
+      "exit_code": 0
+    },
+    "native-build": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-form/.kanon-exec/run-75qhta",
+      "command": [
+        "gateledger",
+        "run",
+        "--ledger",
+        ".gatework/gateledger",
+        "--dir",
+        "dev/validation/stage-m1-form/native",
+        "--scope",
+        "Cargo.toml",
+        "--scope",
+        "Cargo.lock",
+        "--scope",
+        "src",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_HOME=/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-form/dev/validation/stage-m1-form/native/Cargo.toml",
+        "--target-dir",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target",
+        "--jobs",
+        "2"
+      ],
+      "exit_code": 0
+    },
+    "native-check": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-form/.kanon-exec/run-9lYI4D",
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_form_native.py",
+        "--check",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target/debug/lanyard-program",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target/debug/async_form"
+      ],
+      "exit_code": 0
+    },
+    "native-prepare": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-form/.kanon-exec/run-JB8MGj",
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_form_native.py",
+        "--prepare",
+        "/Users/oobi/Documents/gpt2/lanyard-form/.gatework/form-native-final",
+        "--toasty",
+        "/Users/oobi/Documents/toasty",
+        "--topcoat",
+        "/Users/oobi/Documents/topcoat",
+        "--lock",
+        "/Users/oobi/Documents/lanyard/dev/validation/stage-m1-uri/native/Cargo.lock"
+      ],
+      "exit_code": 0
+    },
+    "prototype-64k-native-check": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-form/.kanon-exec/run-HBeZze",
+      "command": [
+        "python3",
+        "-P",
+        "test/lan_form_native.py",
+        "--check",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target/debug/lanyard-program",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target/debug/async_form"
+      ],
+      "exit_code": 1
+    },
+    "stage": {
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-form/.kanon-exec/run-9ng6H5",
+      "command": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-form"
+      ],
+      "exit_code": 0
+    }
+  },
+  "counts": {
+    "catalog_rows": 22,
+    "cli_test_groups": 6,
+    "foreign_types": 9,
+    "generated_lines": 146,
+    "mutations_killed": 4,
+    "native_binaries": 2,
+    "native_observations": 76,
+    "unit_checks": 53
+  },
+  "exit_code": 0,
+  "files_sha256": {
+    "diff-check.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "focused-capture.json": "9172c740b821e6490af530b51646d589f1bd079741581f3b048a8831dec244a4",
+    "focused.stderr": "c14592d34a18593b316286ae2a7c90a90a19805855297357f52a2035470564e6",
+    "focused.stdout": "912e058a6f4de09a8e6f8cd909253a96ada64f59711d3e64ea7b5c89e1f0ae25",
+    "form-mutations-capture.json": "589787452b237b5af86905e45a968fa9093a7f400ad8de132dfc403200e64731",
+    "form-mutations.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "form-mutations.stdout": "aaba25bd2b773e0078dea48ec8f3dac58cd8895c8565b8d2d633510e719240ea",
+    "inventory-policy-capture.json": "c805974370c26b7f17815157f80021a51dae37481c14aecac987c3de5ab39d23",
+    "inventory-policy.stderr": "e21dff6d750d562d3e8834660e516e28926ed775f51ef268a2b9c49531493ae9",
+    "inventory-policy.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "m0-tail-capture.json": "8ff7345e2bfae8f454d9eca8c1042889e72c2e78d9f92124b904ea26d2d04b96",
+    "m0-tail.stderr": "902d6bd38084a6aa67021d69515030b4dcb2175c00e9e42c18f558045bd8347b",
+    "m0-tail.stdout": "3a7281039dfe70dac81bf5e3fe854ec15f91f054118ecab210a3dfaa81204df9",
+    "m1-tail-capture.json": "90e92c23ec21cc8693e9440c1d1749874908ccaac18dd1b7cec7f3155373ff71",
+    "m1-tail.stderr": "880dbe2854d09b01b71d3a127a315fe5a25ab3e945232874d664604d3da97d27",
+    "m1-tail.stdout": "aec716b4a3a406e5ac1ecd0567daae5e4b0041c806a70364b9203b7da1d310bc",
+    "native-build-capture.json": "b1bfab30ecf1c1e8acb629aa1f4f3ad3ce79cd2e4b3708bce57c94aed631aa7f",
+    "native-build.stderr": "001c84a51e08b152a039fbabd35ba9af7447631655435bb8355d36e71eaf9571",
+    "native-build.stdout": "ea55391c17d23b49d95a65dc21451b226dc85455e85c258d5b7f8140c5ca832e",
+    "native-check-capture.json": "ac34668fa3761631ec4a159229293d02820531acd576742f550023c2f3ff1514",
+    "native-check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-check.stdout": "47dff64a3905b182cb1598734cdbd63a7ba05c15b3d903b6daddce3968793d17",
+    "native-prepare-capture.json": "aef065e0574929ad396de5495d7c5cd0422ad2644608609b4c42d521c13bd66d",
+    "native-prepare.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-prepare.stdout": "91cbd695e98f135c632d8ccd2d8c6d597f98449a2b26390b5d992f1e11d6c3cc",
+    "native.lan": "28c579413938d527c1e7c342bc1132be8165436153c6eff4136839cb02a33b59",
+    "native/.gatework/gateledger/v1/080a96decddd00078859c0bc93068daa999bcd95c7eed4262127e53bd8758936": "eeb3243d83963572ebb8d413911d2a1f96a849de123e6fcd684e2e60ec6b9777",
+    "native/.gatework/gateledger/v1/f246df29b66778de7d94be13157c004e19140d03e7507a06964d766c618567d5": "fe828cd44692424b817bcb78d1bf645be76fba86699f2122aea5bd7bc2778003",
+    "native/Cargo.git.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "native/Cargo.lock": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "native/Cargo.toml": "f542ef1107feceb9f68626d4d27917d6515db34c404ffbaef5475bf03fe58efe",
+    "native/cases.json": "b667c841ff63c10a7f7a44f733edddf7c6ed1a7dd93875dd3f531725acc12b9b",
+    "native/src/bin/async_form.rs": "6eb2b5665e5b4eb8504e1ed73d8114293598ff269e8bc98c4267e97b1451ea0c",
+    "native/src/main.rs": "3d01613dd7416b4a6fe93c4b99afee8e6a40d0c2d51ee9ecd9e001580b6f9174",
+    "prototype-64k-native-check-capture.json": "3f1ae64e16d51cac28a55b0b78fd2c0dfb22e347c98518c8a41ff6df9b692f74",
+    "prototype-64k-native-check.stderr.json": "2c1912983ed4def3fddab7f225321383f25fa5c121ec7c93ac3d05f6221e71f5",
+    "prototype-64k-native-check.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source-sha256.json": "1fdc491eaadb5e73de4535172cade3a326215c8723d9c87cba5445c251d201bc",
+    "stage-capture.json": "111f7574f2402ff2ed509a67b456d8abde4ac713e34954b022071e64c2e68887",
+    "stage.stderr": "5fb8f5d035a935a0ff6cc09454aa21d2383a887584d5417f144638580904ee17",
+    "stage.stdout": "0438a6764fe561df506cb5064bb340a3b2b9dd9b47719a9fe265056a8e10d382"
+  },
+  "limits": {
+    "body_bytes": 8192,
+    "fields": 128
+  },
+  "native_binary_sha256": {
+    "async_form": "5bcbbcb7d7883e78aaa8b494cf42a760de086ba5b9d7d9033e7f662659824d8f",
+    "lanyard-program": "de597e3145910bea597b86427d1a9d6e633759b6fd22f847009f9418b64d8ab4"
+  },
+  "prototype": "A 64 KiB byte-list candidate overflowed its native destructor stack. The final parser contract is 8 KiB; arbitrary large program-created byte lists remain outside this runtime guarantee.",
+  "recorded_utc": "2026-09-15T23:52:49.020136+00:00",
+  "review_fix": "Evaluate both form arguments before converting either byte list. Interpreter and native regression checks pin the resulting error order.",
+  "status": "PASS",
+  "trust": "PENDING; proposed budgets unchanged and no M0 exit stamp"
+}

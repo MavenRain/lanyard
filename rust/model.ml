@@ -247,7 +247,8 @@ let source ?entrypoint ?(output = Discard) (checked : Elab.lan_program) =
     let foreign_call row = match () with
       | () when String.starts_with ~prefix:"Model." row.Rir.schema -> foreign_call Catalog.entries models row
       | () when String.equal row.Rir.schema "Db.connect" -> Connection.foreign_call Catalog.entries connections row
-      | () when String.starts_with ~prefix:"Text." row.Rir.schema || String.equal row.Rir.schema "Uri.from_text" ->
+      | () when String.starts_with ~prefix:"Text." row.Rir.schema || String.equal row.Rir.schema "Uri.from_text"
+          || String.equal row.Rir.schema "Form.field" ->
           Text_ops.foreign_call Catalog.entries operations row
       | () -> Foreign.foreign_call Catalog.entries row
   end) in
@@ -261,8 +262,11 @@ let source ?entrypoint ?(output = Discard) (checked : Elab.lan_program) =
     |> List.sort_uniq String.compare in
   let uri_errors = List.exists (fun (operation : Text_ops.t) ->
     operation.operation = Text_ops.Uri_from_text) operations in
-  let* source = Target.native ?entrypoint ~entry_output ~model_errors:true ~text_errors:(text <> []) ~uri_errors
+  let form_errors = List.exists (fun (operation : Text_ops.t) ->
+    operation.operation = Text_ops.Form_field) operations in
+  let* source = Target.native ?entrypoint ~entry_output ~model_errors:true ~text_errors:(text <> []) ~uri_errors ~form_errors
     (("", Erase.Code [Rir.RData data]) :: rows) in
   Ok (source ^ "\n" ^ String.concat "\n" (List.map declaration models) ^ conversions
     ^ (List.map text_conversions text |> String.concat "")
-    ^ (if uri_errors then Text_ops.uri_runtime else "") ^ output_code)
+    ^ (if uri_errors then Text_ops.uri_runtime else "")
+    ^ (if form_errors then Form_data.runtime else "") ^ output_code)

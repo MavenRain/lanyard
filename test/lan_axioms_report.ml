@@ -25,11 +25,11 @@ let primitives = Result.bind checked (fun program ->
 
 let cases = [
   "partial marker", partial,
-    [ "Div main : Nat"; "COUNT Div=1"; "AXIOMS total=23";
-      "AXIOM-RATIO constants=21 definitions=0 status=REPORTED" ];
+    [ "Div main : Nat"; "COUNT Div=1"; "AXIOMS total=24";
+      "AXIOM-RATIO constants=22 definitions=0 status=REPORTED" ];
   "primitive exclusion", primitives,
-    [ "COUNT Div=0"; "AXIOMS total=22";
-      "AXIOM-RATIO constants=21 definitions=1 status=REPORTED" ];
+    [ "COUNT Div=0"; "AXIOMS total=23";
+      "AXIOM-RATIO constants=22 definitions=1 status=REPORTED" ];
 ]
 
 let () =

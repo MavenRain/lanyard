@@ -1,0 +1,15 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+model Title with
+| id : Nat
+| text : Bytes
+| blank : Bool
+end
+
+def field : Bytes -> Bytes -> Bytes := Form.field Bytes
+def main : Title :=
+  let title : Bytes := Text.trim Bytes (field b"title=++write+tests++" b"title") in
+  tuple (1, title, Text.is_empty Bytes title)

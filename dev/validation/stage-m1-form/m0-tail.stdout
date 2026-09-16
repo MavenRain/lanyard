@@ -1,0 +1,113 @@
+M0 R0-COUNT PASS
+M0 R0-TARGET PASS
+M0 TARGET-PIN PASS
+M0 TRUSTED-LINES PENDING: A_rir, A_emit, A_sig and trusted-file scope require user rulings
+TRUSTED-INVENTORY files=52 sha256=f51b62c9aea39405307c38b2725257667f836957a8fc16d48be511834a567a98
+TRUSTED-POLICY PROPOSED candidate=FAIL lines=13757/12766 sha256=7f985c85c6285d54f713e412a4f71e5ebfe198905f08839fe0d03026aed8cabf
+TRUSTED-INVENTORY PENDING
+TRUSTED-LINES rir=155 allowance=A_rir (see inventory policy)
+TRUSTED-LINES erase=1519 baseline=1484
+TRUSTED-LINES erase-kan=1484 (see inventory policy)
+TRUSTED-LINES eterm=117 (see inventory policy)
+TRUSTED-LINES target-bridge=120 (see inventory policy)
+TRUSTED-LINES specialization=97 (see inventory policy)
+TRUSTED-LINES fusion=218 (see inventory policy)
+TRUSTED-LINES target-bridge-total=435 (see inventory policy)
+TRUSTED-LINES emit=668 allowance=A_emit (see inventory policy)
+TRUSTED-LINES foreign=65 allowance=A_emit (see inventory policy)
+TRUSTED-LINES template=71 allowance=A_emit (see inventory policy)
+TRUSTED-LINES effects=46 allowance=A_emit (see inventory policy)
+TRUSTED-LINES model=272 allowance=A_emit (see inventory policy)
+TRUSTED-LINES connection=66 allowance=A_emit (see inventory policy)
+TRUSTED-LINES crate=30 allowance=A_emit (see inventory policy)
+TRUSTED-LINES reachable=74 allowance=A_emit (see inventory policy)
+TRUSTED-LINES text_ops=136 allowance=A_emit (see inventory policy)
+TRUSTED-LINES form_data=104 allowance=A_emit (see inventory policy)
+TRUSTED-LINES printer-total=1532 allowance=A_emit (see inventory policy)
+TRUSTED-LINES signature=146 allowance=A_sig (see inventory policy)
+TRUSTED-LINES kernel=3997/4000
+M0 original ceiling: 5481 + A_rir + A_emit + A_sig
+TRUSTED-LINES OK
+M0 KERNEL-CARRY PASS
+M0 EMIT-DIFF PASS
+M0 R0-COUNT FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-hruzne4n/repo/.gatework/controls/R0-COUNT.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-hruzne4n/repo/.gatework/controls/R0-COUNT.stderr
+M0-GATE-MUTATIONS R0-COUNT=KILLED diagnostic=R0-COUNT FAIL
+M0 R0-COUNT PASS
+M0 R0-COUNT FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-hruzne4n/repo/.gatework/controls/R0-COUNT.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-hruzne4n/repo/.gatework/controls/R0-COUNT.stderr
+M0 R0-COUNT PASS
+M0-GATE-MUTATIONS failed-census-command=KILLED
+M0 R0-TARGET FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-hruzne4n/repo/.gatework/controls/R0-TARGET.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-hruzne4n/repo/.gatework/controls/R0-TARGET.stderr
+M0-GATE-MUTATIONS R0-TARGET=KILLED diagnostic=outside closed atom list
+M0 R0-TARGET PASS
+M0 TARGET-PIN PASS
+M0 TARGET-PIN FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-hruzne4n/repo/.gatework/controls/TARGET-PIN.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-hruzne4n/repo/.gatework/controls/TARGET-PIN.stderr
+M0-GATE-MUTATIONS TARGET-PIN=KILLED diagnostic=TARGET-PIN DIFF FAIL
+M0 TARGET-PIN PASS
+M0 KERNEL-CARRY FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-hruzne4n/repo/.gatework/controls/KERNEL-CARRY.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-hruzne4n/repo/.gatework/controls/KERNEL-CARRY.stderr
+M0-GATE-MUTATIONS KERNEL-CARRY=KILLED diagnostic=bytes-differ
+M0 KERNEL-CARRY PASS
+M0 TRUSTED-LINES PENDING: A_rir, A_emit, A_sig and trusted-file scope require user rulings
+TRUSTED-INVENTORY files=52 sha256=96f7684eedf7e531081b73a052506aac52e8ce99baac74d6fa4efba8a49bc094
+TRUSTED-POLICY PROPOSED candidate=FAIL lines=13807/12766 sha256=7f985c85c6285d54f713e412a4f71e5ebfe198905f08839fe0d03026aed8cabf
+TRUSTED-INVENTORY PENDING
+TRUSTED-LINES rir=155 allowance=A_rir (see inventory policy)
+TRUSTED-LINES erase=1519 baseline=1484
+TRUSTED-LINES erase-kan=1484 (see inventory policy)
+TRUSTED-LINES eterm=117 (see inventory policy)
+TRUSTED-LINES target-bridge=120 (see inventory policy)
+TRUSTED-LINES specialization=97 (see inventory policy)
+TRUSTED-LINES fusion=218 (see inventory policy)
+TRUSTED-LINES target-bridge-total=435 (see inventory policy)
+TRUSTED-LINES emit=718 allowance=A_emit (see inventory policy)
+TRUSTED-LINES foreign=65 allowance=A_emit (see inventory policy)
+TRUSTED-LINES template=71 allowance=A_emit (see inventory policy)
+TRUSTED-LINES effects=46 allowance=A_emit (see inventory policy)
+TRUSTED-LINES model=272 allowance=A_emit (see inventory policy)
+TRUSTED-LINES connection=66 allowance=A_emit (see inventory policy)
+TRUSTED-LINES crate=30 allowance=A_emit (see inventory policy)
+TRUSTED-LINES reachable=74 allowance=A_emit (see inventory policy)
+TRUSTED-LINES text_ops=136 allowance=A_emit (see inventory policy)
+TRUSTED-LINES form_data=104 allowance=A_emit (see inventory policy)
+TRUSTED-LINES printer-total=1582 allowance=A_emit (see inventory policy)
+TRUSTED-LINES signature=146 allowance=A_sig (see inventory policy)
+TRUSTED-LINES kernel=3997/4000
+M0 original ceiling: 5481 + A_rir + A_emit + A_sig
+TRUSTED-LINES OK
+M0-GATE-MUTATIONS TRUSTED-LINES=PENDING added-lines=50 kernel-only-exit=0
+M0 TRUSTED-LINES PENDING: A_rir, A_emit, A_sig and trusted-file scope require user rulings
+TRUSTED-INVENTORY files=52 sha256=f51b62c9aea39405307c38b2725257667f836957a8fc16d48be511834a567a98
+TRUSTED-POLICY PROPOSED candidate=FAIL lines=13757/12766 sha256=7f985c85c6285d54f713e412a4f71e5ebfe198905f08839fe0d03026aed8cabf
+TRUSTED-INVENTORY PENDING
+TRUSTED-LINES rir=155 allowance=A_rir (see inventory policy)
+TRUSTED-LINES erase=1519 baseline=1484
+TRUSTED-LINES erase-kan=1484 (see inventory policy)
+TRUSTED-LINES eterm=117 (see inventory policy)
+TRUSTED-LINES target-bridge=120 (see inventory policy)
+TRUSTED-LINES specialization=97 (see inventory policy)
+TRUSTED-LINES fusion=218 (see inventory policy)
+TRUSTED-LINES target-bridge-total=435 (see inventory policy)
+TRUSTED-LINES emit=668 allowance=A_emit (see inventory policy)
+TRUSTED-LINES foreign=65 allowance=A_emit (see inventory policy)
+TRUSTED-LINES template=71 allowance=A_emit (see inventory policy)
+TRUSTED-LINES effects=46 allowance=A_emit (see inventory policy)
+TRUSTED-LINES model=272 allowance=A_emit (see inventory policy)
+TRUSTED-LINES connection=66 allowance=A_emit (see inventory policy)
+TRUSTED-LINES crate=30 allowance=A_emit (see inventory policy)
+TRUSTED-LINES reachable=74 allowance=A_emit (see inventory policy)
+TRUSTED-LINES text_ops=136 allowance=A_emit (see inventory policy)
+TRUSTED-LINES form_data=104 allowance=A_emit (see inventory policy)
+TRUSTED-LINES printer-total=1532 allowance=A_emit (see inventory policy)
+TRUSTED-LINES signature=146 allowance=A_sig (see inventory policy)
+TRUSTED-LINES kernel=3997/4000
+M0 original ceiling: 5481 + A_rir + A_emit + A_sig
+TRUSTED-LINES OK
+M0 EMIT-DIFF FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-hruzne4n/repo/.gatework/controls/EMIT-DIFF.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-hruzne4n/repo/.gatework/controls/EMIT-DIFF.stderr
+M0-GATE-MUTATIONS EMIT-DIFF=KILLED diagnostic=unbound: Todo_create
+M0 EMIT-DIFF PASS
+M0-GATE-MUTATIONS OK killed=5 pending=1 informational=1 restored=GREEN

@@ -1,0 +1,16 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+model Todo with
+| id : Nat
+| title : Bytes
+end
+
+def main : Cx -> Uri -> Bytes -> SeeOther :=
+  fun (cx : Cx) (request : Uri) (body : Bytes) =>
+    let title : Bytes := Text.trim Bytes (Form.field Bytes body b"title") in
+    let db : Db := topcoat.db cx in
+    let ready : prod () := Db.push_schema db in
+    let created : Todo := Todo.create (tuple (1, title)) db in
+    topcoat.see_other (Uri.from_text Bytes b"/")

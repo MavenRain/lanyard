@@ -1,0 +1,8 @@
+LAN-RUN OK observations=40
+LAN-REQUEST OK observations=23
+LAN-DELETE OK checks=23 failures=0
+LAN-UPDATE OK checks=28 failures=0
+LAN-ALL OK checks=23 failures=0
+LAN-TEXT-OPS OK checks=63 failures=0
+LAN-TEXT-NATIVE OK observations=111
+LAN-URI OK checks=41

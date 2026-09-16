@@ -4,7 +4,7 @@ open Rir
 open Run_value
 module Lower = Kanon_surface.Lower
 type fn = { name : string; params : repr list; result : repr; body : rtm }
-type context = { functions : fn list; foreign : Run_store.catalog }
+type context = { functions : fn list; foreign : Run_store.catalog; families : Foreign.Printer.family list }
 type state = { steps : int; store : Run_store.t }
 let default_steps = 100000
 let max_steps = 1000000
@@ -136,7 +136,8 @@ let prepare checked =
   let* texts = Text_ops.catalog checked text_instances in
   let* constants = Lower.catalog checked in
   let* rows = Lower.program_with instances specialized in
-  Ok { functions = functions rows; foreign = { Run_store.models; connections; texts; constants } }
+  let* families = Foreign.Printer.family_catalog rows in
+  Ok { functions = functions rows; foreign = { Run_store.models; connections; texts; constants }; families }
 
 let checked_steps steps =
   if steps <= 0 || steps > max_steps then invalid "steps must be in 1..1000000" else Ok ()
@@ -160,17 +161,24 @@ let foreign_repr name = function
   | TyForeign (actual, []) | TyArc (TyForeign (actual, [])) -> String.equal name actual
   | TyI31 | TyStruct _ | TyUnion _ | TyFunc _ | TyThunk _ | TyArc _ | TyForeign _ -> false
 
-let request ?(steps = default_steps) ~uri checked =
+let request ?(steps = default_steps) ?form ~uri checked =
   let* () = checked_steps steps in
   let* uri = Run_http.uri uri in
+  let* _fields = Option.fold ~none:(Ok []) ~some:Form_data.parse form in
   let* context = prepare checked in
   let* main = find context "main" in
-  let* () = match main.params with
-    | [cx_type; uri_type] when foreign_repr "Cx" cx_type && foreign_repr "Uri" uri_type
-        && foreign_repr "SeeOther" main.result -> Ok ()
-    | [] | _ :: _ -> invalid "request entry point must have type Cx -> Uri -> SeeOther" in
+  let* body = match main.params, form with
+    | [cx_type; uri_type], None when foreign_repr "Cx" cx_type && foreign_repr "Uri" uri_type
+        && foreign_repr "SeeOther" main.result -> Ok []
+    | [cx_type; uri_type; body_type], Some body when foreign_repr "Cx" cx_type && foreign_repr "Uri" uri_type
+        && foreign_repr "SeeOther" main.result ->
+        let* family = Text_ops.byte_family body_type context.families in
+        Ok [of_text family.family_name body]
+    | ([] | _ :: _), (None | Some _) ->
+        invalid (Option.fold ~none:"request entry point must have type Cx -> Uri -> SeeOther"
+          ~some:(fun _body -> "form request entry point must have type Cx -> Uri -> Bytes -> SeeOther (Bytes is a checked byte list)") form) in
   let cx, store = Run_store.context
     (List.map (fun (model : Model.t) -> model.name) context.foreign.models) Run_store.empty in
-  let* value, _state = call context 0 { steps; store } "main" [cx; Uri uri] in
+  let* value, _state = call context 0 { steps; store } "main" ([cx; Uri uri] @ body) in
   let* text = Run_http.response value in
   Ok (value, text)

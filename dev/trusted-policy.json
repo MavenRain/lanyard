@@ -52,6 +52,7 @@
         "rust/effects.ml",
         "rust/emit.ml",
         "rust/foreign.ml",
+        "rust/form_data.ml",
         "rust/model.ml",
         "rust/reachable.ml",
         "rust/template.ml",

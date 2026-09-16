@@ -33,7 +33,7 @@ let usage () : unit =
     ("usage: lanyard check [--print|--erased] FILE"
     ^ " | emit [--native|--target|--crate DIR [--print-model MODEL]] FILE.lan"
     ^ " | build --out DIR [--release] [--offline] [--print-model MODEL] FILE.lan"
-    ^ " | run [--steps N] [--print-model MODEL | --request URI] FILE.lan"
+    ^ " | run [--steps N] [--print-model MODEL | --request URI [--form BODY]] FILE.lan"
     ^ " | axioms [--names] FILE | spec-count")
 
 let read_file (path : string) : string =
@@ -253,8 +253,10 @@ let dispatch_emit args =
     validated before source I/O, and no output is printed on a failed run.
     --request URI selects request mode: a malformed URI is a usage error
     here, before any file is read, and a run that yields no response
-    exits 1 while a 303 response is printed on stdout with exit 0. *)
-let rec run_options output request steps args =
+    exits 1 while a 303 response is printed on stdout with exit 0.
+    --form BODY supplies a validated encoded body as a third byte-list
+    argument. It requires request mode and accepts an explicit empty body. *)
+let rec run_options output request form steps args =
   let value text = not (String.starts_with ~prefix:"-" text) && text <> "" in
   match args with
   | "--steps" :: amount :: rest when Option.is_none steps && value amount ->
@@ -262,29 +264,33 @@ let rec run_options output request steps args =
         then int_of_string_opt amount else None in
       number |> Option.to_result ~none:() |> Fun.flip Result.bind (fun number ->
         if number <= 0 || number > Lanyard_rust.Interp.max_steps then Error ()
-        else run_options output request (Some number) rest)
+        else run_options output request form (Some number) rest)
   | "--request" :: uri :: rest when Option.is_none request && value uri ->
       (match output with
        | Lanyard_rust.Model.Discard ->
            Lanyard_rust.Run_http.uri uri |> Result.map_error (fun _error -> ())
-           |> Fun.flip Result.bind (fun uri -> run_options output (Some uri) steps rest)
+           |> Fun.flip Result.bind (fun uri -> run_options output (Some uri) form steps rest)
        | Lanyard_rust.Model.Print_model _model -> Error ())
-  | "--print-model" :: model :: rest when Option.is_none request && value model ->
+  | "--form" :: body :: rest when Option.is_none form ->
+      Lanyard_rust.Form_data.parse body |> Result.map_error (fun _error -> ())
+      |> Fun.flip Result.bind (fun _fields -> run_options output request (Some body) steps rest)
+  | "--print-model" :: model :: rest when Option.is_none request && Option.is_none form && value model ->
       (match output with
        | Lanyard_rust.Model.Discard ->
-           run_options (Lanyard_rust.Model.Print_model model) request steps rest
+           run_options (Lanyard_rust.Model.Print_model model) request form steps rest
        | Lanyard_rust.Model.Print_model _model -> Error ())
-  | [path] when value path && lan_file path -> Ok (output, request, steps, path)
+  | [path] when value path && lan_file path && (Option.is_none form || Option.is_some request) ->
+      Ok (output, request, form, steps, path)
   | [] | _ :: _ -> Error ()
 
 let dispatch_run args =
-  run_options Lanyard_rust.Model.Discard None None args
+  run_options Lanyard_rust.Model.Discard None None None args
   |> Result.fold ~error:(fun () -> usage (); exit 64)
-       ~ok:(fun (output, request, steps, path) ->
+       ~ok:(fun (output, request, form, steps, path) ->
          Kanon_surface.Elab.check_lanyard (read_file path)
          |> Fun.flip Result.bind (fun checked ->
               Option.fold ~none:(fun () -> Lanyard_rust.Interp.run ?steps ~output checked)
-                ~some:(fun uri () -> Lanyard_rust.Interp.request ?steps ~uri checked) request ())
+                ~some:(fun uri () -> Lanyard_rust.Interp.request ?steps ?form ~uri checked) request ())
          |> Result.fold ~ok:(fun (_value, text) -> print_string text)
               ~error:(fun error ->
                 prerr_endline (Kanon_kernel.Error.to_string error); exit 1))

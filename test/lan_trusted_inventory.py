@@ -49,7 +49,7 @@ class Inventory(unittest.TestCase):
         report = TRUST.inventory(self.work)
         names = [row["path"] for row in report["files"]]
         self.assertEqual(names, sorted(set(names)))
-        self.assertEqual(len(names), 47)
+        self.assertEqual(len(names), 48)
         grouped = [name for row in report["groups"] for name in row["files"]]
         self.assertEqual(sorted(grouped), names)
         self.assertEqual(report["kernel"], {"lines": 12, "limit": 4000, "passed": True})
@@ -83,7 +83,7 @@ class Inventory(unittest.TestCase):
         group = self.group(report, "unassigned")
         self.assertEqual(group["files"], ["rust/new_backend.ml", "surface/nested/helper.mli"])
         self.assertEqual((group["lines"], group["scope"]), (4, "pending"))
-        self.assertEqual(len(report["files"]), 49)
+        self.assertEqual(len(report["files"]), 50)
 
     def test_removing_each_required_source_fails(self):
         for names in TRUST.GROUPS.values():

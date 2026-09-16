@@ -6,16 +6,23 @@ module Catalog = Lanyard_target.Target_generated
 module Printer = Foreign.Printer
 let ( let* ) = Result.bind
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
-type operation = Trim | Is_empty | Uri_from_text
+type operation = Trim | Is_empty | Uri_from_text | Form_field
 let operation name = match () with
   | () when String.equal name "Text.trim" -> Ok Trim
   | () when String.equal name "Text.is_empty" -> Ok Is_empty
   | () when String.equal name "Uri.from_text" -> Ok Uri_from_text
+  | () when String.equal name "Form.field" -> Ok Form_field
   | () -> Error (Error.Not_yet ("Rust emission: text schema " ^ name))
 let bool_tid = Rir.Tid "sum<struct tuple<>|struct tuple<>>"
 let bool_repr = Rir.TyUnion bool_tid
 type t = { row : Rir.foreign; operation : operation; family : string;
   repr : Rir.repr; data : Rir.tid list }
+let byte_family repr families =
+  List.find_opt (fun (family : Printer.family) ->
+    (repr = Rir.TyUnion (Erase.mu_tid family.family_name)
+     || repr = Rir.TyArc (Rir.TyUnion (Erase.mu_tid family.family_name)))
+    && family.variants = [[]; [Printer.Nat; Printer.Nominal family.family_name]]) families
+  |> Option.to_result ~none:(Error.Not_yet "Rust emission: text operation requires a byte list")
 let catalog (checked : Elab.lan_program) (instances : Lower.text_operation list) =
   Rules.all_ok (List.map (fun (instance : Lower.text_operation) ->
     let* operation = operation instance.row.schema in
@@ -26,17 +33,16 @@ let catalog (checked : Elab.lan_program) (instances : Lower.text_operation list)
     let* tid = Erase.tid_of ec ty in
     let* data = Erase.complete_groups ec [tid] in
     let* families = Printer.family_catalog [instance.wrapper, Erase.Code [Rir.RData data]] in
-    let* family = List.find_opt (fun (family : Printer.family) ->
-      repr = Rir.TyUnion (Erase.mu_tid family.family_name)
-      && family.variants = [[]; [Printer.Nat; Printer.Nominal family.family_name]]) families
-      |> Option.to_result ~none:(Error.Not_yet "Rust emission: text operation requires a byte list") in
+    let* family = byte_family repr families in
     Ok { row = instance.row; operation; family = family.family_name; repr; data }) instances)
 
 let specification = function
   | Trim -> "(0 Text : Type 0) -> (text : Text) -> Text"
   | Is_empty -> "(0 Text : Type 0) -> (text : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
   | Uri_from_text -> "(0 Text : Type 0) -> (text : Text) -> Uri"
-let effects = function Trim | Is_empty -> [] | Uri_from_text -> ["topcoat::Error"]
+  | Form_field -> "(0 Text : Type 0) -> (text : Text) -> (field : Text) -> Text"
+let effects = function Trim | Is_empty -> [] | Uri_from_text | Form_field -> ["topcoat::Error"]
+let parameters = function Trim | Is_empty | Uri_from_text -> ["text"] | Form_field -> ["text"; "field"]
 let foreign_call entries operations (row : Rir.foreign) =
   let* text = List.find_opt (fun text -> text.row = row) operations
     |> Option.to_result ~none:(Error.Mismatch "Rust emission: text metadata differs") in
@@ -47,31 +53,37 @@ let foreign_call entries operations (row : Rir.foreign) =
     | Catalog.Constant | Catalog.Type_constant -> invalid "text schema kind" in
   let* expected = Elab.target_type (specification operation) in
   let* actual = Elab.target_type entry.kernel_type in
-  let* () = if actual = expected && entry.quantities = [Catalog.Zero; Catalog.Many]
-      && entry.effects = effects operation && row.effects = entry.effects && row.arity = 1
+  let parameters = parameters operation in
+  let* () = if actual = expected && entry.quantities = Catalog.Zero :: List.map (fun _name -> Catalog.Many) parameters
+      && entry.effects = effects operation && row.effects = entry.effects && row.arity = List.length parameters
       && row.name = Elab.target_name entry.name && row.print_rule = entry.print_rule
     then Ok () else invalid "text schema metadata" in
   let* template = Template.parse entry.print_rule in
-  let* () = if List.sort_uniq String.compare (Template.slots template) = ["text"]
+  let* () = if List.sort_uniq String.compare (Template.slots template) = List.sort String.compare parameters
     then Ok () else invalid "text schema placeholders" in
-  let render = function
-    | [value] ->
-        let* call = Template.render template ["text", "__lan_text"] in
+  let render arguments =
+    if List.length arguments <> List.length parameters then invalid "text argument count" else
+        let bindings = List.map (fun name -> name, "__lan_" ^ name) parameters in
+        let* call = Template.render template bindings in
         let converted = match operation with
-          | Trim -> Printer.identifier "lan_model_text_from_" text.family ^ "(" ^ call ^ ")"
+          | Trim | Form_field -> Printer.identifier "lan_model_text_from_" text.family ^ "(" ^ call ^ ")"
           | Is_empty ->
               let ty = Printer.rust_type (Printer.Sum [Printer.Unit; Printer.Unit]) in
               "if " ^ call ^ " { " ^ ty ^ "::V1(()) } else { " ^ ty ^ "::V0(()) }"
           | Uri_from_text -> "lan_uri_validate(&__lan_text)?; " ^ call in
-        Ok ("{ let __lan_text_arg = " ^ value ^ "; let __lan_text = "
-          ^ Printer.identifier "lan_model_text_to_" text.family ^ "(&__lan_text_arg)?; " ^ converted ^ " }")
-    | [] | _ :: _ -> invalid "text argument count" in
+        let evaluated = Seq.zip (List.to_seq bindings) (List.to_seq arguments)
+          |> Seq.map (fun ((_name, local), value) -> "let " ^ local ^ "_arg = " ^ value ^ "; ")
+          |> List.of_seq |> String.concat "" in
+        let conversions = List.map (fun (_name, local) -> "let " ^ local ^ " = "
+          ^ Printer.identifier "lan_model_text_to_" text.family ^ "(&" ^ local ^ "_arg)?; ") bindings
+          |> String.concat "" in
+        Ok ("{ " ^ evaluated ^ conversions ^ converted ^ " }") in
   let* result = match operation with
-    | Trim -> Ok text.repr | Is_empty -> Ok bool_repr
+    | Trim | Form_field -> Ok text.repr | Is_empty -> Ok bool_repr
     | Uri_from_text ->
         let* _uri_type = Foreign.foreign_type entries "Uri" [] in
         Ok (Rir.TyForeign ("Uri", [])) in
-  Ok ([Rir.TyArc text.repr], result, render, Effects.Sync)
+  Ok (List.map (fun _name -> Rir.TyArc text.repr) parameters, result, render, Effects.Sync)
 
 (** Match Run_http.uri before the pinned HTTP parser can accept another URI form. *)
 let uri_runtime = {|

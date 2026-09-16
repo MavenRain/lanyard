@@ -1,0 +1,8 @@
+OK build: 0 errors, 0 warnings
+LAN-AXIOMS-REPORT OK observations=2
+LAN-FORM-MUTATIONS CONTROL OK
+LAN-FORM-MUTATIONS skip-duplicates KILLED
+LAN-FORM-MUTATIONS skip-body-bound KILLED
+LAN-FORM-MUTATIONS skip-emitted-validation KILLED
+LAN-FORM-MUTATIONS skip-effect-contract KILLED
+LAN-FORM-MUTATIONS OK killed=4/4 restored=GREEN
