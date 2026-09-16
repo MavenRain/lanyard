@@ -3284,3 +3284,137 @@ RED-WATCH 0, PINS 91/91 and ROWS 155/155 IDENTICAL. The close ladder
 re-runs `zsh dev/gates.sh --stage M1-form` on this exact staged tree
 after the close, and its verdict is recorded in the review kit, not
 in this file.
+
+## Stage M1 RESPONSE (2026-09-16)
+
+`Response.text Bytes body` builds a response with status 200 and the
+content type `text/plain; charset=utf-8`. `Bytes` is the checked
+nominal byte-list family, as for `Form.field`, so a handler can
+answer a scripted request with plain text. Every element must fit in
+a byte and the complete body must be valid UTF-8, and both checks
+fail the program even when the response is unused. `rust/run_http.ml`
+holds the interpreter side: it builds the response value, validates
+the body, and serializes HTTP/1.1 with a content length measured in
+UTF-8 bytes.
+
+The emitted adapter follows the pinned Topcoat `content_response`
+idiom: construct the response from a string, then set the static
+content-type header through the `headers_mut` accessor of the pinned
+API. Byte-list conversion retains its range and UTF-8 errors. The CLI
+accepts `Cx -> Uri -> Response` beside `Cx -> Uri -> SeeOther` under
+`run --request URI`, and with the `--form BODY` option either result
+may follow the checked byte-list body parameter. Redirect behavior is
+unchanged.
+
+`zsh dev/stage-m1-response.sh` retains the cumulative form gate and
+then runs the new suites `_build/default/test/lan_response.exe`,
+`test/lan_response.py` and `test/lan_response_mutations.py`. It
+prints `LAN-RESPONSE OK checks=32`, the six CLI test groups, and the
+four isolated mutations `wrong-status`, `wrong-length`,
+`skip-response-validation` and `skip-effect-contract`, each KILLED,
+between `LAN-RESPONSE-MUTATIONS CONTROL OK` and
+`LAN-RESPONSE-MUTATIONS OK killed=4/4 restored=GREEN`. The stage row
+is `STAGE-M1-RESPONSE OK`, and the stage runs from
+`zsh dev/gates.sh --stage M1-response`.
+
+The native harness `test/lan_response_native.py` builds two offline
+binaries against the checked target pins with Rust 1.98 and reports
+`LAN-RESPONSE-NATIVE OK binaries=2 observations=24`. The stage gate
+does not run that harness, so the native row is a manual recording,
+as for the form stage.
+
+The catalog holds 23 declarations and nine foreign types, and Todo
+reports 28 foreign constants. The generated module has 152 lines, and
+the `target/PIN.json` signature sha changes because the catalog gains
+the `Response.text` row, for 23 rows in total. Library pins, anchor
+fingerprints, trust approval and the M0 exit stamp are unchanged. The
+docs are README.md, dev/STAGE-M1-RESPONSE.md and target/README.md.
+Captures and tested source hashes are frozen under
+`dev/validation/stage-m1-response/`.
+
+## Stage M1 RESPONSE review fixes (tag LSM1P, 2026-09-16)
+
+The review kit LSM1P ran on base ef7dc23 over a 62-path slice, that is
+28 review paths and 34 frozen captures under
+`dev/validation/stage-m1-response/`. A drafter supplied 15 hypotheses,
+an opus prober confirmed two of them, and one ctxcat-review Workflow
+run with three agents supplied 8 raw findings, of which 7 were
+upheld, under a judge cap of 7. Six findings passed the judge: one
+medium, two low and three nits. Three more are carried.
+
+F-1 (med, dev/M1-BUILD-LOG.md:3286). The M1 log ended with the LSM1F
+review block and held no block for this stage, and the file was absent
+from the 62 staged paths. The stage block above and this review block
+are appended, so the stage carries a heading of the sibling shape,
+with the stage name and the date. Every number in the prose is read
+from the frozen captures and is not recomputed.
+
+F-2 (low, bin/lanyard.ml:10-11). The driver doc block accepted both
+entry-point types but its tail still promised the 303 response on
+stdout, which is wrong for a `Response` handler. The tail now reads
+that the command exits 0 with the serialized response on stdout, 303
+for SeeOther and 200 text/plain for Response, and the two lines are
+re-wrapped to the width of the block.
+
+F-3 (low, target/README.md:96-99). The staged paragraph reported the
+152 generated lines but dropped both the proposed allowance 104 and
+the statement of the overrun, so a 48-line overrun stood undisclosed.
+The paragraph now states that S0-D1 requires the user to rule the
+numeric `A_sig` allowance, that the proposed allowance is exactly 104
+without margin, and that the additional 48 measured lines exceed that
+proposed allowance, which this adapter does not change.
+
+F-4 (nit, test/lan_response.ml:13-16). The local `contains` helper
+rebuilt a sub-sequence and allocated a fresh string for every
+candidate index. It now uses the `String.starts_with ~prefix:needle`
+form of test/lan_text_ops.ml:13-15, with the same name, the same
+signature and the same behaviour, so every call site is unchanged.
+
+F-5 (nit, target/README.md:6). One line of the catalog paragraph ran
+to about 95 columns while its neighbours wrap near 70. Lines 3 to 9
+are re-wrapped at 72 columns or less. No word changes.
+
+F-6 (nit, dev/STAGE-M1-RESPONSE.md:34-39). One line of the
+restrictions paragraph was 81 columns and ended on a stray word,
+while the rest of the paragraph measures 50 to 69 columns. The
+paragraph is re-wrapped at 72 columns or less. No word changes.
+
+Carried. C-1: the stage gate never runs `test/lan_response_native.py`,
+so the native row is hand-produced; the predecessor slice LSM1F ruled
+the identical gap a nit as its C-6, the native leg is a manual
+recording that dev/STAGE-M1-RESPONSE.md:78-81 documents,
+test/lan_response.py:59-71 already pins the emitted source text, and
+adding the line would change the frozen stage stdout. C-2: the claim
+that the response UTF-8 guard is unreachable is refuted, because
+`Run_http.response` is a public library entry that
+test/lan_response.ml:77 calls directly, so the guard is load-bearing
+at the module boundary and the mutant kill is genuine. C-3: the
+`Uri_from_text` and `Response_text` arms at rust/text_ops.ml:86-91
+are a taste change with no behavioural content, because the arms bind
+different foreign types and use no `_` arm.
+
+Proof. The fix suites ran on a copy of the tree and printed 19 floor
+rows, all OK: `LAN-RESPONSE OK checks=32`, `LAN-FORM OK checks=53`,
+`LAN-URI OK checks=41`, `LAN-TEXT-OPS OK checks=63`, the request, run,
+delete, update and all binaries at their floors, and ten Python suites
+at their `Ran` floors, each with rc=0. `test/lan_response_mutations.py`
+printed `LAN-RESPONSE-MUTATIONS CONTROL OK`, the four mutants
+`wrong-status`, `wrong-length`, `skip-response-validation` and
+`skip-effect-contract` each KILLED, and
+`LAN-RESPONSE-MUTATIONS OK killed=4/4 restored=GREEN`. The twelve
+review needles each count 1 in their staged files. The fix run staged
+the 28 review paths with `zsh -n OK`, `py_compile OK` and
+`em-dash total=0`. The 34 frozen captures are untouched. The tree then
+held 63 staged paths and 0 unstaged changes.
+
+Ladders. The baseline ladder ran on the unfixed staged tree and
+reported GREEN (GATE-END tag=baseline 2026-09-16T15:26:06Z,
+stage_rc=0; GATE LSM1P tag=baseline GREEN). The compare-rows probe on
+the baseline tag showed RED-WATCH 0, PINS 99/99 and ROWS 163/163
+IDENTICAL. The fix-1 ladder ran on the fixed tree and reported GREEN
+(GATE-END tag=fix-1 2026-09-16T15:52:49Z, stage_rc=0; GATE LSM1P
+tag=fix-1 GREEN). The compare-rows probe on the fix-1 tag showed
+RED-WATCH 0, PINS 99/99 and ROWS 163/163 IDENTICAL. The close ladder
+re-runs `zsh dev/gates.sh --stage M1-response` on this exact staged
+tree after the close, and its verdict is recorded in the review kit,
+not in this file.

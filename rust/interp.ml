@@ -68,7 +68,7 @@ let rec evaluate context depth state env term =
            if List.length arguments <> arity then invalid "closure call argument count"
            else call context (depth + 1) state (fid_text fid) (captures @ arguments)
        | Nat _ | Text _ | Unit | Product _ | Tag _ | Database _
-       | Context _ | Uri _ | See_other _ -> invalid "expected a closure")
+       | Context _ | Uri _ | See_other _ | Response_text _ -> invalid "expected a closure")
   | RStruct (tid, terms) ->
       let* fields, state = values state terms in
       let value = if tid = Tid "tuple<>" && List.is_empty fields then Unit else Product (tid, fields) in
@@ -79,7 +79,7 @@ let rec evaluate context depth state env term =
        | Product (actual, fields) when tid = actual ->
            at index fields |> Result.map (fun value -> value, state)
        | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _
-       | Context _ | Uri _ | See_other _ -> invalid "projection layout differs")
+       | Context _ | Uri _ | See_other _ | Response_text _ -> invalid "projection layout differs")
   | RTag (tid, tag, terms) ->
       let* fields, state = values state terms in Ok (Tag (tid, tag, fields), state)
   | RCase (tid, term, branches) ->
@@ -91,7 +91,7 @@ let rec evaluate context depth state env term =
            if branch.arity <> List.length fields then invalid "case binder count"
            else evaluate context (depth + 1) state (List.rev fields @ env) branch.body
        | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _
-       | Context _ | Uri _ | See_other _ -> invalid "case layout differs")
+       | Context _ | Uri _ | See_other _ | Response_text _ -> invalid "case layout differs")
   | RForeign (row, terms) ->
       let* arguments, state = values state terms in
       let* value, store = Run_store.foreign context.foreign row arguments state.store in
@@ -167,16 +167,17 @@ let request ?(steps = default_steps) ?form ~uri checked =
   let* _fields = Option.fold ~none:(Ok []) ~some:Form_data.parse form in
   let* context = prepare checked in
   let* main = find context "main" in
+  let response_result = foreign_repr "SeeOther" main.result || foreign_repr "Response" main.result in
   let* body = match main.params, form with
     | [cx_type; uri_type], None when foreign_repr "Cx" cx_type && foreign_repr "Uri" uri_type
-        && foreign_repr "SeeOther" main.result -> Ok []
+        && response_result -> Ok []
     | [cx_type; uri_type; body_type], Some body when foreign_repr "Cx" cx_type && foreign_repr "Uri" uri_type
-        && foreign_repr "SeeOther" main.result ->
+        && response_result ->
         let* family = Text_ops.byte_family body_type context.families in
         Ok [of_text family.family_name body]
     | ([] | _ :: _), (None | Some _) ->
-        invalid (Option.fold ~none:"request entry point must have type Cx -> Uri -> SeeOther"
-          ~some:(fun _body -> "form request entry point must have type Cx -> Uri -> Bytes -> SeeOther (Bytes is a checked byte list)") form) in
+        invalid (Option.fold ~none:"request entry point must have type Cx -> Uri -> SeeOther or Cx -> Uri -> Response"
+          ~some:(fun _body -> "form request entry point must have type Cx -> Uri -> Bytes -> SeeOther or Cx -> Uri -> Bytes -> Response (Bytes is a checked byte list)") form) in
   let cx, store = Run_store.context
     (List.map (fun (model : Model.t) -> model.name) context.foreign.models) Run_store.empty in
   let* value, _state = call context 0 { steps; store } "main" ([cx; Uri uri] @ body) in

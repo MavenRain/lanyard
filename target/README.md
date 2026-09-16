@@ -1,12 +1,13 @@
 # Target signatures
 
-The target catalog provides 21 proposed foreign declarations: nine type
-constants and twelve constant or schema declarations. M1 adds
+The target catalog provides 23 proposed foreign declarations: nine type
+constants and fourteen constant or schema declarations. M1 adds
 `Model.delete_by_id`, `Model.update`, `Model.all`, `Text.trim`,
-`Text.is_empty` and `Uri.from_text` to the catalog. The target layer builds as
-`lanyard_target`; its `Target_generated` module exposes immutable
-metadata and total lookup. Stage C instantiates schemas and checks their
-types before adding axioms. Stage E applies synchronous, async, model and
+`Text.is_empty`, `Uri.from_text`, `Form.field` and `Response.text` to
+the catalog. The target layer builds as `lanyard_target`; its
+`Target_generated` module exposes immutable metadata and total lookup.
+Stage C instantiates schemas and checks their types before adding
+axioms. Stage E applies synchronous, async, model and
 connection print rules through `emit --target`. The [crate
 command](../dev/STAGE-E-CRATE.md) uses the same printer with a checked
 main entry point. Stage B does not establish Rust compilation or kernel
@@ -93,9 +94,11 @@ files and `dev/gen-target.py`. It is deterministic, records a semantic digest,
 and carries no absolute source paths. It is compiled into an OCaml library,
 so a consumer does not parse signature files at runtime.
 
-The generated module has 116 lines after adding the update schema. S0-D1
-requires the user to rule the numeric `A_sig` allowance; the proposed
-allowance is exactly 104, without margin. The additional twelve measured lines
-exceed that proposed allowance; the proposal is unchanged.
+The generated module has 152 lines after adding the response schema.
+The [trust policy](../dev/STAGE-F-POLICY.md) records proposed source
+groups and budgets. S0-D1 requires the user to rule the numeric `A_sig`
+allowance. The proposed allowance is exactly 104, without margin, and
+the additional 48 measured lines exceed that proposed allowance, which
+this adapter does not change.
 `dev/trusted-lines.sh` reports the measurement and keeps the ruled formula
 `5481 + A_rir + A_emit + A_sig`. It does not claim an approved total.

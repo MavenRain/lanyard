@@ -28,7 +28,7 @@ let database value store = match value with
   | Database id -> List.find_opt (fun database -> database.id = id) store.databases
       |> Option.to_result ~none:(Error.Mismatch "run: unknown database handle")
   | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _
-  | Context _ | Uri _ | See_other _ -> invalid "expected a database"
+  | Context _ | Uri _ | See_other _ | Response_text _ -> invalid "expected a database"
 
 let replace database store = { store with databases =
   List.map (fun previous -> if previous.id = database.id then database else previous) store.databases }
@@ -96,7 +96,7 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
         |> Option.to_result ~none:(Error.Mismatch "run: connection metadata differs") in
       connect connection arguments store
   | () when String.starts_with ~prefix:"Text." row.schema || String.equal row.schema "Uri.from_text"
-      || String.equal row.schema "Form.field" ->
+      || String.equal row.schema "Form.field" || String.equal row.schema "Response.text" ->
       let* operation = List.find_opt (fun (text : Text_ops.t) -> text.row = row) catalog.texts
         |> Option.to_result ~none:(Error.Mismatch "run: text metadata differs") in
       let* _contract = Text_ops.foreign_call Lanyard_target.Target_generated.entries catalog.texts row in
@@ -113,6 +113,7 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
              | Text_ops.Is_empty ->
                  Ok (Tag (Text_ops.bool_tid, (if String.equal text "" then 1 else 0), [Unit]))
              | Text_ops.Uri_from_text -> Run_http.uri text |> Result.map (fun uri -> Uri uri)
+             | Text_ops.Response_text -> Ok (Response_text text)
              | Text_ops.Form_field -> invalid "form argument count" in
            Ok (value, store)
        | [] | _ :: _ -> invalid "text argument count")

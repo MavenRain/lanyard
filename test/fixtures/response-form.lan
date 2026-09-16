@@ -1,0 +1,15 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+model Todo with
+| id : Nat
+| title : Bytes
+end
+
+def main : Cx -> Uri -> Bytes -> Response := fun (cx : Cx) (uri : Uri) (body : Bytes) =>
+  let title : Bytes := Text.trim Bytes (Form.field Bytes body b"title") in
+  let db : Db := topcoat.db cx in
+  let ready : prod () := Db.push_schema db in
+  let created : Todo := Todo.create (tuple (1, title)) db in
+  Response.text Bytes created.1

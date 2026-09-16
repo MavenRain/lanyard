@@ -1,0 +1,12 @@
+{
+  "bodies": [
+    "",
+    "hello",
+    "caf\u00e9",
+    "\u65e5\ud83d\ude00",
+    "a\u0000b",
+    "a\r\n\r\nX-Header:yes",
+    "<b>hello</b>"
+  ],
+  "observations": 12
+}

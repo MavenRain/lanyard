@@ -6,12 +6,13 @@ module Catalog = Lanyard_target.Target_generated
 module Printer = Foreign.Printer
 let ( let* ) = Result.bind
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
-type operation = Trim | Is_empty | Uri_from_text | Form_field
+type operation = Trim | Is_empty | Uri_from_text | Form_field | Response_text
 let operation name = match () with
   | () when String.equal name "Text.trim" -> Ok Trim
   | () when String.equal name "Text.is_empty" -> Ok Is_empty
   | () when String.equal name "Uri.from_text" -> Ok Uri_from_text
   | () when String.equal name "Form.field" -> Ok Form_field
+  | () when String.equal name "Response.text" -> Ok Response_text
   | () -> Error (Error.Not_yet ("Rust emission: text schema " ^ name))
 let bool_tid = Rir.Tid "sum<struct tuple<>|struct tuple<>>"
 let bool_repr = Rir.TyUnion bool_tid
@@ -41,8 +42,9 @@ let specification = function
   | Is_empty -> "(0 Text : Type 0) -> (text : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
   | Uri_from_text -> "(0 Text : Type 0) -> (text : Text) -> Uri"
   | Form_field -> "(0 Text : Type 0) -> (text : Text) -> (field : Text) -> Text"
-let effects = function Trim | Is_empty -> [] | Uri_from_text | Form_field -> ["topcoat::Error"]
-let parameters = function Trim | Is_empty | Uri_from_text -> ["text"] | Form_field -> ["text"; "field"]
+  | Response_text -> "(0 Text : Type 0) -> (text : Text) -> Response"
+let effects = function Trim | Is_empty | Response_text -> [] | Uri_from_text | Form_field -> ["topcoat::Error"]
+let parameters = function Trim | Is_empty | Uri_from_text | Response_text -> ["text"] | Form_field -> ["text"; "field"]
 let foreign_call entries operations (row : Rir.foreign) =
   let* text = List.find_opt (fun text -> text.row = row) operations
     |> Option.to_result ~none:(Error.Mismatch "Rust emission: text metadata differs") in
@@ -70,7 +72,8 @@ let foreign_call entries operations (row : Rir.foreign) =
           | Is_empty ->
               let ty = Printer.rust_type (Printer.Sum [Printer.Unit; Printer.Unit]) in
               "if " ^ call ^ " { " ^ ty ^ "::V1(()) } else { " ^ ty ^ "::V0(()) }"
-          | Uri_from_text -> "lan_uri_validate(&__lan_text)?; " ^ call in
+          | Uri_from_text -> "lan_uri_validate(&__lan_text)?; " ^ call
+          | Response_text -> call in
         let evaluated = Seq.zip (List.to_seq bindings) (List.to_seq arguments)
           |> Seq.map (fun ((_name, local), value) -> "let " ^ local ^ "_arg = " ^ value ^ "; ")
           |> List.of_seq |> String.concat "" in
@@ -82,7 +85,10 @@ let foreign_call entries operations (row : Rir.foreign) =
     | Trim | Form_field -> Ok text.repr | Is_empty -> Ok bool_repr
     | Uri_from_text ->
         let* _uri_type = Foreign.foreign_type entries "Uri" [] in
-        Ok (Rir.TyForeign ("Uri", [])) in
+        Ok (Rir.TyForeign ("Uri", []))
+    | Response_text ->
+        let* _response_type = Foreign.foreign_type entries "Response" [] in
+        Ok (Rir.TyForeign ("Response", [])) in
   Ok (List.map (fun _name -> Rir.TyArc text.repr) parameters, result, render, Effects.Sync)
 
 (** Match Run_http.uri before the pinned HTTP parser can accept another URI form. *)

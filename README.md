@@ -145,6 +145,16 @@ _build/default/bin/lanyard.exe run --request /todos --form 'title=write+tests' t
 zsh dev/gates.sh --stage M1-form
 ```
 
+The [M1 text response adapter](dev/STAGE-M1-RESPONSE.md) adds
+`Response.text Bytes body`. Scripted handlers may return `Response` with
+status 200 and a UTF-8 plain-text body. The form example stores a Todo
+and returns its title:
+
+```sh
+_build/default/bin/lanyard.exe run --request /todos --form 'title=write+tests' test/fixtures/response-form.lan
+zsh dev/gates.sh --stage M1-response
+```
+
 Build and validate through Stage D:
 
 ```sh

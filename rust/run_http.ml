@@ -1,4 +1,4 @@
-(** A scripted origin-form request and an empty redirect response. *)
+(** Scripted origin-form requests, redirects and UTF-8 text responses. *)
 open Run_value
 
 let max_uri_bytes = 8192
@@ -24,9 +24,13 @@ let uri text =
     scan (List.of_seq (String.to_seq text))
 
 let response = function
+  | Response_text body ->
+      if not (String.is_valid_utf_8 body) then invalid "invalid UTF-8 in response body" else
+      Ok ("HTTP/1.1 200 OK\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: "
+          ^ string_of_int (String.length body) ^ "\r\n\r\n" ^ body)
   | See_other location ->
       let* location = uri location in
       Ok ("HTTP/1.1 303 See Other\r\nLocation: " ^ location ^
           "\r\nContent-Length: 0\r\n\r\n")
   | Nat _ | Text _ | Unit | Product _ | Tag _ | Closure _ | Database _
-  | Context _ | Uri _ -> invalid "request handler did not return SeeOther"
+  | Context _ | Uri _ -> invalid "request handler did not return SeeOther or Response"
