@@ -1,0 +1,19 @@
+W src/bin/async_concat.rs:45:8  dead_code  methods `compare`, `sub`, and `mul` are never used
+W src/bin/async_concat.rs:95:6  dead_code  enum `T6e6f6d696e616c2831303a50696563655f726f777329` is never used
+W src/bin/async_concat.rs:112:6  dead_code  enum `T73756d28756e69742c756e697429` is never used
+W src/bin/async_concat.rs:191:14  unused_variables  unused variable: `v0`
+W src/bin/async_concat.rs:195:14  unused_variables  unused variable: `v0`
+W src/bin/async_concat.rs:198:4  dead_code  function `f_6d61696e` is never used
+W src/bin/async_concat.rs:203:986  unused_variables  unused variable: `p0`
+W src/bin/async_concat.rs:207:1233  unused_variables  unused variable: `v2`
+W src/bin/async_concat.rs:207:1533  unused_variables  unused variable: `p0`
+W src/bin/async_concat.rs:211:1232  unused_variables  unused variable: `v1`
+W src/main.rs:8:33  dead_code  variant `ModelRange` is never constructed
+W src/main.rs:34:8  dead_code  methods `compare`, `sub`, and `mul` are never used
+W src/main.rs:95:6  dead_code  enum `T73756d28756e69742c756e697429` is never used
+W src/main.rs:170:14  unused_variables  unused variable: `v0`
+W src/main.rs:174:14  unused_variables  unused variable: `v0`
+W src/main.rs:177:4  dead_code  function `f_6d61696e` is never used
+W src/main.rs:182:4  dead_code  function `lan_model_to_i64` is never used
+W src/main.rs:188:4  dead_code  function `lan_model_from_i64` is never used
+OK build: 0 errors, 18 warnings

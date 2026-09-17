@@ -46,11 +46,15 @@
 #   zsh dev/gates.sh --stage M1-form
 #   zsh dev/gates.sh --stage M1-response
 #   zsh dev/gates.sh --stage M1-html
+#   zsh dev/gates.sh --stage M1-concat
 #   zsh dev/gates.sh M0
 #   zsh dev/gates.sh M0-E2E --toasty PATH --topcoat PATH
 
 set -u
 
+if [[ $# -eq 2 && $1 == "--stage" && $2 == "M1-concat" ]]; then
+  exec zsh ${0:A:h}/stage-m1-concat.sh
+fi
 if [[ $# -eq 2 && $1 == "--stage" && $2 == "M1-html" ]]; then
   exec zsh ${0:A:h}/stage-m1-html.sh
 fi
@@ -338,7 +342,7 @@ if [[ $# -ge 2 && $1 == "--leg" ]]; then
 fi
 
 if [[ $# -ne 0 ]]; then
-  print -r -- "usage: zsh dev/gates.sh [M0 [--output NEW-DIRECTORY] | M0-E2E --toasty PATH --topcoat PATH [OPTIONS] | --leg NAME | --stage B|C|D|E-native|E-foreign|E-async|E-foreign-types|E-models|E-connections|E-crate|E-reachable|E-handlers|E-todo|F-axioms|F-time|F-gates|M1-build|M1-run|M1-request|M1-delete|M1-update|M1-all|M1-text|M1-uri|M1-form|M1-response|M1-html]"
+  print -r -- "usage: zsh dev/gates.sh [M0 [--output NEW-DIRECTORY] | M0-E2E --toasty PATH --topcoat PATH [OPTIONS] | --leg NAME | --stage B|C|D|E-native|E-foreign|E-async|E-foreign-types|E-models|E-connections|E-crate|E-reachable|E-handlers|E-todo|F-axioms|F-time|F-gates|M1-build|M1-run|M1-request|M1-delete|M1-update|M1-all|M1-text|M1-uri|M1-form|M1-response|M1-html|M1-concat]"
   exit 64
 fi
 

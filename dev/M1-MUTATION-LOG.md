@@ -646,3 +646,31 @@ restored=GREEN` row, with `EXIT stage 0`. No standalone
 `html-mutations` trio or receipt key is shipped: the form and
 response trios are capture-harness artifacts of the author's
 worktree, and no command of this tree makes them.
+
+## Text concatenation (2026-09-16)
+
+`test/lan_concat_mutations.py` builds an isolated source copy and
+requires the named behavioral failure for each source mutation.
+
+| Mutation | Required failing observation |
+| --- | --- |
+| Reverse the two concat operands | `left before right:` |
+| Skip the left byte and UTF-8 check | `left byte range:` |
+| Skip the right byte and UTF-8 check | `right byte range:` |
+| Bypass the schema effects contract | `metadata effects:` |
+
+Each edit must match exactly one source site. Compile failures do not
+count as kills. Clean and restored controls must pass. The cumulative
+command is `zsh dev/gates.sh --stage M1-concat`, which retains every
+earlier stage gate, including the five HTML mutations. Native
+concatenation, ordering and failures are exercised separately by
+`test/lan_concat_native.py`.
+
+This slice records the mutation observations only in the cumulative
+capture. dev/validation/stage-m1-concat/stage.stdout rows 687 to 692
+hold the control row, the four KILLED rows and the `killed=4/4
+restored=GREEN` row. Row 693 holds `STAGE-M1-CONCAT OK`, with
+`EXIT stage 0`. No standalone `concat-mutations` trio or receipt key is
+shipped: the predecessor trios are capture-harness artifacts of the
+author's worktree, and no command of this tree makes them.
+

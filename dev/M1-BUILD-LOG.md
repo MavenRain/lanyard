@@ -3532,3 +3532,170 @@ RED-WATCH 0, PINS 108/108 and ROWS 172/172 IDENTICAL. The close
 ladder re-runs `zsh dev/gates.sh --stage M1-html` on this exact staged
 tree after the close, and its verdict is recorded in the review kit,
 not in this file.
+
+## Stage M1 CONCAT (2026-09-16)
+
+This slice continues from the reviewed HTML commit `d34eb7b`.
+`Text.concat Bytes left right` joins two checked UTF-8 byte lists into
+one value. Concatenation preserves literal bytes. It applies no
+escaping and no sanitization. Both arguments pass the byte range and
+UTF-8 checks before the join, and a failure of either argument
+propagates even when the result is unused.
+
+The operation specializes through the existing byte-list path and adds
+no dependency and no foreign type. It converts both checked lists to
+strings, uses standard `String` concatenation, then converts the result
+back to the selected list family. Complete foreign metadata and print
+placeholders are validated before native emission. Aliases and captured
+helpers work. Partially applied value arguments are rejected, as with
+the existing foreign adapter lowering.
+
+The cumulative stage retains the HTML gate and adds 33 OCaml checks and
+7 Python checks. It adds four concat mutations with clean and restored
+controls, and reports `LAN-CONCAT-MUTATIONS OK killed=4/4
+restored=GREEN`. Rows 686 to 693 of the stage capture hold
+`LAN-CONCAT OK checks=33`, the control row, the four KILLED rows, the
+kill summary and `STAGE-M1-CONCAT OK`. The kit comparator tracks 180
+gate rows and 116 pins. The axioms, Dune test, native prepare, native
+build, native check and stage captures all exit 0.
+
+The separate native harness checks 19 observations in the synchronous
+error variant and 20 in the database error variant. It reports
+`LAN-CONCAT-NATIVE OK binary=lanyard-program observations=19` and
+`LAN-CONCAT-NATIVE OK binary=async_concat observations=20`. The
+database case creates a row in the left argument, then updates and
+deletes it in the right argument. Reversal or repeated evaluation
+fails. The harness runs by hand with Rust 1.98; the stage gate does not
+call it.
+
+The catalog grows to 26 declarations, with nine foreign types. Todo
+reports 31 foreign constants. The generated catalog has 170 lines, 66
+above the pending proposed allowance of 104. No allowance, library pin,
+source anchor, trust approval or M0 exit stamp is changed.
+
+The recursive byte-list representation retains its large-value stack
+limit. This slice adds no size limit and no streaming representation.
+The slice stages 51 paths: 23 source, test and document paths, and 28
+frozen captures. The stage contract is in `STAGE-M1-CONCAT.md`.
+Validation captures, native sources and checked input hashes are in
+`validation/stage-m1-concat/`.
+
+## Stage M1 CONCAT review fixes (tag LSM1C, 2026-09-16)
+
+The review kit LSM1C ran on base d34eb7b over a 51-path slice. An opus
+drafter supplied 9 hypotheses. An opus prober upheld five of them,
+downgraded three, refuted one and added two new rows. One ctxcat-review
+Workflow run, wf_ab3560e0-fbe, supplied 6 raw findings, of which 5 were
+upheld and 5 survived. An opus judge passed seven findings, one medium,
+three low and three nits, under a judge cap of 7. Four more are
+carried.
+
+F-1 (med, dev/M1-BUILD-LOG.md:3536). The slice recorded no block in the
+M1 build log. The file held 18 `## Stage M1 ` headings, none of which
+named CONCAT, while every predecessor stage recorded a block. The log
+now holds a `## Stage M1 CONCAT (2026-09-16)` block in the shape of the
+HTML block. The block states the base commit, the operation, the
+specialization and metadata path, the gate and native numbers and the
+capture directory. The file is hand-staged as an added path.
+
+F-2 (low, dev/M1-MUTATION-LOG.md:650). The slice recorded no section in
+the M1 mutation log, so the log and the captures disagreed: the four
+CONCAT KILLED rows existed only inside the staged stage capture. The log
+now holds a `## Text concatenation (2026-09-16)` section with one table
+row per mutation, the control rules, the cumulative command and the
+capture row numbers. The file is staged with F-1.
+
+F-3 (low, rust/run_store.ml:124). The Concat and Form_field arity arm
+printed `invalid "text argument count"`, the same string as the
+catch-all arm at :126 and the render guard at rust/text_ops.ml:74, so
+three distinct failures shared one message. The pre-image arm named its
+operation family. The arm now prints `invalid "concat or form argument
+count"`. The catch-all and the render guard keep their strings.
+
+F-4 (low, test/lan_concat.ml:12-14). The new `contains` test helper
+rebuilt the whole suffix for every index, so the search allocated O(n)
+bytes per position and O(n^2) overall. The helper now scans with
+`String.sub` over a total index list and allocates no suffix. The other
+three copies of the helper stay unchanged; a shared helper is a
+repo-wide refactor and is out of slice scope. The scan line carries a
+`(* @total-accessor *)` marker, because the OCaml exception hook blocks
+a bare `String.sub`; the index range of the `List.init` bound makes the
+call total.
+
+F-5 (nit, target/README.md:6-9). The catalog paragraph was not reflowed
+after the `Text.concat` insert, so line 7 was 86 columns, the widest
+line of the file, against neighbours of 63 to 71. The paragraph is
+re-wrapped at 71 columns or less. No word changes.
+
+F-6 (nit, dev/STAGE-M1-CONCAT.md:13-77). Six prose lines of the new
+stage document exceeded 72 columns, while the sibling stage documents
+hold every prose line at 72 or fewer and exceed that width only inside
+fences. The six prose lines are re-wrapped at 72 columns. The fenced
+command lines stay on one line each, by convention. The re-wrapped
+paragraphs are at :13-14, :25-28, :41-43, :45-47, :67-69 and :73-77. The
+F-4 duplication sentence is at :71-72.
+
+F-7 (nit, test/lan_concat.py:90-92). The placeholder contract compares
+sorted slot sets, so a print rule of `#{right} + &#{left}` satisfies it,
+and the emission test asserted only that `src/main.rs` exists. The gate
+therefore could not kill an operand-order reversal. The existing
+`test_emission` now reads the emitted Rust. It asserts that the file
+contains the expanded print rule `__lan_left + &__lan_right`. It also
+asserts that the file does not contain the swapped form
+`__lan_right + &__lan_left`. The first version of the assertion looked
+for the source literals `b"left"` and `b"right"`. The printer never
+emits those literals, because byte texts become model-text constructor
+calls on hex-named nominal types. The fix-1 ladder found the error. It
+was RED at `test_emission`. Ladder tag fix-2 carries the repaired
+assertion. The Python check count stays 7.
+This round adds no mutation row to test/lan_concat_mutations.py. The kit
+comparator pins the gate log to the frozen capture, which holds 180
+rows, `LAN-CONCAT-MUTATIONS OK killed=4/4 restored=GREEN` and
+`LAN-CONCAT OK checks=33`. The captures and the receipt stay untouched
+in a review round. The mutation row is deferred to the next capture
+round.
+
+Carried. C-1: the stage gate never runs `test/lan_concat_native.py`,
+so the native row is a manual recording, carried unchanged since LSM1F.
+C-2: the added README sentence is 75 columns, but the staged README has
+68 lines over 72 columns and a maximum of 136, so the line sits inside
+the file's own width band; refuted against the bytes. C-3: the empty
+`dev/validation/stage-m1-concat/diff-check.stdout` appears only in the
+receipt `files_sha256`, and the HTML receipt lists the identical empty
+file with the same hash, so the orphan is carried from LSM1H by design.
+C-4: the receipt has no `e2e-local` key, which matches the form
+receipt, and the composed request path runs in-gate through
+test/lan_concat.py; this is practice, not a gap.
+
+Proof. Six of the seven fixes are documentation or test-local. The one
+source edit changes an error string in rust/run_store.ml. No receipt and
+no capture under `dev/validation/stage-m1-concat/` is changed, so the 28
+frozen captures, the pinned source hashes and the recorded stage stdout
+keep their values. The fix suites ran on a copy of the tree outside the
+repository: all 23 verdict rows are OK, with `LAN-CONCAT OK checks=33`
+for the OCaml suite, `Ran 7 tests` for test/lan_concat.py and
+`LAN-CONCAT-MUTATIONS OK killed=4/4 restored=GREEN` for the mutation
+suite. The recorded run is `FIX-RUN paths=23 extras=2`, over `FIX-RUN
+STAGED base=51 porcelain=53 captures=28 optional=2 unexpected=0`.
+
+Ladders. The baseline ladder ran on the unfixed staged tree and reported
+GREEN (LAUNCH 2026-09-17T00:16:41Z after a 60s load-gate wait at load1
+41.88; VERDICT GATE LSM1C tag=baseline GREEN waited=960s lines=788 at
+2026-09-17T00:34:44Z; FIX-LADDER baseline GREEN). The compare-rows probe
+on the baseline tag showed RED-WATCH 0, PINS 116/116 and ROWS 180/180
+IDENTICAL. The fix-1 ladder ran on the first fixed tree and reported RED
+(LAUNCH 2026-09-17T00:48:31Z at load1 11.98; VERDICT GATE LSM1C
+tag=fix-1 RED waited=360s lines=790 at 2026-09-17T00:56:32Z; FIX-LADDER
+fix-1 RED). The compare-rows probe on the fix-1 tag showed RED-WATCH 0,
+PINS 107/116 and ROWS 173/180 DIFFER, because the first F-7 assertion
+still looked for the source literals b"left" and b"right", which the
+native printer never emits, so test_emission failed. Fixer unit D
+replaced the assertion with a check on the expanded print rule
+`__lan_left + &__lan_right` and on the absence of the swapped form. The
+fix-2 ladder ran on the repaired tree and reported GREEN (LAUNCH
+2026-09-17T01:26:55Z at load1 14.06 with no wait; VERDICT GATE LSM1C
+tag=fix-2 GREEN waited=390s lines=788 at 2026-09-17T01:35:26Z;
+FIX-LADDER fix-2 GREEN). The compare-rows probe on the fix-2 tag showed
+RED-WATCH 0, PINS 116/116 and ROWS 180/180 IDENTICAL. The close ladder
+re-runs the gate on this exact staged tree after the close, and its
+verdict is recorded in the review kit, not in this file.

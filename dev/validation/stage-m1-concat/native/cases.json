@@ -1,0 +1,70 @@
+{
+  "pairs": [
+    [
+      "",
+      ""
+    ],
+    [
+      "",
+      "right"
+    ],
+    [
+      "left",
+      ""
+    ],
+    [
+      "left",
+      "right"
+    ],
+    [
+      "caf\u00e9",
+      "\u65e5\ud83d\ude00"
+    ],
+    [
+      "a\u0000",
+      "\r\nb"
+    ],
+    [
+      "<b>",
+      "&lt;\"'"
+    ],
+    [
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+    ]
+  ],
+  "errors": [
+    [
+      "badLeftByte",
+      "ModelByteRange"
+    ],
+    [
+      "badRightByte",
+      "ModelByteRange"
+    ],
+    [
+      "badLeftUtf8",
+      "ModelUtf8"
+    ],
+    [
+      "badRightUtf8",
+      "ModelUtf8"
+    ],
+    [
+      "splitUtf8",
+      "ModelUtf8"
+    ],
+    [
+      "unusedLeft",
+      "ModelUtf8"
+    ],
+    [
+      "unusedRight",
+      "ModelUtf8"
+    ]
+  ],
+  "observations": {
+    "sync": 19,
+    "async": 20
+  }
+}

@@ -1,4 +1,4 @@
-AXIOMS scope=checked-module target-sha256=0af315c1a65b0578641ec1096bfd9e3089add0ac2368bd948d0dbfe907e19117
+AXIOMS scope=checked-module target-sha256=187e8a92ec66ebdd89aeab3159de72b8b1dd7e400814cf76df44500950ae18c7
 Framework imax_zero : imax l zero = zero
 Foreign Cx : Type 1 [schema=Cx]
 Foreign Db : Type 1 [schema=Db]
@@ -17,6 +17,7 @@ Foreign Response : Type 1 [schema=Response]
 Foreign Response_html : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Response)) [schema=Response.html]
 Foreign Response_text : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Response)) [schema=Response.text]
 Foreign SeeOther : Type 1 [schema=SeeOther]
+Foreign Text_concat : (Ran SPi 0 Text Type 1 (Ran SPi w left Text (Ran SPi w right Text Text))) [schema=Text.concat]
 Foreign Text_is_empty : (Ran SPi 0 Text Type 1 (Ran SPi w text Text (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)])))) [schema=Text.is_empty]
 Foreign Text_trim : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Text)) [schema=Text.trim]
 Foreign Todo_all : (Ran SPi w db Db (Lan SMu Todo_rows [] (Sec SColl 0 []))) [schema=Model.all]
@@ -31,8 +32,8 @@ Foreign topcoat_Error : Type 1 [schema=topcoat::Error]
 Foreign topcoat_db : (Ran SPi w cx Cx Db) [schema=topcoat.db]
 Foreign topcoat_see_other : (Ran SPi w uri Uri SeeOther) [schema=topcoat.see_other]
 COUNT Framework=1
-COUNT Foreign=30
+COUNT Foreign=31
 COUNT Classical=0
 COUNT Div=0
-AXIOMS total=31
-AXIOM-RATIO constants=30 definitions=3 status=REPORTED
+AXIOMS total=32
+AXIOM-RATIO constants=31 definitions=3 status=REPORTED

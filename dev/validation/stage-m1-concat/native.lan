@@ -1,0 +1,38 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+def concat : Bytes -> Bytes -> Bytes := Text.concat Bytes
+def join : Bytes -> Bytes -> Response := fun (left : Bytes) (right : Bytes) =>
+  Response.text Bytes (concat left right)
+def captured : Response :=
+  let prefix : Bytes := b"prefix:" in
+  let append : Bytes -> Bytes := fun (value : Bytes) => Text.concat Bytes prefix value in
+  Response.text Bytes (append b"captured")
+def nested : Response := Response.text Bytes (Text.concat Bytes b"a" (Text.concat Bytes b"b" b"c"))
+def shared : Response := let text : Bytes := b"twice" in join text text
+def page : Response := Response.html Bytes
+  (Text.concat Bytes b"<p>" (Text.concat Bytes (Html.text Bytes b"<script>&") b"</p>"))
+def badLeftByte : Response := join (bytesCons 256 bytesNil) b"ok"
+def badRightByte : Response := join b"ok" (bytesCons 256 bytesNil)
+def badLeftUtf8 : Response := join (bytesCons 255 bytesNil) b"ok"
+def badRightUtf8 : Response := join b"ok" (bytesCons 255 bytesNil)
+def splitUtf8 : Response := join (bytesCons 195 bytesNil) (bytesCons 169 bytesNil)
+def unusedLeft : Response := let ignored : Bytes := Text.concat Bytes (bytesCons 255 bytesNil) b"ok" in join b"ok" b""
+def unusedRight : Response := let ignored : Bytes := Text.concat Bytes b"ok" (bytesCons 255 bytesNil) in join b"ok" b""
+def main : Response := join b"left" b"right"
+model Piece with
+| id : Nat
+| text : Bytes
+end
+
+def left : Db -> Bytes := fun (db : Db) =>
+  let created : Piece := Piece.create (tuple (1, b"left")) db in created.1
+
+def right : Db -> Bytes := fun (db : Db) =>
+  let updated : Piece := Piece.update (tuple (1, b"right")) db in
+  let deleted : prod () := Piece.delete_by_id 1 db in updated.1
+
+def ordered : Response :=
+  let db : Db := Db.connect Piece Bytes b"sqlite::memory:" in
+  let ready : prod () := Db.push_schema db in
+  Response.text Bytes (Text.concat Bytes (left db) (right db))

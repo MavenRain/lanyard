@@ -1,0 +1,20 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+model Piece with
+| id : Nat
+| text : Bytes
+end
+
+def left : Db -> Bytes := fun (db : Db) =>
+  let created : Piece := Piece.create (tuple (1, b"left")) db in created.1
+
+def right : Db -> Bytes := fun (db : Db) =>
+  let updated : Piece := Piece.update (tuple (1, b"right")) db in
+  let deleted : prod () := Piece.delete_by_id 1 db in updated.1
+
+def main : Response :=
+  let db : Db := Db.connect Piece Bytes b"sqlite::memory:" in
+  let ready : prod () := Db.push_schema db in
+  Response.text Bytes (Text.concat Bytes (left db) (right db))

@@ -6,10 +6,11 @@ module Catalog = Lanyard_target.Target_generated
 module Printer = Foreign.Printer
 let ( let* ) = Result.bind
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
-type operation = Trim | Is_empty | Uri_from_text | Form_field | Response_text | Html_text | Response_html
+type operation = Trim | Is_empty | Concat | Uri_from_text | Form_field | Response_text | Html_text | Response_html
 let operation name = match () with
   | () when String.equal name "Text.trim" -> Ok Trim
   | () when String.equal name "Text.is_empty" -> Ok Is_empty
+  | () when String.equal name "Text.concat" -> Ok Concat
   | () when String.equal name "Uri.from_text" -> Ok Uri_from_text
   | () when String.equal name "Form.field" -> Ok Form_field
   | () when String.equal name "Response.text" -> Ok Response_text
@@ -41,13 +42,15 @@ let catalog (checked : Elab.lan_program) (instances : Lower.text_operation list)
 
 let specification = function
   | Trim | Html_text -> "(0 Text : Type 0) -> (text : Text) -> Text"
+  | Concat -> "(0 Text : Type 0) -> (left : Text) -> (right : Text) -> Text"
   | Is_empty -> "(0 Text : Type 0) -> (text : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
   | Uri_from_text -> "(0 Text : Type 0) -> (text : Text) -> Uri"
   | Form_field -> "(0 Text : Type 0) -> (text : Text) -> (field : Text) -> Text"
   | Response_text | Response_html -> "(0 Text : Type 0) -> (text : Text) -> Response"
-let effects = function Trim | Is_empty | Response_text | Html_text | Response_html -> []
+let effects = function Trim | Is_empty | Concat | Response_text | Html_text | Response_html -> []
   | Uri_from_text | Form_field -> ["topcoat::Error"]
 let parameters = function Trim | Is_empty | Uri_from_text | Response_text | Html_text | Response_html -> ["text"]
+  | Concat -> ["left"; "right"]
   | Form_field -> ["text"; "field"]
 let foreign_call entries operations (row : Rir.foreign) =
   let* text = List.find_opt (fun text -> text.row = row) operations
@@ -72,7 +75,7 @@ let foreign_call entries operations (row : Rir.foreign) =
         let bindings = List.map (fun name -> name, "__lan_" ^ name) parameters in
         let* call = Template.render template bindings in
         let converted = match operation with
-          | Trim | Form_field | Html_text -> Printer.identifier "lan_model_text_from_" text.family ^ "(" ^ call ^ ")"
+          | Trim | Concat | Form_field | Html_text -> Printer.identifier "lan_model_text_from_" text.family ^ "(" ^ call ^ ")"
           | Is_empty ->
               let ty = Printer.rust_type (Printer.Sum [Printer.Unit; Printer.Unit]) in
               "if " ^ call ^ " { " ^ ty ^ "::V1(()) } else { " ^ ty ^ "::V0(()) }"
@@ -86,7 +89,7 @@ let foreign_call entries operations (row : Rir.foreign) =
           |> String.concat "" in
         Ok ("{ " ^ evaluated ^ conversions ^ converted ^ " }") in
   let* result = match operation with
-    | Trim | Form_field | Html_text -> Ok text.repr | Is_empty -> Ok bool_repr
+    | Trim | Concat | Form_field | Html_text -> Ok text.repr | Is_empty -> Ok bool_repr
     | Uri_from_text ->
         let* _uri_type = Foreign.foreign_type entries "Uri" [] in
         Ok (Rir.TyForeign ("Uri", []))

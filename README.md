@@ -168,6 +168,19 @@ The form example stores the title and returns `&lt;hello&gt;`. HTML
 responses preserve markup supplied by the program. Text-node escaping
 does not make values safe for attributes, scripts, styles or URLs.
 
+The [M1 text concatenation adapter](dev/STAGE-M1-CONCAT.md) joins two
+checked UTF-8 byte lists with `Text.concat Bytes left right`. Combine
+literal markup with escaped text to build a complete response body:
+
+```sh
+_build/default/bin/lanyard.exe run --request /todos --form 'title=%3Chello%3E' test/fixtures/concat-form.lan
+zsh dev/gates.sh --stage M1-concat
+```
+
+The form example stores the title and returns `<h1>&lt;hello&gt;</h1>`.
+Concatenation preserves its inputs, so dynamic text still needs `Html.text`
+before it is placed in a text node.
+
 Build and validate through Stage D:
 
 ```sh
@@ -308,7 +321,7 @@ _build/default/bin/lanyard.exe axioms --names examples/m0-todo.lan
 
 The report lists Framework, Foreign, Classical and Div, sorted by class
 and name, with class totals and the compiled target catalog's SHA-256.
-Todo reports 17 foreign constants and 3 definitions of the checked
+Todo reports 31 foreign constants and 3 definitions of the checked
 module (Bool, Todo and main). These are informational inputs, with no
 ratio bound. The scope is the whole checked module, including unused
 catalog rows and model operations.
