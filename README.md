@@ -181,6 +181,16 @@ The form example stores the title and returns `<h1>&lt;hello&gt;</h1>`.
 Concatenation preserves its inputs, so dynamic text still needs `Html.text`
 before it is placed in a text node.
 
+The [M1 natural-number text adapter](dev/STAGE-M1-NAT-TEXT.md) renders
+IDs with `Text.from_nat Bytes value`. It supports arbitrary-size naturals
+and emits decimal digits without leading zeros. The Todo list example
+combines sorted database rows, links containing their IDs, and escaped titles:
+
+```sh
+_build/default/bin/lanyard.exe run --request /todos test/fixtures/todo-list.lan
+zsh dev/gates.sh --stage M1-nat-text
+```
+
 Build and validate through Stage D:
 
 ```sh
@@ -321,7 +331,7 @@ _build/default/bin/lanyard.exe axioms --names examples/m0-todo.lan
 
 The report lists Framework, Foreign, Classical and Div, sorted by class
 and name, with class totals and the compiled target catalog's SHA-256.
-Todo reports 31 foreign constants and 3 definitions of the checked
+Todo reports 32 foreign constants and 3 definitions of the checked
 module (Bool, Todo and main). These are informational inputs, with no
 ratio bound. The scope is the whole checked module, including unused
 catalog rows and model operations.

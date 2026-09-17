@@ -265,9 +265,12 @@ let source ?entrypoint ?(output = Discard) (checked : Elab.lan_program) =
     operation.operation = Text_ops.Uri_from_text) operations in
   let form_errors = List.exists (fun (operation : Text_ops.t) ->
     operation.operation = Text_ops.Form_field) operations in
+  let nat_text = List.exists (fun (operation : Text_ops.t) ->
+    operation.operation = Text_ops.From_nat) operations in
   let* source = Target.native ?entrypoint ~entry_output ~model_errors:true ~text_errors:(text <> []) ~uri_errors ~form_errors
     (("", Erase.Code [Rir.RData data]) :: rows) in
   Ok (source ^ "\n" ^ String.concat "\n" (List.map declaration models) ^ conversions
     ^ (List.map text_conversions text |> String.concat "")
+    ^ (if nat_text then Text_ops.nat_runtime else "")
     ^ (if uri_errors then Text_ops.uri_runtime else "")
     ^ (if form_errors then Form_data.runtime else "") ^ output_code)

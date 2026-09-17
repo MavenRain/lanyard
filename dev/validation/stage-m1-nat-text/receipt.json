@@ -1,0 +1,108 @@
+{
+  "base": "6e1a952ce7fe42788d6977f62bcbe74fccc3adff",
+  "captures": {
+    "dune-tests": {
+      "argv": [
+        "dunecho",
+        "test"
+      ],
+      "exit_code": 0
+    },
+    "native-build": {
+      "argv": [
+        "gateledger",
+        "run",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-nat-text/.gatework/gateledger",
+        "--dir",
+        "dev/validation/stage-m1-nat-text/native",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_HOME=/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-nat-text/dev/validation/stage-m1-nat-text/native/Cargo.toml",
+        "--target-dir",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target",
+        "--jobs",
+        "2"
+      ],
+      "exit_code": 0
+    },
+    "native-check": {
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_nat_text_database.py",
+        "--check",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target/debug/lanyard-program"
+      ],
+      "exit_code": 0
+    },
+    "native-prepare": {
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_nat_text_database.py",
+        "--prepare",
+        "dev/validation/stage-m1-nat-text/native",
+        "--toasty",
+        "/Users/oobi/Documents/toasty",
+        "--topcoat",
+        "/Users/oobi/Documents/topcoat",
+        "--lock",
+        "dev/validation/stage-m1-concat/native/Cargo.lock"
+      ],
+      "exit_code": 0
+    },
+    "stage": {
+      "argv": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-nat-text"
+      ],
+      "exit_code": 0
+    }
+  },
+  "files": {
+    "diff-check.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dune-tests-capture.json": "76ebaad61005e18c53ca9acb505390057971dc148a3f43845ea1bc570fe63899",
+    "dune-tests.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dune-tests.stdout": "0a9ae2db73aa6b128fd0d99e2a7e69fe6331e825616696e91988c969cd54d4e7",
+    "native-build-capture.json": "19409c61bd640987d31cc988926114e38effc0f0dbf8842360cd513d8458153d",
+    "native-build.stderr": "82487854e754eccd6d3b1e3cc150e1e123f550b6e61a157b0a4011aa7edd00db",
+    "native-build.stdout": "06700f693f1b5c8fbc969451501aeca9a8a9f50d609d94d4bdb92c1a29ce3ad4",
+    "native-check-capture.json": "5a144156fd0c229cad7b48b0a129d1fd0f75e89d9f5e8dd5b92aac8b2a2fbc74",
+    "native-check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-check.stdout": "bdbab6b49f88dbd3b7396cb1f759e2f5bbf3b5d0db9cc02288817c514a13d07c",
+    "native-prepare-capture.json": "fd313c130ffb89cad9675fe95628dc3bc758c5e787a9d7ec1faa9e17c48e88b9",
+    "native-prepare.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-prepare.stdout": "a688549a7ca67858acb639bf165b3091332df254e69256810af1a9c42db7fa67",
+    "native.lan": "60754cd03941892b04806fc8d568135b78f805d7f5711e5d27ed81f3ac12f34f",
+    "native/Cargo.git.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "native/Cargo.lock": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "native/Cargo.toml": "f542ef1107feceb9f68626d4d27917d6515db34c404ffbaef5475bf03fe58efe",
+    "native/cases.json": "d81736caff000a6377ac0fc41d48a59f4c9a315d9e2a0278cc48cd08701fba3e",
+    "native/src/main.rs": "9738df08fe147860f1652e722bbfab216529e08abb4f16589c2038c2f32d95db",
+    "source-sha256.json": "c6d7bc5ed1c3e976121e8c78c6a2809c60af565b327b911afc8cb4132b439060",
+    "stage-capture.json": "f1318b28b0d6dc19a7961f6cf91bd2ee0f734885cd09c4bee9cee5d40e8339b6",
+    "stage.stderr": "15e5a11ae9031926fc8916f131e9212f4cb056fd0d1d1d22a609bd961fa11a0a",
+    "stage.stdout": "749f1c41b9ed900048cce3c0773c3013337bec3473244181af02727076a9f06e"
+  },
+  "recorded_at": "2026-09-17T02:56:00.728826+00:00",
+  "stage": "M1-nat-text",
+  "status": "PASS"
+}

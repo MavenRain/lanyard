@@ -3699,3 +3699,154 @@ FIX-LADDER fix-2 GREEN). The compare-rows probe on the fix-2 tag showed
 RED-WATCH 0, PINS 116/116 and ROWS 180/180 IDENTICAL. The close ladder
 re-runs the gate on this exact staged tree after the close, and its
 verdict is recorded in the review kit, not in this file.
+
+## Stage M1 NAT-TEXT (2026-09-16)
+
+This slice continues from the reviewed CONCAT commit `6e1a952`.
+`Text.from_nat Bytes value` renders a natural number as decimal text.
+Zero becomes `b"0"`. Other values carry no leading zeros. Values
+beyond `u64` work in the interpreter and in the emitted Rust, with
+computed values, aliases and captured arguments.
+
+The schema is `(0 Text : Type 0) -> (value : Nat) -> Text`. The output
+must be a closed, checked byte-list family. The type argument is
+erased. The natural has shared quantity. The operation is synchronous
+and pure. An effectful argument is evaluated once, and its effects
+are retained when the formatted result is unused.
+
+The interpreter uses its arbitrary-precision natural representation.
+The Rust adapter reads the existing little-endian base-256 limbs and
+accumulates decimal digits without narrowing the input. Each digit is
+in `0..9`. Each multiply-and-carry value is at most 2559 and fits in
+`u16`. The helper is emitted only when the program uses this
+operation. It adds no library dependency and no foreign type. The SQL
+integer range checks and the recursive byte-list limits still apply.
+
+The cumulative stage retains the concat gate and adds 45 OCaml checks
+and 7 Python checks. The adapter unit suite joins the default Dune
+test alias. Decimal checks cover byte boundaries through 1024 bits,
+deterministic larger values below 2048 bits, zero, leading zeros,
+arithmetic, closures and link composition. The separate native leg
+checks 970 decimal observations. The database leg checks five
+observations in the interpreter. Both legs run by hand with Rust
+1.98; the stage gate does not call the native leg.
+
+Four native mutations alter radix, limb order, zero and carry
+behavior, with clean and restored controls. Rows 695 to 705 of the
+stage capture hold `LAN-NAT-TEXT OK checks=45`, the native row, the
+database row, the two control rows, the four killed rows,
+`LAN-NAT-TEXT-MUTATIONS OK killed=4` and `STAGE-M1-NAT-TEXT OK`. The
+kit comparator tracks 191 gate rows and 127 pins.
+
+The additional database harness checks empty, single-row and sorted
+multi-row pages against pinned Toasty and Topcoat. It also checks a
+database write inside the natural argument and an unused formatted
+result. Native database compilation reports 15 generated
+unused-variable and dead-code warnings.
+
+The catalog grows to 27 declarations, with nine foreign types. Todo
+reports 32 foreign constants. The generated catalog has 176 lines, 72
+above the pending proposed allowance of 104. No allowance, library
+pin, source anchor, trust approval or M0 exit stamp is changed.
+
+The slice stages 47 paths: 23 source, test and document paths, and 24
+frozen captures. Five capture json files record the round. The staged
+`receipt.json` keeps the reduced schema of the capture round, with the
+keys `base`, `captures`, `files`, `recorded_at`, `stage` and `status`.
+It holds no axioms capture, although the stage log records the
+`LAN-AXIOMS` rows. The stage contract is in `STAGE-M1-NAT-TEXT.md`.
+Validation captures, native sources and checked input hashes are in
+`validation/stage-m1-nat-text/`.
+
+## Stage M1 NAT-TEXT review fixes (tag LSM1N, 2026-09-16)
+
+The review kit LSM1N ran on base 6e1a952 over a 47-path slice. An opus
+drafter supplied 13 hypotheses. An opus prober confirmed nine of them,
+refuted one and ruled three not a finding. One ctxcat-review Workflow
+run, wf_6e0148a1-f42, supplied 7 raw findings, of which 3 were upheld
+and 3 survived. An opus judge passed seven findings, four medium and
+three nits, under a judge cap of 7. Six more are carried.
+
+F-1 (med, target/README.md:98). The catalog README kept the generated
+counts of the concat round. Line 98 read 170 lines and line 102 read
+66 measured lines, while this catalog has 176 lines and exceeds the
+proposed 104-line allowance by 72. Line 98 now reads 176 lines and
+line 102 now reads 72 measured lines. The allowance is unchanged.
+
+F-2 (med, target/README.md:334). The foreign constant count stayed at
+31, the concat number, although Todo reports 32 foreign constants
+after this slice. Line 334 now reads 32 foreign constants.
+
+F-3 (med, dev/M1-BUILD-LOG.md:3703 and dev/M1-MUTATION-LOG.md:678).
+The slice recorded no block in the M1 build log and no section in the
+M1 mutation log, so the logs and the captures disagreed: the four
+NAT-TEXT killed rows existed only inside the staged stage capture. The
+build log now holds a `## Stage M1 NAT-TEXT (2026-09-16)` block in the
+shape of the concat block, and this fixes block. The mutation log now
+holds a `## Natural-number text (2026-09-16)` section with one table
+row per mutation, the control rules, the cumulative command and the
+capture row numbers. Both logs are hand-staged as added paths.
+
+F-4 (med, dev/STAGE-M1-NAT-TEXT.md:63-70). The staged `receipt.json`
+holds only the keys `base`, `captures`, `files`, `recorded_at`,
+`stage` and `status`, and the capture set holds no axioms trio,
+although the stage log records the `LAN-AXIOMS` rows. Earlier rounds
+recorded the full schema. The stage document now records the frozen
+captures, the reduced schema, the missing axioms capture and the
+deferred recapture. Deviation: no in-repo writer is corrected, because
+`dev/stage-m1-nat-text.sh` writes no receipt, and neither did
+`HEAD:dev/stage-m1-concat.sh`. The writer is the out-of-tree
+gateledger harness named in the receipt argv. The keys that the
+harness must restore are listed in the review kit, and the recapture
+belongs to the next capture round.
+
+F-5 (nit, target/README.md:6-8). The catalog paragraph was not
+reflowed after the `Text.from_nat` insert, so one line reached 83
+columns, the widest line of the file. The paragraph is re-wrapped at
+64 columns or less. No word changes.
+
+F-6 (nit, rust/run_store.ml:127-128). A dead `From_nat` arm preceded
+the combined arity arm, so one arm of the match was unreachable.
+`Text_ops.From_nat` now joins the combined arm. The match stays
+exhaustive and adds no catch-all pattern. No test and no capture
+pinned the removed message.
+
+F-7 (nit, test/lan_nat_text.py:61-64 and
+test/lan_nat_text_database.py:48-51). Two fixture builders grew a
+string with repeated concatenation inside a loop. Each builder is now
+one `"".join` over a generator. The emitted bytes are unchanged and
+the ast parses clean. Deviation: the third site, the emitted helper in
+rust/text_ops.ml:117-126, is deferred to the next capture round,
+because `receipt.json:99` pins the digest of `native/src/main.rs`,
+which carries the helper verbatim at :203-220, and the carry mutation
+anchor `(digits, next / 10)` at test/lan_nat_text.py:39 is the fold
+accumulator that a chain-and-collect rewrite removes.
+
+Carried. C-1, the manual native leg, holds the LSM1F design. C-2, the
+empty `diff-check.stdout`, and C-3, the missing e2e-local capture, sit
+inside the frozen captures and wait for the next capture round. C-4,
+the Workflow row on the `contains` helper, is refuted under the LSM1C
+F-4 precedent. C-5, the wrap candidates at or under 80 columns, and
+C-6, the Workflow row 4 with drafter H9, are refuted.
+
+Proof. The suite probe on the fixed tree reported
+`lan_nat_text.exe checks=45`, `test/lan_nat_text.py Ran 7`,
+`lan_nat_text_database.py --interpreter observations=5` and
+`--mutations killed=4` with both controls, and every earlier floor row
+OK. A search for `FAILED`, `Error` and `Traceback` in the suite log
+printed nothing. The needle probe reported `NEEDLES rows=14 bad=0`.
+
+Ladders. The baseline ladder ran on the unfixed staged tree and
+reported GREEN (launched detached 2026-09-17T03:46:21Z at load1 36.14,
+pid 99692; verdict 2026-09-17T04:00:52Z after 750s, 805 log lines;
+GATE LSM1N tag=baseline GREEN at gates-LSM1N-baseline.log:805;
+FIX-LADDER baseline GREEN). The compare-rows probe on the baseline tag
+showed RED-WATCH 0, PINS 127/127 and ROWS 191/191 IDENTICAL. The fix-1
+ladder ran on the fixed tree and reported GREEN (launched detached
+2026-09-17T04:23:41Z at load1 11.57, pid 3477; verdict
+2026-09-17T04:38:42Z after 780s, 805 log lines; GATE LSM1N tag=fix-1
+GREEN at gates-LSM1N-fix-1.log:805; FIX-LADDER fix-1 GREEN). The
+compare-rows probe on the fix-1 tag showed RED-WATCH 0, PINS 127/127
+and ROWS 191/191 IDENTICAL. The close ladder re-runs the gate on this
+exact staged tree after the close, and its verdict is recorded in the
+review kit, not in this file.

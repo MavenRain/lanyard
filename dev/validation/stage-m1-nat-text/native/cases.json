@@ -1,0 +1,32 @@
+[
+  [
+    "empty",
+    "page db",
+    "<ul></ul>",
+    "text/html"
+  ],
+  [
+    "single",
+    "let row : Todo := Todo.create (tuple (0, b\"\")) db in page db",
+    "<ul><li><a href='/todos/0'></a></li></ul>",
+    "text/html"
+  ],
+  [
+    "multiple",
+    "let last : Todo := Todo.create (tuple (20, b\"café\")) db in let first : Todo := Todo.create (tuple (3, b\"<write> & test\")) db in page db",
+    "<ul><li><a href='/todos/3'>&lt;write&gt; &amp; test</a></li><li><a href='/todos/20'>café</a></li></ul>",
+    "text/html"
+  ],
+  [
+    "once",
+    "Response.text Bytes (Text.from_nat Bytes (allocate db))",
+    "257",
+    "text/plain"
+  ],
+  [
+    "retained",
+    "let ignored : Bytes := Text.from_nat Bytes (allocate db) in page db",
+    "<ul><li><a href='/todos/257'>saved</a></li></ul>",
+    "text/html"
+  ]
+]

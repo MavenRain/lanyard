@@ -1,0 +1,16 @@
+W src/main.rs:45:8  dead_code  methods `compare`, `sub`, and `mul` are never used
+W src/main.rs:101:6  dead_code  enum `T73756d28756e69742c756e697429` is never used
+W src/main.rs:128:409  unused_variables  unused variable: `p1`
+W src/main.rs:128:586  unused_variables  unused variable: `p0`
+W src/main.rs:136:1071  unused_variables  unused variable: `p1`
+W src/main.rs:140:1232  unused_variables  unused variable: `v1`
+W src/main.rs:144:1232  unused_variables  unused variable: `v1`
+W src/main.rs:144:1324  unused_variables  unused variable: `v2`
+W src/main.rs:148:1232  unused_variables  unused variable: `v1`
+W src/main.rs:148:1324  unused_variables  unused variable: `v2`
+W src/main.rs:148:2295  unused_variables  unused variable: `v3`
+W src/main.rs:152:1232  unused_variables  unused variable: `v1`
+W src/main.rs:156:1232  unused_variables  unused variable: `v1`
+W src/main.rs:156:1324  unused_variables  unused variable: `v2`
+W src/main.rs:159:10  dead_code  function `f_6d61696e` is never used
+OK build: 0 errors, 15 warnings

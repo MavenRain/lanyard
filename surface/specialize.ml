@@ -12,6 +12,7 @@ let text_arguments = function
       Option.map (fun schema -> schema, text)
         (List.assoc_opt name ["Text_trim", "Text.trim"; "Text_is_empty", "Text.is_empty";
           "Text_concat", "Text.concat";
+          "Text_from_nat", "Text.from_nat";
           "Uri_from_text", "Uri.from_text"; "Form_field", "Form.field";
           "Response_text", "Response.text"; "Html_text", "Html.text";
           "Response_html", "Response.html"])

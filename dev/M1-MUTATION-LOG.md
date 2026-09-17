@@ -674,3 +674,34 @@ restored=GREEN` row. Row 693 holds `STAGE-M1-CONCAT OK`, with
 shipped: the predecessor trios are capture-harness artifacts of the
 author's worktree, and no command of this tree makes them.
 
+
+## Natural-number text (2026-09-16)
+
+`test/lan_nat_text.py --mutations` emits the native target once, then
+applies each source mutation to an isolated copy and compiles and runs
+it. The mutated observation lines must differ from the clean lines.
+
+| Mutation | Required failing observation |
+| --- | --- |
+| radix: use 255 per limb | wrong digits above one limb |
+| limb-order: drop `rev` from the fold | wrong digits above one limb |
+| zero: empty the digit vector | wrong text for zero |
+| carry: drop the carry quotient | wrong digits where a digit carries |
+
+Each edit must match exactly one source site; the harness exits when
+an anchor occurs more than once. A native execution failure does not
+count as a kill, and a surviving mutant fails the run. The clean and
+restored controls must reproduce the expected lines. The cumulative
+command is `zsh dev/gates.sh --stage M1-nat-text`, which retains every
+earlier stage gate, including the four concat mutations. Native
+decimal parity and the database page are exercised separately by
+`test/lan_nat_text_database.py`.
+
+This slice records the mutation observations only in the cumulative
+capture. dev/validation/stage-m1-nat-text/stage.stdout rows 698 to 704
+hold the two control rows, the four killed rows and the
+`LAN-NAT-TEXT-MUTATIONS OK killed=4` row. Row 705 holds
+`STAGE-M1-NAT-TEXT OK`. No standalone `nat-text-mutations` trio and no
+receipt key is shipped: the predecessor trios are capture-harness
+artifacts of the author's worktree, and no command of this tree makes
+them.

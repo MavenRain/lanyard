@@ -1,0 +1,31 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+model Todo with
+| id : Nat
+| title : Bytes
+end
+
+def rec items : Todo.rows -> Bytes := fun (rows : Todo.rows) =>
+  match rows as self in Todo.rows return Bytes with
+  | Todo.nil => b""
+  | Todo.cons head tail =>
+      let key : Bytes := Text.from_nat Bytes head.0 in
+      let title : Bytes := Html.text Bytes head.1 in
+      Text.concat Bytes b"<li><a href='/todos/"
+        (Text.concat Bytes key
+          (Text.concat Bytes b"'>"
+            (Text.concat Bytes title
+              (Text.concat Bytes b"</a></li>" (items tail)))))
+
+def page : Db -> Response := fun (db : Db) =>
+  Response.html Bytes (Text.concat Bytes b"<ul>" (Text.concat Bytes (items (Todo.all db)) b"</ul>"))
+
+def allocate : Db -> Nat := fun (db : Db) => let row : Todo := Todo.create (tuple (257, b"saved")) db in row.0
+def empty : Response := let db : Db := Db.connect Todo Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in page db
+def single : Response := let db : Db := Db.connect Todo Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in let row : Todo := Todo.create (tuple (0, b"")) db in page db
+def multiple : Response := let db : Db := Db.connect Todo Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in let last : Todo := Todo.create (tuple (20, b"café")) db in let first : Todo := Todo.create (tuple (3, b"<write> & test")) db in page db
+def once : Response := let db : Db := Db.connect Todo Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in Response.text Bytes (Text.from_nat Bytes (allocate db))
+def retained : Response := let db : Db := Db.connect Todo Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in let ignored : Bytes := Text.from_nat Bytes (allocate db) in page db
+def main : Response := multiple
