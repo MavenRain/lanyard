@@ -1,0 +1,44 @@
+[
+  [
+    "create",
+    "let key : Nat := Text.to_nat Bytes (Form.field Bytes b\"id=000257\" b\"id\") in let row : Todo := Todo.create (tuple (key, b\"saved\")) db in let fetched : Todo := Todo.get_by_id key db in fetched.0",
+    "257",
+    null
+  ],
+  [
+    "update",
+    "let key : Nat := Text.to_nat Bytes (Form.field Bytes b\"id=000257\" b\"id\") in let row : Todo := Todo.create (tuple (key, b\"1\")) db in let updated : Todo := Todo.update (tuple (key, b\"00042\")) db in let fetched : Todo := Todo.get_by_id key db in Text.to_nat Bytes fetched.1",
+    "42",
+    null
+  ],
+  [
+    "delete",
+    "let key : Nat := Text.to_nat Bytes (Form.field Bytes b\"id=000257\" b\"id\") in let row : Todo := Todo.create (tuple (key, b\"saved\")) db in let removed : prod () := Todo.delete_by_id key db in match Todo.all db as self in Todo.rows return Nat with | Todo.nil => 0 | Todo.cons head tail => 1",
+    "0",
+    null
+  ],
+  [
+    "once",
+    "Text.to_nat Bytes (allocate db)",
+    "257",
+    null
+  ],
+  [
+    "retained",
+    "let ignored : Nat := Text.to_nat Bytes (allocate db) in let fetched : Todo := Todo.get_by_id 257 db in fetched.0",
+    "257",
+    null
+  ],
+  [
+    "range",
+    "let key : Nat := Text.to_nat Bytes b\"9223372036854775808\" in let row : Todo := Todo.create (tuple (key, b\"large\")) db in row.0",
+    "i64",
+    "ModelRange"
+  ],
+  [
+    "invalid",
+    "let ignored : Nat := Text.to_nat Bytes b\"bad\" in let row : Todo := Todo.create (tuple (1, b\"saved\")) db in row.0",
+    "decimal natural",
+    "Digit"
+  ]
+]

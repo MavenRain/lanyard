@@ -1,0 +1,19 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+model Todo with
+| id : Nat
+| title : Bytes
+end
+
+def main : Cx -> Uri -> Bytes -> Response :=
+  fun (cx : Cx) (uri : Uri) (body : Bytes) =>
+    let db : Db := topcoat.db cx in
+    let ready : prod () := Db.push_schema db in
+    let id : Nat := Text.to_nat Bytes (Form.field Bytes body b"id") in
+    let title : Bytes := Form.field Bytes body b"title" in
+    let created : Todo := Todo.create (tuple (id, title)) db in
+    let fetched : Todo := Todo.get_by_id id db in
+    Response.html Bytes (Text.concat Bytes (Text.from_nat Bytes fetched.0)
+      (Text.concat Bytes b": " (Html.text Bytes fetched.1)))

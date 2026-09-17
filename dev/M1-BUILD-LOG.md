@@ -3850,3 +3850,150 @@ compare-rows probe on the fix-1 tag showed RED-WATCH 0, PINS 127/127
 and ROWS 191/191 IDENTICAL. The close ladder re-runs the gate on this
 exact staged tree after the close, and its verdict is recorded in the
 review kit, not in this file.
+
+## Stage M1 TEXT-NAT (2026-09-16)
+
+This slice adds `Text.to_nat Bytes text`, the inverse decimal boundary to
+`Text.from_nat`. A nonempty sequence of ASCII digits parses exactly into
+an arbitrary-precision natural. Leading zeros are accepted. Empty input,
+signs, whitespace, fractions, separators, exponents, non-ASCII digits,
+NULs, malformed UTF-8 and out-of-range byte elements fail.
+
+Specialization retains the checked byte-list family. The Rust adapter
+returns the existing natural representation and reuses `Nat::decimal`
+behind an empty-input check. The interpreter uses `Bignum.of_decimal`.
+The schema carries the existing fallible-text error effect. Neither the
+kernel nor the natural runtime arithmetic changes. Argument effects
+remain once-only and survive an unused result, including failures.
+
+The form fixtures exercise arithmetic above `u64` and a Todo create/fetch
+flow with parsed IDs and escaped titles. The database harness also covers
+updates, deletion, retained writes and the unchanged SQL key range.
+`Text.to_nat` is recognized through aliases and captured text arguments;
+the helper is absent when unused.
+
+Focused validation passed 53 OCaml checks, nine CLI groups, 736 native
+observations and seven database scenarios in each runtime. Four native
+mutations were killed with passing clean and restored controls. The
+default Dune test alias includes the new unit suite. The native database
+crate builds offline against the existing pins with Rust 1.98, reporting
+26 generated unused-variable and dead-code warnings.
+
+The cumulative stage retains every predecessor check. Its temporary Git
+root is outside the Dune project so native ledger scopes and copied
+mutation projects have independent roots, and is removed on exit.
+Validation needs normal Git process access on this macOS host: sandboxed
+Git emits a `confstr` warning that violates two existing empty-stderr
+assertions. The 19-test end-to-end suite passes with normal access;
+those assertions remain unchanged.
+
+The generated catalog now has 28 proposed declarations, nine foreign
+types and 182 lines. Todo's disclosure reports 33 foreign constants.
+The signature fingerprint, disclosure golden and count assertions are
+updated. The proposed 104-line signature allowance is exceeded by 78;
+this slice approves no trust budget, library revision or M0 exit stamp.
+
+`dev/validation/stage-m1-text-nat/` retains the native harness, complete
+captures and input hashes. Its receipt uses the full capture schema and
+includes a separate axiom-report capture, addressing the prior slice's
+deferred evidence recapture.
+
+Final validation passed `STAGE-M1-TEXT-NAT`, the default Dune tests,
+the ten-observation, eleven-refusal axiom suite and the seven-scenario
+native database harness. The cumulative capture ends with passing clean
+and restored controls around all four killed parser mutations.
+
+## Stage M1 TEXT-NAT review fixes (tag LSM1D, 2026-09-16)
+
+The review kit LSM1D ran on base e6e40fe over a 25-path slice. An opus
+drafter supplied seven hypotheses. An opus prober confirmed four of
+them and refuted three. One ctxcat-review Workflow run,
+wf_a8161576-02d, supplied 13 raw findings, of which 12 were upheld and
+12 survived. An opus judge passed seven findings, two medium, two low
+and three nits, under a judge cap of 7. Seven more are carried.
+
+F-1 (med, README.md:344). The root README kept the pre-slice count of
+32 foreign constants, while corpus/m0/axioms.txt reads
+`COUNT Foreign=33`, test/lan_axioms.py calls `report(todo, 33, 3)` and
+dev/STAGE-M1-TEXT-NAT.md reads 33 foreign constants. Line 344 now
+reads 33 foreign constants. No other word of the paragraph changes.
+
+F-2 (med, target/README.md:102). The allowance disclosure kept the
+excess of the concat round. Line 98 reads 182 lines and the proposed
+allowance is 104, thus the excess is 78, the value that
+dev/STAGE-M1-TEXT-NAT.md records. Line 102 now reads 78 measured
+lines. The allowance is unchanged.
+
+F-3 (low, dev/stage-m1-text-nat.sh:9). The comment at :8 promised the
+system temporary directory, but the command hard-coded /tmp, so a
+caller without a writable /tmp saw a RED stage for an environment
+reason. Line 9 now reads
+`stage_tmp=$(mktemp -d "${TMPDIR:-/tmp}/lanyard-text-nat.XXXXXX")`.
+The default keeps the earlier behavior where TMPDIR is unset.
+
+F-4 (low, dev/M1-MUTATION-LOG.md:711 and :718). The section presented
+the four mutants as mutations of a changed Rust adapter, although
+`mutations()` at test/lan_text_nat.py:217-231 patches the whole
+emitted program, and the radix anchor `n.scale(10)?` occurs only in
+`Nat::decimal` at rust/emit.ml:484, which this slice does not change.
+Line 711 now names the mutated copy of the emitted program, and the
+radix row at :718 names the shared decimal runtime that the adapter
+calls. No count and no capture changes.
+
+F-5 (nit, test/lan_text_nat.ml:36 and :39). Two string comparisons
+used the polymorphic `=` in a file that compares with `String.equal`
+at :14 and :16. Both sites now call `String.equal`, so the file keeps
+one spelling and the comparisons stay monomorphic.
+
+F-6 (nit, test/lan_text_nat.ml:26). The second bind of `number` only
+rewrapped its value, thus it is a map. Line 26 now reads
+`V.natural value |> Result.map Bignum.to_string`. The outer bind that
+branches is unchanged.
+
+F-7 (nit, test/lan_text_nat.ml:12-14). A second `contains` helper
+built a full index list with `List.init` and read the text with
+`String.sub` under a `(* @total-accessor *)` escape. The helper now
+uses the test/lan_text_ops.ml:13-15 formulation over `String.to_seq`
+and `String.starts_with`. The escape comment goes away with the
+`String.sub` call, and no other user of the escape is in this file.
+
+Carried. C-1, the manual native leg, holds the LSM1F design. C-2, the
+target/README.md:7 width at 78 columns, and C-3, the mutation-log
+heading form, are refuted. C-4, the `harness()` append loop, C-5, the
+`source()` rebuild per case, and C-6, the third `List.exists`
+operation probe, sit below the judge cap. C-7 lists the by-design
+items of the hypotheses document. The two pinned sources that this
+round edits, dev/stage-m1-text-nat.sh and test/lan_text_nat.ml, keep
+their pre-fix shas at
+dev/validation/stage-m1-text-nat/source-sha256.json:109 and :696: no
+command of this tree rewrites that capture, and all 27 captures stay
+byte-identical, as in the LSM1N round.
+
+Proof. The suite probe on the fixed tree reported 44 floor rows OK and
+none FAIL, among them `lan_text_nat.exe checks=53`,
+`test/lan_text_nat.py Ran 9` with `LAN-TEXT-NAT NATIVE OK
+observations=736`, `lan_text_nat_database.py --interpreter
+observations=7`, and the mutation rows `LAN-TEXT-NAT-MUT OK clean`,
+the four KILLED rows empty, radix, plus and zero, and
+`LAN-TEXT-NAT-MUT OK restored`. The retained rows kept their LSM1N
+values: `lan_nat_text.exe checks=45`, `test/lan_nat_text.py Ran 7`,
+`lan_nat_text_database.py --interpreter observations=5` and
+`--mutations killed=4`. A search for `FAILED`, `Error` and `Traceback`
+in the suite log printed nothing. The needle probe reported
+`NEEDLES rows=13 bad=0`.
+
+Ladders. The baseline ladder ran on the unfixed staged tree and
+reported GREEN (launched detached 2026-09-17T06:56:32Z at load1
+30.56, pid 54633; verdict 2026-09-17T07:16:39Z after 1080s, 821 log
+lines; GATE LSM1D tag=baseline GREEN at
+gates-LSM1D-baseline.log:821; RED-WATCH tag=baseline hits=0; PINS
+tag=baseline ok=137 missing=0; ROWS tag=baseline capture=201 log=201
+IDENTICAL; COMPARE rc=0; FIX-LADDER baseline GREEN). The fix-1
+ladder ran on the fixed tree and reported GREEN (launched detached
+2026-09-17T07:37:46Z at load1 11.89, pid 40388; verdict
+2026-09-17T07:48:48Z after 540s, 821 log lines; GATE LSM1D tag=fix-1
+GREEN at gates-LSM1D-fix-1.log:821; RED-WATCH tag=fix-1 hits=0;
+PINS tag=fix-1 ok=137 missing=0; ROWS tag=fix-1 capture=201 log=201
+IDENTICAL; COMPARE rc=0; FIX-LADDER fix-1 GREEN). The close ladder
+re-runs the gate on this exact staged tree after the close, and its
+verdict is recorded in the review kit, not in this file.

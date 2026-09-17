@@ -191,6 +191,16 @@ _build/default/bin/lanyard.exe run --request /todos test/fixtures/todo-list.lan
 zsh dev/gates.sh --stage M1-nat-text
 ```
 
+The [M1 decimal text parser](dev/STAGE-M1-TEXT-NAT.md) converts nonempty
+ASCII decimal text with `Text.to_nat Bytes value`. Leading zeros are
+accepted and values beyond `u64` remain exact. Signs, whitespace and
+other malformed input fail. Forms can supply IDs for model operations:
+
+```sh
+_build/default/bin/lanyard.exe run --request /todos --form 'id=000257&title=%3Chello%3E' test/fixtures/todo-form-id.lan
+zsh dev/gates.sh --stage M1-text-nat
+```
+
 Build and validate through Stage D:
 
 ```sh
@@ -331,7 +341,7 @@ _build/default/bin/lanyard.exe axioms --names examples/m0-todo.lan
 
 The report lists Framework, Foreign, Classical and Div, sorted by class
 and name, with class totals and the compiled target catalog's SHA-256.
-Todo reports 32 foreign constants and 3 definitions of the checked
+Todo reports 33 foreign constants and 3 definitions of the checked
 module (Bool, Todo and main). These are informational inputs, with no
 ratio bound. The scope is the whole checked module, including unused
 catalog rows and model operations.

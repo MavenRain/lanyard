@@ -705,3 +705,23 @@ hold the two control rows, the four killed rows and the
 receipt key is shipped: the predecessor trios are capture-harness
 artifacts of the author's worktree, and no command of this tree makes
 them.
+
+## Stage M1 TEXT-NAT (2026-09-16)
+
+`python3 -P test/lan_text_nat.py --mutations` compiles each mutated copy
+of the emitted program against the native decimal observations. Every mutant must
+compile successfully and disagree with the expected observations.
+
+| Mutation | Changed behavior | Observation |
+| --- | --- | --- |
+| empty | Remove the adapter's empty-input rejection | Empty text is incorrectly accepted as zero |
+| radix | Accumulate digits in radix 9 instead of 10 in the shared decimal runtime that the adapter calls | Decimal values disagree with the independent formatted-text expectations |
+| plus | Strip a leading plus before parsing | `+1` is incorrectly accepted |
+| zero | Reject the valid input `0` | Zero no longer parses |
+
+All four mutations are killed. The clean and restored adapters pass.
+The cumulative `M1-text-nat` gate includes these rows after the previous
+stage's four natural-number formatting mutations. Its capture retains
+the observations with the other stage evidence. Metadata refusal checks
+also exercise effects, quantities, type, kind, arity, erased type
+arguments and print rules.

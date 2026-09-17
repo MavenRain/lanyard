@@ -1,0 +1,8 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def main : Cx -> Uri -> Bytes -> Response :=
+  fun (cx : Cx) (uri : Uri) (body : Bytes) =>
+    let value : Nat := Text.to_nat Bytes (Form.field Bytes body b"value") in
+    Response.text Bytes (Text.from_nat Bytes (natAdd value 1))

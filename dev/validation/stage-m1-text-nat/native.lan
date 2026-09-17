@@ -1,0 +1,15 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+model Todo with | id : Nat | title : Bytes end
+def render : Nat -> Bytes := Text.from_nat Bytes
+def allocate : Db -> Bytes := fun (db : Db) =>
+  let row : Todo := Todo.create (tuple (257, b"000257")) db in row.1
+def create : Nat := let db : Db := Db.connect Todo Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in let key : Nat := Text.to_nat Bytes (Form.field Bytes b"id=000257" b"id") in let row : Todo := Todo.create (tuple (key, b"saved")) db in let fetched : Todo := Todo.get_by_id key db in fetched.0
+def update : Nat := let db : Db := Db.connect Todo Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in let key : Nat := Text.to_nat Bytes (Form.field Bytes b"id=000257" b"id") in let row : Todo := Todo.create (tuple (key, b"1")) db in let updated : Todo := Todo.update (tuple (key, b"00042")) db in let fetched : Todo := Todo.get_by_id key db in Text.to_nat Bytes fetched.1
+def delete : Nat := let db : Db := Db.connect Todo Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in let key : Nat := Text.to_nat Bytes (Form.field Bytes b"id=000257" b"id") in let row : Todo := Todo.create (tuple (key, b"saved")) db in let removed : prod () := Todo.delete_by_id key db in match Todo.all db as self in Todo.rows return Nat with | Todo.nil => 0 | Todo.cons head tail => 1
+def once : Nat := let db : Db := Db.connect Todo Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in Text.to_nat Bytes (allocate db)
+def retained : Nat := let db : Db := Db.connect Todo Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in let ignored : Nat := Text.to_nat Bytes (allocate db) in let fetched : Todo := Todo.get_by_id 257 db in fetched.0
+def range : Nat := let db : Db := Db.connect Todo Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in let key : Nat := Text.to_nat Bytes b"9223372036854775808" in let row : Todo := Todo.create (tuple (key, b"large")) db in row.0
+def invalid : Nat := let db : Db := Db.connect Todo Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in let ignored : Nat := Text.to_nat Bytes b"bad" in let row : Todo := Todo.create (tuple (1, b"saved")) db in row.0
+def main : Nat := create

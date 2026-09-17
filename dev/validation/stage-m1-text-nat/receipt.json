@@ -1,0 +1,141 @@
+{
+  "base": "e6e40fe0e03da50f11252604717bf2f62df78241",
+  "captures": {
+    "axioms": {
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_axioms.py"
+      ],
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-text-nat/.kanon-exec/run-LCA5HK",
+      "exit_code": 0
+    },
+    "dune-tests": {
+      "argv": [
+        "zsh",
+        "dev/dunecho.sh",
+        "test"
+      ],
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-text-nat/.kanon-exec/run-ZgTt7i",
+      "exit_code": 0
+    },
+    "native-build": {
+      "argv": [
+        "gateledger",
+        "run",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-text-nat/.gatework/gateledger",
+        "--dir",
+        "dev/validation/stage-m1-text-nat/native",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_HOME=/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-text-nat/dev/validation/stage-m1-text-nat/native/Cargo.toml",
+        "--target-dir",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target",
+        "--jobs",
+        "2"
+      ],
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-text-nat/.kanon-exec/run-fGaDDj",
+      "exit_code": 0
+    },
+    "native-check": {
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_text_nat_database.py",
+        "--check",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target/debug/lanyard-program"
+      ],
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-text-nat/.kanon-exec/run-OAFbOg",
+      "exit_code": 0
+    },
+    "native-prepare": {
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_text_nat_database.py",
+        "--prepare",
+        "dev/validation/stage-m1-text-nat/native",
+        "--toasty",
+        "/Users/oobi/Documents/toasty",
+        "--topcoat",
+        "/Users/oobi/Documents/topcoat",
+        "--lock",
+        "dev/validation/stage-m1-nat-text/native/Cargo.lock"
+      ],
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-text-nat/.kanon-exec/run-QMKwT2",
+      "exit_code": 0
+    },
+    "stage": {
+      "argv": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-text-nat"
+      ],
+      "artifact": "/Users/oobi/Documents/gpt2/lanyard-text-nat/.kanon-exec/run-x5T9kT",
+      "exit_code": 0
+    }
+  },
+  "counts": {
+    "catalog_rows": 28,
+    "cli_groups": 9,
+    "database_observations_per_runtime": 7,
+    "foreign_types": 9,
+    "generated_catalog_lines": 182,
+    "native_mutants_killed": 4,
+    "native_observations": 736,
+    "todo_foreign_constants": 33,
+    "unit_checks": 53
+  },
+  "files_sha256": {
+    "axioms-capture.json": "540daaecb809e1367217ce080290b348cdc327ded8de5e19e2d1825cea72f4bc",
+    "axioms.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "axioms.stdout": "cafc0fe8450cbfc84b24cd5df110095db8cdab69d24d01698ea36281892208ea",
+    "diff-check.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dune-tests-capture.json": "a94e1541266f9dec929eccd49a2b7f12cd660013668d57d2b917c3f826656cdc",
+    "dune-tests.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dune-tests.stdout": "0a9ae2db73aa6b128fd0d99e2a7e69fe6331e825616696e91988c969cd54d4e7",
+    "native-build-capture.json": "26ace564fb3a1fad0a5479e4304cd452710256b363e50dbd7f4ee2f858e09e97",
+    "native-build.stderr": "3f8f2280060c928e8c0a3814f9cf191a579a6715887f1d034e22862f3838a3b5",
+    "native-build.stdout": "72db798f6285697d051adc47fbb7af89eac07e7f5fbf3db516384a8af7f86d04",
+    "native-check-capture.json": "bbc85a405cb0d1f6877314408c9e7d7bfab73ea13b2999b32663749d1b0b41bd",
+    "native-check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-check.stdout": "86e95e6b51ae29d4ab63129459c79418e50caf734c7a3c87e1279f9ca6450309",
+    "native-prepare-capture.json": "6536b06831155bf58ef3862a4534e375d5fa9d36adf064cf43ad2335b6bd2c46",
+    "native-prepare.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-prepare.stdout": "9cf84d45df6a015bc2a4db1002544676efceb7b9b8f953c2032281acfb99bb2e",
+    "native.lan": "d7b70b159a0b7802ce5d85cabbb127c04f30969da01faa928e4f0aa202e2ee8f",
+    "native/Cargo.git.toml": "414eebc7f64e59a659eb05a802c10b6b8edf8e5a459de2a5a4c258cd441b094f",
+    "native/Cargo.lock": "57cd4d0e8a1d7ceb6d2b1cb51553768873154ae6a2b69c58f696277eb5e82410",
+    "native/Cargo.toml": "f542ef1107feceb9f68626d4d27917d6515db34c404ffbaef5475bf03fe58efe",
+    "native/cases.json": "af720f6e2cf1c373ab0d58767be3717f656452fc9426f5177dfcc95c5df48fa7",
+    "native/src/main.rs": "e5ab939315df20fb427d7c9e2e025157805504096a7c0431b303019616bc3489",
+    "source-sha256.json": "8faf17d5cd4a053d1221f03ffa928ee60c29e98953c3fef72186c4d754691120",
+    "stage-capture.json": "1c7c3fb4fbf3e44e89c57204b9aa1e99378ac373da45cce0dea6fb5df91b7892",
+    "stage.stderr": "d0ef3601781b609d8aed5be0124ec00c05c3f433b8b8299dfcfd914846a74723",
+    "stage.stdout": "8d7599bb66806995855d0209f49872fafb254299b6184c1973d510720b2ca2e8"
+  },
+  "limits": "Existing byte-list, reduction and SQL key limits remain in force.",
+  "native_binary_sha256": "67e5e1840f53930fe98a2bd6a1d8933fc046b349b51573e20e0790e0a1a0c57e",
+  "native_build_warnings": 26,
+  "native_scope": "Pinned Toasty/Topcoat database operations and text argument effects.",
+  "recorded_utc": "2026-09-17T05:57:21.728470+00:00",
+  "status": "PASS",
+  "trust": "No trust approval, library revision change, or M0 exit stamp."
+}

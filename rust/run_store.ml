@@ -118,6 +118,7 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
            let* text = text ~what:"text operation" operation.family value in
            let* value = match operation.operation with
              | Text_ops.Trim -> Text_ops.trim text |> Result.map (of_text operation.family)
+             | Text_ops.To_nat -> Text_ops.to_nat text |> Result.map (fun number -> Nat number)
              | Text_ops.Is_empty ->
                  Ok (Tag (Text_ops.bool_tid, (if String.equal text "" then 1 else 0), [Unit]))
              | Text_ops.Uri_from_text -> Run_http.uri text |> Result.map (fun uri -> Uri uri)

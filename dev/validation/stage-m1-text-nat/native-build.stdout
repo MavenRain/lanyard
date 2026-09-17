@@ -1,0 +1,27 @@
+W src/main.rs:46:8  dead_code  methods `compare`, `sub`, and `mul` are never used
+W src/main.rs:102:6  dead_code  enum `T73756d28756e69742c756e697429` is never used
+W src/main.rs:116:4  dead_code  function `f_72656e646572` is never used
+W src/main.rs:121:1132  unused_variables  unused variable: `p0`
+W src/main.rs:125:1232  unused_variables  unused variable: `v1`
+W src/main.rs:125:2318  unused_variables  unused variable: `v3`
+W src/main.rs:125:3783  unused_variables  unused variable: `p1`
+W src/main.rs:129:1232  unused_variables  unused variable: `v1`
+W src/main.rs:129:2318  unused_variables  unused variable: `v3`
+W src/main.rs:129:3005  unused_variables  unused variable: `v4`
+W src/main.rs:129:4733  unused_variables  unused variable: `p0`
+W src/main.rs:133:1232  unused_variables  unused variable: `v1`
+W src/main.rs:133:2318  unused_variables  unused variable: `v3`
+W src/main.rs:133:3301  unused_variables  unused variable: `v4`
+W src/main.rs:133:4266  unused_variables  unused variable: `v5`
+W src/main.rs:133:4270  unused_variables  unused variable: `v6`
+W src/main.rs:137:1232  unused_variables  unused variable: `v1`
+W src/main.rs:141:1232  unused_variables  unused variable: `v1`
+W src/main.rs:141:1324  unused_variables  unused variable: `v2`
+W src/main.rs:141:1915  unused_variables  unused variable: `p1`
+W src/main.rs:145:1232  unused_variables  unused variable: `v1`
+W src/main.rs:145:3877  unused_variables  unused variable: `p1`
+W src/main.rs:149:1232  unused_variables  unused variable: `v1`
+W src/main.rs:149:1324  unused_variables  unused variable: `v2`
+W src/main.rs:149:2688  unused_variables  unused variable: `p1`
+W src/main.rs:152:10  dead_code  function `f_6d61696e` is never used
+OK build: 0 errors, 26 warnings
