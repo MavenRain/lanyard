@@ -223,6 +223,20 @@ The example returns `todos` for `/todos` and echoes other paths with an
 `unmatched: ` prefix. Conversion preserves percent escapes and the full
 text after `?`; it does not decode or split the URI.
 
+The [M1 request sessions](dev/STAGE-M1-SESSION.md) run a sequence of requests
+against one private database. Each script line contains a URI, optionally
+followed by a tab and an encoded form body. The Todo example creates,
+lists, updates and deletes rows across requests:
+
+```sh
+_build/default/bin/lanyard.exe run --requests test/fixtures/todo-session.requests test/fixtures/todo-session.lan
+zsh dev/gates.sh --stage M1-session
+```
+
+Responses are concatenated in request order with their HTTP content lengths.
+A failed session prints no transcript. Each invocation starts empty, and
+`--steps` supplies one budget for the whole sequence.
+
 Build and validate through Stage D:
 
 ```sh

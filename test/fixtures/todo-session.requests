@@ -1,0 +1,7 @@
+/init	unused=1
+/todos/create	id=20&title=caf%C3%A9
+/todos/create	id=3&title=+%3Cwrite%3E+%26+test+
+/todos/update	id=3&title=updated&completed=true
+/todos/delete	id=20
+/todos/delete	id=999
+/todos	unused=1

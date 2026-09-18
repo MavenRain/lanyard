@@ -4191,3 +4191,119 @@ the emitted Rust text stays byte-identical.
   GREEN, with PINS tag=fix-1 ok=155 missing=0 and ROWS tag=fix-1
   capture=219 log=219 IDENTICAL. The close ladder repeats this gate
   on the staged tree after this paragraph.
+
+## Stage M1 SESSION (2026-09-18)
+
+`lanyard run --requests SCRIPT FILE.lan` runs an ordered request sequence
+against one private interpreter database. Script lines carry an origin-form
+URI and an optional tab-separated form body. The parser validates every
+request before source I/O and exposes an abstract script type to the
+interpreter. Limits are 128 requests and 1,048,576 script bytes, with the
+existing per-URI and per-form limits. LF and CRLF are accepted; an explicit
+empty form remains distinct from no form.
+
+The interpreter prepares the checked program once, allocates one context,
+and threads its immutable store and remaining step count through the whole
+session. It preserves response order, annotates runtime errors with the
+request number, and returns a transcript only when every request succeeds.
+The existing single-request path shares the extracted handler shape check.
+
+`test/fixtures/todo-session.lan` combines URI dispatch, explicit schema
+initialization, form IDs, trimmed titles, sorted listings, HTML escaping,
+completion updates and deletion. Its request file demonstrates a complete
+create/list/update/delete sequence. Focused checks exercise isolation,
+UTF-8 response lengths, redirects, empty bodies, invalid scripts, option
+conflicts, a shared step budget and empty stdout after late failures.
+
+The target catalog, library pins and emitted Rust implementation retain
+their existing bytes. The inventory includes the new parser and interface
+as unassigned sources. Proposed trust budgets and the M0 exit decision
+remain pending.
+
+Validation passed the cumulative `STAGE-M1-SESSION` gate and the complete
+Dune test alias. The new checks comprise 30 OCaml cases, 12 CLI groups and
+four killed mutations, with clean and restored controls. The mutations
+reset the store, reset the budget, reverse responses and omit URI
+validation. The retained Stage F result is `STAGE-F-GATES OK m0=PENDING`.
+An initial restricted run failed two existing Git stderr assertions on a
+macOS `confstr` warning. The successful gate ran with normal macOS access,
+with those assertions preserved. Captures and final source hashes are in
+`validation/stage-m1-session/`.
+
+## Stage M1 SESSION review fixes (tag LSM1S, 2026-09-18)
+
+A staged-slice review of this stage ran over the 23-path slice on HEAD
+798252d. An opus drafter supplied 13 hypotheses. An opus prober
+confirmed 2 of them, H1 and H8, and added the sweep item S1. One
+ctxcat-review Workflow run (wf_c3c74b68-b94) supplied 8 raw findings,
+of which 4 were upheld, and all 4 survived the verifier. An opus judge
+upheld 6 findings, one medium, three low and two nits, under a judge
+cap of 7. Seven more are carried. The fixes touch four review paths.
+No frozen capture under `validation/stage-m1-session/` changes,
+because every emitted string stays byte-identical.
+
+- F-1, med, `test/lan_session_mutations.py:25,30`. The mutation driver
+  ran `dev/dunecho.sh build` with `timeout=None`, and gave every other
+  call a 120 s floor. A hung build stops the stage gate with no
+  diagnostic, and a slow build under load fails the controls. The
+  helper default is now 600 s, and the build call passes 600 s. No row
+  text changes, and the driver still kills 4 of 4 mutants.
+- F-2, low, `dev/STAGE-M1-SESSION.md:21-22`. The doc sold the
+  1,048,576-byte script bound as a limit. `bin/lanyard.ml:308` reads
+  the script file in full, then `rust/run_script.ml` refuses it, so the
+  bound is a post-read check. The same paragraph now states this. The
+  code keeps the post-read shape, because a bounded reader needs an
+  exception path that the house rules ban.
+- F-3, low, `rust/run_script.ml:23,28`. Both bound refusals spelled the
+  numerals as literals beside the constants `max_bytes` and
+  `max_requests`. A bound change leaves an actively wrong message. Both
+  messages now derive the numeral with `Printf.sprintf`. Both strings
+  stay byte-identical.
+- F-4, low, `rust/run_script.ml:22-29`. `parse` tested three conditions
+  in one nested if / else-if chain. The house rule asks for a guard
+  block. The `lines` binding is now hoisted above a `match () with`
+  block that keeps the three tests in the same order. The block has no
+  wildcard arm, so the refusal text for an oversized script does not
+  change.
+- F-5, nit, `rust/run_script.ml:17`. The line-shape error called
+  `invalid`, which adds a `request script: ` prefix, and the caller
+  adds `request script line %d: ` a second time. The error now builds
+  `Error.Mismatch` direct. The three `invalid` calls in `parse` get no
+  wrapper, so they keep the prefix.
+- F-6, nit, `test/lan_session.ml:14-16`. The test helper `contains`
+  built a full suffix string for every index, so the substring test
+  allocated in O(n^2). A total `Seq` walk now compares only the needle
+  width at each tail. The predicate is the same, the fix adds no check,
+  and the row `LAN-SESSION OK checks=30` holds.
+- Carried. C-1 keeps the native leg manual, because the slice has no
+  native capture by design. C-2 upholds the missing SESSION section of
+  `dev/M1-MUTATION-LOG.md` as a gap, and defers it, because the
+  preceding slice has the same gap and the staged set must stay at 23
+  paths. C-3 refutes the exit-code claim against the doc prose, because
+  the cited test pins exit 64 for the script path only. C-4 merges the
+  bound-literal report into F-3. C-5 drops the CR strip report, because
+  the proposed `String.sub` is partial and raises. C-6 drops the
+  by-design reports on the SIG-SHA contract, the borrowed native
+  `Cargo.lock` and the receipt shape. C-7 confirms that no fix changes
+  a frozen `LAN-`, `STAGE-` or `EMIT-` row.
+- Proof. The fix run reports `FIX-RUN paths=15 captures=8 extras=0`,
+  `FIX-RUN STAGED base=23 porcelain=23 captures=8 optional=0
+  unexpected=0` and `FIX-RUN CONTRACT OK porcelain=23 == base 23`. The
+  pin map reports `FIX-RUN-PINS-VERIFY ok=15 mismatch=0` over the five
+  repinned paths: `test/lan_session_mutations.py`,
+  `dev/STAGE-M1-SESSION.md`, `rust/run_script.ml`,
+  `test/lan_session.ml` and this log. The needle sweep reports
+  `NEEDLES rows=14 bad=0`. The build reports `OK build: 0 errors, 0
+  warnings`.
+- Ladders. The baseline ladder ran on the unfixed tree, launched
+  detached 2026-09-18T17:28:25Z at load1 13.99 (pid 3877), verdict
+  2026-09-18T17:41:38Z after 793 s, 865 log lines, GATE-END
+  tag=baseline stage_rc=0, GATE LSM1S tag=baseline GREEN, with PINS
+  tag=baseline ok=164 missing=0 and ROWS tag=baseline capture=228
+  log=228 IDENTICAL. The fix-1 ladder ran on the fixed tree, launched
+  detached 2026-09-18T17:59:23Z at load1 12.61 (pid 72468), verdict
+  2026-09-18T18:21:30Z after 1200 s, 865 log lines, GATE-END tag=fix-1
+  stage_rc=0, GATE LSM1S tag=fix-1 GREEN, with PINS tag=fix-1 ok=164
+  missing=0 and ROWS tag=fix-1 capture=228 log=228 IDENTICAL. The
+  close ladder repeats this gate on the staged tree after this
+  paragraph.

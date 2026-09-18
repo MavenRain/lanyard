@@ -1,0 +1,43 @@
+{
+  "stage": "M1-session",
+  "recorded_at": "2026-09-18T12:30:09.871849+00:00",
+  "base_commit": "798252de47487f47594cd14a3022e1fbb7ddb84b",
+  "validation_root": "/Users/oobi/Documents/gpt2/lanyard-session",
+  "commands": {
+    "stage": {
+      "capture": "stage-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-session"
+      ]
+    },
+    "dune-tests": {
+      "capture": "dune-tests-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "zsh",
+        "dev/dunecho.sh",
+        "test"
+      ]
+    }
+  },
+  "source_hashes": "source-sha256.json",
+  "submodule_commits": {
+    "vendor/tot": "8cf0b8bfbb574e344d8d489ba6fd6b81de4cf562"
+  },
+  "observations": {
+    "ocaml": 30,
+    "cli_groups": 12,
+    "mutants_killed": 4
+  },
+  "notes": [
+    "The cumulative gate includes all retained stages through M1-uri-text and clean and restored session mutation controls.",
+    "The stage ran with normal macOS access after the restricted run failed two existing Git stderr assertions on a confstr warning.",
+    "No Rust emission or pinned dependency changed in this interpreter and driver slice.",
+    "The full Dune test alias also passed; dunecho does not count plain OCaml checks.",
+    "Trust proposals and the M0 exit decision remain pending."
+  ]
+}

@@ -1,0 +1,66 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+
+model Todo with
+| id : Nat
+| title : Bytes
+| completed : Bool
+end
+
+def rec items : Todo.rows -> Bytes := fun (rows : Todo.rows) =>
+  match rows as self in Todo.rows return Bytes with
+  | Todo.nil => b""
+  | Todo.cons head tail =>
+      let status : Bytes := case head.2 with
+        | 0 (u : prod ()) => b""
+        | 1 (u : prod ()) => b" (done)" in
+      Text.concat Bytes b"<li>"
+        (Text.concat Bytes (Text.from_nat Bytes head.0)
+          (Text.concat Bytes b": "
+            (Text.concat Bytes (Html.text Bytes head.1)
+              (Text.concat Bytes status
+                (Text.concat Bytes b"</li>" (items tail))))))
+
+def page : Db -> Response := fun (db : Db) =>
+  Response.html Bytes (Text.concat Bytes b"<ul>" (Text.concat Bytes (items (Todo.all db)) b"</ul>"))
+
+def create : Db -> Bytes -> Response := fun (db : Db) (body : Bytes) =>
+  let id : Nat := Text.to_nat Bytes (Form.field Bytes body b"id") in
+  let title : Bytes := Text.trim Bytes (Form.field Bytes body b"title") in
+  case Text.is_empty Bytes title with
+  | 1 (u : prod ()) => Response.text Bytes b"title required"
+  | 0 (u : prod ()) =>
+      let row : Todo := Todo.create (tuple (id, title, inj 0 of 2 ())) db in
+      page db
+
+def update : Db -> Bytes -> Response := fun (db : Db) (body : Bytes) =>
+  let id : Nat := Text.to_nat Bytes (Form.field Bytes body b"id") in
+  let title : Bytes := Text.trim Bytes (Form.field Bytes body b"title") in
+  let completed : Bool := Text.equal Bytes (Form.field Bytes body b"completed") b"true" in
+  let row : Todo := Todo.update (tuple (id, title, completed)) db in
+  page db
+
+def delete : Db -> Bytes -> Response := fun (db : Db) (body : Bytes) =>
+  let id : Nat := Text.to_nat Bytes (Form.field Bytes body b"id") in
+  let removed : prod () := Todo.delete_by_id id db in
+  page db
+
+def main : Cx -> Uri -> Bytes -> Response := fun (cx : Cx) (uri : Uri) (body : Bytes) =>
+  let db : Db := topcoat.db cx in
+  let path : Bytes := Uri.to_text Bytes uri in
+  case Text.equal Bytes path b"/init" with
+  | 1 (u : prod ()) =>
+      let ready : prod () := Db.push_schema db in
+      Response.text Bytes b"ready"
+  | 0 (u : prod ()) => case Text.equal Bytes path b"/todos" with
+    | 1 (u : prod ()) => page db
+    | 0 (u : prod ()) => case Text.equal Bytes path b"/todos/create" with
+      | 1 (u : prod ()) => create db body
+      | 0 (u : prod ()) => case Text.equal Bytes path b"/todos/update" with
+        | 1 (u : prod ()) => update db body
+        | 0 (u : prod ()) => case Text.equal Bytes path b"/todos/delete" with
+          | 1 (u : prod ()) => delete db body
+          | 0 (u : prod ()) => Response.text Bytes (Text.concat Bytes b"unmatched: " path)

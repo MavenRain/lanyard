@@ -161,14 +161,9 @@ let foreign_repr name = function
   | TyForeign (actual, []) | TyArc (TyForeign (actual, [])) -> String.equal name actual
   | TyI31 | TyStruct _ | TyUnion _ | TyFunc _ | TyThunk _ | TyArc _ | TyForeign _ -> false
 
-let request ?(steps = default_steps) ?form ~uri checked =
-  let* () = checked_steps steps in
-  let* uri = Run_http.uri uri in
-  let* _fields = Option.fold ~none:(Ok []) ~some:Form_data.parse form in
-  let* context = prepare checked in
-  let* main = find context "main" in
+let request_body context main form =
   let response_result = foreign_repr "SeeOther" main.result || foreign_repr "Response" main.result in
-  let* body = match main.params, form with
+  match main.params, form with
     | [cx_type; uri_type], None when foreign_repr "Cx" cx_type && foreign_repr "Uri" uri_type
         && response_result -> Ok []
     | [cx_type; uri_type; body_type], Some body when foreign_repr "Cx" cx_type && foreign_repr "Uri" uri_type
@@ -177,9 +172,38 @@ let request ?(steps = default_steps) ?form ~uri checked =
         Ok [of_text family.family_name body]
     | ([] | _ :: _), (None | Some _) ->
         invalid (Option.fold ~none:"request entry point must have type Cx -> Uri -> SeeOther or Cx -> Uri -> Response"
-          ~some:(fun _body -> "form request entry point must have type Cx -> Uri -> Bytes -> SeeOther or Cx -> Uri -> Bytes -> Response (Bytes is a checked byte list)") form) in
+          ~some:(fun _body -> "form request entry point must have type Cx -> Uri -> Bytes -> SeeOther or Cx -> Uri -> Bytes -> Response (Bytes is a checked byte list)") form)
+
+let request ?(steps = default_steps) ?form ~uri checked =
+  let* () = checked_steps steps in
+  let* uri = Run_http.uri uri in
+  let* _fields = Option.fold ~none:(Ok []) ~some:Form_data.parse form in
+  let* context = prepare checked in
+  let* main = find context "main" in
+  let* body = request_body context main form in
   let cx, store = Run_store.context
     (List.map (fun (model : Model.t) -> model.name) context.foreign.models) Run_store.empty in
   let* value, _state = call context 0 { steps; store } "main" ([cx; Uri uri] @ body) in
   let* text = Run_http.response value in
   Ok (value, text)
+
+(** Prepare once, preserve the store and spend one step budget across the
+    whole session. Only a complete transcript escapes a successful run. *)
+let session ?(steps = default_steps) script checked =
+  let* () = checked_steps steps in
+  let* context = prepare checked in
+  let* main = find context "main" in
+  let cx, store = Run_store.context
+    (List.map (fun (model : Model.t) -> model.name) context.foreign.models) Run_store.empty in
+  let rec run number state reversed = function
+    | [] -> Ok (String.concat "" (List.rev reversed))
+    | (request : Run_script.request) :: rest ->
+        let result =
+          let* body = request_body context main request.form in
+          let* value, state = call context 0 state "main" ([cx; Uri request.uri] @ body) in
+          let* text = Run_http.response value in
+          Ok (text, state) in
+        let* text, state = result |> Result.map_error (fun error ->
+          Error.Mismatch (Printf.sprintf "request %d: %s" number (Error.to_string error))) in
+        run (number + 1) state (text :: reversed) rest in
+  run 1 { steps; store } [] (Run_script.requests script)

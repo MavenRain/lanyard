@@ -35,7 +35,7 @@ let usage () : unit =
     ("usage: lanyard check [--print|--erased] FILE"
     ^ " | emit [--native|--target|--crate DIR [--print-model MODEL]] FILE.lan"
     ^ " | build --out DIR [--release] [--offline] [--print-model MODEL] FILE.lan"
-    ^ " | run [--steps N] [--print-model MODEL | --request URI [--form BODY]] FILE.lan"
+    ^ " | run [--steps N] [--print-model MODEL | --request URI [--form BODY] | --requests SCRIPT] FILE.lan"
     ^ " | axioms [--names] FILE | spec-count")
 
 let read_file (path : string) : string =
@@ -258,6 +258,12 @@ let dispatch_emit args =
     exits 1 while a 303 response is printed on stdout with exit 0.
     --form BODY supplies a validated encoded body as a third byte-list
     argument. It requires request mode and accepts an explicit empty body. *)
+type request_mode = Single_request of string | Request_script of string
+
+let scripted = Option.fold ~none:false ~some:(function
+  | Single_request _uri -> false
+  | Request_script _path -> true)
+
 let rec run_options output request form steps args =
   let value text = not (String.starts_with ~prefix:"-" text) && text <> "" in
   match args with
@@ -271,9 +277,13 @@ let rec run_options output request form steps args =
       (match output with
        | Lanyard_rust.Model.Discard ->
            Lanyard_rust.Run_http.uri uri |> Result.map_error (fun _error -> ())
-           |> Fun.flip Result.bind (fun uri -> run_options output (Some uri) form steps rest)
+           |> Fun.flip Result.bind (fun uri -> run_options output (Some (Single_request uri)) form steps rest)
        | Lanyard_rust.Model.Print_model _model -> Error ())
-  | "--form" :: body :: rest when Option.is_none form ->
+  | "--requests" :: script :: rest when Option.is_none request && Option.is_none form && value script ->
+      (match output with
+       | Lanyard_rust.Model.Discard -> run_options output (Some (Request_script script)) form steps rest
+       | Lanyard_rust.Model.Print_model _model -> Error ())
+  | "--form" :: body :: rest when Option.is_none form && not (scripted request) ->
       Lanyard_rust.Form_data.parse body |> Result.map_error (fun _error -> ())
       |> Fun.flip Result.bind (fun _fields -> run_options output request (Some body) steps rest)
   | "--print-model" :: model :: rest when Option.is_none request && Option.is_none form && value model ->
@@ -289,11 +299,19 @@ let dispatch_run args =
   run_options Lanyard_rust.Model.Discard None None None args
   |> Result.fold ~error:(fun () -> usage (); exit 64)
        ~ok:(fun (output, request, form, steps, path) ->
+         let execute = Option.fold
+           ~none:(fun () -> fun checked -> Lanyard_rust.Interp.run ?steps ~output checked |> Result.map snd)
+           ~some:(function
+             | Single_request uri ->
+                 (fun () -> fun checked -> Lanyard_rust.Interp.request ?steps ?form ~uri checked |> Result.map snd)
+             | Request_script script -> (fun () ->
+                 let script = Lanyard_rust.Run_script.parse (read_file script)
+                   |> Result.fold ~ok:Fun.id ~error:(fun error ->
+                     prerr_endline (Kanon_kernel.Error.to_string error); exit 64) in
+                 fun checked -> Lanyard_rust.Interp.session ?steps script checked)) request () in
          Kanon_surface.Elab.check_lanyard (read_file path)
-         |> Fun.flip Result.bind (fun checked ->
-              Option.fold ~none:(fun () -> Lanyard_rust.Interp.run ?steps ~output checked)
-                ~some:(fun uri () -> Lanyard_rust.Interp.request ?steps ?form ~uri checked) request ())
-         |> Result.fold ~ok:(fun (_value, text) -> print_string text)
+         |> Fun.flip Result.bind execute
+         |> Result.fold ~ok:print_string
               ~error:(fun error ->
                 prerr_endline (Kanon_kernel.Error.to_string error); exit 1))
 
