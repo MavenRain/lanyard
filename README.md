@@ -237,6 +237,18 @@ Responses are concatenated in request order with their HTTP content lengths.
 A failed session prints no transcript. Each invocation starts empty, and
 `--steps` supplies one budget for the whole sequence.
 
+The [M1 native sessions](dev/STAGE-M1-NATIVE-SESSION.md) embed the same
+handler and script in a standalone Rust executable:
+
+```sh
+_build/default/bin/lanyard.exe build --out /tmp/native-todo --requests test/fixtures/todo-session.requests test/fixtures/todo-session.lan
+/tmp/native-todo/target/debug/lanyard-program
+```
+
+The executable shares one private SQLite store across requests and prints
+the complete HTTP transcript on success. Native execution uses the Rust
+backend's error semantics and does not accept `--steps`.
+
 Build and validate through Stage D:
 
 ```sh

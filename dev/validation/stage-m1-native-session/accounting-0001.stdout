@@ -1,0 +1,131 @@
+TRUSTED-INVENTORY files=55 sha256=811c2bbf058c0b34a0d6f8511e0dab4b5430adfc37b2eeb16af1dcfebea3e912
+TRUSTED-POLICY PROPOSED candidate=FAIL lines=14180/12766 sha256=264caa82ea6fe214be7725ae0f70e3fbcbc39106cfc359427a4a2bcfa3aeac1f
+TRUSTED-INVENTORY PENDING
+TRUSTED-LINES rir=155 allowance=A_rir (see inventory policy)
+TRUSTED-LINES erase=1519 baseline=1484
+TRUSTED-LINES erase-kan=1484 (see inventory policy)
+TRUSTED-LINES eterm=117 (see inventory policy)
+TRUSTED-LINES target-bridge=120 (see inventory policy)
+TRUSTED-LINES specialization=104 (see inventory policy)
+TRUSTED-LINES fusion=218 (see inventory policy)
+TRUSTED-LINES target-bridge-total=442 (see inventory policy)
+TRUSTED-LINES emit=684 allowance=A_emit (see inventory policy)
+TRUSTED-LINES foreign=65 allowance=A_emit (see inventory policy)
+TRUSTED-LINES template=71 allowance=A_emit (see inventory policy)
+TRUSTED-LINES effects=46 allowance=A_emit (see inventory policy)
+TRUSTED-LINES model=282 allowance=A_emit (see inventory policy)
+TRUSTED-LINES connection=66 allowance=A_emit (see inventory policy)
+TRUSTED-LINES crate=39 allowance=A_emit (see inventory policy)
+TRUSTED-LINES reachable=74 allowance=A_emit (see inventory policy)
+TRUSTED-LINES text_ops=220 allowance=A_emit (see inventory policy)
+TRUSTED-LINES form_data=104 allowance=A_emit (see inventory policy)
+TRUSTED-LINES session_emit=115 allowance=A_emit (see inventory policy)
+TRUSTED-LINES printer-total=1766 allowance=A_emit (see inventory policy)
+TRUSTED-LINES signature=194 allowance=A_sig (see inventory policy)
+TRUSTED-LINES kernel=3997/4000
+M0 original ceiling: 5481 + A_rir + A_emit + A_sig
+TRUSTED-LINES OK
+OK build: 0 errors, 0 warnings
+M0 R0-COUNT PASS
+M0 R0-TARGET PASS
+M0 TARGET-PIN PASS
+M0 TRUSTED-LINES PASS
+TRUSTED-INVENTORY files=55 sha256=afa610035d1c7376d1c8d2628a98dfcf8d726f2940fd03f4bfa7f28335510055
+TRUSTED-POLICY APPROVED candidate=PASS lines=14180/14180 sha256=adc16bb70a8156a90bdd01f2826ac23e050f09c98b44c30a39429569d7705b94
+TRUSTED-INVENTORY PASS
+TRUSTED-LINES rir=155 allowance=A_rir (see inventory policy)
+TRUSTED-LINES erase=1519 baseline=1484
+TRUSTED-LINES erase-kan=1484 (see inventory policy)
+TRUSTED-LINES eterm=117 (see inventory policy)
+TRUSTED-LINES target-bridge=120 (see inventory policy)
+TRUSTED-LINES specialization=104 (see inventory policy)
+TRUSTED-LINES fusion=218 (see inventory policy)
+TRUSTED-LINES target-bridge-total=442 (see inventory policy)
+TRUSTED-LINES emit=684 allowance=A_emit (see inventory policy)
+TRUSTED-LINES foreign=65 allowance=A_emit (see inventory policy)
+TRUSTED-LINES template=71 allowance=A_emit (see inventory policy)
+TRUSTED-LINES effects=46 allowance=A_emit (see inventory policy)
+TRUSTED-LINES model=282 allowance=A_emit (see inventory policy)
+TRUSTED-LINES connection=66 allowance=A_emit (see inventory policy)
+TRUSTED-LINES crate=39 allowance=A_emit (see inventory policy)
+TRUSTED-LINES reachable=74 allowance=A_emit (see inventory policy)
+TRUSTED-LINES text_ops=220 allowance=A_emit (see inventory policy)
+TRUSTED-LINES form_data=104 allowance=A_emit (see inventory policy)
+TRUSTED-LINES session_emit=115 allowance=A_emit (see inventory policy)
+TRUSTED-LINES printer-total=1766 allowance=A_emit (see inventory policy)
+TRUSTED-LINES signature=194 allowance=A_sig (see inventory policy)
+TRUSTED-LINES kernel=3997/4000
+M0 original ceiling: 5481 + A_rir + A_emit + A_sig
+TRUSTED-LINES OK
+M0 KERNEL-CARRY PASS
+M0 EMIT-DIFF PASS
+M0 R0-COUNT FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/R0-COUNT.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/R0-COUNT.stderr
+M0-GATE-MUTATIONS R0-COUNT=KILLED diagnostic=R0-COUNT FAIL
+M0 R0-COUNT PASS
+M0 R0-COUNT FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/R0-COUNT.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/R0-COUNT.stderr
+M0 R0-COUNT PASS
+M0-GATE-MUTATIONS failed-census-command=KILLED
+M0 R0-TARGET FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/R0-TARGET.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/R0-TARGET.stderr
+M0-GATE-MUTATIONS R0-TARGET=KILLED diagnostic=outside closed atom list
+M0 R0-TARGET PASS
+M0 TARGET-PIN PASS
+M0 TARGET-PIN FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/TARGET-PIN.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/TARGET-PIN.stderr
+M0-GATE-MUTATIONS TARGET-PIN=KILLED diagnostic=TARGET-PIN DIFF FAIL
+M0 TARGET-PIN PASS
+M0 KERNEL-CARRY FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/KERNEL-CARRY.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/KERNEL-CARRY.stderr
+M0-GATE-MUTATIONS KERNEL-CARRY=KILLED diagnostic=bytes-differ
+M0 KERNEL-CARRY PASS
+M0 TRUSTED-LINES FAIL: child failed
+TRUSTED-INVENTORY files=55 sha256=aff7641997b02047ffe10335ac8b337dc978003e8405dffbf53d4247c823440e
+TRUSTED-POLICY APPROVED candidate=FAIL lines=14230/14180 sha256=adc16bb70a8156a90bdd01f2826ac23e050f09c98b44c30a39429569d7705b94
+TRUSTED-POLICY group=printer lines=1816/1766 paths_match=true
+TRUSTED-INVENTORY FAIL
+TRUSTED-LINES FAIL
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/TRUSTED-LINES.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/TRUSTED-LINES.stderr
+M0-GATE-MUTATIONS TRUSTED-LINES=KILLED diagnostic=TRUSTED-POLICY group=printer
+M0 TRUSTED-LINES PASS
+TRUSTED-INVENTORY files=55 sha256=afa610035d1c7376d1c8d2628a98dfcf8d726f2940fd03f4bfa7f28335510055
+TRUSTED-POLICY APPROVED candidate=PASS lines=14180/14180 sha256=adc16bb70a8156a90bdd01f2826ac23e050f09c98b44c30a39429569d7705b94
+TRUSTED-INVENTORY PASS
+TRUSTED-LINES rir=155 allowance=A_rir (see inventory policy)
+TRUSTED-LINES erase=1519 baseline=1484
+TRUSTED-LINES erase-kan=1484 (see inventory policy)
+TRUSTED-LINES eterm=117 (see inventory policy)
+TRUSTED-LINES target-bridge=120 (see inventory policy)
+TRUSTED-LINES specialization=104 (see inventory policy)
+TRUSTED-LINES fusion=218 (see inventory policy)
+TRUSTED-LINES target-bridge-total=442 (see inventory policy)
+TRUSTED-LINES emit=684 allowance=A_emit (see inventory policy)
+TRUSTED-LINES foreign=65 allowance=A_emit (see inventory policy)
+TRUSTED-LINES template=71 allowance=A_emit (see inventory policy)
+TRUSTED-LINES effects=46 allowance=A_emit (see inventory policy)
+TRUSTED-LINES model=282 allowance=A_emit (see inventory policy)
+TRUSTED-LINES connection=66 allowance=A_emit (see inventory policy)
+TRUSTED-LINES crate=39 allowance=A_emit (see inventory policy)
+TRUSTED-LINES reachable=74 allowance=A_emit (see inventory policy)
+TRUSTED-LINES text_ops=220 allowance=A_emit (see inventory policy)
+TRUSTED-LINES form_data=104 allowance=A_emit (see inventory policy)
+TRUSTED-LINES session_emit=115 allowance=A_emit (see inventory policy)
+TRUSTED-LINES printer-total=1766 allowance=A_emit (see inventory policy)
+TRUSTED-LINES signature=194 allowance=A_sig (see inventory policy)
+TRUSTED-LINES kernel=3997/4000
+M0 original ceiling: 5481 + A_rir + A_emit + A_sig
+TRUSTED-LINES OK
+M0 EMIT-DIFF FAIL: child failed
+M0-DETAIL /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/EMIT-DIFF.stdout /var/folders/d4/9sdgktzs23s857pdkm4yfndw0000gn/T/lanyard-m0-gate-mutants-xl48q3hh/repo/.gatework/controls/EMIT-DIFF.stderr
+M0-GATE-MUTATIONS EMIT-DIFF=KILLED diagnostic=unbound: Todo_create
+M0 EMIT-DIFF PASS
+M0-GATE-MUTATIONS OK killed=6 pending=0 informational=1 restored=GREEN
+LAN-APPROVED-POLICY OK temporary-approval=1 source-policy=unchanged
+HOUSE no-exception OK
+HOUSE no-mutable-state OK
+HOUSE one-catch-site OK
+/Users/oobi/Documents/gpt2/lanyard-m1-native-session/test/sys_io.ml:19:  try Ok (thunk ()) with Sys_error m -> Error m
+HOUSE no-bool-match OK
+HOUSE no-em-dash OK
+HOUSE OK

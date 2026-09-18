@@ -55,6 +55,7 @@
         "rust/form_data.ml",
         "rust/model.ml",
         "rust/reachable.ml",
+        "rust/session_emit.ml",
         "rust/template.ml",
         "rust/text_ops.ml"
       ]

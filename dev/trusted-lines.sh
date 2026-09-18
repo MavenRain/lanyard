@@ -158,7 +158,7 @@ if [[ -d $root/rust ]]; then
   # Foreign policy and template expansion decide emitted Rust too. Include both
   # in the measured printer total; splitting files cannot hide trusted code.
   printer_lines=$emit_lines
-  for part in foreign template effects model connection crate reachable text_ops form_data; do
+  for part in foreign template effects model connection crate reachable text_ops form_data session_emit; do
     if [[ ! -f $root/rust/$part.ml ]]; then
       print -r -- "TRUSTED-LINES FAIL: rust/$part.ml missing"
       exit 1

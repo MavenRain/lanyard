@@ -224,23 +224,28 @@ let output_source model =
     ^ "(value: &" ^ Printer.rust_type native ^ ") -> Result<(), LanMainError> {\n"
     ^ "    let line = format!(\"" ^ format ^ "\", " ^ String.concat ", " arguments ^ ");\n"
     ^ "    std::io::Write::write_all(&mut std::io::stdout().lock(), line.as_bytes()).map_err(LanMainError::Output)\n}\n")
-let source ?entrypoint ?(output = Discard) (checked : Elab.lan_program) =
+let source ?entrypoint ?(output = Discard) ?entry_output ?(input_text = []) (checked : Elab.lan_program) =
   let* specialized = Lower.specialize checked in
   let checked = specialized.Lower.specialized in
   let* models = catalog checked in
-  let* entry_output, output_code = match output with
+  let* default_entry_output, output_code = match output with
     | Discard -> Ok (Emit.Discard, "")
     | Print_model name ->
         let* () = if Option.is_some entrypoint then Ok () else invalid "model output requires a crate entry point" in
         let* model = List.find_opt (fun model -> String.equal name model.name) models
           |> Option.to_result ~none:(Error.Mismatch ("Rust emission: printed model is unknown or not reachable: " ^ name)) in
         output_source model in
+  let entry_output = Option.value ~default:default_entry_output entry_output in
   let* instances = Lower.connections specialized in
   let* connections = Connection.catalog checked (List.map (fun model -> model.name, rust_name model) models) instances in
   let* text_instances = Lower.text_operations specialized in
   let* operations = Text_ops.catalog checked text_instances in
   let* rows = Lower.program_with instances specialized in
-  if List.is_empty models && List.is_empty connections && List.is_empty operations then Foreign.source ?entrypoint rows else
+  match () with
+  | () when List.is_empty models && List.is_empty connections
+      && List.is_empty operations && List.is_empty input_text ->
+      Foreign.source ?entrypoint ~entry_output rows
+  | () ->
   let module Target = Emit.Make (struct
     let foreign_type = Foreign.foreign_type Catalog.entries
     let foreign_layout = foreign_type
@@ -260,7 +265,7 @@ let source ?entrypoint ?(output = Discard) (checked : Elab.lan_program) =
   let text = List.concat_map (fun model -> List.filter_map (fun (_field, scalar) ->
     match scalar with Nat_field | Bool_field -> None | Text_field name -> Some name) model.fields) models
     @ List.map (fun (connection : Connection.t) -> connection.family) connections
-    @ List.map (fun (operation : Text_ops.t) -> operation.family) operations
+    @ List.map (fun (operation : Text_ops.t) -> operation.family) operations @ input_text
     |> List.sort_uniq String.compare in
   let uri_errors = List.exists (fun (operation : Text_ops.t) ->
     operation.operation = Text_ops.Uri_from_text || operation.operation = Text_ops.Uri_to_text) operations in

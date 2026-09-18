@@ -17,7 +17,7 @@ toasty = { git = "https://github.com/tokio-rs/toasty", rev = "7bd502cbf44cc47f70
 topcoat = { git = "https://github.com/tokio-rs/topcoat", rev = "51caa01dca3a8f20bdacfa771b1b8ac8b6f2668a", default-features = false, features = ["router"] }
 |}
 
-let files ?output checked =
+let files ?output ?requests checked =
   let entrypoint = "main" in
   let ( let* ) = Result.bind in
   let* checked = Reachable.program entrypoint checked in
@@ -26,5 +26,14 @@ let files ?output checked =
     let* checked = Kanon_surface.Fuse.program checked in
     let* checked = Reachable.program entrypoint checked in
     Kanon_surface.Fuse.closed checked in
-  Model.source ~entrypoint ?output checked
+  let* source = Option.fold
+    ~none:(fun () -> Model.source ~entrypoint ?output checked)
+    ~some:(fun script () ->
+      let* () = match Option.value ~default:Model.Discard output with
+        | Model.Discard -> Ok ()
+        | Model.Print_model _name ->
+            Error (Kanon_kernel.Error.Mismatch "request sessions cannot print a model") in
+      let* entry_output, input_text = Session_emit.entry checked script in
+      Model.source ~entrypoint ~entry_output ~input_text checked) requests () in
+  Ok source
   |> Result.map (fun source -> ["Cargo.toml", manifest; "src/main.rs", source])

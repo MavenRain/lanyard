@@ -33,8 +33,8 @@
 let usage () : unit =
   prerr_endline
     ("usage: lanyard check [--print|--erased] FILE"
-    ^ " | emit [--native|--target|--crate DIR [--print-model MODEL]] FILE.lan"
-    ^ " | build --out DIR [--release] [--offline] [--print-model MODEL] FILE.lan"
+    ^ " | emit [--native|--target|--crate DIR [--print-model MODEL | --requests SCRIPT]] FILE.lan"
+    ^ " | build --out DIR [--release] [--offline] [--print-model MODEL | --requests SCRIPT] FILE.lan"
     ^ " | run [--steps N] [--print-model MODEL | --request URI [--form BODY] | --requests SCRIPT] FILE.lan"
     ^ " | axioms [--names] FILE | spec-count")
 
@@ -150,10 +150,14 @@ let write_crate directory files =
           (fun channel -> Out_channel.output_string channel contents)) files;
       Sys.rename staging directory
 
-let run_crate (output : Lanyard_rust.Model.output) (directory : string)
+let run_crate ?requests (output : Lanyard_rust.Model.output) (directory : string)
     (path : string) : unit =
+  let requests = Option.map (fun script ->
+    Lanyard_rust.Run_script.parse (read_file script)
+    |> Result.fold ~ok:Fun.id ~error:(fun error ->
+        prerr_endline (Kanon_kernel.Error.to_string error); exit 64)) requests in
   Kanon_surface.Elab.check_lanyard (read_file path)
-  |> Fun.flip Result.bind (Lanyard_rust.Crate.files ~output)
+  |> Fun.flip Result.bind (Lanyard_rust.Crate.files ~output ?requests)
   |> Result.fold ~ok:(write_crate directory) ~error:(fun error ->
       prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
 
@@ -166,6 +170,7 @@ let lan_file (path : string) : bool =
     so the consumer never reads the parse accumulator. *)
 type build_flags = {
   output : Lanyard_rust.Model.output;
+  requests : string option;
   release : bool;
   offline : bool;
 }
@@ -185,13 +190,18 @@ let rec build_options options args =
   match args with
   | "--out" :: directory :: rest when value directory && Option.is_none options.directory ->
       build_options { options with directory = Some directory } rest
-  | "--print-model" :: model :: rest when value model ->
+  | "--print-model" :: model :: rest when value model && Option.is_none options.flags.requests ->
       (match options.flags.output with
        | Lanyard_rust.Model.Discard ->
            build_options
              { options with
                flags = { options.flags with output = Lanyard_rust.Model.Print_model model } }
              rest
+        | Lanyard_rust.Model.Print_model _model -> Error ())
+  | "--requests" :: script :: rest when value script && Option.is_none options.flags.requests ->
+      (match options.flags.output with
+       | Lanyard_rust.Model.Discard ->
+           build_options { options with flags = { options.flags with requests = Some script } } rest
        | Lanyard_rust.Model.Print_model _model -> Error ())
   | "--release" :: rest when not options.flags.release ->
       build_options { options with flags = { options.flags with release = true } } rest
@@ -213,11 +223,12 @@ let rec build_options options args =
 let dispatch_build args =
   let initial = { directory = None;
                   flags = { output = Lanyard_rust.Model.Discard;
+                            requests = None;
                             release = false; offline = false } } in
   build_options initial args
   |> Result.fold ~error:(fun () -> usage (); exit 64)
        ~ok:(fun (flags, directory, path) ->
-         run_crate flags.output directory path;
+          run_crate ?requests:flags.requests flags.output directory path;
          Sys.chdir directory;
          let command = ["cargo"; "build"]
            @ (if flags.release then ["--release"] else [])
@@ -234,6 +245,9 @@ let dispatch_build args =
     the entire module prints. Emission never invokes Cargo or the program. *)
 let dispatch_emit args =
   match args with
+  | [ "--crate"; directory; "--requests"; script; path ] when lan_file path
+      && script <> "" && not (String.starts_with ~prefix:"-" script) ->
+      run_crate ~requests:script Lanyard_rust.Model.Discard directory path
   | [ "--crate"; directory; "--print-model"; model; path ] when lan_file path ->
       run_crate (Lanyard_rust.Model.Print_model model) directory path
   | [ "--crate"; directory; path ] when lan_file path ->

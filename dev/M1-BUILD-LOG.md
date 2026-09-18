@@ -4307,3 +4307,140 @@ because every emitted string stays byte-identical.
   missing=0 and ROWS tag=fix-1 capture=228 log=228 IDENTICAL. The
   close ladder repeats this gate on the staged tree after this
   paragraph.
+
+## M1 native request sessions (2026-09-18)
+
+`emit --crate DIR --requests SCRIPT FILE.lan` and `build --out DIR
+--requests SCRIPT FILE.lan` embed the validated request sequence in a
+standalone Rust program. Script validation precedes program I/O. The
+existing model-output option conflicts with request mode, and the build
+driver preserves Cargo flags, output and exit status.
+
+The session emitter reuses the checked request shape and byte-list layout.
+The Rust entry printer verifies those layouts against its own lowered
+signature and selects synchronous or awaited calls from inferred effects.
+Unused form arguments still receive their checked text conversion. Each
+request runs as a sequential Tokio task against one private SQLite context.
+This requires a Send future and converts task failures into indexed errors.
+The pinned SQLite missing-schema panic is covered by this path.
+
+The program collects the full HTTP transcript before writing stdout.
+Eight native cases, run twice each, agree with independent expected
+transcripts and the interpreter. They cover the Todo lifecycle, redirects,
+URI text, UTF-8 and control bytes, ignored forms, 128 requests, a late
+failure and a missing schema. Two compiled runtime controls demonstrate
+that reversed responses and partial transcripts are detected.
+
+The cumulative `STAGE-M1-NATIVE-SESSION` gate passed, retaining the earlier
+M1 gates and five new CLI test groups. The earlier restricted attempt
+failed two existing Git stderr assertions because macOS emitted a confstr
+warning; the successful run used normal macOS access with those assertions
+preserved. Generated Rust has dead-code warnings. The full Dune alias and
+final accounting checks are recorded separately under
+`validation/stage-m1-native-session/`.
+
+The printer inventory and line total now include `rust/session_emit.ml`.
+This accounting update follows the aggregate run and has its own checks;
+it changes no compiler or runtime source bytes. Source hashes record the
+final inputs. Target signatures, dependency pins, proposed trust
+allowances and the pending M0 exit stamp retain their existing values.
+The manual approval probe now derives an exact roster and limits for its
+disposable test policy. This lets its budget mutations run after source
+growth instead of failing on the old proposal before any mutation. Its
+source-policy byte check still requires the real proposal to remain intact.
+
+## Stage M1 NATIVE-SESSION review fixes (tag LSM1NS, 2026-09-18)
+
+A staged-slice review of this stage ran over the 30-path slice on HEAD
+414121c. The slice holds 19 review paths and the 11 frozen captures
+under `validation/stage-m1-native-session/`. One Workflow run
+(wf_4e41740b-20e) ran three finders by lens, ocaml, python-gate and
+docs-captures, then one adversarial verifier for each finder batch,
+then one judge. The verifiers took 12 rows, upheld 8 and refuted 4.
+The judge kept 7 findings under the judge cap of 7, five low and two
+nits, and carried 5 more. This fix applies all 7. No frozen capture
+under `validation/stage-m1-native-session/` changes, because every
+emitted row stays byte-identical.
+
+- F-1, low, `dev/STAGE-M1-NATIVE-SESSION.md:30-35`. The doc promised a
+  request number for a database failure. The `Database` arm of
+  `LanSessionError` carries no request number, and its only producer,
+  the in-memory connect, runs before any request exists. The paragraph
+  now numbers handler and response failures, and states that a
+  database or output failure names no request.
+- F-2, low, `dev/stage-m1-native-session.sh:11-13`. The cleanup trap
+  covered EXIT only, so an interrupt during the multi-minute Cargo
+  build left the eight-crate work tree inside the repository. Two
+  signal traps now remove the tree and exit, 130 on INT and 143 on
+  TERM or HUP. One combined trap was tested and rejected, because zsh
+  then continues the script after the handler.
+- F-3, low, `rust/emit.ml:610-617`. The scripted entry-point layout
+  check tested three conditions in one `if` chain. A parenthesized
+  `match () with` block now holds the same three tests in the same
+  order. The brackets are load-bearing, because line 618 is an arm of
+  the outer `match output with`. The refusal text does not change.
+- F-4, low, `rust/session_emit.ml:82-85`. The emitter copied the raw
+  form body into the generated Rust literal, so a body that mixes a
+  high byte with a percent escape wrote a `src/main.rs` that rustc
+  cannot read. `entry` now refuses that body and names the request
+  number. The check in `rust/form_data.ml` tests the decoded field
+  only, so it accepts the same input.
+- F-5, low, `test/lan_native_session.py:20-22,158`. The suite gave
+  every subprocess 120 s, which equals the budget of each of the five
+  children of `dev/prepare-crate.py`, so the child's named
+  `CRATE-PREPARE FAIL` timeout row was unreachable. The `run` helper
+  now takes a timeout keyword and the crate-prepare call passes 900 s.
+  A caught timeout was applied first and then reverted, because the
+  house rule `one-catch-site` allows exactly one `try` under lib,
+  surface, bin and test (`test/sys_io.ml:19`), so a timeout still
+  surfaces as a Python traceback.
+- F-6, nit, `rust/model.ml:244-248`. The foreign-path guard grew to
+  four conditions in one `if`. A `match () with` guard block now holds
+  them in the same order. This is style only, and the emitted source
+  does not change.
+- F-7, nit, `test/lan_native_session.py:110-117`. The bad-entry-point
+  test pinned stderr to the substring `request`, which every session
+  error carries. Each of the three cases now pins its own indexed
+  prefix, `request 1: ` or `request 2: `, and all three pin `entry
+  point must have type`.
+- Carried. C-1 upholds the interpreter-agreement check in
+  `test/lan_native_session.py`, which pins stdout and the exit code
+  but not the indexed error, and defers it as the weakest row past the
+  cap of 7. C-2 refutes the approved-policy report on
+  `test/lan_approved_policy.py`, because the fixture approves exactly
+  the copied bytes and the proposed fix would delete eight frozen
+  capture rows. C-3 refutes the KeyError report on the same file as
+  speculation about a future edit, because the staged code indexes a
+  key that exists. C-4 refutes the `--prepare` report on
+  `test/lan_native_session.py`, because a refused existing directory
+  keeps stale crates out of the eight-case manifest. C-5 refutes the
+  dead-code report on this log, because the build row hides warning
+  text by construction and the receipt corroborates the claim.
+- Repins. Seven paths take new hashes in
+  `validation/stage-m1-native-session/source-sha256.json`:
+  `dev/STAGE-M1-NATIVE-SESSION.md`, `dev/stage-m1-native-session.sh`,
+  `rust/emit.ml`, `rust/session_emit.ml`, `rust/model.ml`,
+  `test/lan_native_session.py` and this log. The map keeps its 29
+  entries and verifies `PINS ok=29 mismatch=0`. The build reports `OK
+  build: 0 errors, 0 warnings`.
+
+Proof: `zsh dev/gates.sh --stage M1-native-session` on the staged
+tree (2026-09-18T21:24:19Z, load 18.5) prints `OK build: 0 errors,
+0 shown-warnings (141 hidden; --warn)`,
+`LAN-NATIVE-SESSION-CLI OK groups=5`,
+`LAN-NATIVE-SESSION PREPARED cases=8 mutants=2`,
+`LAN-NATIVE-SESSION OK cases=8 executions=16 mutants=2`,
+`STAGE-M1-NATIVE-SESSION OK` and exits 0. The same command on a
+clone of the slice before the fixes was green at 21:02:34Z. A first
+fix run went red at `HOUSE one-catch-site FAIL` because F-5 had
+added a Python `try`; the rework above removed it. The trusted
+accounting moves with the fixes: emit 684 to 688, model 282 to 285,
+session_emit 115 to 119, printer-total 1766 to 1777;
+TRUSTED-POLICY stays PROPOSED with candidate lines 14191 (was
+14180). The first `TRUSTED-LINES` block of the run reports
+`printer-total=1827` because the M0 mutation leg measures a mutant
+copy with `added-lines=50`; the clean root and the FAST leg both
+report 1777, and the baseline log shows the same shape at 1816 and
+1766. The frozen captures keep the pre-fix counts, as the receipt
+notes record; only `source-sha256.json` is refreshed and `PINS
+ok=29 mismatch=0` holds.

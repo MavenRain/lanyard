@@ -64,11 +64,11 @@ class Policy(unittest.TestCase):
         self.approved()
         report = TRUST.inventory(self.work)
         self.assertEqual((report["status"], report["policy"]["lines"], report["policy"]["limit"]),
-                         ("PASS", 48, 48))
+                         ("PASS", 49, 49))
         self.assertEqual(report["pending_rulings"], [])
         self.assertEqual(report["m0_exit"], "not-stamped")
-        self.assertEqual(report["ceiling"]["total"], 48)
-        self.assertEqual(report["ceiling"]["A_emit"], 10)
+        self.assertEqual(report["ceiling"]["total"], 49)
+        self.assertEqual(report["ceiling"]["A_emit"], 11)
         self.assertEqual(self.gate()["status"], "PASS")
 
     def test_growth_in_every_group_fails_approved_budget(self):
@@ -124,8 +124,8 @@ class Policy(unittest.TestCase):
         (self.work / "surface/elab.ml").write_bytes(b"\n" * 100)
         report = TRUST.inventory(self.work)
         self.assertEqual(report["status"], "PASS")
-        self.assertEqual(len(report["files"]), 48)
-        self.assertEqual(report["ceiling"]["total"], 41)
+        self.assertEqual(len(report["files"]), 49)
+        self.assertEqual(report["ceiling"]["total"], 42)
         self.assertTrue(any(row["path"] == "surface/elab.ml" for row in report["files"]))
 
     def test_kernel_cannot_be_excluded_or_budgeted_above_ratified_bound(self):

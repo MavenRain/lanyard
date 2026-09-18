@@ -1,0 +1,76 @@
+{
+  "stage": "M1-native-session",
+  "recorded_at": "2026-09-18T19:59:24.599893+00:00",
+  "base_commit": "414121c12f7d3bc16b788087b8ad628a592adfd4",
+  "validation_root": "/Users/oobi/Documents/gpt2/lanyard-m1-native-session",
+  "commands": {
+    "stage": {
+      "capture": "stage-capture.json",
+      "commands": [
+        {
+          "argv": [
+            "env",
+            "LANYARD_TOASTY=/Users/oobi/Documents/toasty",
+            "LANYARD_TOPCOAT=/Users/oobi/Documents/topcoat",
+            "RUSTUP_TOOLCHAIN=1.98",
+            "RUSTC_WRAPPER=",
+            "CARGO_INCREMENTAL=0",
+            "CARGO_HOME=/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+            "CARGO_TARGET_DIR=/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target",
+            "zsh",
+            "dev/gates.sh",
+            "--stage",
+            "M1-native-session"
+          ],
+          "exit_code": 0,
+          "stdout": "stage-0001.stdout",
+          "stderr": "stage-0001.stderr"
+        }
+      ]
+    },
+    "dune": {
+      "capture": "dune-capture.json",
+      "commands": [
+        {
+          "argv": [
+            "zsh",
+            "dev/dunecho.sh",
+            "test"
+          ],
+          "exit_code": 0,
+          "stdout": "dune-0001.stdout",
+          "stderr": "dune-0001.stderr"
+        }
+      ]
+    },
+    "accounting": {
+      "capture": "accounting-capture.json",
+      "commands": [
+        {
+          "argv": [
+            "zsh",
+            "-c",
+            "set -eu\nzsh dev/trusted-lines.sh\npython3 -P test/lan_trusted_inventory.py\npython3 -P test/lan_trusted_policy.py\npython3 -P test/lan_approved_policy.py\nzsh dev/house.sh\ngit diff --check"
+          ],
+          "exit_code": 0,
+          "stdout": "accounting-0001.stdout",
+          "stderr": "accounting-0001.stderr"
+        }
+      ]
+    }
+  },
+  "source_hashes": "source-sha256.json",
+  "observations": {
+    "cli_groups": 5,
+    "native_cases": 8,
+    "native_executions": 16,
+    "runtime_mutants": 2
+  },
+  "notes": [
+    "The cumulative gate includes interpreter agreement, native builds, native executions and runtime controls.",
+    "The successful aggregate ran with normal macOS access; the earlier restricted run failed the existing Git confstr stderr assertions.",
+    "Printer accounting was updated after the aggregate run and checked separately by the accounting capture; compiler and runtime source bytes stayed unchanged.",
+    "Generated Rust emitted dead-code warnings. The pinned SQLite missing-schema panic becomes an indexed task failure with empty stdout.",
+    "Target signatures, dependency pins, trust allowances and the pending M0 exit decision were preserved."
+  ]
+}

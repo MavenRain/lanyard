@@ -745,3 +745,22 @@ All five mutations are killed. The clean and restored programs pass all
 266 observations. The interpreter's unused-result control omits the
 comparison and must fail to retrieve the row its arguments would write.
 The cumulative gate retains the earlier decimal parser mutations.
+
+## M1 native session controls (2026-09-18)
+
+The native session gate compiles eight valid programs and two mutated
+copies. The valid binaries run twice with complete byte-for-byte expected
+transcripts, including the two failures that must keep stdout empty.
+Independent expected transcripts also have to agree with the interpreter.
+
+| Mutation | Change | Required incorrect observation |
+| --- | --- | --- |
+| order | Reverse the two serialized redirect responses | The last redirect precedes the first |
+| partial | Write the first response before later requests finish | The ready response leaks before the request 3 failure |
+
+Both controls compile. The order control exits successfully with exactly
+the reversed transcript; the partial control exits 1 with exactly the
+first response on stdout and an indexed request 3 error. Unexpected build
+or runtime failures fail the gate. The cumulative gate passed all 16 clean
+executions and both controls. Source files and captures are recorded in
+`validation/stage-m1-native-session/`.
