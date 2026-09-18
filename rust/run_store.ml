@@ -96,6 +96,7 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
         |> Option.to_result ~none:(Error.Mismatch "run: connection metadata differs") in
       connect connection arguments store
   | () when String.starts_with ~prefix:"Text." row.schema || String.equal row.schema "Uri.from_text"
+      || String.equal row.schema "Uri.to_text"
       || String.equal row.schema "Form.field" || String.equal row.schema "Response.text"
       || String.equal row.schema "Html.text" || String.equal row.schema "Response.html" ->
       let* operation = List.find_opt (fun (text : Text_ops.t) -> text.row = row) catalog.texts
@@ -105,6 +106,10 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
        | [value] when operation.operation = Text_ops.From_nat ->
            let* number = natural value in
            Ok (of_text operation.family (Bignum.to_string number), store)
+       | [Uri uri] when operation.operation = Text_ops.Uri_to_text ->
+           let* uri = Run_http.uri uri in
+           Ok (of_text operation.family uri, store)
+       | [_value] when operation.operation = Text_ops.Uri_to_text -> invalid "expected a request URI"
        | [left; right] when operation.operation = Text_ops.Concat ->
            let* left = text ~what:"concat left" operation.family left in
            let* right = text ~what:"concat right" operation.family right in
@@ -129,7 +134,7 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
              | Text_ops.Response_text -> Ok (Response_text text)
              | Text_ops.Html_text -> Text_ops.html_text text |> Result.map (of_text operation.family)
              | Text_ops.Response_html -> Ok (Response_html text)
-             | Text_ops.From_nat | Text_ops.Equal | Text_ops.Concat | Text_ops.Form_field ->
+             | Text_ops.From_nat | Text_ops.Uri_to_text | Text_ops.Equal | Text_ops.Concat | Text_ops.Form_field ->
                  invalid "text pair argument count" in
            Ok (value, store)
        | [] | _ :: _ -> invalid "text argument count")

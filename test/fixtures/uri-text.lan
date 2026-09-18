@@ -1,0 +1,11 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def render : Uri -> Bytes := Uri.to_text Bytes
+
+def main : Cx -> Uri -> Response := fun (cx : Cx) (uri : Uri) =>
+  let path : Bytes := render uri in
+  case Text.equal Bytes path b"/todos" with
+  | 0 (u : prod ()) => Response.text Bytes (Text.concat Bytes b"unmatched: " path)
+  | 1 (u : prod ()) => Response.text Bytes b"todos"

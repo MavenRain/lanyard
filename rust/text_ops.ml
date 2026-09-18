@@ -6,7 +6,7 @@ module Catalog = Lanyard_target.Target_generated
 module Printer = Foreign.Printer
 let ( let* ) = Result.bind
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
-type operation = Trim | Is_empty | Equal | Concat | From_nat | To_nat | Uri_from_text | Form_field | Response_text | Html_text | Response_html
+type operation = Trim | Is_empty | Equal | Concat | From_nat | To_nat | Uri_from_text | Uri_to_text | Form_field | Response_text | Html_text | Response_html
 let operation name = match () with
   | () when String.equal name "Text.trim" -> Ok Trim
   | () when String.equal name "Text.is_empty" -> Ok Is_empty
@@ -15,6 +15,7 @@ let operation name = match () with
   | () when String.equal name "Text.from_nat" -> Ok From_nat
   | () when String.equal name "Text.to_nat" -> Ok To_nat
   | () when String.equal name "Uri.from_text" -> Ok Uri_from_text
+  | () when String.equal name "Uri.to_text" -> Ok Uri_to_text
   | () when String.equal name "Form.field" -> Ok Form_field
   | () when String.equal name "Response.text" -> Ok Response_text
   | () when String.equal name "Html.text" -> Ok Html_text
@@ -51,17 +52,20 @@ let specification = function
   | Is_empty -> "(0 Text : Type 0) -> (text : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
   | Equal -> "(0 Text : Type 0) -> (left : Text) -> (right : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
   | Uri_from_text -> "(0 Text : Type 0) -> (text : Text) -> Uri"
+  | Uri_to_text -> "(0 Text : Type 0) -> (uri : Uri) -> Text"
   | Form_field -> "(0 Text : Type 0) -> (text : Text) -> (field : Text) -> Text"
   | Response_text | Response_html -> "(0 Text : Type 0) -> (text : Text) -> Response"
-let effects = function Trim | Is_empty | Equal | Concat | From_nat | Response_text | Html_text | Response_html -> []
+let effects = function Trim | Is_empty | Equal | Concat | From_nat | Uri_to_text | Response_text | Html_text | Response_html -> []
   | To_nat | Uri_from_text | Form_field -> ["topcoat::Error"]
 let parameters = function Trim | Is_empty | To_nat | Uri_from_text | Response_text | Html_text | Response_html -> ["text"]
   | Equal | Concat -> ["left"; "right"]
   | From_nat -> ["value"]
+  | Uri_to_text -> ["uri"]
   | Form_field -> ["text"; "field"]
-type input = Byte_list | Natural
+type input = Byte_list | Natural | Request_uri
 let input = function
   | From_nat -> Natural
+  | Uri_to_text -> Request_uri
   | Trim | Is_empty | Equal | Concat | To_nat | Uri_from_text | Form_field | Response_text | Html_text | Response_html -> Byte_list
 let foreign_call entries operations (row : Rir.foreign) =
   let* text = List.find_opt (fun text -> text.row = row) operations
@@ -91,6 +95,8 @@ let foreign_call entries operations (row : Rir.foreign) =
               let ty = Printer.rust_type (Printer.Sum [Printer.Unit; Printer.Unit]) in
               "if " ^ call ^ " { " ^ ty ^ "::V1(()) } else { " ^ ty ^ "::V0(()) }"
           | Uri_from_text -> "lan_uri_validate(&__lan_text)?; " ^ call
+          | Uri_to_text -> "let __lan_uri_text = " ^ call ^ "; lan_uri_validate(&__lan_uri_text)?; "
+              ^ Printer.identifier "lan_model_text_from_" text.family ^ "(__lan_uri_text)"
           | To_nat | Response_text | Response_html -> call in
         let evaluated = Seq.zip (List.to_seq bindings) (List.to_seq arguments)
           |> Seq.map (fun ((_name, local), value) -> "let " ^ local ^ "_arg = " ^ value ^ "; ")
@@ -98,20 +104,21 @@ let foreign_call entries operations (row : Rir.foreign) =
         let conversions = List.map (fun (_name, local) -> "let " ^ local ^ " = "
           ^ (match input operation with
              | Byte_list -> Printer.identifier "lan_model_text_to_" text.family ^ "(&" ^ local ^ "_arg)?"
-             | Natural -> local ^ "_arg") ^ "; ") bindings
+             | Natural | Request_uri -> local ^ "_arg") ^ "; ") bindings
           |> String.concat "" in
         Ok ("{ " ^ evaluated ^ conversions ^ converted ^ " }") in
+  let uri_foreign () = let* _uri_type = Foreign.foreign_type entries "Uri" [] in
+    Ok (Rir.TyForeign ("Uri", [])) in
   let* result = match operation with
-    | Trim | Concat | From_nat | Form_field | Html_text -> Ok text.repr | Is_empty | Equal -> Ok bool_repr
+    | Trim | Concat | From_nat | Uri_to_text | Form_field | Html_text -> Ok text.repr | Is_empty | Equal -> Ok bool_repr
     | To_nat -> Ok (Rir.TyUnion (Rir.Tid "nat"))
-    | Uri_from_text ->
-        let* _uri_type = Foreign.foreign_type entries "Uri" [] in
-        Ok (Rir.TyForeign ("Uri", []))
+    | Uri_from_text -> uri_foreign ()
     | Response_text | Response_html ->
         let* _response_type = Foreign.foreign_type entries "Response" [] in
         Ok (Rir.TyForeign ("Response", [])) in
-  let argument = match input operation with
-    | Byte_list -> text.repr | Natural -> Rir.TyUnion (Rir.Tid "nat") in
+  let* argument = match input operation with
+    | Byte_list -> Ok text.repr | Natural -> Ok (Rir.TyUnion (Rir.Tid "nat"))
+    | Request_uri -> uri_foreign () in
   Ok (List.map (fun _name -> Rir.TyArc argument) parameters, result, render, Effects.Sync)
 
 (** Decimal parsing shares the kernel's checked arbitrary-precision boundary. *)

@@ -16,6 +16,7 @@ let text_arguments = function
           "Text_from_nat", "Text.from_nat";
           "Text_to_nat", "Text.to_nat";
           "Uri_from_text", "Uri.from_text"; "Form_field", "Form.field";
+          "Uri_to_text", "Uri.to_text";
           "Response_text", "Response.text"; "Html_text", "Html.text";
           "Response_html", "Response.html"])
   | Term.Var _ | Term.Univ _ | Term.Lan _ | Term.Ran _ | Term.In _ | Term.Elim _

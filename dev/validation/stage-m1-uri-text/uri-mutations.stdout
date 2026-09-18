@@ -1,0 +1,5 @@
+LAN-URI-TEXT-MUT CONTROL OK
+LAN-URI-TEXT-MUT skip-interpreter-validation KILLED
+LAN-URI-TEXT-MUT replace-uri-text KILLED
+LAN-URI-TEXT-MUT skip-emitted-validation KILLED
+LAN-URI-TEXT-MUT OK killed=3/3 restored=GREEN

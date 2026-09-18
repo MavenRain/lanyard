@@ -1,0 +1,140 @@
+{
+  "stage": "M1-uri-text",
+  "recorded_at": "2026-09-18T03:12:19.784361+00:00",
+  "base_commit": "ad248dc5a8b4adef1e79057bf678b20b2b27231e",
+  "validation_root": "/Users/oobi/Documents/gpt2/lanyard-uri-text",
+  "commands": {
+    "dune-tests": {
+      "capture": "dune-tests-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "zsh",
+        "dev/dunecho.sh",
+        "test"
+      ]
+    },
+    "axioms": {
+      "capture": "axioms-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_axioms.py"
+      ]
+    },
+    "house": {
+      "capture": "house-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "zsh",
+        "dev/house.sh"
+      ]
+    },
+    "uri-cli": {
+      "capture": "uri-cli-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_uri_text.py"
+      ]
+    },
+    "uri-mutations": {
+      "capture": "uri-mutations-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_uri_text_mutations.py"
+      ]
+    },
+    "native-prepare": {
+      "capture": "native-prepare-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_uri_text.py",
+        "--prepare",
+        "dev/validation/stage-m1-uri-text/native",
+        "--toasty",
+        "/Users/oobi/Documents/toasty",
+        "--topcoat",
+        "/Users/oobi/Documents/topcoat",
+        "--lock",
+        "dev/validation/stage-m1-text-equal/native/Cargo.lock"
+      ]
+    },
+    "native-build": {
+      "capture": "native-build-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "gateledger",
+        "run",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-uri-text/.gatework/gateledger",
+        "--dir",
+        "dev/validation/stage-m1-uri-text/native",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_HOME=/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-uri-text/dev/validation/stage-m1-uri-text/native/Cargo.toml",
+        "--target-dir",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target",
+        "--jobs",
+        "2"
+      ]
+    },
+    "native-check": {
+      "capture": "native-check-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_uri_text.py",
+        "--check",
+        ".gatework/uri-text-native"
+      ]
+    },
+    "stage": {
+      "capture": "stage-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-uri-text"
+      ]
+    }
+  },
+  "source_hashes": "source-sha256.json",
+  "submodule_commits": {
+    "vendor/tot": "8cf0b8bfbb574e344d8d489ba6fd6b81de4cf562"
+  },
+  "observations": {
+    "ocaml": 43,
+    "cli_groups": 4,
+    "native": 70,
+    "mutants_killed": 3
+  },
+  "notes": [
+    "The stage ran with normal macOS access because restricted Git emits a confstr warning in the retained configuration test.",
+    "Native build completed offline with the pinned dependencies and preceding stage lock; eight generated dead-code warnings.",
+    "The Dune test alias completed with exit zero; dunecho does not count the plain OCaml check output.",
+    "Trust proposals and the M0 exit decision remain pending."
+  ]
+}

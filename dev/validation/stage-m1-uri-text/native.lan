@@ -1,0 +1,13 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+def render : Uri -> Bytes := Uri.to_text Bytes
+mu Other : Type 0 :=
+| otherNil : Other
+| otherCons (head : Nat) (tail : Other) : Other
+def alternate : Uri -> Other := Uri.to_text Other
+def roundtrip : Bytes -> Bytes := fun (text : Bytes) => render (Uri.from_text Bytes text)
+def captured : Uri -> Bytes := fun (uri : Uri) =>
+  let closure : Nat -> Bytes := fun (n : Nat) => Uri.to_text Bytes uri in closure 0
+def unused : Uri -> Nat := fun (uri : Uri) => let ignored : Bytes := render uri in 1
+def main : Bytes := roundtrip b"/todos?x=%2f"

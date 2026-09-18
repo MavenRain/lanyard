@@ -4111,3 +4111,83 @@ log=212 IDENTICAL. The fix-1 ladder ran on the fixed tree on
 PINS tag=fix-1 ok=148 missing=0 and ROWS tag=fix-1 capture=212
 log=212 IDENTICAL. The close ladder repeats this gate on the staged
 tree after this paragraph.
+
+## Stage M1 URI-TEXT (2026-09-17)
+
+Starting at ad248dc, this slice adds `Uri.to_text Bytes uri` to the checked
+catalog, specialization, interpreter and Rust emitter. A request handler
+can inspect the full URI and select a response with `Text.equal`. The new
+`uri-text.lan` fixture returns `todos` for exactly `/todos` and echoes other
+paths after `unmatched: `.
+
+The adapter retains URI spelling, including percent-escape case, repeated
+slashes, dot segments and the complete text after `?`. It checks the shared
+origin-form contract and 8192-byte limit in both runtimes. This check remains
+observable for unused results and rejects native Topcoat URI values outside
+the supported subset. Type arguments remain erased; URI arguments retain
+shared quantity. The operation is synchronous with no library effect. The
+existing adapter error channel reports validation failures.
+
+Validation adds 43 OCaml checks, four CLI groups and three compiler
+mutations, with clean and restored controls. A native crate built offline
+against pinned Topcoat passes 70 observations for rendering, round trips,
+captures, alternate byte-list families and used or unused invalid values.
+Its build reports eight generated dead-code warnings. The default Dune test
+alias, axiom suite (10 observations and 11 refusals) and HOUSE gate pass.
+
+The catalog grows to 30 proposed declarations and nine foreign types. Todo
+now reports 35 foreign constants; both report forms and the exact golden
+reflect the new row. The generated catalog is 194 lines, 90 above the pending
+104-line proposal. No dependency revision, source anchor, trust approval or
+M0 exit decision changes.
+
+The cumulative stage runs with normal macOS access. Its retained Git
+configuration regression fails under filesystem sandboxing because Git
+prints a `confstr` warning; the original stderr assertion is preserved.
+Captures, the native source and lock, and final input hashes are retained
+under `validation/stage-m1-uri-text/`.
+
+Final cumulative validation passed `STAGE-M1-URI-TEXT`, including all
+retained stages, 43 new OCaml checks and the three killed mutations with
+clean and restored controls. Its retained Stage F gate reports
+`STAGE-F-GATES OK m0=PENDING`, preserving the existing ratification status.
+
+## Stage M1 URI-TEXT review fixes (tag LSM1R, 2026-09-17)
+
+A staged-slice review of this stage ran over the 23-path slice on
+HEAD ad248dc. An opus drafter supplied 9 hypotheses. An opus prober
+confirmed 1, refuted 2 and ruled 6 not a finding. One ctxcat-review
+Workflow run supplied 7 raw findings, of which 4 were upheld. An
+opus judge passed 3 findings, one low and two nits, under a judge
+cap of 7. Six more are carried. The fixes touch two source files. No
+frozen capture under `validation/stage-m1-uri-text/` changes, because
+the emitted Rust text stays byte-identical.
+
+- F-1, low, `README.md:366`. The axiom report paragraph said 34 foreign
+  constants. The catalog, the capture and the axiom suite all report 35. The
+  count is now 35.
+- F-2, nit, `rust/text_ops.ml:107`. The rewritten `| Natural | Request_uri`
+  arm used 14 spaces of indentation against 13 on the arm above it. The arm
+  now uses 13 spaces. The change is whitespace only.
+- F-3, nit, `rust/text_ops.ml:113-115` and `121-123`. The `Uri` foreign-type
+  lookup was written twice in one function. A local `uri_foreign ()` helper
+  holds the lookup, and both arms call it. The lookup stays lazy, so the
+  refusal behaviour for other text operations does not change. Both matches
+  stay exhaustive with no wildcard arm.
+- Repin. `validation/stage-m1-uri-text/source-sha256.json` records the new
+  SHA-256 of each edited review path: `README.md`, `rust/text_ops.ml` and
+  this log.
+- Refuted. The review also proposed an effects finding against the
+  synchronous classification of `Uri.to_text`. It is refuted, because the
+  operation adds no library effect and `dev/STAGE-M1-URI-TEXT.md:22` already
+  names the adapter error channel for validation failures.
+- Ladders. The baseline ladder ran on the unfixed tree, launched
+  detached 2026-09-18T04:50:51Z at load1 15.60, verdict
+  2026-09-18T05:02:06Z after 675 s, GATE LSM1R tag=baseline GREEN,
+  with PINS tag=baseline ok=155 missing=0 and ROWS tag=baseline
+  capture=219 log=219 IDENTICAL. The fix-1 ladder ran on the fixed
+  tree, launched detached 2026-09-18T05:18:02Z at load1 12.42,
+  verdict 2026-09-18T05:28:03Z after 480 s, GATE LSM1R tag=fix-1
+  GREEN, with PINS tag=fix-1 ok=155 missing=0 and ROWS tag=fix-1
+  capture=219 log=219 IDENTICAL. The close ladder repeats this gate
+  on the staged tree after this paragraph.
