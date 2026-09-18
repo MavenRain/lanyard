@@ -1,0 +1,12 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+def same : Bytes -> Bytes -> Bool := Text.equal Bytes
+
+def main : Cx -> Uri -> Bytes -> Response :=
+  fun (cx : Cx) (uri : Uri) (body : Bytes) =>
+  case (same (Form.field Bytes body b"action") b"save") with
+  | 0 (u : prod ()) => Response.text Bytes b"unknown action"
+  | 1 (u : prod ()) => Response.text Bytes b"saved"

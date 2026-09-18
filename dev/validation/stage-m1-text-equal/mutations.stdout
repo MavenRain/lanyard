@@ -1,0 +1,7 @@
+LAN-TEXT-EQUAL-MUT OK clean
+LAN-TEXT-EQUAL-MUT KILLED inverted observations=259
+LAN-TEXT-EQUAL-MUT KILLED length observations=42
+LAN-TEXT-EQUAL-MUT KILLED prefix observations=20
+LAN-TEXT-EQUAL-MUT KILLED trimmed observations=8
+LAN-TEXT-EQUAL-MUT KILLED unchecked_right observations=3
+LAN-TEXT-EQUAL-MUT OK restored

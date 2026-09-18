@@ -201,6 +201,15 @@ _build/default/bin/lanyard.exe run --request /todos --form 'id=000257&title=%3Ch
 zsh dev/gates.sh --stage M1-text-nat
 ```
 
+The [M1 text comparison](dev/STAGE-M1-TEXT-EQUAL.md) checks exact equality
+with `Text.equal Bytes left right`. Both inputs must be valid UTF-8 byte
+lists. The result is a Boolean, so form values can select a response:
+
+```sh
+_build/default/bin/lanyard.exe run --request / --form 'action=save' test/fixtures/text-equal.lan
+zsh dev/gates.sh --stage M1-text-equal
+```
+
 Build and validate through Stage D:
 
 ```sh
@@ -341,7 +350,7 @@ _build/default/bin/lanyard.exe axioms --names examples/m0-todo.lan
 
 The report lists Framework, Foreign, Classical and Div, sorted by class
 and name, with class totals and the compiled target catalog's SHA-256.
-Todo reports 33 foreign constants and 3 definitions of the checked
+Todo reports 34 foreign constants and 3 definitions of the checked
 module (Bool, Todo and main). These are informational inputs, with no
 ratio bound. The scope is the whole checked module, including unused
 catalog rows and model operations.

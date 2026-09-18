@@ -1,0 +1,142 @@
+{
+  "stage": "M1-text-equal",
+  "recorded_at": "2026-09-17T09:33:35.771752+00:00",
+  "base_commit": "4ff9f6fd2f48da75268ef58d8144c27490f622e3",
+  "validation_root": "/Users/oobi/Documents/gpt2/lanyard-equal",
+  "commands": {
+    "stage": {
+      "capture": "stage-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "zsh",
+        "dev/gates.sh",
+        "--stage",
+        "M1-text-equal"
+      ]
+    },
+    "dune-tests": {
+      "capture": "dune-tests-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "zsh",
+        "dev/dunecho.sh",
+        "test"
+      ]
+    },
+    "axioms": {
+      "capture": "axioms-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_axioms.py"
+      ]
+    },
+    "native-prepare": {
+      "capture": "native-prepare-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_text_equal_database.py",
+        "--prepare",
+        "dev/validation/stage-m1-text-equal/native",
+        "--toasty",
+        "/Users/oobi/Documents/toasty",
+        "--topcoat",
+        "/Users/oobi/Documents/topcoat",
+        "--lock",
+        "dev/validation/stage-m1-text-nat/native/Cargo.lock"
+      ]
+    },
+    "native-build": {
+      "capture": "native-build-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "gateledger",
+        "run",
+        "--ledger",
+        "/Users/oobi/Documents/gpt2/lanyard-equal/.gatework/gateledger",
+        "--dir",
+        "dev/validation/stage-m1-text-equal/native",
+        "--toolchain",
+        "1.98",
+        "--",
+        "env",
+        "RUSTUP_TOOLCHAIN=1.98",
+        "RUSTC_WRAPPER=",
+        "CARGO_INCREMENTAL=0",
+        "CARGO_HOME=/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+        "cargocho",
+        "--warn",
+        "build",
+        "--",
+        "--offline",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--manifest-path",
+        "/Users/oobi/Documents/gpt2/lanyard-equal/dev/validation/stage-m1-text-equal/native/Cargo.toml",
+        "--target-dir",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target",
+        "--jobs",
+        "2"
+      ]
+    },
+    "native-check": {
+      "capture": "native-check-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_text_equal_database.py",
+        "--check",
+        "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target/debug/lanyard-program"
+      ]
+    },
+    "mutations": {
+      "capture": "mutations-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_text_equal.py",
+        "--mutations"
+      ]
+    },
+    "house": {
+      "capture": "house-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "zsh",
+        "dev/house.sh"
+      ]
+    },
+    "git-environment": {
+      "capture": "git-environment-capture.json",
+      "exit_code": 0,
+      "argv": [
+        "python3",
+        "-P",
+        "test/lan_m0_e2e.py",
+        "EndToEnd.test_git_steps_ignore_the_operator_configuration"
+      ]
+    }
+  },
+  "observations": {
+    "ocaml": 49,
+    "cli_groups": 8,
+    "interpreter_pairs": 256,
+    "native": 266,
+    "interpreter_database": 5,
+    "native_database": 5,
+    "killed_mutations": 5
+  },
+  "source_hashes": "source-sha256.json",
+  "native_build_warnings": 25,
+  "m0_status": "PENDING",
+  "notes": [
+    "The cumulative stage uses normal macOS access because sandboxed Git warns on stderr.",
+    "Library revisions and source anchors are unchanged; trust allowances remain proposed."
+  ]
+}

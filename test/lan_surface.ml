@@ -41,7 +41,7 @@ let catalog_refuses name ty kind expected () =
 
 let catalog () =
   let* _g, rows, atoms = Elab.target_environment () |> Result.map_error Error.to_string in
-  if List.length rows = 28 && List.length atoms = 9 then Ok ()
+  if List.length rows = 29 && List.length atoms = 9 then Ok ()
   else Error "catalog inventory differs"
 
 let cases = [

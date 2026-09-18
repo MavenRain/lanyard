@@ -725,3 +725,23 @@ stage's four natural-number formatting mutations. Its capture retains
 the observations with the other stage evidence. Metadata refusal checks
 also exercise effects, quantities, type, kind, arity, erased type
 arguments and print rules.
+
+## Stage M1 TEXT-EQUAL (2026-09-17)
+
+`test/lan_text_equal.py --mutations` changes a copy of the emitted Rust
+program. Each mutant must compile, exit normally and emit the complete
+observation list. A false semantic observation kills the mutant; build
+failures and missing observations fail the harness.
+
+| Mutation | Change | Failing observations |
+| --- | --- | --- |
+| inverted | Replace equality with inequality | 259 |
+| length | Compare only string lengths | 42 |
+| prefix | Accept a matching prefix | 20 |
+| trimmed | Trim both values before comparing | 8 |
+| unchecked_right | Replace a failed right-input conversion with empty text | 3 |
+
+All five mutations are killed. The clean and restored programs pass all
+266 observations. The interpreter's unused-result control omits the
+comparison and must fail to retrieve the row its arguments would write.
+The cumulative gate retains the earlier decimal parser mutations.

@@ -1,0 +1,25 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+
+model Piece with
+| id : Nat
+| text : Bytes
+end
+
+def left : Db -> Bytes := fun (db : Db) =>
+  let created : Piece := Piece.create (tuple (1, b"left")) db in created.1
+
+def right : Db -> Bytes := fun (db : Db) =>
+  let updated : Piece := Piece.update (tuple (1, b"right")) db in
+  let deleted : prod () := Piece.delete_by_id 1 db in
+  let recorded : Piece := Piece.create (tuple (2, updated.1)) db in recorded.1
+
+def different : Bytes := let db : Db := Db.connect Piece Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in let compared : Bool := Text.equal Bytes (left db) (right db) in let recreated : Piece := Piece.create (tuple (1, b"once")) db in case compared with | 0 (u : prod ()) => let recorded : Piece := Piece.get_by_id 2 db in Text.concat Bytes recreated.1 recorded.1 | 1 (u : prod ()) => b"wrong"
+def retained : Bytes := let db : Db := Db.connect Piece Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in let ignored : Bool := Text.equal Bytes (left db) (right db) in let recreated : Piece := Piece.create (tuple (1, b"once")) db in let recorded : Piece := Piece.get_by_id 2 db in Text.concat Bytes recreated.1 recorded.1
+def same : Bytes := let db : Db := Db.connect Piece Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in case (Text.equal Bytes (left db) (let stored : Piece := Piece.get_by_id 1 db in stored.1)) with | 0 (u : prod ()) => b"no" | 1 (u : prod ()) => b"yes"
+def invalid : Bytes := let db : Db := Db.connect Piece Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in let ignored : Bool := Text.equal Bytes b"x" (bytesCons 255 bytesNil) in b"ok"
+def order : Bytes := let db : Db := Db.connect Piece Bytes b"sqlite::memory:" in let ready : prod () := Db.push_schema db in let allocated : Bytes := left db in let ignored : Bool := Text.equal Bytes (bytesCons 255 bytesNil) (left db) in b"ok"
+def main : Bytes := different

@@ -6,10 +6,11 @@ module Catalog = Lanyard_target.Target_generated
 module Printer = Foreign.Printer
 let ( let* ) = Result.bind
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
-type operation = Trim | Is_empty | Concat | From_nat | To_nat | Uri_from_text | Form_field | Response_text | Html_text | Response_html
+type operation = Trim | Is_empty | Equal | Concat | From_nat | To_nat | Uri_from_text | Form_field | Response_text | Html_text | Response_html
 let operation name = match () with
   | () when String.equal name "Text.trim" -> Ok Trim
   | () when String.equal name "Text.is_empty" -> Ok Is_empty
+  | () when String.equal name "Text.equal" -> Ok Equal
   | () when String.equal name "Text.concat" -> Ok Concat
   | () when String.equal name "Text.from_nat" -> Ok From_nat
   | () when String.equal name "Text.to_nat" -> Ok To_nat
@@ -48,19 +49,20 @@ let specification = function
   | From_nat -> "(0 Text : Type 0) -> (value : Nat) -> Text"
   | To_nat -> "(0 Text : Type 0) -> (text : Text) -> Nat"
   | Is_empty -> "(0 Text : Type 0) -> (text : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
+  | Equal -> "(0 Text : Type 0) -> (left : Text) -> (right : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
   | Uri_from_text -> "(0 Text : Type 0) -> (text : Text) -> Uri"
   | Form_field -> "(0 Text : Type 0) -> (text : Text) -> (field : Text) -> Text"
   | Response_text | Response_html -> "(0 Text : Type 0) -> (text : Text) -> Response"
-let effects = function Trim | Is_empty | Concat | From_nat | Response_text | Html_text | Response_html -> []
+let effects = function Trim | Is_empty | Equal | Concat | From_nat | Response_text | Html_text | Response_html -> []
   | To_nat | Uri_from_text | Form_field -> ["topcoat::Error"]
 let parameters = function Trim | Is_empty | To_nat | Uri_from_text | Response_text | Html_text | Response_html -> ["text"]
-  | Concat -> ["left"; "right"]
+  | Equal | Concat -> ["left"; "right"]
   | From_nat -> ["value"]
   | Form_field -> ["text"; "field"]
 type input = Byte_list | Natural
 let input = function
   | From_nat -> Natural
-  | Trim | Is_empty | Concat | To_nat | Uri_from_text | Form_field | Response_text | Html_text | Response_html -> Byte_list
+  | Trim | Is_empty | Equal | Concat | To_nat | Uri_from_text | Form_field | Response_text | Html_text | Response_html -> Byte_list
 let foreign_call entries operations (row : Rir.foreign) =
   let* text = List.find_opt (fun text -> text.row = row) operations
     |> Option.to_result ~none:(Error.Mismatch "Rust emission: text metadata differs") in
@@ -85,7 +87,7 @@ let foreign_call entries operations (row : Rir.foreign) =
         let* call = Template.render template bindings in
         let converted = match operation with
           | Trim | Concat | From_nat | Form_field | Html_text -> Printer.identifier "lan_model_text_from_" text.family ^ "(" ^ call ^ ")"
-          | Is_empty ->
+          | Is_empty | Equal ->
               let ty = Printer.rust_type (Printer.Sum [Printer.Unit; Printer.Unit]) in
               "if " ^ call ^ " { " ^ ty ^ "::V1(()) } else { " ^ ty ^ "::V0(()) }"
           | Uri_from_text -> "lan_uri_validate(&__lan_text)?; " ^ call
@@ -100,7 +102,7 @@ let foreign_call entries operations (row : Rir.foreign) =
           |> String.concat "" in
         Ok ("{ " ^ evaluated ^ conversions ^ converted ^ " }") in
   let* result = match operation with
-    | Trim | Concat | From_nat | Form_field | Html_text -> Ok text.repr | Is_empty -> Ok bool_repr
+    | Trim | Concat | From_nat | Form_field | Html_text -> Ok text.repr | Is_empty | Equal -> Ok bool_repr
     | To_nat -> Ok (Rir.TyUnion (Rir.Tid "nat"))
     | Uri_from_text ->
         let* _uri_type = Foreign.foreign_type entries "Uri" [] in

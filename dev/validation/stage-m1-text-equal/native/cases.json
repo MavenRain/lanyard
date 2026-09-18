@@ -1,0 +1,32 @@
+[
+  [
+    "different",
+    "let compared : Bool := Text.equal Bytes (left db) (right db) in let recreated : Piece := Piece.create (tuple (1, b\"once\")) db in case compared with | 0 (u : prod ()) => let recorded : Piece := Piece.get_by_id 2 db in Text.concat Bytes recreated.1 recorded.1 | 1 (u : prod ()) => b\"wrong\"",
+    "onceright",
+    null
+  ],
+  [
+    "retained",
+    "let ignored : Bool := Text.equal Bytes (left db) (right db) in let recreated : Piece := Piece.create (tuple (1, b\"once\")) db in let recorded : Piece := Piece.get_by_id 2 db in Text.concat Bytes recreated.1 recorded.1",
+    "onceright",
+    null
+  ],
+  [
+    "same",
+    "case (Text.equal Bytes (left db) (let stored : Piece := Piece.get_by_id 1 db in stored.1)) with | 0 (u : prod ()) => b\"no\" | 1 (u : prod ()) => b\"yes\"",
+    "yes",
+    null
+  ],
+  [
+    "invalid",
+    "let ignored : Bool := Text.equal Bytes b\"x\" (bytesCons 255 bytesNil) in b\"ok\"",
+    "UTF-8",
+    "ModelUtf8"
+  ],
+  [
+    "order",
+    "let allocated : Bytes := left db in let ignored : Bool := Text.equal Bytes (bytesCons 255 bytesNil) (left db) in b\"ok\"",
+    "duplicate",
+    "Database(_)"
+  ]
+]

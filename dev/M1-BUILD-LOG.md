@@ -3997,3 +3997,117 @@ PINS tag=fix-1 ok=137 missing=0; ROWS tag=fix-1 capture=201 log=201
 IDENTICAL; COMPARE rc=0; FIX-LADDER fix-1 GREEN). The close ladder
 re-runs the gate on this exact staged tree after the close, and its
 verdict is recorded in the review kit, not in this file.
+
+## Stage M1 TEXT-EQUAL (2026-09-17)
+
+Added `Text.equal Bytes left right` as a synchronous adapter over closed
+byte-list families. The target schema erases its type argument and gives
+both values shared quantity. The interpreter compares validated strings;
+the Rust printer maps string equality to the existing Boolean sum. Case,
+whitespace, NULs and Unicode encodings are preserved. Both arguments are
+evaluated once, left to right, before their byte-list validation. Errors
+and database effects survive unused results.
+
+The form fixture branches on `action=save`. The database fixture uses
+ordered create, update and delete operations, then reads a persisted
+record to prove the comparison's effects remain observable. Omitting an
+unused comparison fails that read-back control. Named aliases, captures,
+alternate families, unsupported layouts, malformed UTF-8 and invalid
+bytes are covered in the unit and CLI suites.
+
+Validation covers 49 OCaml checks, eight CLI groups, 256 interpreted text
+pairs, 266 native observations and five database scenarios in each
+runtime. Five emitted-program mutations are killed, with passing clean
+and restored controls. The native database crate uses locked, offline
+dependencies and reports 25 generated unused-variable and dead-code
+warnings. No library dependency or foreign type was added.
+
+The catalog and disclosure fixtures now report 29 proposed declarations,
+nine foreign types and 34 Todo foreign constants. Its generated module
+has 188 lines, 84 above the proposed 104-line allowance. The Topcoat
+signature digest changes with the new row; library identities, source
+anchors, proposed allowances and the pending M0 exit decision stay as
+before.
+
+Captures and source hashes are in `validation/stage-m1-text-equal/`.
+A cumulative run under the filesystem sandbox stopped in the
+existing Git-configuration regression: macOS Git wrote a temporary-path
+warning to stderr. The isolated regression passed with normal macOS
+access. The complete stage is validated in that environment, keeping
+the original assertions.
+
+Final validation passed `STAGE-M1-TEXT-EQUAL`, the default Dune test
+alias, the axiom suite, the style gate and the five-scenario native
+database harness. The cumulative capture includes the 49 new OCaml
+checks, 266 native observations and all five killed mutations with clean
+and restored controls.
+
+## Stage M1 TEXT-EQUAL review fixes (tag LSM1E, 2026-09-17)
+
+The review kit LSM1E ran on base 4ff9f6f over a 24-path slice. An opus
+drafter supplied 14 hypotheses. An opus prober confirmed two of them,
+refuted three and cut nine. One ctxcat-review Workflow run supplied
+six raw findings, of which two were upheld. An opus judge passed three
+findings, one low and two nits, under a judge cap of 7. Three more are
+carried.
+
+F-1 (nit, rust/run_store.ml:133). The arm for one text argument and
+the catch-all arm at :135 both printed `text argument count`, thus the
+run path lost the distinction that HEAD held. Line 133 now reads
+`invalid "text pair argument count"`. The catch-all arm at :135 and
+the emit path at rust/text_ops.ml:85 keep their wording. Behavior does
+not change; only the diagnosis is distinct again. A search for
+`argument count` over the two files shows three different strings.
+
+F-2 (low, dev/STAGE-M1-TEXT-EQUAL.md:48-50). The manual native
+database leg gave the template LOCK, but no line of the record named
+the lock of the capture. New prose below the code fence names
+dev/validation/stage-m1-text-nat/native/Cargo.lock, which the argv of
+native-prepare-capture.json:1 records, and states that its bytes are
+identical to this stage lock. A search for `stage-m1-text-nat` over
+the doc gives one hit, which was zero before.
+
+F-3 (nit, test/lan_text_equal.ml:13-15). The `contains` helper built
+each suffix again with `Seq.drop` and `String.of_seq`, thus one
+allocation for each index. The helper now uses the
+test/lan_concat.ml:12-14 form over `List.init` and `String.sub` below
+the `(* @total-accessor *)` marker, which also covers the empty text.
+Test code only: no capture value moves.
+
+Repin. The three edited sources and this log are pinned, thus the same
+fix rewrites their sha256 in
+dev/validation/stage-m1-text-equal/source-sha256.json: rust/run_store.ml
+to c6d960e9, dev/STAGE-M1-TEXT-EQUAL.md to e3c5cecd,
+test/lan_text_equal.ml to 164c2617 and dev/M1-BUILD-LOG.md to the
+value of this block. The other 974 entries stay as before.
+receipt.json needs no edit: its `source_hashes` value is the file name
+"source-sha256.json". The pin probe reports ok=24 mismatch=0.
+
+Carried. C-1, the manual native database leg, is a hand leg by design.
+C-2, the `OK test: 0 failed, 0 passed` row of dune-tests.stdout:1, is
+pre-existing in the two predecessor captures. C-3, the allocating
+`contains` copy in five more test modules, is a family-wide move out
+of this slice. Five more claims are refuted, among them the warning
+classes of the doc, the 72-column width and the receipt hash gap.
+
+Proof. The suite probe on the fixed tree reported 50 floor rows OK and
+none FAIL, among them `lan_text_equal.exe checks=49`,
+`test/lan_text_equal.py Ran 8` with `LAN-TEXT-EQUAL NATIVE OK
+observations=266`, `lan_text_equal_database.py --interpreter
+observations=5`, and the mutation rows `LAN-TEXT-EQUAL-MUT OK clean`,
+the five KILLED rows inverted, length, prefix, trimmed and
+unchecked_right, plus `LAN-TEXT-EQUAL-MUT OK restored`. The retained
+lan_text_nat rows kept their LSM1D values: `lan_text_nat.exe
+checks=53`, `Ran 9`, `NATIVE OK observations=736`, `--interpreter
+observations=7` and four KILLED rows. A search for `FAILED`, `Error`,
+`error:` and `Traceback` in the suite log printed nothing. The needle
+probe reported `NEEDLES rows=14 bad=0`.
+
+Ladders. The baseline ladder ran on the unfixed tree on 2026-09-17,
+LAUNCH rc=0, VERDICT GATE LSM1E tag=baseline GREEN, with PINS
+tag=baseline ok=148 missing=0 and ROWS tag=baseline capture=212
+log=212 IDENTICAL. The fix-1 ladder ran on the fixed tree on
+2026-09-17, LAUNCH rc=0, VERDICT GATE LSM1E tag=fix-1 GREEN, with
+PINS tag=fix-1 ok=148 missing=0 and ROWS tag=fix-1 capture=212
+log=212 IDENTICAL. The close ladder repeats this gate on the staged
+tree after this paragraph.
