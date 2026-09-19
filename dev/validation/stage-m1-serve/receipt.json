@@ -1,0 +1,33 @@
+{
+  "stage": "M1-serve",
+  "recorded_at": "2026-09-19T04:56:24.074885+00:00",
+  "base_commit": "20a3e18a8ece28e5863409d80a01d84fa2813d9f",
+  "validated_root": "/Users/oobi/Documents/gpt2/lanyard-m1-serve",
+  "command": [
+    "zsh",
+    "dev/gates.sh",
+    "--stage",
+    "M1-serve"
+  ],
+  "capture": "stage-capture.json",
+  "stdout": "stage-0001.stdout",
+  "stderr": "stage-0001.stderr",
+  "exit_code": 0,
+  "source_hashes": "source-sha256.json",
+  "environment": {
+    "RUSTUP_TOOLCHAIN": "1.98",
+    "RUSTC_WRAPPER": "",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_HOME": "/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+    "CARGO_TARGET_DIR": "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target",
+    "LANYARD_TOASTY": "/Users/oobi/Documents/toasty",
+    "LANYARD_TOPCOAT": "/Users/oobi/Documents/topcoat"
+  },
+  "notes": [
+    "The cumulative gate retains the prior HTTP and interpreter checks.",
+    "Native Cargo uses clean checked local target pins and the HTTP slice's lockfile.",
+    "Loopback socket checks ran with sandbox permission; dependencies resolved offline.",
+    "The validation driver disabled sccache because its daemon is unavailable in the sandbox.",
+    "No trust-policy allowance or milestone exit is approved."
+  ]
+}

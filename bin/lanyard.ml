@@ -4,6 +4,7 @@
     Target slices print synchronous and async foreign constants through --target.
     The crate command writes a standalone target program with a main entry point.
     The build command emits that crate and reports the Cargo subprocess time.
+    The serve command emits an HTTP crate and hands the process to Cargo run.
     The run command interprets checked IR with a private in-memory model store.
     With --request URI the same command runs request mode: it validates the
     URI before any source I/O and exits 64 on a malformed one, calls the
@@ -35,6 +36,7 @@ let usage () : unit =
     ("usage: lanyard check [--print|--erased] FILE"
     ^ " | emit [--native|--target|--crate DIR [--print-model MODEL | --requests SCRIPT | --listen ADDRESS]] FILE.lan"
     ^ " | build --out DIR [--release] [--offline] [--print-model MODEL | --requests SCRIPT | --listen ADDRESS] FILE.lan"
+    ^ " | serve --out DIR --listen ADDRESS [--release] [--offline] FILE.lan"
     ^ " | run [--steps N] [--print-model MODEL | --request URI [--form BODY] | --requests SCRIPT] FILE.lan"
     ^ " | axioms [--names] FILE | spec-count")
 
@@ -184,6 +186,17 @@ type build_options = {
   flags : build_flags;
 }
 
+let initial_build_options =
+  { directory = None;
+    flags = { output = Lanyard_rust.Model.Discard;
+              requests = None; listen = None; release = false; offline = false } }
+
+let cargo_command action flags =
+  (["cargo"; action]
+   @ (if flags.release then ["--release"] else [])
+   @ (if flags.offline then ["--offline"] else []))
+  |> List.map Filename.quote |> String.concat " "
+
 (** Parse all options before checking or publishing the crate. Paths beginning
     with a dash can be written with an explicit relative or absolute prefix. *)
 let rec build_options options args =
@@ -232,25 +245,34 @@ let rec build_options options args =
     An I/O failure after the guards is loud, so the process exits 2 with
     the system error text, the same as the crate command. *)
 let dispatch_build args =
-  let initial = { directory = None;
-                  flags = { output = Lanyard_rust.Model.Discard;
-                            requests = None; listen = None;
-                            release = false; offline = false } } in
-  build_options initial args
+  build_options initial_build_options args
   |> Result.fold ~error:(fun () -> usage (); exit 64)
        ~ok:(fun (flags, directory, path) ->
            run_crate ?requests:flags.requests ?listen:flags.listen flags.output directory path;
          Sys.chdir directory;
-         let command = ["cargo"; "build"]
-           @ (if flags.release then ["--release"] else [])
-           @ (if flags.offline then ["--offline"] else [])
-           |> List.map Filename.quote |> String.concat " " in
+         let command = cargo_command "build" flags in
          let started = Unix.gettimeofday () in
          let code = Sys.command command in
          let milliseconds = (Unix.gettimeofday () -. started) *. 1000. in
          Printf.eprintf "LANYARD-BUILD REPORTED cargo_exit=%d cargo_ms=%.3f\n%!"
            code milliseconds;
          exit code)
+
+(** Finish preflight before publishing an HTTP crate, then replace the driver
+    with Cargo run. The shell executes only fixed quoted arguments and replaces
+    itself with Cargo, preserving stdin, signals and exit status. Cargo selects
+    the executable, including configured target directories and target runners.
+    The shell reports a missing Cargo as 127 and an unexecutable one as 126. *)
+let dispatch_serve args =
+  build_options initial_build_options args
+  |> Fun.flip Result.bind (fun (flags, directory, path) ->
+       flags.listen |> Option.to_result ~none:()
+       |> Result.map (fun listen -> flags, directory, path, listen))
+  |> Result.fold ~error:(fun () -> usage (); exit 64)
+       ~ok:(fun (flags, directory, path, listen) ->
+         run_crate ~listen Lanyard_rust.Model.Discard directory path;
+         Sys.chdir directory;
+         Unix.execv "/bin/sh" [| "sh"; "-c"; "exec " ^ cargo_command "run" flags |])
 
 (** Source goes to stdout, or crate files to a fresh directory, only after
     the entire module prints. Emission never invokes Cargo or the program. *)
@@ -379,6 +401,7 @@ let dispatch (cmd : string) (args : string list) : unit =
   | "axioms" -> dispatch_axioms args
   | "emit" -> dispatch_emit args
   | "build" -> dispatch_build args
+  | "serve" -> dispatch_serve args
   | "run" -> dispatch_run args
   | _unknown ->
       usage ();

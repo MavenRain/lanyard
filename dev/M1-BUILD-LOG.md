@@ -4547,3 +4547,61 @@ errors, 0 shown-warnings (98 hidden; --warn)`,
 `LAN-HTTP CLI OK groups=4`,
 `LAN-HTTP PREPARED cases=5 mutants=2`,
 `LAN-HTTP RUNTIME OK groups=6` and `STAGE-M1-HTTP OK`, and exits 0.
+
+## M1 compile and serve (2026-09-18)
+
+Added `serve --out DIR --listen ADDRESS [--release] [--offline] FILE.lan`.
+It reuses build-option validation and HTTP crate emission, then replaces
+the driver with `cargo run` in the new crate. Cargo retains responsibility
+for its configured target directory and target runner. Paths never enter
+shell text. Missing or unexecutable Cargo retains the shell's 127 or 126
+status, and compilation or server failures preserve the emitted crate.
+The existing `build` command retains its compilation-only timing report.
+
+Eight process test groups cover refusal before source I/O, exact HTTP
+crate bytes, Cargo arguments and environment, stdin, status propagation,
+shell metacharacters in paths, existing outputs and direct signal delivery.
+The native test verifies emitted bytes against a checked local-pin seed,
+then uses real offline Cargo to exercise Todo requests and fresh restart.
+Both SIGINT and SIGTERM produce graceful server exits. The `M1-serve`
+gate retains the full `M1-http` gate before these checks and ends with
+the house checks. No trust-policy allowance or milestone exit is approved.
+
+Validation receipts and input hashes are recorded under
+`dev/validation/stage-m1-serve/`.
+
+## Stage M1 SERVE review fixes (tag LSM1SV, 2026-09-19)
+
+A staged-slice review of this stage ran over the 13-path slice on HEAD
+20a3e18. The slice holds 8 review paths and the 5 frozen captures under
+`validation/stage-m1-serve/`. Three finder lenses, ocaml, python-gate and
+docs-captures, reported four rows, which the adversarial verifiers and
+the judge reduced to 1 upheld finding under the judge cap of 7, one low.
+Three rows are carried, and every carried row is refuted. This fix
+applies the 1 upheld finding.
+
+- F-1, low, `test/lan_serve_native.py:18`. The READY regex ended in `$`,
+  which matches end of buffer even under `re.MULTILINE`, so the poll
+  could read a truncated in-progress write and report the wrong port
+  before the marker line's trailing newline lands in the shared
+  diagnostics file. The pattern now ends in a literal `\n`, the same
+  convention `test/lan_http.py:139` already uses for the identical
+  marker. The read and search loop at lines 70-78 is unchanged.
+- Carried. Three rows are carried and every one is refuted: C-1 on the
+  Header Exit codes paragraph in `bin/lanyard.ml`, which already
+  documents serve's exit codes in the dispatch_serve comment; C-2 on
+  process-group cleanup in `test/lan_serve_native.py`, which execs
+  straight into the compiled binary with no fork; and C-3 on the
+  "restart" wording in `dev/STAGE-M1-SERVE.md`, which matches existing
+  codebase vocabulary for the same pattern.
+- Repins. Two paths take new hashes in
+  `validation/stage-m1-serve/source-sha256.json`:
+  `test/lan_serve_native.py` and this log. The map keeps its 15 entries
+  and verifies `PINS ok=15 mismatch=0`. The build reports `OK build: 0
+  errors, 0 warnings` and `dev/house.sh` reports `HOUSE OK`.
+
+Proof: zsh dev/gates.sh --stage M1-serve GREEN on the fixed tree
+(2026-09-19, LAUNCH 11:51Z to GATE-END 12:00Z, stage_rc=0):
+STAGE-M1-HTTP OK, CRATE-PREPARE OK, LAN-SERVE NATIVE OK lifecycle=2
+signals=2, HOUSE OK, STAGE-M1-SERVE OK. The same gate was GREEN on the
+unfixed slice before the fix. Pins ok=15 mismatch=0.

@@ -262,6 +262,16 @@ Initialize this example with `GET /init`, submit URL-encoded forms with
 Port zero selects an available port, reported on stderr. Each process
 starts empty, and Ctrl+C shuts the server down gracefully.
 
+The [M1 serve command](dev/STAGE-M1-SERVE.md) compiles and starts that
+checked HTTP handler in one command:
+
+```sh
+_build/default/bin/lanyard.exe serve --out /tmp/todo-serve --listen 127.0.0.1:3000 test/fixtures/todo-session.lan
+```
+
+The output directory must be fresh. Add `--offline` to use cached
+dependencies or `--release` for an optimized server.
+
 Build and validate through Stage D:
 
 ```sh

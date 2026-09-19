@@ -1,0 +1,17 @@
+{
+  "README.md": "fe99ee2359bc41ab4ce206bee2fbe3869e5b1204a25d9489fc51eec30bd6fed9",
+  "bin/dune": "f6b79f7bb4125194c2f088e58cebfc4e6ac040f0eaccac58e2ee135469a5461f",
+  "bin/lanyard.ml": "21a21314e0db7d19b3d0f39a5c8eeedfd6697bf6d6b2c94889a7f2a161ba109c",
+  "dev/M1-BUILD-LOG.md": "060526a40d7932876d3be6b123be5400816de5a389c34f5b16f06243aa1fca4f",
+  "dev/STAGE-M1-SERVE.md": "ef4f8f3424760e9588176ce9a0f18f7f8fac3d1b2e4cc641fdeaa453f2920c61",
+  "dev/gates.sh": "28580f169100883442755cdbda1ac45d5c544106eac13fecd46a12eb0de2b311",
+  "dev/prepare-crate.py": "31bbb7386d3cbb05f5db822e517845f929faa57cf82527c69a13c3fddd90c69f",
+  "dev/stage-m1-http.sh": "b875d47e64d8cf42956cb864e2aeee4fe827cb4590a2414eb50c8e7b8978944f",
+  "dev/stage-m1-serve.sh": "c6a0d7524d9f72c4d357eaf21bae0f9d8b8c9d77fb368c3c0f604fa07c2572ad",
+  "dev/validation/stage-m1-http/Cargo.lock": "c202b9fe792e342201da3c36d4521a9fae2939599ef5298c555d0a336a34a75a",
+  "target/PIN.json": "e9fbd20e40a001d5773f1760c2f7e207907bca47bcd5ee439ea9aa03f8c40564",
+  "test/fixtures/todo-session.lan": "492681953283eb965103549eff201b29175985e15002d21bb03f07667f16037f",
+  "test/lan_http.py": "f6644af41eda83ad9e7240e41073e3456bc4e8b692fa249abed62ac1530dcce3",
+  "test/lan_serve.py": "07164f2b69b0a5ce0510346c8e0f1b7597f4d6b2ed8fcd8c03bfd34298e12f6f",
+  "test/lan_serve_native.py": "2e81fc4102e41895d69600f3c8af5d94e4f821dc7c136cd2b3398a18b1b61d34"
+}
