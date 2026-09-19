@@ -249,6 +249,19 @@ The executable shares one private SQLite store across requests and prints
 the complete HTTP transcript on success. Native execution uses the Rust
 backend's error semantics and does not accept `--steps`.
 
+The [M1 HTTP listener](dev/STAGE-M1-HTTP.md) serves checked request handlers
+on loopback with one shared SQLite store:
+
+```sh
+_build/default/bin/lanyard.exe build --out /tmp/todo-http --listen 127.0.0.1:3000 test/fixtures/todo-session.lan
+/tmp/todo-http/target/debug/lanyard-program
+```
+
+Initialize this example with `GET /init`, submit URL-encoded forms with
+`POST /todos/create`, and read the current list with `GET /todos`.
+Port zero selects an available port, reported on stderr. Each process
+starts empty, and Ctrl+C shuts the server down gracefully.
+
 Build and validate through Stage D:
 
 ```sh

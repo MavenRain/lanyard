@@ -4444,3 +4444,106 @@ report 1777, and the baseline log shows the same shape at 1816 and
 1766. The frozen captures keep the pre-fix counts, as the receipt
 notes record; only `source-sha256.json` is refreshed and `PINS
 ok=29 mismatch=0` holds.
+
+## M1 loopback HTTP listeners (2026-09-18)
+
+`emit --crate` and `build --out` accept `--listen 127.0.0.1:PORT`.
+The generated program serves checked two-argument and form handlers
+through pinned Topcoat, using one private SQLite store and serialized
+handler calls. An abstract listen-address type enforces the loopback
+endpoint before source I/O. The HTTP entry retains the emitter's checked
+parameter and result layouts. Batch manifests and target pins are unchanged.
+
+The adapter shares the URI and form validators with existing operations.
+Form field decoding now exposes its validated field list for boundary
+checks, including ignored forms. Request bodies have an 8192-byte bound
+and a five-second read timeout. Typed errors select 400, 408, 413, 415 or
+500; Topcoat handles HTTP framing, panic containment and graceful shutdown.
+The pinned HTTP parser removes fragments before the adapter sees them,
+which is documented and tested separately from raw scripted URI parsing.
+
+Validation: `zsh dev/gates.sh --stage M1-http` exited 0 on the isolated
+checkout of `e49c43e25b48c38d65ad4d7603e2116858ff65a2` plus this slice.
+The cumulative run retained the compiler and interpreter gates, eight
+native session cases with sixteen executions and two controls, four HTTP
+CLI groups, and six socket groups over five server cases and two controls.
+The generated HTTP build reported zero errors and 98 hidden warnings;
+the retained session build reported zero errors and 141 hidden warnings.
+The run used Rust 1.98, clean local target checkouts, an offline locked
+build, and the existing Cargo cache. Additional transport packages were
+fetched before validation and are pinned in the saved lockfile.
+
+`validation/stage-m1-http/` records the full stage stdout and stderr,
+capture manifest, receipt, lockfile and changed-source hashes. The existing
+M0 trust-budget rulings and exit stamp remain pending. No policy approval
+is implied by the successful stage gate.
+
+## Stage M1 HTTP review fixes (tag LSM1HT, 2026-09-18)
+
+A staged-slice review of this stage ran over the 22-path slice on HEAD
+e49c43e. The slice holds 16 review paths and the 6 frozen captures
+under `validation/stage-m1-http/`. Three finder lenses, ocaml,
+python-gate and docs-captures, reported fourteen rows, which the
+adversarial verifiers and the judge reduced to 6 upheld findings under
+the judge cap of 7, one medium, four low and one nit. Eight rows are
+carried, and every carried row is refuted. This fix applies all 6.
+
+- F-1, medium, `rust/server_emit.ml:95-98`. The emitted content-type
+  test was an exact byte comparison, so a conformant POST that adds a
+  parameter, `application/x-www-form-urlencoded;charset=UTF-8`, or
+  that folds case took 415 and the handler never ran. The emitter now
+  splits the header at the first `;`, trims it and lowercases it
+  before the compare, and tests the result with `as_deref`. A missing
+  or a wrong type still yields 415.
+- F-2, low, `dev/STAGE-M1-HTTP.md:62-64`. The doc claimed socket
+  coverage of panic recovery, but no group makes an emitted handler
+  panic: the suite asserts 500 for a handler `Result` error, which the
+  runtime maps through `.map_err(LanHttpError::Handler)?`. The
+  sentence now reads "handler error recovery and SIGTERM shutdown".
+  The shutdown half is real, because the suite sends SIGTERM and
+  asserts exit 0.
+- F-3, low, `rust/server_emit.ml:85`. The transport body bound was the
+  bare numeral 8192, which repeats `Form_data.max_bytes`, so a later
+  edit of the named constant would leave the two limits apart and
+  answer an oversized form 413 on one path and 400 on the other. The
+  emitter now splices `string_of_int Form_data.max_bytes`, the shape
+  `rust/form_data.ml:81` already uses. The emitted bytes do not
+  change, because the constant is 8192.
+- F-4, low, `rust/server_emit.ml:13`. A nonempty body sent to a
+  two-argument handler, which has no form at all, was reported as
+  `invalid request URI or form`. No variant is added: the one message
+  now reads `invalid request URI, form or body`, which stays true for
+  the three-argument emission, where BadRequest covers the invalid
+  URI, the non-UTF-8 body, the nonempty body on a non-POST method and
+  the invalid form.
+- F-5, low, `test/lan_http.py:22-24,109-112`. One helper gave every
+  subprocess 900 s. No call in the file is a Cargo or dune build, so a
+  hang stayed hidden for a quarter of an hour. `run` now takes a
+  `timeout` keyword that defaults to 60 s, and the crate-prepare call
+  passes 300 s, which covers the five 120 s-capped children of
+  `dev/prepare-crate.py`. The five CLI call sites are unchanged.
+- F-6, nit, `dev/M1-MUTATION-LOG.md:775`. The unchecked-form row named
+  neither the POST method nor the content-type header, so the stated
+  303 is not reproducible as written: the same bytes sent as a GET
+  return 400 from the mutant and a POST without the header returns
+  415. The row now names both.
+- Carried. Eight rows are carried and every one is refuted: C-1, C-3
+  and C-4 on the concurrency group, the panic claim and the socket
+  lifetime in `test/lan_http.py`, C-2 on the bounded server shutdown
+  in the same file, C-5, C-7 and C-8 on `dev/STAGE-M1-HTTP.md`, and
+  C-6 on the Rust 1.98 row of this log, which eight capture rows
+  corroborate.
+- Repins. Five paths take new hashes in
+  `validation/stage-m1-http/source-sha256.json`:
+  `rust/server_emit.ml`, `dev/STAGE-M1-HTTP.md`, `test/lan_http.py`,
+  `dev/M1-MUTATION-LOG.md` and this log. The map keeps its 17 entries
+  and verifies `PINS ok=17 mismatch=0`. The build reports `OK build: 0
+  errors, 0 shown-warnings (98 hidden; --warn)` and `dev/house.sh`
+  reports `HOUSE OK`.
+
+Proof: `zsh dev/gates.sh --stage M1-http` on the staged tree
+(GREEN at 2026-09-19T03:23:23Z, load 20.50) prints `OK build: 0
+errors, 0 shown-warnings (98 hidden; --warn)`,
+`LAN-HTTP CLI OK groups=4`,
+`LAN-HTTP PREPARED cases=5 mutants=2`,
+`LAN-HTTP RUNTIME OK groups=6` and `STAGE-M1-HTTP OK`, and exits 0.

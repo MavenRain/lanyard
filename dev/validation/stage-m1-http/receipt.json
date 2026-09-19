@@ -1,0 +1,18 @@
+{
+  "stage": "M1-http",
+  "recorded_at": "2026-09-19T00:35:47.566174+00:00",
+  "base_commit": "e49c43e25b48c38d65ad4d7603e2116858ff65a2",
+  "validated_root": "/private/tmp/lanyard-http-20260918",
+  "capture": "stage-capture.json",
+  "stdout": "stage-0001.stdout",
+  "stderr": "stage-0001.stderr",
+  "exit_code": 0,
+  "source_hashes": "source-sha256.json",
+  "notes": [
+    "Cumulative M1-http gate includes the compiler, interpreter and native-session gates.",
+    "Four listener CLI groups and six socket groups passed; five server programs and two runtime mutants compiled offline.",
+    "Native sessions retain eight clean programs, sixteen executions and two mutation controls.",
+    "M0 trust budgets and the exit stamp remain pending; this slice does not approve the proposed policy.",
+    "Logs were captured before adding documentation-only build and mutation log entries."
+  ]
+}

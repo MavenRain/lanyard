@@ -77,7 +77,7 @@ fn lan_form_validate_component(text: &str) -> Result<(), Error> {
         LanFormEscape::High | LanFormEscape::Low(_) => Err(Error::InvalidForm),
     })
 }
-fn lan_form_field(body: &str, name: &str) -> Result<String, Error> {
+fn lan_form_fields(body: &str) -> Result<Vec<(String, String)>, Error> {
     let bounded = if body.len() > |} ^ string_of_int max_bytes ^ {| { Err(Error::InvalidForm) } else { Ok(()) };
     bounded?;
     if !body.is_empty() {
@@ -98,7 +98,10 @@ fn lan_form_field(body: &str, name: &str) -> Result<String, Error> {
         if key.is_empty() || seen.contains(&key.as_str()) { Err(Error::InvalidForm) }
         else { seen.push(key); Ok(seen) }
     })?;
-    fields.into_iter().find(|(key, _value)| key == name)
+    Ok(fields)
+}
+fn lan_form_field(body: &str, name: &str) -> Result<String, Error> {
+    lan_form_fields(body)?.into_iter().find(|(key, _value)| key == name)
         .map(|(_key, value)| value).ok_or(Error::InvalidForm)
 }
 |}

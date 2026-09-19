@@ -1,0 +1,19 @@
+{
+  "README.md": "b0edc7879a82711862736460b29baa945b7bad45f4819cdecfec1f3ed54dbbe8",
+  "bin/lanyard.ml": "46ff6ecabd412242b1985836b3c7c024f2040ab93a7f239058606057794c6dd2",
+  "dev/M1-BUILD-LOG.md": "a666a7b8a6eeebe5e793e3cee10503583a74b890345e2995b0201fe0c17a2b8b",
+  "dev/M1-MUTATION-LOG.md": "c552449b21fe6ec2f23fd15243b3bf8f8b00a682503ddc44cb76551fe45a523f",
+  "dev/STAGE-M1-HTTP.md": "47c9b05d98476d76c92fe2df55390c403367f5610eb2340c52483bcf2d08ed93",
+  "dev/gates.sh": "ba5cbb4918c1be12448dbf9daed2b4c7e19e840b38adf010d685cbff7aa0c24e",
+  "dev/prepare-crate.py": "31bbb7386d3cbb05f5db822e517845f929faa57cf82527c69a13c3fddd90c69f",
+  "dev/stage-m1-http.sh": "b875d47e64d8cf42956cb864e2aeee4fe827cb4590a2414eb50c8e7b8978944f",
+  "dev/validation/stage-m1-http/Cargo.lock": "c202b9fe792e342201da3c36d4521a9fae2939599ef5298c555d0a336a34a75a",
+  "rust/crate.ml": "3175932f492b0342f1612cd15bc65638ccaa6b1d5de7b0f1d81d6313ecb98641",
+  "rust/emit.ml": "f22c195eeae79d4b0df947e8a570a1fbe0d817545cedd69a8a4228b2e313e5e0",
+  "rust/form_data.ml": "4b2a7f99d5ba8c36ceff5c41c210613b06aa7c11cfb42aa489d502056eeaf1df",
+  "rust/listen_address.ml": "c3b7b2bc1a849cc5d1d9eba9c9eee595d0bc4d2cdd56891b3278fdc1923397e4",
+  "rust/listen_address.mli": "2bb91426afc703d777ee77d4909d14f62f6f8d3e323fd3d2ff0ca535540c06f1",
+  "rust/model.ml": "045d92a6d5c9fd7fcc5b45367c0b9f2d5f798dbda4a9ccbfa817192f6290c780",
+  "rust/server_emit.ml": "c3a638b99d53237e434d4f45264257b9aff6988fc2847e3016c3caa35b3e6c9d",
+  "test/lan_http.py": "f6644af41eda83ad9e7240e41073e3456bc4e8b692fa249abed62ac1530dcce3"
+}

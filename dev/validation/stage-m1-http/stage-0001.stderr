@@ -1,0 +1,144 @@
+............................
+----------------------------------------------------------------------
+Ran 28 tests in 2.560s
+
+OK
+.......................
+----------------------------------------------------------------------
+Ran 23 tests in 12.996s
+
+OK
+..................
+----------------------------------------------------------------------
+Ran 18 tests in 2.806s
+
+OK
+.................
+----------------------------------------------------------------------
+Ran 17 tests in 3.500s
+
+OK
+....................................
+----------------------------------------------------------------------
+Ran 36 tests in 2.482s
+
+OK
+...................
+----------------------------------------------------------------------
+Ran 19 tests in 0.801s
+
+OK
+................
+----------------------------------------------------------------------
+Ran 16 tests in 2.912s
+
+OK
+..........................
+----------------------------------------------------------------------
+Ran 26 tests in 0.661s
+
+OK
+..................
+----------------------------------------------------------------------
+Ran 18 tests in 0.425s
+
+OK
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 0.113s
+
+OK
+...........
+----------------------------------------------------------------------
+Ran 11 tests in 0.159s
+
+OK
+............
+----------------------------------------------------------------------
+Ran 12 tests in 0.293s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 3.399s
+
+OK
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.162s
+
+OK
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.162s
+
+OK
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.264s
+
+OK
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.262s
+
+OK
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 0.321s
+
+OK
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 8.782s
+
+OK
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 7.389s
+
+OK
+........
+----------------------------------------------------------------------
+Ran 8 tests in 7.039s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.391s
+
+OK
+............
+----------------------------------------------------------------------
+Ran 12 tests in 0.436s
+
+OK
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.590s
+
+OK
+gateledger: MISS 5a1fa512: cargocho build -- --offline --locked --bins --manifest-path /private/tmp/lanyard-http-20260918/.gatework/native-session.brbPVX/crates/Cargo.toml --target-dir /Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target --jobs 2
+gateledger: recorded green 5a1fa512 (22s)
+test_addresses_before_source_io (__main__.Cli.test_addresses_before_source_io) ... ok
+test_build_flags_and_existing_destination (__main__.Cli.test_build_flags_and_existing_destination) ... ok
+test_checked_entry_before_publication (__main__.Cli.test_checked_entry_before_publication) ... ok
+test_conflicting_options (__main__.Cli.test_conflicting_options) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.559s
+
+OK
+gateledger: MISS c7547e4d: cargocho build -- --offline --locked --bins --manifest-path /private/tmp/lanyard-http-20260918/.gatework/http.XFI5Ne/crates/Cargo.toml --target-dir /Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target --jobs 2
+gateledger: recorded green c7547e4d (15s)
+test_body_timeout (__main__.Http.test_body_timeout) ... ok
+test_concurrent_handlers_and_panics (__main__.Http.test_concurrent_handlers_and_panics) ... ok
+test_form_boundaries_and_recovery (__main__.Http.test_form_boundaries_and_recovery) ... ok
+test_mutation_controls (__main__.Http.test_mutation_controls) ... ok
+test_todo_lifecycle_and_restart (__main__.Http.test_todo_lifecycle_and_restart) ... ok
+test_uri_redirect_and_methods (__main__.Http.test_uri_redirect_and_methods) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 12.336s
+
+OK

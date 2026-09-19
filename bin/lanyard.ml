@@ -33,8 +33,8 @@
 let usage () : unit =
   prerr_endline
     ("usage: lanyard check [--print|--erased] FILE"
-    ^ " | emit [--native|--target|--crate DIR [--print-model MODEL | --requests SCRIPT]] FILE.lan"
-    ^ " | build --out DIR [--release] [--offline] [--print-model MODEL | --requests SCRIPT] FILE.lan"
+    ^ " | emit [--native|--target|--crate DIR [--print-model MODEL | --requests SCRIPT | --listen ADDRESS]] FILE.lan"
+    ^ " | build --out DIR [--release] [--offline] [--print-model MODEL | --requests SCRIPT | --listen ADDRESS] FILE.lan"
     ^ " | run [--steps N] [--print-model MODEL | --request URI [--form BODY] | --requests SCRIPT] FILE.lan"
     ^ " | axioms [--names] FILE | spec-count")
 
@@ -150,14 +150,14 @@ let write_crate directory files =
           (fun channel -> Out_channel.output_string channel contents)) files;
       Sys.rename staging directory
 
-let run_crate ?requests (output : Lanyard_rust.Model.output) (directory : string)
+let run_crate ?requests ?listen (output : Lanyard_rust.Model.output) (directory : string)
     (path : string) : unit =
   let requests = Option.map (fun script ->
     Lanyard_rust.Run_script.parse (read_file script)
     |> Result.fold ~ok:Fun.id ~error:(fun error ->
         prerr_endline (Kanon_kernel.Error.to_string error); exit 64)) requests in
   Kanon_surface.Elab.check_lanyard (read_file path)
-  |> Fun.flip Result.bind (Lanyard_rust.Crate.files ~output ?requests)
+  |> Fun.flip Result.bind (Lanyard_rust.Crate.files ~output ?requests ?listen)
   |> Result.fold ~ok:(write_crate directory) ~error:(fun error ->
       prerr_endline (Kanon_kernel.Error.to_string error); exit 1)
 
@@ -171,6 +171,7 @@ let lan_file (path : string) : bool =
 type build_flags = {
   output : Lanyard_rust.Model.output;
   requests : string option;
+  listen : Lanyard_rust.Listen_address.t option;
   release : bool;
   offline : bool;
 }
@@ -190,7 +191,8 @@ let rec build_options options args =
   match args with
   | "--out" :: directory :: rest when value directory && Option.is_none options.directory ->
       build_options { options with directory = Some directory } rest
-  | "--print-model" :: model :: rest when value model && Option.is_none options.flags.requests ->
+  | "--print-model" :: model :: rest when value model && Option.is_none options.flags.requests
+      && Option.is_none options.flags.listen ->
       (match options.flags.output with
        | Lanyard_rust.Model.Discard ->
            build_options
@@ -198,10 +200,19 @@ let rec build_options options args =
                flags = { options.flags with output = Lanyard_rust.Model.Print_model model } }
              rest
         | Lanyard_rust.Model.Print_model _model -> Error ())
-  | "--requests" :: script :: rest when value script && Option.is_none options.flags.requests ->
+  | "--requests" :: script :: rest when value script && Option.is_none options.flags.requests
+      && Option.is_none options.flags.listen ->
       (match options.flags.output with
        | Lanyard_rust.Model.Discard ->
            build_options { options with flags = { options.flags with requests = Some script } } rest
+       | Lanyard_rust.Model.Print_model _model -> Error ())
+  | "--listen" :: address :: rest when value address && Option.is_none options.flags.listen
+      && Option.is_none options.flags.requests ->
+      (match options.flags.output with
+       | Lanyard_rust.Model.Discard ->
+           Lanyard_rust.Listen_address.parse address |> Result.map_error (fun _error -> ())
+           |> Fun.flip Result.bind (fun address ->
+             build_options { options with flags = { options.flags with listen = Some address } } rest)
        | Lanyard_rust.Model.Print_model _model -> Error ())
   | "--release" :: rest when not options.flags.release ->
       build_options { options with flags = { options.flags with release = true } } rest
@@ -223,12 +234,12 @@ let rec build_options options args =
 let dispatch_build args =
   let initial = { directory = None;
                   flags = { output = Lanyard_rust.Model.Discard;
-                            requests = None;
+                            requests = None; listen = None;
                             release = false; offline = false } } in
   build_options initial args
   |> Result.fold ~error:(fun () -> usage (); exit 64)
        ~ok:(fun (flags, directory, path) ->
-          run_crate ?requests:flags.requests flags.output directory path;
+           run_crate ?requests:flags.requests ?listen:flags.listen flags.output directory path;
          Sys.chdir directory;
          let command = ["cargo"; "build"]
            @ (if flags.release then ["--release"] else [])
@@ -245,6 +256,11 @@ let dispatch_build args =
     the entire module prints. Emission never invokes Cargo or the program. *)
 let dispatch_emit args =
   match args with
+  | [ "--crate"; directory; "--listen"; address; path ] when lan_file path ->
+      Lanyard_rust.Listen_address.parse address
+      |> Result.fold ~error:(fun error ->
+          prerr_endline (Kanon_kernel.Error.to_string error); exit 64)
+        ~ok:(fun address -> run_crate ~listen:address Lanyard_rust.Model.Discard directory path)
   | [ "--crate"; directory; "--requests"; script; path ] when lan_file path
       && script <> "" && not (String.starts_with ~prefix:"-" script) ->
       run_crate ~requests:script Lanyard_rust.Model.Discard directory path

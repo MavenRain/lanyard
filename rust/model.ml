@@ -224,7 +224,8 @@ let output_source model =
     ^ "(value: &" ^ Printer.rust_type native ^ ") -> Result<(), LanMainError> {\n"
     ^ "    let line = format!(\"" ^ format ^ "\", " ^ String.concat ", " arguments ^ ");\n"
     ^ "    std::io::Write::write_all(&mut std::io::stdout().lock(), line.as_bytes()).map_err(LanMainError::Output)\n}\n")
-let source ?entrypoint ?(output = Discard) ?entry_output ?(input_text = []) (checked : Elab.lan_program) =
+let source ?entrypoint ?(output = Discard) ?entry_output ?(input_text = [])
+    ?(http_input = false) (checked : Elab.lan_program) =
   let* specialized = Lower.specialize checked in
   let checked = specialized.Lower.specialized in
   let* models = catalog checked in
@@ -243,7 +244,7 @@ let source ?entrypoint ?(output = Discard) ?entry_output ?(input_text = []) (che
   let* rows = Lower.program_with instances specialized in
   match () with
   | () when List.is_empty models && List.is_empty connections
-      && List.is_empty operations && List.is_empty input_text ->
+      && List.is_empty operations && List.is_empty input_text && not http_input ->
       Foreign.source ?entrypoint ~entry_output rows
   | () ->
   let module Target = Emit.Make (struct
@@ -267,9 +268,9 @@ let source ?entrypoint ?(output = Discard) ?entry_output ?(input_text = []) (che
     @ List.map (fun (connection : Connection.t) -> connection.family) connections
     @ List.map (fun (operation : Text_ops.t) -> operation.family) operations @ input_text
     |> List.sort_uniq String.compare in
-  let uri_errors = List.exists (fun (operation : Text_ops.t) ->
+  let uri_errors = http_input || List.exists (fun (operation : Text_ops.t) ->
     operation.operation = Text_ops.Uri_from_text || operation.operation = Text_ops.Uri_to_text) operations in
-  let form_errors = List.exists (fun (operation : Text_ops.t) ->
+  let form_errors = http_input || List.exists (fun (operation : Text_ops.t) ->
     operation.operation = Text_ops.Form_field) operations in
   let nat_text = List.exists (fun (operation : Text_ops.t) ->
     operation.operation = Text_ops.From_nat) operations in

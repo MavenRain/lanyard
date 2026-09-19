@@ -7,7 +7,8 @@ type request_entry = {
   response : repr;
   render : Effects.t -> string -> string;
 }
-type entry_output = Discard | Print_model of repr * string | Scripted_requests of request_entry
+type entry_output = Discard | Print_model of repr * string
+  | Scripted_requests of request_entry | Http_listener of request_entry
 module type Target = sig
   val foreign_type : string -> string list -> (string, Error.t) result
   val foreign_layout : string -> string list -> (string, Error.t) result
@@ -603,7 +604,7 @@ let entry_point output signatures name =
   let* signature = List.find_opt (fun signature -> String.equal signature.name name) signatures
     |> Option.to_result ~none:(Error.Mismatch ("Rust emission: missing runtime entry point " ^ name)) in
   match output with
-  | Scripted_requests entry ->
+  | Scripted_requests entry | Http_listener entry ->
       let* parameters = all (List.map repr entry.parameters) in
       let* response = repr entry.response in
       let pairs = Seq.zip (List.to_seq parameters) (List.to_seq signature.params) in
@@ -622,7 +623,7 @@ let entry_point output signatures name =
       | Effects.Sync -> "" | Effects.Async_db -> "#[tokio::main(flavor = \"current_thread\")]\n" in
     let call = function_name name ^ "()" in
     let* error, body, helper = match output with
-      | Scripted_requests _entry -> invalid "request entry point requires its session printer"
+      | Scripted_requests _entry | Http_listener _entry -> invalid "request entry point requires its request printer"
       | Discard -> Ok ("Error", call ^ Effects.await signature.effect ^ "?;", "")
       | Print_model (layout, printer) ->
           let* expected = repr layout in

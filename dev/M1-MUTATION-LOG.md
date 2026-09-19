@@ -764,3 +764,19 @@ first response on stdout and an indexed request 3 error. Unexpected build
 or runtime failures fail the gate. The cumulative gate passed all 16 clean
 executions and both controls. Source files and captures are recorded in
 `validation/stage-m1-native-session/`.
+
+## M1 HTTP boundary controls (2026-09-18)
+
+The native HTTP gate compiles two additional server executables from the
+same emitted source, changing one boundary check in each.
+
+| Mutation | Change | Required incorrect observation |
+| --- | --- | --- |
+| unchecked-form | Remove the form validator from a handler that ignores its body | A POST of `bad=%XX` with `application/x-www-form-urlencoded` returns 303 instead of the clean server's 400 |
+| unchecked-uri | Remove the URI validator from the redirect handler | `/bad%Q0` returns 303 instead of the clean server's 400 |
+
+The clean and mutated programs are exercised over real loopback sockets.
+Both controls compiled and produced their exact incorrect status. The
+six runtime groups passed in the cumulative `M1-http` gate, which also
+retains the earlier native-session controls. Captures and source hashes
+are recorded in `validation/stage-m1-http/`.
