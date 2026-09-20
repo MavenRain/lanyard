@@ -58,7 +58,7 @@ fn lan_http_route(cx: &topcoat::context::Cx, body: topcoat::router::Body) -> top
 }
 |}
 
-let entry checked address =
+let entry ?database checked address =
   let* context = Interp.prepare checked in
   let* main = Interp.find context "main" in
   let form = match main.params with [_cx; _uri; _body] -> Some "" | [] | _ :: _ -> None in
@@ -109,7 +109,10 @@ async fn lan_http_handle(cx: &topcoat::context::Cx, body: topcoat::router::Body)
     ^ "    use topcoat::router::{Method, RouteFn, Router};\n"
     ^ "    let db = toasty::Db::builder()"
     ^ (if List.is_empty models then "" else ".models(toasty::models!(" ^ String.concat ", " models ^ "))")
-    ^ ".connect(\"sqlite::memory:\").await.map_err(LanServerError::Database)?;\n"
+    ^ Option.fold ~none:".connect(\"sqlite::memory:\")"
+        ~some:(fun path -> ".build(toasty_driver_sqlite::Sqlite::open("
+          ^ Database_path.rust_string path ^ "))") database
+    ^ ".await.map_err(LanServerError::Database)?;\n"
     ^ "    let router = Router::builder().app_context(db)\n"
     ^ "        .route(RouteFn::new(vec![Method::GET, Method::POST], \"/\", lan_http_route))\n"
     ^ "        .route(RouteFn::new(vec![Method::GET, Method::POST], \"/{*path}\", lan_http_route)).build();\n"

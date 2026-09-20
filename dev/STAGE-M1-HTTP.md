@@ -48,10 +48,12 @@ content type on a nonempty POST form returns 415. Handler errors return
 panics to 500. Subsequent requests can still run. The server delegates
 HTTP framing and graceful Ctrl+C or SIGTERM shutdown to pinned Topcoat.
 
-All requests share one private in-memory SQLite database. Handler calls
+By default all requests share one private in-memory SQLite database.
+The [database option](STAGE-M1-DATABASE.md) selects a persistent SQLite
+file with `--database PATH`. Handler calls
 are serialized after input validation; this does not add transactions or
 roll back a failed handler's writes. The handler initializes its schema
-with `Db.push_schema`. A new process starts empty. Startup database and
+with `Db.push_schema`. An in-memory process starts empty. Startup database and
 socket errors exit 1. Native recursion and errors retain the backend's
 existing semantics. This slice serves local development over plain HTTP.
 

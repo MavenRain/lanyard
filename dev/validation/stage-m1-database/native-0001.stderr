@@ -1,0 +1,8 @@
+gateledger: MISS df62e5bb: python3 -P test/lan_database_native.py --toasty /Users/oobi/Documents/toasty --topcoat /Users/oobi/Documents/topcoat --target /Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target
+test_restart_crud_paths_failures_and_memory_control (__main__.NativeDatabase.test_restart_crud_paths_failures_and_memory_control) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 25.439s
+
+OK
+gateledger: recorded green df62e5bb (25s)

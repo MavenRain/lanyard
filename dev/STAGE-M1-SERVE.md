@@ -22,8 +22,10 @@ The listener accepts numeric IPv4 loopback addresses, including port 0,
 and reports `LANYARD-LISTEN http://127.0.0.1:PORT` on stderr when ready.
 Requests, forms, errors and database lifetime follow the
 [HTTP slice](STAGE-M1-HTTP.md). For the Todo fixture, request `/init`
-before creating or listing rows. Each process starts with an empty
-in-memory database. This command does not watch files or rebuild on edits.
+before creating or listing rows. By default each process starts with an
+empty in-memory database. Add [--database PATH](STAGE-M1-DATABASE.md) to
+reuse a SQLite file across restarts. This command does not watch files or
+rebuild on edits.
 
 Cargo is selected through `PATH`. Its working directory is the emitted
 crate, so Cargo configuration, `CARGO_TARGET_DIR`, toolchain selection

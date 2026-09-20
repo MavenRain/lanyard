@@ -23,11 +23,13 @@ topcoat = { git = "https://github.com/tokio-rs/topcoat", rev = "51caa01dca3a8f20
 |}
 let manifest = manifest_for Batch
 
-let files ?output ?requests ?listen checked =
+let files ?output ?requests ?listen ?database checked =
   let entrypoint = "main" in
   let ( let* ) = Result.bind in
   let* () = if Option.is_some requests && Option.is_some listen then
     Error (Kanon_kernel.Error.Mismatch "listen and requests are mutually exclusive") else Ok () in
+  let* () = if Option.is_some database && Option.is_none listen then
+    Error (Kanon_kernel.Error.Mismatch "database requires an HTTP listener") else Ok () in
   let* checked = Reachable.program entrypoint checked in
   let* checked =
     if List.is_empty checked.Kanon_surface.Elab.signatures then Ok checked else
@@ -47,8 +49,10 @@ let files ?output ?requests ?listen checked =
     let* () = match Option.value ~default:Model.Discard output with
       | Model.Discard -> Ok ()
       | Model.Print_model _name -> Error (Kanon_kernel.Error.Mismatch "HTTP listeners cannot print a model") in
-    let* entry_output, input_text = Server_emit.entry checked address in
+    let* entry_output, input_text = Server_emit.entry ?database checked address in
     Model.source ~entrypoint ~entry_output ~input_text ~http_input:true checked) listen () in
   let manifest = Option.fold ~none:manifest ~some:(fun _address -> manifest_for Http) listen in
+  let manifest = manifest ^ Option.fold ~none:"" ~some:(fun _path ->
+    "toasty-driver-sqlite = { git = \"https://github.com/tokio-rs/toasty\", rev = \"7bd502cbf44cc47f70db9f2b27ab35d77a096364\" }\n") database in
   Ok source
   |> Result.map (fun source -> ["Cargo.toml", manifest; "src/main.rs", source])

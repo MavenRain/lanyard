@@ -780,3 +780,18 @@ Both controls compiled and produced their exact incorrect status. The
 six runtime groups passed in the cumulative `M1-http` gate, which also
 retains the earlier native-session controls. Captures and source hashes
 are recorded in `validation/stage-m1-http/`.
+
+## M1 persistent database control (2026-09-19)
+
+The native database test replaces the emitted file driver with
+`.connect("sqlite::memory:")` and compiles the modified server. Against
+the existing database path, the clean server returns 200 for `/todos`
+after restart. The control returns 500 because its fresh in-memory
+database has no Todo table. `/init` still returns 200, demonstrating a
+working server with the specific missing persistence behavior. The
+control leaves the on-disk database byte-identical. A compile failure,
+startup failure, or different status fails the test.
+
+The clean test also persists creates, updates, and deletes through three
+restarts, uses the exact unusual filename, and checks a missing-parent
+startup failure. Captures are in `validation/stage-m1-database/`.

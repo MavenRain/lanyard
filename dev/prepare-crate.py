@@ -32,9 +32,11 @@ def main():
     output_mode.add_argument("--print-model", help="print main's result using the named model")
     output_mode.add_argument("--requests", type=Path, help="embed a checked request script")
     output_mode.add_argument("--listen", help="emit a loopback HTTP listener")
+    parser.add_argument("--database", type=Path, help="use a SQLite file for the HTTP listener")
     parser.add_argument("--lock", type=Path, help="seed Cargo's offline resolution from a validation lock")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    require(args.database is None or args.listen is not None, "--database requires --listen")
     require(args.lock is None or args.lock.is_file(), f"lock file is missing: {args.lock}")
     lock = args.lock.read_bytes() if args.lock is not None else None
     pins = json.loads((ROOT / "target/PIN.json").read_text())["libraries"]
@@ -53,6 +55,8 @@ def main():
         output = ["--requests", args.requests.absolute()]
     if args.listen is not None:
         output = ["--listen", args.listen]
+    if args.database is not None:
+        output += ["--database", args.database.absolute()]
     emitted = run(ROOT / "_build/default/bin/lanyard.exe", "emit", "--crate", destination,
                   *output, args.source.absolute())
     require(emitted.returncode == 0 and not emitted.stdout, emitted.stderr)
@@ -60,15 +64,19 @@ def main():
     original = manifest.read_text()
     dependencies = tomllib.loads(original)["dependencies"]
     replacement = original
-    for name, path in libraries.items():
+    crates = {"toasty": "toasty", "topcoat": "topcoat"}
+    if args.database is not None:
+        crates["toasty-driver-sqlite"] = "toasty"
+    for name, library in crates.items():
+        path = libraries[library]
         require(name in dependencies, f"emitted manifest has no {name} dependency")
         dependency = dependencies[name]
         require("git" in dependency and "rev" in dependency,
                 f"emitted {name} dependency is not a git pin")
-        require(dependency["rev"] == pins[name]["commit"], f"emitted {name} pin differs")
-        before = f'git = {json.dumps(dependency["git"])}, rev = {json.dumps(dependency["rev"])}'
+        require(dependency["rev"] == pins[library]["commit"], f"emitted {name} pin differs")
+        before = f'{name} = {{ git = {json.dumps(dependency["git"])}, rev = {json.dumps(dependency["rev"])}'
         require(replacement.count(before) == 1, f"{name} dependency layout differs")
-        replacement = replacement.replace(before, f'path = {json.dumps(str(path / "crates" / name), ensure_ascii=False)}')
+        replacement = replacement.replace(before, f'{name} = {{ path = {json.dumps(str(path / "crates" / name), ensure_ascii=False)}')
     (destination / "Cargo.git.toml").write_text(original)
     manifest.write_text(replacement)
     if lock is not None:

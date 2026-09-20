@@ -4605,3 +4605,95 @@ Proof: zsh dev/gates.sh --stage M1-serve GREEN on the fixed tree
 STAGE-M1-HTTP OK, CRATE-PREPARE OK, LAN-SERVE NATIVE OK lifecycle=2
 signals=2, HOUSE OK, STAGE-M1-SERVE OK. The same gate was GREEN on the
 unfixed slice before the fix. Pins ok=15 mismatch=0.
+
+## M1 persistent HTTP databases (2026-09-19)
+
+Added `--database PATH` to HTTP crate emission, build, and serve. A checked
+path is anchored to the invocation directory before Cargo changes the
+working directory. The file driver receives the literal path, including
+URI punctuation, instead of parsing it as a database URL. Its direct
+dependency uses the existing Toasty revision. Without the option, HTTP
+source and manifest bytes retain their in-memory form.
+
+Option validation precedes source and output I/O. The database is opened
+only at server startup. Handlers still own schema creation; startup does
+not reset or migrate an existing database. Existing output refusals,
+Cargo process behavior, HTTP validation, and shutdown remain in place.
+
+The new cumulative `M1-database` gate retains `M1-serve`, adds five CLI
+groups, and compiles a native persistence test and an in-memory mutation
+control. Native checks cover create, update, delete, restarts, invocation
+and runtime working directories, unusual filename bytes, SIGINT and
+SIGTERM, and missing-parent startup failure. Captures and source hashes
+are recorded under `dev/validation/stage-m1-database/`.
+
+Validation on the isolated checkout completed with exit 0 and
+`STAGE-M1-DATABASE OK`. The cumulative gate also reported
+`STAGE-M1-HTTP OK`, `STAGE-M1-SERVE OK`, five passing database CLI
+groups, and `LAN-DATABASE NATIVE OK restarts=3 signals=2
+startup-failures=1 mutants=1`. House checks passed. The native suite ran
+against checked local target pins with offline Cargo and permission for
+loopback sockets. A separate comparison confirmed byte-identical default
+HTTP and batch manifests and Rust sources against the main checkout's
+compiler. No trust allowance or milestone exit was approved.
+
+## Stage M1 DATABASE review fixes (tag LSM1DB, 2026-09-19)
+
+A staged-slice review of this stage ran over the 25-path slice on HEAD
+5e5a35b. The slice holds 16 review paths and the 9 frozen captures
+under `validation/stage-m1-database/`. Three finder lenses, ocaml,
+python-gate and docs-captures, reviewed the slice; the adversarial
+verifiers and the judge upheld 3 findings under the judge cap of 7,
+all low. One row is carried, and it is refuted. This fix applies the
+3 upheld findings.
+
+- F-1, low, `rust/database_path.ml:3-8`. The `parse` guard ORed six
+  boolean sub-conditions in a single `if` instead of a `match ()`
+  guard block, the idiom the neighboring `rust_string` escape function
+  in the same file already uses. `parse` now reads a `match () with`
+  block: one guarded arm for the six conditions returning the same
+  `Error`, and a bare `()` arm returning the same `Ok` payload. The
+  error text and the Ok payload are byte-identical to before.
+- F-2, low, `test/lan_database.py:114`. The CLI gate OK line hardcoded
+  `groups=5` instead of deriving it from the suite. The line now
+  prints an f-string built from `result.testsRun`, reusing the
+  `result` object already bound at line 111. This evaluates to 5
+  today, so `capture-stdout.txt` row 771 stays byte-identical.
+- F-3, low, `test/lan_database_native.py:178`. The native gate OK line
+  hardcoded `restarts=3 signals=2 startup-failures=1 mutants=1`
+  instead of deriving the numbers from the test's own counters.
+  `NativeDatabase` now keeps class-level `restarts`, `signal_kinds`,
+  `startup_failures` and `mutants` counters, reset in `setUp`.
+  `restarts` bumps only before the "second" serve (line 126), the
+  "direct" start (line 132) and the "deleted" start (line 136), not
+  the "first" or "control" starts, giving restarts=3. `shutdown`
+  records every signal it receives into `signal_kinds` (line 111),
+  giving signals=2 across SIGTERM and SIGINT. `startup_failures`
+  bumps once, right after the missing-parent assertions (line 146),
+  giving startup-failures=1. `mutants` takes the `re.subn` count
+  (line 154), giving mutants=1. Line 178 now derives its printed row
+  from these four counters, reproducing the exact frozen string, so
+  `capture-stdout.txt` row 772 stays byte-identical.
+- Carried. C-1 on the toasty-driver-sqlite revision in `rust/crate.ml`
+  is refuted: `dev/prepare-crate.py:76` already cross-checks both the
+  toasty and toasty-driver-sqlite manifest revisions against the same
+  pinned commit and hard-fails on drift.
+- Repins. Four paths take new hashes in
+  `validation/stage-m1-database/source-sha256.json`:
+  `rust/database_path.ml`, `test/lan_database.py`,
+  `test/lan_database_native.py` and this log. The map keeps its 26
+  entries and verifies `PINS ok=26 mismatch=0`. The build reports
+  `OK build: 0 errors, 0 warnings`.
+
+Proof: zsh dev/gates.sh --stage M1-database GREEN on the fixed tree
+(2026-09-20T00:14:23Z, stage_rc=0, load averages 21.49 25.90 26.04):
+STAGE-M1-HTTP OK (907), STAGE-M1-SERVE OK (930), LAN-DATABASE CLI OK
+groups=5 (941), LAN-DATABASE NATIVE OK restarts=3 signals=2
+startup-failures=1 mutants=1 (949), STAGE-M1-DATABASE OK (958). Log:
+gates-LSM1DB-fix-1.log. The baseline ladder on the unfixed copy was
+GREEN 2026-09-19T22:43:57Z stage_rc=0. Row comparison of the fix log
+against the frozen capture dev/validation/stage-m1-database/
+stage-0001.stdout: capture=731 log=761 rows, differences are the known
+noise families only (extra bare OK rows, M0-DETAIL mktemp paths) plus
+the TRUSTED-INVENTORY sha256 and TRUSTED-POLICY lines=14436 rows that
+move with any source edit. Pins ok=26 mismatch=0.

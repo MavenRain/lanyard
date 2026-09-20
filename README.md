@@ -272,6 +272,13 @@ _build/default/bin/lanyard.exe serve --out /tmp/todo-serve --listen 127.0.0.1:30
 The output directory must be fresh. Add `--offline` to use cached
 dependencies or `--release` for an optimized server.
 
+The [M1 database option](dev/STAGE-M1-DATABASE.md) keeps HTTP state across
+restarts with `--database ./todo.sqlite3`. It works with `emit --crate`,
+`build`, and `serve` when `--listen` is present. Relative paths use the
+invocation directory. Initialize the Todo schema once with `/init`, then
+reuse that database on subsequent starts. Without this option, each server
+continues to start with an empty in-memory database.
+
 Build and validate through Stage D:
 
 ```sh

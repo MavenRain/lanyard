@@ -1,0 +1,37 @@
+{
+  "stage": "M1-database",
+  "recorded_at": "2026-09-19T22:06:03.915386+00:00",
+  "base_commit": "5e5a35b44b1541fbfca9499031c3e06ccf8101c8",
+  "validated_root": "/Users/oobi/Documents/gpt2/lanyard-persistence",
+  "command": [
+    "zsh",
+    "dev/gates.sh",
+    "--stage",
+    "M1-database"
+  ],
+  "capture": "stage-capture.json",
+  "stdout": "stage-0001.stdout",
+  "stderr": "stage-0001.stderr",
+  "exit_code": 0,
+  "source_hashes": "source-sha256.json",
+  "supporting_captures": [
+    "native-capture.json",
+    "default-bytes.stdout"
+  ],
+  "environment": {
+    "RUSTUP_TOOLCHAIN": "1.98",
+    "RUSTC_WRAPPER": "",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_HOME": "/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+    "CARGO_TARGET_DIR": "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target",
+    "LANYARD_TOASTY": "/Users/oobi/Documents/toasty",
+    "LANYARD_TOPCOAT": "/Users/oobi/Documents/topcoat"
+  },
+  "notes": [
+    "The cumulative gate retains the prior serve and HTTP checks.",
+    "Native Cargo uses clean checked local target pins with offline dependency resolution.",
+    "Socket validation ran outside the sandbox after its loopback bind restriction was observed.",
+    "Default HTTP and batch manifests and source match the main checkout compiler byte-for-byte.",
+    "No trust-policy allowance or milestone exit is approved."
+  ]
+}
