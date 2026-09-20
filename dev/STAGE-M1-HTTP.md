@@ -58,8 +58,9 @@ socket errors exit 1. Native recursion and errors retain the backend's
 existing semantics. This slice serves local development over plain HTTP.
 
 The cumulative gate preserves the native-session and interpreter gates,
-checks CLI validation, and compiles five server programs and two mutation
-controls offline. Real socket tests cover URI preservation, redirects,
+checks CLI validation, and compiles six server programs and two mutation
+controls offline. Real socket tests cover URI preservation, path and query
+inspection, query-field decoding, redirects,
 Todo state and restart, forms, body limits and timeouts, concurrency,
 handler error recovery and SIGTERM shutdown. The controls remove URI or
 form validation and must exhibit the specific bad response rejected by

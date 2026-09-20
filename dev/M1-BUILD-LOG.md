@@ -4697,3 +4697,52 @@ stage-0001.stdout: capture=731 log=761 rows, differences are the known
 noise families only (extra bare OK rows, M0-DETAIL mktemp paths) plus
 the TRUSTED-INVENTORY sha256 and TRUSTED-POLICY lines=14436 rows that
 move with any source edit. Pins ok=26 mismatch=0.
+
+## M1 URI path and query adapters (2026-09-19)
+
+Added `Uri.path` and `Uri.query` with closed byte-list output types. Path
+selection stops at the first `?`; query selection omits that separator and
+preserves the remainder. Missing and empty queries both return empty text.
+Both runtimes validate the entire origin-form URI before projection,
+including unused results and invalid bytes in the other component. The
+native adapters call the pinned URI accessors after validation. Existing
+`Uri.to_text` emission retains its rendering and validation sequence.
+
+The fixture separates path routing from query decoding with `Form.field`.
+Interpreter and socket tests cover encoded Unicode, plus signs, reserved
+bytes, empty queries, handler errors and recovery. Direct native calls also
+cover aliases, captures, alternate byte-list families, boundary lengths,
+and invalid values that the native URI type permits. A compiled control
+removes all four specialized validation sites and must expose the expected
+invalid-value acceptance for used and unused component results.
+
+The target catalog now has 32 proposed declarations, nine foreign types
+and 206 generated lines. Todo reports 37 foreign constants and three
+definitions. Catalog assertions, axiom-report totals and the Todo report
+golden reflect the two added schemas. Library pins and dependencies retain
+their existing revisions. No trust allowance or milestone exit is approved.
+
+The new `M1-uri-parts` gate preserves `M1-database`, including its HTTP,
+serve and persistence checks. It adds 92 interpreter checks, four CLI
+groups and 140 native observations with one compiled mutation control.
+Captures and source hashes are recorded under
+`dev/validation/stage-m1-uri-parts/`.
+
+The cumulative gate completed with exit 0 and `STAGE-M1-URI-PARTS OK`.
+Its seven HTTP runtime groups, serve lifecycle checks, and three database
+restarts passed. Native builds used checked local pins and offline Cargo;
+the gate ran with loopback socket access. House checks passed. The existing
+combined M0 gate retained its pending trust ruling.
+
+## M1 URI path and query adapters: review fixes (2026-09-19)
+
+A review of the staged URI-PARTS slice (tag LSM1UP) found one defect and refuted one candidate.
+
+- dev/gates.sh: the runtime usage row now lists the `--stage M1-uri-parts` form next to the M1-database form. The header comment already listed it.
+- Refuted: the mutation log sentence that lists invalid native URI value kinds uses the word include and gives the count of nine. It does not claim to be exhaustive.
+
+Gate: `zsh dev/gates.sh --stage M1-uri-parts` on the fixed tree.
+
+Proof: STAGE-GATE-EXIT 0
+  GATE-END tag=fix-1 2026-09-20T03:55:50Z stage_rc=0
+  GATE LSM1UP tag=fix-1 GREEN

@@ -1,0 +1,14 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def greeting : Bytes -> Response := fun (query : Bytes) =>
+  case Text.is_empty Bytes query with
+  | 1 (u : prod ()) => Response.text Bytes b"hello world"
+  | 0 (u : prod ()) => Response.text Bytes (Text.concat Bytes b"hello "
+      (Form.field Bytes query b"name"))
+
+def main : Cx -> Uri -> Response := fun (cx : Cx) (uri : Uri) =>
+  case Text.equal Bytes (Uri.path Bytes uri) b"/hello" with
+  | 1 (u : prod ()) => greeting (Uri.query Bytes uri)
+  | 0 (u : prod ()) => Response.text Bytes (Uri.path Bytes uri)

@@ -34,6 +34,7 @@ def cases():
     return {
         "redirect": REDIRECT,
         "uri": (ROOT / "test/fixtures/uri-text.lan").read_text(),
+        "uri-parts": (ROOT / "test/fixtures/uri-parts.lan").read_text(),
         "todo": (ROOT / "test/fixtures/todo-session.lan").read_text(),
         "form": BYTES + "def main : Cx -> Uri -> Bytes -> Response := fun (cx : Cx) (uri : Uri) (body : Bytes) => Response.text Bytes (Form.field Bytes body b\"title\")\n",
         "ignored": BYTES + "def main : Cx -> Uri -> Bytes -> SeeOther := fun (cx : Cx) (uri : Uri) (body : Bytes) => topcoat.see_other uri\n",
@@ -167,6 +168,28 @@ class Http(unittest.TestCase):
         port, _process = self.start("uri")
         for uri in ["/", "/a?x=1?two", "/%C3%A9"]:
             self.assertEqual(self.request(port, "GET", uri)[::2], (200, f"unmatched: {uri}".encode()))
+
+    def test_uri_parts_and_query_fields(self):
+        port, _process = self.start("uri-parts")
+        for uri, expected in [("/hello?name=Ada+Lovelace", b"hello Ada Lovelace"),
+                              ("/hello?name=caf%C3%A9", "hello café".encode()),
+                              ("/hello?name=a%26b%3Fc%2Bd", b"hello a&b?c+d"),
+                              ("/hello?name=a?b", b"hello a?b"),
+                              ("/hello", b"hello world"), ("/hello?", b"hello world"),
+                              ("/hello?name=", b"hello "),
+                              ("/a%3fb?name=Ada", b"/a%3fb"),
+                              ("/a//b/../c?name=Ada", b"/a//b/../c")]:
+            with self.subTest(uri=uri):
+                status, headers, body = self.request(port, "GET", uri)
+                self.assertEqual((status, body), (200, expected))
+                self.assertEqual(headers.get("content-type"), "text/plain; charset=utf-8")
+                self.assertEqual(int(headers["content-length"]), len(expected))
+        for uri, expected in [("/hello?name=%GG", 400), ("/bad%?name=Ada", 400),
+                              ("/hello?name=%FF", 500), ("/hello?name=a&name=b", 500),
+                              ("/hello?other=x", 500)]:
+            with self.subTest(uri=uri):
+                self.assertEqual(self.request(port, "GET", uri)[0], expected)
+        self.assertEqual(self.request(port, "GET", "/hello?name=after")[::2], (200, b"hello after"))
 
     def test_todo_lifecycle_and_restart(self):
         port, _process = self.start("todo")

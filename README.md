@@ -223,6 +223,19 @@ The example returns `todos` for `/todos` and echoes other paths with an
 `unmatched: ` prefix. Conversion preserves percent escapes and the full
 text after `?`; it does not decode or split the URI.
 
+The [M1 URI component adapters](dev/STAGE-M1-URI-PARTS.md) separate routing
+from query data. `Uri.path Bytes uri` returns the path and `Uri.query Bytes uri`
+returns the raw query without its leading `?`, or an empty byte list when
+absent. Both preserve escapes and validate the complete URI. Pass the query
+to `Form.field` when URL-encoded field decoding is needed:
+
+```sh
+_build/default/bin/lanyard.exe run --request '/hello?name=Ada+Lovelace' test/fixtures/uri-parts.lan
+zsh dev/gates.sh --stage M1-uri-parts
+```
+
+The example responds with `hello Ada Lovelace`. It also works with `serve`.
+
 The [M1 request sessions](dev/STAGE-M1-SESSION.md) run a sequence of requests
 against one private database. Each script line contains a URI, optionally
 followed by a tab and an encoded form body. The Todo example creates,
@@ -419,7 +432,7 @@ _build/default/bin/lanyard.exe axioms --names examples/m0-todo.lan
 
 The report lists Framework, Foreign, Classical and Div, sorted by class
 and name, with class totals and the compiled target catalog's SHA-256.
-Todo reports 35 foreign constants and 3 definitions of the checked
+Todo reports 37 foreign constants and 3 definitions of the checked
 module (Bool, Todo and main). These are informational inputs, with no
 ratio bound. The scope is the whole checked module, including unused
 catalog rows and model operations.

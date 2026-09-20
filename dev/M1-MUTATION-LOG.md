@@ -795,3 +795,25 @@ startup failure, or different status fails the test.
 The clean test also persists creates, updates, and deletes through three
 restarts, uses the exact unusual filename, and checks a missing-parent
 startup failure. Captures are in `validation/stage-m1-database/`.
+
+## M1 URI component validation control (2026-09-19)
+
+The URI component harness emits path and query operations for two distinct
+byte-list families. Its native control removes the four full-URI validation
+calls from those specialized wrappers, retaining the surrounding conversion
+and program code. The checked binary must pass all 140 observations.
+The control must preserve every valid result and turn each invalid-value
+rejection, including unused results, into acceptance. Compile failures,
+parse failures or other output differences fail the control check.
+
+The 13 valid inputs exercise absent and empty queries, further question
+marks, escape spelling, repeated slashes, dot segments and the URI length
+boundary. The nine invalid native values include absolute and relative
+URIs, authority form, malformed path and query escapes, and an oversized
+query. Interpreter checks additionally reject whitespace, raw Unicode,
+control bytes and fragments in either component.
+
+The standalone native check passed with 140 observations and one killed
+control. The cumulative `M1-uri-parts` gate repeats it after the HTTP and
+persistent-database checks. Its captures are recorded under
+`dev/validation/stage-m1-uri-parts/`.

@@ -255,6 +255,7 @@ let source ?entrypoint ?(output = Discard) ?entry_output ?(input_text = [])
       | () when String.equal row.Rir.schema "Db.connect" -> Connection.foreign_call Catalog.entries connections row
       | () when String.starts_with ~prefix:"Text." row.Rir.schema || String.equal row.Rir.schema "Uri.from_text"
           || String.equal row.Rir.schema "Uri.to_text"
+          || String.equal row.Rir.schema "Uri.path" || String.equal row.Rir.schema "Uri.query"
           || String.equal row.Rir.schema "Form.field" || String.equal row.Rir.schema "Response.text"
           || String.equal row.Rir.schema "Html.text" || String.equal row.Rir.schema "Response.html" ->
           Text_ops.foreign_call Catalog.entries operations row
@@ -269,7 +270,7 @@ let source ?entrypoint ?(output = Discard) ?entry_output ?(input_text = [])
     @ List.map (fun (operation : Text_ops.t) -> operation.family) operations @ input_text
     |> List.sort_uniq String.compare in
   let uri_errors = http_input || List.exists (fun (operation : Text_ops.t) ->
-    operation.operation = Text_ops.Uri_from_text || operation.operation = Text_ops.Uri_to_text) operations in
+    operation.operation = Text_ops.Uri_from_text || Text_ops.input operation.operation = Text_ops.Request_uri) operations in
   let form_errors = http_input || List.exists (fun (operation : Text_ops.t) ->
     operation.operation = Text_ops.Form_field) operations in
   let nat_text = List.exists (fun (operation : Text_ops.t) ->

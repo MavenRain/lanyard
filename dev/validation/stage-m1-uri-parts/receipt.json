@@ -1,0 +1,40 @@
+{
+  "stage": "M1-uri-parts",
+  "recorded_at": "2026-09-20T02:05:04.738144+00:00",
+  "base_commit": "2ef51968f1d42645aa4ab288a06042c0c49f32e9",
+  "validated_root": "/Users/oobi/Documents/gpt2/lanyard-uri-parts",
+  "command": [
+    "zsh",
+    "dev/gates.sh",
+    "--stage",
+    "M1-uri-parts"
+  ],
+  "capture": "stage-capture.json",
+  "stdout": "stage-0001.stdout",
+  "stderr": "stage-0001.stderr",
+  "exit_code": 0,
+  "source_hashes": "source-sha256.json",
+  "passing_rows": [
+    "STAGE-M1-HTTP OK",
+    "STAGE-M1-SERVE OK",
+    "STAGE-M1-DATABASE OK",
+    "LAN-URI-PARTS OK checks=92",
+    "LAN-URI-PARTS CLI OK groups=4",
+    "LAN-URI-PARTS NATIVE OK observations=140 mutants=1",
+    "STAGE-M1-URI-PARTS OK"
+  ],
+  "environment": {
+    "LANYARD_TOASTY": "/Users/oobi/Documents/toasty",
+    "LANYARD_TOPCOAT": "/Users/oobi/Documents/topcoat",
+    "RUSTUP_TOOLCHAIN": "1.98",
+    "RUSTC_WRAPPER": "",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_HOME": "/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+    "CARGO_TARGET_DIR": "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target"
+  },
+  "notes": [
+    "Cumulative gate completed with local loopback socket access and offline Cargo.",
+    "The native mutation omits validation at all four specialized URI component sites.",
+    "Trust allowances and milestone exits remain pending."
+  ]
+}
