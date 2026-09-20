@@ -98,7 +98,7 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
   | () when String.starts_with ~prefix:"Text." row.schema || String.equal row.schema "Uri.from_text"
       || String.equal row.schema "Uri.to_text"
       || String.equal row.schema "Uri.path" || String.equal row.schema "Uri.query"
-      || String.equal row.schema "Form.field" || String.equal row.schema "Response.text"
+       || String.equal row.schema "Form.field" || String.equal row.schema "Form.has" || String.equal row.schema "Response.text"
       || String.equal row.schema "Html.text" || String.equal row.schema "Response.html" ->
       let* operation = List.find_opt (fun (text : Text_ops.t) -> text.row = row) catalog.texts
         |> Option.to_result ~none:(Error.Mismatch "run: text metadata differs") in
@@ -125,6 +125,11 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
            let* name = text ~what:"form field name" operation.family name in
            let* value = Form_data.field body name in
            Ok (of_text operation.family value, store)
+       | [body; name] when operation.operation = Text_ops.Form_has ->
+           let* body = text ~what:"form body" operation.family body in
+           let* name = text ~what:"form field name" operation.family name in
+           let* present = Form_data.has body name in
+           Ok (Tag (Text_ops.bool_tid, (if present then 1 else 0), [Unit]), store)
        | [value] ->
            let* text = text ~what:"text operation" operation.family value in
            let* value = match operation.operation with
@@ -137,7 +142,7 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
              | Text_ops.Html_text -> Text_ops.html_text text |> Result.map (of_text operation.family)
              | Text_ops.Response_html -> Ok (Response_html text)
              | Text_ops.From_nat | Text_ops.Uri_to_text | Text_ops.Uri_path | Text_ops.Uri_query
-             | Text_ops.Equal | Text_ops.Concat | Text_ops.Form_field ->
+             | Text_ops.Equal | Text_ops.Concat | Text_ops.Form_field | Text_ops.Form_has ->
                  invalid "text pair argument count" in
            Ok (value, store)
        | [] | _ :: _ -> invalid "text argument count")

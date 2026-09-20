@@ -45,6 +45,7 @@ let parse body = match () with
 let field body name =
   let* fields = parse body in
   List.assoc_opt name fields |> Option.to_result ~none:(Error.Mismatch "form: missing field")
+let has body name = parse body |> Result.map (List.mem_assoc name)
 
 (** Validate strictly before using the pinned Topcoat form deserializer. *)
 let runtime = {|
@@ -103,5 +104,8 @@ fn lan_form_fields(body: &str) -> Result<Vec<(String, String)>, Error> {
 fn lan_form_field(body: &str, name: &str) -> Result<String, Error> {
     lan_form_fields(body)?.into_iter().find(|(key, _value)| key == name)
         .map(|(_key, value)| value).ok_or(Error::InvalidForm)
+}
+fn lan_form_has(body: &str, name: &str) -> Result<bool, Error> {
+    Ok(lan_form_fields(body)?.iter().any(|(key, _value)| key == name))
 }
 |}

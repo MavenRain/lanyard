@@ -1,0 +1,41 @@
+{
+  "stage": "M1-form-has",
+  "recorded_at": "2026-09-20T05:27:24.551466+00:00",
+  "base_commit": "42ddac8ee7c89ddd5ffe1592f7a42b94f9233e7c",
+  "validated_root": "/Users/oobi/Documents/lanyard",
+  "command": [
+    "zsh",
+    "dev/gates.sh",
+    "--stage",
+    "M1-form-has"
+  ],
+  "capture": "stage-capture.json",
+  "stdout": "stage-0001.stdout",
+  "stderr": "stage-0001.stderr",
+  "exit_code": 0,
+  "source_hashes": "source-sha256.json",
+  "passing_rows": [
+    "STAGE-M1-HTTP OK",
+    "STAGE-M1-SERVE OK",
+    "STAGE-M1-DATABASE OK",
+    "LAN-FORM-HAS OK checks=65",
+    "LAN-FORM-HAS CLI OK groups=2",
+    "LAN-FORM-HAS NATIVE OK observations=103 mutants=1",
+    "STAGE-M1-URI-PARTS OK",
+    "STAGE-M1-FORM-HAS OK"
+  ],
+  "environment": {
+    "LANYARD_TOASTY": "/Users/oobi/Documents/toasty",
+    "LANYARD_TOPCOAT": "/Users/oobi/Documents/topcoat",
+    "RUSTUP_TOOLCHAIN": "1.98",
+    "RUSTC_WRAPPER": "",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_HOME": "/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+    "CARGO_TARGET_DIR": "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target"
+  },
+  "notes": [
+    "Cumulative gate completed with local loopback socket access and offline Cargo.",
+    "The native mutation replaces complete form decoding and validation with raw field splitting.",
+    "Trust allowances and milestone exits remain pending."
+  ]
+}

@@ -4746,3 +4746,31 @@ Gate: `zsh dev/gates.sh --stage M1-uri-parts` on the fixed tree.
 Proof: STAGE-GATE-EXIT 0
   GATE-END tag=fix-1 2026-09-20T03:55:50Z stage_rc=0
   GATE LSM1UP tag=fix-1 GREEN
+
+## M1 optional form fields (2026-09-19)
+
+`Form.has` checks for a decoded form field and returns the existing Boolean
+sum. Missing fields and empty bodies return false; empty values count as
+present. Both execution paths parse and validate the complete body before
+testing presence, retaining the existing byte, field-count, duplicate-name
+and UTF-8 limits.
+
+The schema participates in closed byte-list specialization, metadata
+validation, interpreter dispatch, and native Boolean conversion. The Rust
+helper uses the same checked form parser as `Form.field`. No dependency or
+library revision changes. The catalog has 33 proposed declarations; its
+signature hash, declaration counts and axiom golden reflect the addition.
+
+Focused validation passed: 65 interpreter checks, two CLI groups, and 103
+native observations with one compiled mutation control. Aliases, captured
+calls, alternate families, unused errors, and argument evaluation order
+are covered. The cumulative `M1-form-has` gate retains `M1-uri-parts`,
+including HTTP, serve, and database restart coverage. Its final receipt
+and source hashes belong under `dev/validation/stage-m1-form-has/`.
+
+Trust allowances and milestone exits retain their existing pending status.
+
+The cumulative gate completed with exit 0 and `STAGE-M1-FORM-HAS OK`.
+HTTP runtime checks, serve lifecycle checks and database restarts passed.
+Native builds used the checked local pins and offline Cargo. House checks
+passed. The combined M0 gate retained its pending trust ruling.

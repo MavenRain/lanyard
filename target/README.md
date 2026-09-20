@@ -1,11 +1,11 @@
 # Target signatures
 
-The target catalog provides 32 proposed foreign declarations: nine type
-constants and twenty-three constant or schema declarations. M1 adds
+The target catalog provides 33 proposed foreign declarations: nine type
+constants and twenty-four constant or schema declarations. M1 adds
 `Model.delete_by_id`, `Model.update`, `Model.all`, `Text.trim`,
 `Text.is_empty`, `Uri.from_text`, `Form.field`, `Response.text`,
 `Html.text`, `Response.html`, `Text.concat`, `Text.from_nat`, `Text.to_nat`,
-`Text.equal`, `Uri.to_text`, `Uri.path` and `Uri.query` to the catalog. The target layer builds as
+`Text.equal`, `Uri.to_text`, `Uri.path`, `Uri.query` and `Form.has` to the catalog. The target layer builds as
 `lanyard_target`;
 its `Target_generated` module exposes immutable
 metadata and total lookup. Stage C instantiates schemas and checks

@@ -145,6 +145,17 @@ _build/default/bin/lanyard.exe run --request /todos --form 'title=write+tests' t
 zsh dev/gates.sh --stage M1-form
 ```
 
+The [M1 optional form adapter](dev/STAGE-M1-FORM-HAS.md) adds
+`Form.has Bytes body name`, returning whether a decoded field is present.
+It accepts missing fields and empty bodies, so handlers can use optional
+checkboxes and query parameters. Empty values count as present; malformed
+forms still fail validation.
+
+```sh
+_build/default/bin/lanyard.exe run --request /todos --form 'completed=' test/fixtures/form-has.lan
+zsh dev/gates.sh --stage M1-form-has
+```
+
 The [M1 text response adapter](dev/STAGE-M1-RESPONSE.md) adds
 `Response.text Bytes body`. Scripted handlers may return `Response` with
 status 200 and a UTF-8 plain-text body. The form example stores a Todo

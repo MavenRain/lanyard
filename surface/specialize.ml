@@ -16,6 +16,7 @@ let text_arguments = function
           "Text_from_nat", "Text.from_nat";
           "Text_to_nat", "Text.to_nat";
           "Uri_from_text", "Uri.from_text"; "Form_field", "Form.field";
+          "Form_has", "Form.has";
           "Uri_to_text", "Uri.to_text";
           "Uri_path", "Uri.path"; "Uri_query", "Uri.query";
           "Response_text", "Response.text"; "Html_text", "Html.text";

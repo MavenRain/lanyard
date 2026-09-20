@@ -817,3 +817,21 @@ The standalone native check passed with 140 observations and one killed
 control. The cumulative `M1-uri-parts` gate repeats it after the HTTP and
 persistent-database checks. Its captures are recorded under
 `dev/validation/stage-m1-uri-parts/`.
+
+## M1 form presence validation control (2026-09-19)
+
+The native `Form.has` control replaces the checked parser call with a raw
+split on `&` and `=`. It skips decoding, duplicate-name rejection, UTF-8
+validation and the body and field-count limits. The checked binary must
+pass 103 observations. The control must produce the exact expected raw
+name answers and accept all 18 malformed or oversized forms, including
+unused results. Both binaries retain the argument evaluation-order check.
+A compile failure, runtime failure or different output fails the check.
+
+The valid cases include absent and empty fields, case-sensitive names,
+percent-encoded names, plus and space distinctions, Unicode, embedded NUL,
+and exact parser limits. Direct, captured and alternate-family calls are
+checked. Every invalid form is tested with `title` and an absent lookup name.
+The focused run passed with one killed control. The cumulative gate repeats
+it after URI, HTTP and persistence checks and records its capture under
+`dev/validation/stage-m1-form-has/`.

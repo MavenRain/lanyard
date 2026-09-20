@@ -55,7 +55,7 @@ class Signatures(unittest.TestCase):
 
     def test_generate_deterministically_without_source_paths(self):
         rows = GEN.read_signatures(self.target)
-        self.assertEqual(len(rows), 32)
+        self.assertEqual(len(rows), 33)
         self.assertEqual(sum(row["kind"] == "type" for row in rows), 9)
         self.assertEqual(GEN.generate(rows), GEN.generate(GEN.read_signatures(ROOT / "target")))
         self.assertNotIn(str(ROOT), GEN.generate(rows))

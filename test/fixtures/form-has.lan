@@ -1,0 +1,8 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def main : Cx -> Uri -> Bytes -> Response := fun (cx : Cx) (uri : Uri) (body : Bytes) =>
+  case Form.has Bytes body b"completed" with
+  | 1 (u : prod ()) => Response.text Bytes b"completed"
+  | 0 (u : prod ()) => Response.text Bytes b"pending"
