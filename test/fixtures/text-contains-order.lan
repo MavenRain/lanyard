@@ -1,0 +1,28 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def Bool : Type 0 := sum ((prod () : Type 0), (prod () : Type 0))
+
+model Piece with
+| id : Nat
+| text : Bytes
+end
+
+def left : Db -> Bytes := fun (db : Db) =>
+  let created : Piece := Piece.create (tuple (1, b"left")) db in created.1
+
+def right : Db -> Bytes := fun (db : Db) =>
+  let updated : Piece := Piece.update (tuple (1, b"right")) db in
+  let deleted : prod () := Piece.delete_by_id 1 db in
+  let recorded : Piece := Piece.create (tuple (2, updated.1)) db in recorded.1
+
+def main : Cx -> Uri -> Response := fun (cx : Cx) (uri : Uri) =>
+  let db : Db := Db.connect Piece Bytes b"sqlite::memory:" in
+  let ready : prod () := Db.push_schema db in
+  let same : Bool := Text.contains Bytes (left db) (right db) in
+  let recreated : Piece := Piece.create (tuple (1, b"once")) db in
+  let recorded : Piece := Piece.get_by_id 2 db in
+  case same with
+  | 0 (u : prod ()) => Response.text Bytes (Text.concat Bytes recreated.1 recorded.1)
+  | 1 (u : prod ()) => Response.text Bytes b"wrong comparison"

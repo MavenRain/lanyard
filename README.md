@@ -231,6 +231,16 @@ _build/default/bin/lanyard.exe run --request /length --form 'text=%C3%A9' test/f
 zsh dev/gates.sh --stage M1-text-length
 ```
 
+The [M1 substring adapter](dev/STAGE-M1-TEXT-CONTAINS.md) checks whether
+`Text.contains Bytes text needle` finds an exact, case-sensitive substring.
+An empty needle matches every valid text. Both inputs are validated as
+UTF-8 before searching, including when the result is unused.
+
+```sh
+_build/default/bin/lanyard.exe run --request /search --form 'action=autosave' test/fixtures/text-contains.lan
+zsh dev/gates.sh --stage M1-text-contains
+```
+
 The [M1 URI text adapter](dev/STAGE-M1-URI-TEXT.md) exposes the full checked
 request URI as a byte list with `Uri.to_text Bytes uri`. Handlers can use
 `Text.equal` to choose a response from the URI:

@@ -1,0 +1,48 @@
+{
+  "stage": "M1-text-contains",
+  "recorded_at": "2026-09-20T17:49:46.573506+00:00",
+  "base_commit": "2b953ea381ec3b3e1e7a225b820710fa7b039b2e",
+  "validated_root": "/Users/oobi/Documents/lanyard",
+  "command": [
+    "zsh",
+    "dev/gates.sh",
+    "--stage",
+    "M1-text-contains"
+  ],
+  "validated_staged_diff_sha256": "9d4f4da0f882143cb36e9d8c68e85c6ca893cf6fef3a55090016f67d32b436d0",
+  "capture": "stage-capture.json",
+  "stdout": "stage-0001.stdout",
+  "stderr": "stage-0001.stderr",
+  "exit_code": 0,
+  "source_hashes": "source-sha256.json",
+  "passing_rows": [
+    "STAGE-M1-HTTP OK",
+    "STAGE-M1-SERVE OK",
+    "STAGE-M1-DATABASE OK",
+    "STAGE-M1-TEXT-LENGTH OK",
+    "LAN-TEXT-CONTAINS OK checks=73",
+    "LAN-TEXT-CONTAINS NATIVE OK observations=280",
+    "LAN-TEXT-CONTAINS-MUT OK clean",
+    "LAN-TEXT-CONTAINS-MUT OK restored",
+    "STAGE-M1-TEXT-CONTAINS OK",
+    "LAN-TEXT-CONTAINS-MUT KILLED equality observations=34",
+    "LAN-TEXT-CONTAINS-MUT KILLED prefix observations=13",
+    "LAN-TEXT-CONTAINS-MUT KILLED reversed observations=59",
+    "LAN-TEXT-CONTAINS-MUT KILLED nonempty observations=16",
+    "LAN-TEXT-CONTAINS-MUT KILLED unchecked_needle observations=4"
+  ],
+  "environment": {
+    "LANYARD_TOASTY": "/Users/oobi/Documents/toasty",
+    "LANYARD_TOPCOAT": "/Users/oobi/Documents/topcoat",
+    "RUSTUP_TOOLCHAIN": "1.98",
+    "RUSTC_WRAPPER": "",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_HOME": "/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+    "CARGO_TARGET_DIR": "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target"
+  },
+  "notes": [
+    "The cumulative gate passed with loopback access and offline Cargo.",
+    "Five compiled substring mutations were killed; clean and restored controls passed.",
+    "Trust allowances and milestone exits remain pending."
+  ]
+}

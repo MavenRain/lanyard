@@ -856,3 +856,20 @@ Each control requires a matching emission site, successful compilation,
 a clean process exit, a complete observation set and at least one false
 observation. The baseline must match every expected row. Both controls
 were killed in the focused validation run.
+
+## M1 substring search (2026-09-20)
+
+`test/lan_text_contains.py --mutations` compiles five mutations of the
+generated adapter and compares all 280 observations against the baseline:
+
+- Equality-only matching misses proper substrings.
+- Prefix-only matching misses interior and suffix matches.
+- Reversed inputs change asymmetric matches.
+- Rejecting empty needles violates the empty-substring rule.
+- Replacing needle conversion errors with empty text skips validation.
+
+Every mutant requires one matching emission site, successful compilation,
+a clean process exit, a complete observation set and at least one false
+observation. All five were killed. Clean and restored baselines matched
+every expected row. Interpreter checks also compare all 16,129 pairs of
+binary strings through length six with an independent substring oracle.

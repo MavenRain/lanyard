@@ -4797,3 +4797,65 @@ including HTTP, serve and database restarts. Validation receipts and source
 hashes belong under `dev/validation/stage-m1-text-length/`.
 
 Trust allowances and milestone exits retain their pending status.
+
+## M1 substring search (2026-09-20)
+
+Added `Text.contains` for exact, case-sensitive substring checks on two
+closed byte lists. Empty needles match valid text; Unicode normalization,
+case folding and trimming are not applied. Both complete inputs are
+validated before searching, and argument evaluation remains once each in
+source order, including unused results.
+
+The interpreter uses immutable prefix-fallback maps with total lookups,
+avoiding quadratic rescans on repeated prefixes. Generated Rust uses
+`str::contains` behind the existing byte-list conversion. The schema returns
+the existing Boolean sum, is synchronous and declares no foreign error
+effect. Specialization covers aliases, captures and alternate families.
+
+The catalog now has 35 proposed declarations. Updated the signature hash,
+catalog counts and Todo axiom snapshot without changing library pins or
+dependencies. The search fixture branches on a decoded form field; the
+database fixture checks once-only evaluation and source order.
+
+Focused validation passed: a warning-free Dune build, 73 interpreter checks,
+eight CLI/native test groups and 280 native observations. The interpreter
+also compares every pair of binary strings through length six against a
+separate oracle and tests 100,000-byte repetitive inputs. Five compiled
+mutations were killed, with clean and restored baselines passing.
+
+The cumulative `M1-text-contains` gate retains `M1-text-length`, including
+HTTP, serve and database restart checks. Validation captures and source
+hashes belong under `dev/validation/stage-m1-text-contains/`.
+Trust allowances and milestone exits remain pending.
+
+## M1 Stage TEXT-CONTAINS review fixes (tag LSM1TC, 2026-09-20)
+
+A staged-slice review of this stage found two low findings, both in
+`rust/text_ops.ml`. The house rule for OCaml under `rust/` bans
+if/else-if chains in favor of `match ()` with guarded arms.
+
+F-1 replaced the top-level if/else-if chain in `contains` with a
+`match ()` block. Three arms cover the empty-needle guard, the
+needle-longer-than-text guard and the default search path. F-2
+replaced the three-way if/else-if chain inside the `advance`
+function's `~some:` lambda with a `match ()` block of the same
+shape. Both fixes keep the same guard order and the same results.
+The size guards and the advance transition are unaffected, so
+checks=73 and observations=280 stay byte-identical.
+
+Repins. `rust/text_ops.ml` and this log take new hashes in
+`dev/validation/stage-m1-text-contains/source-sha256.json`. The map
+keeps its 47 entries. The build reports
+`OK build: 0 errors, 0 warnings`.
+
+Proof: zsh dev/gates.sh --stage M1-text-contains GREEN on the fixed tree
+(fix-1 ladder on ROOT at HEAD 2b953ea, GATE-END 2026-09-20T20:29:48Z,
+stage_rc=0, load averages 13.88 26.53 29.78): LAN-TEXT-CONTAINS OK
+checks=73 (1016), NATIVE OK observations=280 (1022), MUT OK clean
+(1023), MUT OK restored (1029), STAGE-M1-TEXT-CONTAINS OK (1037).
+The log differs from the frozen capture only on non-gating detail rows
+and on the trusted inventory rows that follow the fixed file: text_ops
+264 to 269 lines, printer total 1850 to 1855, policy lines 14530 to
+14535, inventory sha256 ecb4b05d to 752f7950. The baseline ladder on
+the unfixed kit copy was GREEN 2026-09-20T20:03:53Z
+stage_rc=0. Pins ok=47 mismatch=0.
