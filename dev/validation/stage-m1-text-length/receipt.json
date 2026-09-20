@@ -1,0 +1,42 @@
+{
+  "stage": "M1-text-length",
+  "recorded_at": "2026-09-20T08:09:01.483748+00:00",
+  "base_commit": "f8f9da630e26845b047cb15e2b0f0ab1b4cc0e69",
+  "validated_root": "/Users/oobi/Documents/lanyard",
+  "command": [
+    "zsh",
+    "dev/gates.sh",
+    "--stage",
+    "M1-text-length"
+  ],
+  "capture": "stage-capture.json",
+  "stdout": "stage-0001.stdout",
+  "stderr": "stage-0001.stderr",
+  "exit_code": 0,
+  "source_hashes": "source-sha256.json",
+  "passing_rows": [
+    "STAGE-M1-HTTP OK",
+    "STAGE-M1-SERVE OK",
+    "STAGE-M1-DATABASE OK",
+    "STAGE-M1-URI-PARTS OK",
+    "STAGE-M1-FORM-HAS OK",
+    "LAN-TEXT-LENGTH OK checks=44",
+    "LAN-TEXT-LENGTH CLI OK groups=4",
+    "LAN-TEXT-LENGTH NATIVE OK observations=34 mutants=2",
+    "STAGE-M1-TEXT-LENGTH OK"
+  ],
+  "environment": {
+    "LANYARD_TOASTY": "/Users/oobi/Documents/toasty",
+    "LANYARD_TOPCOAT": "/Users/oobi/Documents/topcoat",
+    "RUSTUP_TOOLCHAIN": "1.98",
+    "RUSTC_WRAPPER": "",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_HOME": "/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+    "CARGO_TARGET_DIR": "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target"
+  },
+  "notes": [
+    "The cumulative gate passed with loopback socket access and offline Cargo.",
+    "Two compiled mutations miscount Unicode bytes or truncate lengths to one byte.",
+    "Trust allowances and milestone exits remain pending."
+  ]
+}

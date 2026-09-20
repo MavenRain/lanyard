@@ -4774,3 +4774,26 @@ The cumulative gate completed with exit 0 and `STAGE-M1-FORM-HAS OK`.
 HTTP runtime checks, serve lifecycle checks and database restarts passed.
 Native builds used the checked local pins and offline Cargo. House checks
 passed. The combined M0 gate retained its pending trust ruling.
+## M1 text byte lengths (2026-09-20)
+
+Added `Text.length` with a closed byte-list input and a natural-number
+result. It counts UTF-8 bytes, including whitespace and embedded NULs,
+without normalization. The interpreter validates the complete byte list
+before taking its length. Native emission uses the same checked conversion
+and constructs a canonical natural from every byte of Rust's length value.
+There is no narrowing or new foreign error effect.
+
+The schema participates in specialization, metadata validation, aliases,
+captured calls and alternate byte-list families. Invalid UTF-8 and byte
+values above 255 fail even when the result is discarded. The catalog now
+has 34 proposed declarations; the signature digest, declaration counts and
+Todo axiom golden reflect the addition. Dependencies retain their revisions.
+
+Focused checks passed: 44 interpreter checks, four CLI groups and 34 native
+observations. Two compiled controls replace byte counting with character
+counting or truncate the count to one byte; both produce incorrect answers.
+The cumulative `M1-text-length` gate retains all `M1-form-has` checks,
+including HTTP, serve and database restarts. Validation receipts and source
+hashes belong under `dev/validation/stage-m1-text-length/`.
+
+Trust allowances and milestone exits retain their pending status.

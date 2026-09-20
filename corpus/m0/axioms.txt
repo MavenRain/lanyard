@@ -1,4 +1,4 @@
-AXIOMS scope=checked-module target-sha256=64f8e8e4d92f13581e4f6f1ad6736c5989b4532e959904a714f875c88af0b64b
+AXIOMS scope=checked-module target-sha256=5ca62433d5f2ba052ed95a324156a23f32b3b1ec60190f447beac53429b36386
 Framework imax_zero : imax l zero = zero
 Foreign Cx : Type 1 [schema=Cx]
 Foreign Db : Type 1 [schema=Db]
@@ -22,6 +22,7 @@ Foreign Text_concat : (Ran SPi 0 Text Type 1 (Ran SPi w left Text (Ran SPi w rig
 Foreign Text_equal : (Ran SPi 0 Text Type 1 (Ran SPi w left Text (Ran SPi w right Text (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))))) [schema=Text.equal]
 Foreign Text_from_nat : (Ran SPi 0 Text Type 1 (Ran SPi w value Nat Text)) [schema=Text.from_nat]
 Foreign Text_is_empty : (Ran SPi 0 Text Type 1 (Ran SPi w text Text (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)])))) [schema=Text.is_empty]
+Foreign Text_length : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Nat)) [schema=Text.length]
 Foreign Text_to_nat : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Nat)) [schema=Text.to_nat]
 Foreign Text_trim : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Text)) [schema=Text.trim]
 Foreign Todo_all : (Ran SPi w db Db (Lan SMu Todo_rows [] (Sec SColl 0 []))) [schema=Model.all]
@@ -39,8 +40,8 @@ Foreign topcoat_Error : Type 1 [schema=topcoat::Error]
 Foreign topcoat_db : (Ran SPi w cx Cx Db) [schema=topcoat.db]
 Foreign topcoat_see_other : (Ran SPi w uri Uri SeeOther) [schema=topcoat.see_other]
 COUNT Framework=1
-COUNT Foreign=38
+COUNT Foreign=39
 COUNT Classical=0
 COUNT Div=0
-AXIOMS total=39
-AXIOM-RATIO constants=38 definitions=3 status=REPORTED
+AXIOMS total=40
+AXIOM-RATIO constants=39 definitions=3 status=REPORTED

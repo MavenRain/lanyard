@@ -221,6 +221,16 @@ _build/default/bin/lanyard.exe run --request / --form 'action=save' test/fixture
 zsh dev/gates.sh --stage M1-text-equal
 ```
 
+The [M1 text length adapter](dev/STAGE-M1-TEXT-LENGTH.md) counts UTF-8 bytes
+with `Text.length Bytes value`. It returns a natural number: empty text has
+length zero, `b"é"` has length 2, and `b"😀"` has length 4. It validates the
+complete byte list even when the result is unused.
+
+```sh
+_build/default/bin/lanyard.exe run --request /length --form 'text=%C3%A9' test/fixtures/text-length.lan
+zsh dev/gates.sh --stage M1-text-length
+```
+
 The [M1 URI text adapter](dev/STAGE-M1-URI-TEXT.md) exposes the full checked
 request URI as a byte list with `Uri.to_text Bytes uri`. Handlers can use
 `Text.equal` to choose a response from the URI:

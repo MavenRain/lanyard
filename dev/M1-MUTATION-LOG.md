@@ -835,3 +835,24 @@ checked. Every invalid form is tested with `title` and an absent lookup name.
 The focused run passed with one killed control. The cumulative gate repeats
 it after URI, HTTP and persistence checks and records its capture under
 `dev/validation/stage-m1-form-has/`.
+## M1 text byte lengths (2026-09-20)
+
+`test/lan_text_length.py --native` builds the emitted adapter and checks 34
+observations: 22 direct byte counts, six computed calls and six conversion
+errors. The inputs include empty text, NULs, Unicode scalars, a combining
+sequence, lengths crossing 255 and text longer than 8192 bytes. Computed
+calls cover aliases, captures, concatenation, formatting and alternate
+byte-list families. Malformed inputs include invalid UTF-8, byte values
+above 255 and discarded results that must still fail.
+
+Two compiled mutations use the same native observation set:
+
+- `characters` replaces the byte count with `chars().count()`. Multibyte
+  inputs expose the incorrect Unicode scalar count.
+- `narrow` converts the byte count to `u8`. Inputs of at least 256 bytes
+  expose truncation.
+
+Each control requires a matching emission site, successful compilation,
+a clean process exit, a complete observation set and at least one false
+observation. The baseline must match every expected row. Both controls
+were killed in the focused validation run.

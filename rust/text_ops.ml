@@ -6,11 +6,12 @@ module Catalog = Lanyard_target.Target_generated
 module Printer = Foreign.Printer
 let ( let* ) = Result.bind
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
-type operation = Trim | Is_empty | Equal | Concat | From_nat | To_nat | Uri_from_text | Uri_to_text | Uri_path | Uri_query | Form_field | Form_has | Response_text | Html_text | Response_html
+type operation = Trim | Is_empty | Equal | Length | Concat | From_nat | To_nat | Uri_from_text | Uri_to_text | Uri_path | Uri_query | Form_field | Form_has | Response_text | Html_text | Response_html
 let operation name = match () with
   | () when String.equal name "Text.trim" -> Ok Trim
   | () when String.equal name "Text.is_empty" -> Ok Is_empty
   | () when String.equal name "Text.equal" -> Ok Equal
+  | () when String.equal name "Text.length" -> Ok Length
   | () when String.equal name "Text.concat" -> Ok Concat
   | () when String.equal name "Text.from_nat" -> Ok From_nat
   | () when String.equal name "Text.to_nat" -> Ok To_nat
@@ -51,7 +52,7 @@ let specification = function
   | Trim | Html_text -> "(0 Text : Type 0) -> (text : Text) -> Text"
   | Concat -> "(0 Text : Type 0) -> (left : Text) -> (right : Text) -> Text"
   | From_nat -> "(0 Text : Type 0) -> (value : Nat) -> Text"
-  | To_nat -> "(0 Text : Type 0) -> (text : Text) -> Nat"
+  | Length | To_nat -> "(0 Text : Type 0) -> (text : Text) -> Nat"
   | Is_empty -> "(0 Text : Type 0) -> (text : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
   | Equal -> "(0 Text : Type 0) -> (left : Text) -> (right : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
   | Uri_from_text -> "(0 Text : Type 0) -> (text : Text) -> Uri"
@@ -59,9 +60,9 @@ let specification = function
   | Form_field -> "(0 Text : Type 0) -> (text : Text) -> (field : Text) -> Text"
   | Form_has -> "(0 Text : Type 0) -> (text : Text) -> (field : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
   | Response_text | Response_html -> "(0 Text : Type 0) -> (text : Text) -> Response"
-let effects = function Trim | Is_empty | Equal | Concat | From_nat | Uri_to_text | Uri_path | Uri_query | Response_text | Html_text | Response_html -> []
+let effects = function Trim | Is_empty | Equal | Length | Concat | From_nat | Uri_to_text | Uri_path | Uri_query | Response_text | Html_text | Response_html -> []
   | To_nat | Uri_from_text | Form_field | Form_has -> ["topcoat::Error"]
-let parameters = function Trim | Is_empty | To_nat | Uri_from_text | Response_text | Html_text | Response_html -> ["text"]
+let parameters = function Trim | Is_empty | Length | To_nat | Uri_from_text | Response_text | Html_text | Response_html -> ["text"]
   | Equal | Concat -> ["left"; "right"]
   | From_nat -> ["value"]
   | Uri_to_text | Uri_path | Uri_query -> ["uri"]
@@ -70,7 +71,7 @@ type input = Byte_list | Natural | Request_uri
 let input = function
   | From_nat -> Natural
   | Uri_to_text | Uri_path | Uri_query -> Request_uri
-  | Trim | Is_empty | Equal | Concat | To_nat | Uri_from_text | Form_field | Form_has | Response_text | Html_text | Response_html -> Byte_list
+  | Trim | Is_empty | Equal | Length | Concat | To_nat | Uri_from_text | Form_field | Form_has | Response_text | Html_text | Response_html -> Byte_list
 let foreign_call entries operations (row : Rir.foreign) =
   let* text = List.find_opt (fun text -> text.row = row) operations
     |> Option.to_result ~none:(Error.Mismatch "Rust emission: text metadata differs") in
@@ -104,7 +105,7 @@ let foreign_call entries operations (row : Rir.foreign) =
               let part = if operation = Uri_to_text then "__lan_uri_text" else call in
               "let __lan_uri_text = " ^ full ^ "; lan_uri_validate(&__lan_uri_text)?; "
               ^ Printer.identifier "lan_model_text_from_" text.family ^ "(" ^ part ^ ")"
-          | To_nat | Response_text | Response_html -> call in
+          | Length | To_nat | Response_text | Response_html -> call in
         let evaluated = Seq.zip (List.to_seq bindings) (List.to_seq arguments)
           |> Seq.map (fun ((_name, local), value) -> "let " ^ local ^ "_arg = " ^ value ^ "; ")
           |> List.of_seq |> String.concat "" in
@@ -118,7 +119,7 @@ let foreign_call entries operations (row : Rir.foreign) =
     Ok (Rir.TyForeign ("Uri", [])) in
   let* result = match operation with
     | Trim | Concat | From_nat | Uri_to_text | Uri_path | Uri_query | Form_field | Html_text -> Ok text.repr | Is_empty | Equal | Form_has -> Ok bool_repr
-    | To_nat -> Ok (Rir.TyUnion (Rir.Tid "nat"))
+    | Length | To_nat -> Ok (Rir.TyUnion (Rir.Tid "nat"))
     | Uri_from_text -> uri_foreign ()
     | Response_text | Response_html ->
         let* _response_type = Foreign.foreign_type entries "Response" [] in
@@ -135,7 +136,7 @@ let uri_text operation uri =
   | Uri_to_text -> Ok uri
   | Uri_path -> Ok (String.to_seq uri |> Seq.take_while before_query |> String.of_seq)
   | Uri_query -> Ok (String.to_seq uri |> Seq.drop_while before_query |> Seq.drop 1 |> String.of_seq)
-  | Trim | Is_empty | Equal | Concat | From_nat | To_nat | Uri_from_text
+  | Trim | Is_empty | Equal | Length | Concat | From_nat | To_nat | Uri_from_text
   | Form_field | Form_has | Response_text | Html_text | Response_html -> invalid "expected a URI text operation"
 
 (** Decimal parsing shares the kernel's checked arbitrary-precision boundary. *)

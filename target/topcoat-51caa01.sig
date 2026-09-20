@@ -16,6 +16,7 @@
 {"name":"Text.trim","type":"(0 Text : Type 0) -> (text : Text) -> Text","quantities":["0","w"],"effects":[],"print":"#{text}.trim().to_owned()","kind":"schema","status":"PROPOSED"}
 {"name":"Text.is_empty","type":"(0 Text : Type 0) -> (text : Text) -> sum ((prod () : Type 0), (prod () : Type 0))","quantities":["0","w"],"effects":[],"print":"#{text}.is_empty()","kind":"schema","status":"PROPOSED"}
 {"name":"Text.equal","type":"(0 Text : Type 0) -> (left : Text) -> (right : Text) -> sum ((prod () : Type 0), (prod () : Type 0))","quantities":["0","w","w"],"effects":[],"print":"#{left} == #{right}","kind":"schema","status":"PROPOSED"}
+{"name":"Text.length","type":"(0 Text : Type 0) -> (text : Text) -> Nat","quantities":["0","w"],"effects":[],"print":"Nat::canonical(#{text}.len().to_le_bytes().to_vec())","kind":"schema","status":"PROPOSED"}
 {"name":"Text.concat","type":"(0 Text : Type 0) -> (left : Text) -> (right : Text) -> Text","quantities":["0","w","w"],"effects":[],"print":"#{left} + &#{right}","kind":"schema","status":"PROPOSED"}
 {"name":"Text.from_nat","type":"(0 Text : Type 0) -> (value : Nat) -> Text","quantities":["0","w"],"effects":[],"print":"lan_text_from_nat(&#{value})","kind":"schema","status":"PROPOSED"}
 {"name":"Text.to_nat","type":"(0 Text : Type 0) -> (text : Text) -> Nat","quantities":["0","w"],"effects":["topcoat::Error"],"print":"lan_text_to_nat(&#{text})?","kind":"schema","status":"PROPOSED"}
