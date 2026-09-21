@@ -893,3 +893,23 @@ and at least one false observation. Clean and restored baselines match
 all 280 observations for each operation. The interpreter and CLI checks
 also cover malformed UTF-8 beyond a matching boundary, aliases, alternate
 families, source-order effects, unused results and URI path classification.
+
+## M1 text replacement (2026-09-21)
+
+`python3 -P test/lan_text_replace.py --mutations` compiles six changes to
+the emitted Rust and compares the native output with the 461 expected
+observation rows:
+
+- `first_only`: `replacen` with a count of 1 replaces only the first match.
+- `swapped`: the needle and the replacement change places.
+- `empty_noop`: an empty needle returns the text without insertion.
+- `unchecked_text`, `unchecked_needle` and `unchecked_replacement`: a
+  conversion error of that input becomes empty text, which skips validation.
+
+Every mutant requires its target text in the emitted source, successful
+compilation, a clean process exit with empty stderr, all 461 observation
+rows and the one false row that the test names for that mutant. All six
+were killed. Clean and restored baselines matched all 461 rows. The
+frozen capture `dev/validation/stage-m1-text-replace/stage-0001.stdout`
+holds `LAN-TEXT-REPLACE MUT OK clean`, the six mutation rows and
+`LAN-TEXT-REPLACE MUT OK restored` at rows 874 to 881.

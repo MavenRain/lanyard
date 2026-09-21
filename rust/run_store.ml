@@ -120,6 +120,11 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
            let* left = text ~what:"equal left" operation.family left in
            let* right = text ~what:"equal right" operation.family right in
            Ok (Tag (Text_ops.bool_tid, (if String.equal left right then 1 else 0), [Unit]), store)
+       | [body; needle; replacement] when operation.operation = Text_ops.Replace ->
+           let* body = text ~what:"replace text" operation.family body in
+           let* needle = text ~what:"replace needle" operation.family needle in
+           let* replacement = text ~what:"replace replacement" operation.family replacement in
+           Ok (of_text operation.family (Text_ops.replace body needle replacement), store)
        | [body; needle] when operation.operation = Text_ops.Contains ->
            let* body = text ~what:"contains text" operation.family body in
            let* needle = text ~what:"contains needle" operation.family needle in
@@ -154,6 +159,7 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
              | Text_ops.Response_text -> Ok (Response_text text)
              | Text_ops.Html_text -> Text_ops.html_text text |> Result.map (of_text operation.family)
              | Text_ops.Response_html -> Ok (Response_html text)
+             | Text_ops.Replace -> invalid "text triple argument count"
              | Text_ops.From_nat | Text_ops.Uri_to_text | Text_ops.Uri_path | Text_ops.Uri_query
              | Text_ops.Equal | Text_ops.Contains | Text_ops.Starts_with | Text_ops.Ends_with
              | Text_ops.Concat | Text_ops.Form_field | Text_ops.Form_has ->

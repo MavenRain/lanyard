@@ -4934,3 +4934,68 @@ STAGE-M1-TEXT-BOUNDARIES OK (1078). The round-1 ladders were GREEN:
 baseline on the kit copy (GATE-END 2026-09-20T23:49:41Z), fix-1
 (GATE-END 2026-09-21T00:32:04Z) and close (GATE-END
 2026-09-21T00:46:28Z) on ROOT, stage_rc=0. Pins ok=91 mismatch=0.
+
+## M1 text replacement (2026-09-21)
+
+Added `Text.replace` through the checked text specialization path. It replaces
+all non-overlapping matches in source order, without searching replacement
+text. Empty needles insert at Unicode scalar boundaries. Case, normalization,
+whitespace and embedded NULs retain their exact input bytes. All three inputs
+are evaluated once in source order and fully validated before replacement,
+including unused results and unmatched needles.
+
+The interpreter shares immutable prefix-fallback search with `Text.contains`
+and joins disjoint spans without partial string accessors. Generated Rust
+uses `str::replace` after checked byte-list conversion. Aliases, captures,
+alternate families and metadata refusals follow the existing adapter path.
+
+The catalog now contains 38 proposed declarations. Updated its signature
+hash, declaration assertions and Todo axiom snapshot. Dependency revisions
+and trust allowances retain their existing status.
+
+Focused validation passed: a warning-free Dune build, 54 interpreter checks,
+2,835 small-input comparisons against an independent oracle, six CLI/native
+test groups and 461 native observations. Compiled argument producers expose
+order and counts, including unused results and a failing conversion. The
+database fixture checks the same behavior through dependent writes.
+
+The cumulative `M1-text-replace` gate retains `M1-text-boundaries`, including
+HTTP, serve and database restart checks, and adds six compiled mutations.
+The final gate result, captures and source hashes are recorded under
+`dev/validation/stage-m1-text-replace/`. Trust and milestone exits remain
+pending.
+
+## M1 Stage TEXT-REPLACE review fixes (tag LSM1TR, 2026-09-21)
+
+A staged-slice review of the stage M1-text-replace found four
+findings, three low and one nit, and the fix applied all four. The
+fixes touch `dev/M1-MUTATION-LOG.md`, `test/lan_text_replace.py` and
+`rust/run_store.ml`. One row per finding follows.
+
+F-1, low, dev/M1-MUTATION-LOG.md:877-895. Claim: the build log and the frozen capture record six compiled Text.replace mutations, but the mutation log had no section for them and was not a staged path. Fix: the log now has the section `## M1 text replacement (2026-09-21)`, which names the six mutants, the kill rule and the capture rows 874 to 881, and the file is the 28th staged path.
+F-2, low, test/lan_text_replace.py:63-64, 148 and 263. Claim: each of the 12 subprocess calls had one flat timeout of 180 s and the run had no ceiling, so a driver that hangs on all 435 cases can stall the suite for 435 x 180 s. Fix: a driver, git init or compiled-binary call now gets CLI_BUDGET of 60 s, the one native compile keeps BUILD_BUDGET of 180 s, and the unittest run stops at the first failure with failfast; the printed rows are unchanged.
+F-3, low, test/lan_text_replace.py:240 and 247-249. Claim: a mutant counted as killed on any difference between the native rows and the expected rows, so no mutant was tied to the wrong output that it must produce. Fix: each mutant now requires the full count of 461 rows and the one false row that a sentinel map names for it, a CASE row for first_only, swapped and empty_noop and an ERROR row for the three conversion mutants; the printed MUT OK rows are unchanged.
+F-4, nit, rust/run_store.ml:162-166. Claim: the new Replace arm split the or-pattern of the one-argument refusal, so eight operations that are not Replace reported "text triple argument count". Fix: the Replace arm now sits before the or-pattern, which restores the four rows of the previous commit byte for byte; the arm is defensive and the behavior does not change.
+
+The Workflow run wf_e7d832e1-e8c ran 3 finders by lens, 3 verifiers and
+1 judge; 4 findings were upheld and 3 refuted.
+
+Repins. `dev/M1-MUTATION-LOG.md`, `test/lan_text_replace.py`,
+`rust/run_store.ml` and this log take new hashes in
+`dev/validation/stage-m1-text-replace/source-sha256.json`. The map
+keeps its 97 entries. The dune build reports `OK build: 0 errors, 0
+warnings`, the interpreter suite prints `LAN-TEXT-REPLACE OK checks=54
+oracle=2835`, the house script prints `HOUSE OK` and the Python suite
+parses. The review did not compile the three ERROR sentinels of F-3, so
+the fix ladder confirms them.
+The close recomputes the receipt digest validated_staged_diff_sha256 over the fixed staged diff.
+
+Proof: zsh dev/gates.sh --stage M1-text-replace GREEN on the fixed
+tree (GATE-END 2026-09-21T14:59:31Z, stage_rc=0, load averages
+14.25 17.38 16.52): LAN-TEXT-REPLACE OK checks=54 oracle=2835 (1080),
+NATIVE OK observations=461 (1086), MUT OK clean (1087), six named
+mutants first_only, swapped, empty_noop, unchecked_text,
+unchecked_needle and unchecked_replacement OK (1088-1093) and
+restored (1094), STAGE-M1-TEXT-REPLACE OK (1102). The baseline
+ladder on the unfixed kit copy was GREEN 2026-09-21T11:00:23Z
+stage_rc=0. Pins ok=97 mismatch=0.

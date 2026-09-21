@@ -6,7 +6,7 @@ module Catalog = Lanyard_target.Target_generated
 module Printer = Foreign.Printer
 let ( let* ) = Result.bind
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
-type operation = Trim | Is_empty | Equal | Contains | Starts_with | Ends_with | Length | Concat | From_nat | To_nat | Uri_from_text | Uri_to_text | Uri_path | Uri_query | Form_field | Form_has | Response_text | Html_text | Response_html
+type operation = Trim | Is_empty | Equal | Contains | Starts_with | Ends_with | Replace | Length | Concat | From_nat | To_nat | Uri_from_text | Uri_to_text | Uri_path | Uri_query | Form_field | Form_has | Response_text | Html_text | Response_html
 let operation name = match () with
   | () when String.equal name "Text.trim" -> Ok Trim
   | () when String.equal name "Text.is_empty" -> Ok Is_empty
@@ -14,6 +14,7 @@ let operation name = match () with
   | () when String.equal name "Text.contains" -> Ok Contains
   | () when String.equal name "Text.starts_with" -> Ok Starts_with
   | () when String.equal name "Text.ends_with" -> Ok Ends_with
+  | () when String.equal name "Text.replace" -> Ok Replace
   | () when String.equal name "Text.length" -> Ok Length
   | () when String.equal name "Text.concat" -> Ok Concat
   | () when String.equal name "Text.from_nat" -> Ok From_nat
@@ -54,6 +55,7 @@ let catalog (checked : Elab.lan_program) (instances : Lower.text_operation list)
 let specification = function
   | Trim | Html_text -> "(0 Text : Type 0) -> (text : Text) -> Text"
   | Concat -> "(0 Text : Type 0) -> (left : Text) -> (right : Text) -> Text"
+  | Replace -> "(0 Text : Type 0) -> (text : Text) -> (needle : Text) -> (replacement : Text) -> Text"
   | From_nat -> "(0 Text : Type 0) -> (value : Nat) -> Text"
   | Length | To_nat -> "(0 Text : Type 0) -> (text : Text) -> Nat"
   | Is_empty -> "(0 Text : Type 0) -> (text : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
@@ -64,11 +66,12 @@ let specification = function
   | Form_field -> "(0 Text : Type 0) -> (text : Text) -> (field : Text) -> Text"
   | Form_has -> "(0 Text : Type 0) -> (text : Text) -> (field : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
   | Response_text | Response_html -> "(0 Text : Type 0) -> (text : Text) -> Response"
-let effects = function Trim | Is_empty | Equal | Contains | Starts_with | Ends_with | Length | Concat | From_nat | Uri_to_text | Uri_path | Uri_query | Response_text | Html_text | Response_html -> []
+let effects = function Trim | Is_empty | Equal | Contains | Starts_with | Ends_with | Replace | Length | Concat | From_nat | Uri_to_text | Uri_path | Uri_query | Response_text | Html_text | Response_html -> []
   | To_nat | Uri_from_text | Form_field | Form_has -> ["topcoat::Error"]
 let parameters = function Trim | Is_empty | Length | To_nat | Uri_from_text | Response_text | Html_text | Response_html -> ["text"]
   | Equal | Concat -> ["left"; "right"]
   | Contains | Starts_with | Ends_with -> ["text"; "needle"]
+  | Replace -> ["text"; "needle"; "replacement"]
   | From_nat -> ["value"]
   | Uri_to_text | Uri_path | Uri_query -> ["uri"]
   | Form_field | Form_has -> ["text"; "field"]
@@ -76,7 +79,7 @@ type input = Byte_list | Natural | Request_uri
 let input = function
   | From_nat -> Natural
   | Uri_to_text | Uri_path | Uri_query -> Request_uri
-  | Trim | Is_empty | Equal | Contains | Starts_with | Ends_with | Length | Concat | To_nat | Uri_from_text | Form_field | Form_has | Response_text | Html_text | Response_html -> Byte_list
+  | Trim | Is_empty | Equal | Contains | Starts_with | Ends_with | Replace | Length | Concat | To_nat | Uri_from_text | Form_field | Form_has | Response_text | Html_text | Response_html -> Byte_list
 let foreign_call entries operations (row : Rir.foreign) =
   let* text = List.find_opt (fun text -> text.row = row) operations
     |> Option.to_result ~none:(Error.Mismatch "Rust emission: text metadata differs") in
@@ -100,7 +103,7 @@ let foreign_call entries operations (row : Rir.foreign) =
         let bindings = List.map (fun name -> name, "__lan_" ^ name) parameters in
         let* call = Template.render template bindings in
         let converted = match operation with
-          | Trim | Concat | From_nat | Form_field | Html_text -> Printer.identifier "lan_model_text_from_" text.family ^ "(" ^ call ^ ")"
+          | Trim | Concat | Replace | From_nat | Form_field | Html_text -> Printer.identifier "lan_model_text_from_" text.family ^ "(" ^ call ^ ")"
           | Is_empty | Equal | Contains | Starts_with | Ends_with | Form_has ->
               let ty = Printer.rust_type (Printer.Sum [Printer.Unit; Printer.Unit]) in
               "if " ^ call ^ " { " ^ ty ^ "::V1(()) } else { " ^ ty ^ "::V0(()) }"
@@ -123,7 +126,7 @@ let foreign_call entries operations (row : Rir.foreign) =
   let uri_foreign () = let* _uri_type = Foreign.foreign_type entries "Uri" [] in
     Ok (Rir.TyForeign ("Uri", [])) in
   let* result = match operation with
-    | Trim | Concat | From_nat | Uri_to_text | Uri_path | Uri_query | Form_field | Html_text -> Ok text.repr | Is_empty | Equal | Contains | Starts_with | Ends_with | Form_has -> Ok bool_repr
+    | Trim | Concat | Replace | From_nat | Uri_to_text | Uri_path | Uri_query | Form_field | Html_text -> Ok text.repr | Is_empty | Equal | Contains | Starts_with | Ends_with | Form_has -> Ok bool_repr
     | Length | To_nat -> Ok (Rir.TyUnion (Rir.Tid "nat"))
     | Uri_from_text -> uri_foreign ()
     | Response_text | Response_html ->
@@ -141,36 +144,60 @@ let uri_text operation uri =
   | Uri_to_text -> Ok uri
   | Uri_path -> Ok (String.to_seq uri |> Seq.take_while before_query |> String.of_seq)
   | Uri_query -> Ok (String.to_seq uri |> Seq.drop_while before_query |> Seq.drop 1 |> String.of_seq)
-  | Trim | Is_empty | Equal | Contains | Starts_with | Ends_with | Length | Concat | From_nat | To_nat | Uri_from_text
+  | Trim | Is_empty | Equal | Contains | Starts_with | Ends_with | Replace | Length | Concat | From_nat | To_nat | Uri_from_text
   | Form_field | Form_has | Response_text | Html_text | Response_html -> invalid "expected a URI text operation"
 
 module Text_positions = Map.Make (Int)
 
 (** Prefix fallback avoids rescanning repetitive text. Total map lookups keep
     the table immutable, with logarithmic lookup cost per search transition. *)
+let rec advance table matched character =
+      Text_positions.find_opt matched table |> Option.fold ~none:0
+        ~some:(fun (expected, fallback) ->
+          match () with
+          | () when Char.equal expected character -> matched + 1
+          | () when matched = 0 -> 0
+          | () -> advance table fallback character)
+let search_table needle =
+    let table, _, _ = String.fold_left (fun (table, index, matched) character ->
+      let next = if index = 0 then 0 else advance table matched character in
+      Text_positions.add index (character, matched) table, index + 1, next)
+      (Text_positions.empty, 0, 0) needle in table
 let contains text needle =
   let size = String.length needle in
   match () with
   | () when size = 0 -> true
   | () when size > String.length text -> false
   | () ->
-    let rec advance table matched character =
-      Text_positions.find_opt matched table |> Option.fold ~none:0
-        ~some:(fun (expected, fallback) ->
-          match () with
-          | () when Char.equal expected character -> matched + 1
-          | () when matched = 0 -> 0
-          | () -> advance table fallback character) in
-    let table, _, _ = String.fold_left (fun (table, index, matched) character ->
-      let next = if index = 0 then 0 else advance table matched character in
-      Text_positions.add index (character, matched) table, index + 1, next)
-      (Text_positions.empty, 0, 0) needle in
+    let table = search_table needle in
     let rec search matched remaining = match remaining () with
       | Seq.Nil -> false
       | Seq.Cons (character, rest) ->
           let matched = advance table matched character in
           matched = size || search matched rest in
     search 0 (String.to_seq text)
+
+(** Inputs are validated UTF-8. Empty needles match scalar boundaries;
+    nonempty matches consume their full span before the next search. *)
+let replace text needle replacement =
+  let size = String.length needle in
+  if size = 0 then
+    let bytes = String.to_seq text |> Seq.flat_map (fun character ->
+      if Char.code character land 0xc0 = 0x80 then Seq.return character
+      else Seq.append (String.to_seq replacement) (Seq.return character)) in
+    Seq.append bytes (String.to_seq replacement) |> String.of_seq
+  else
+    let table = search_table needle in
+    let rec search index start matched pieces segment remaining = match remaining () with
+      | Seq.Nil -> String.of_seq segment :: pieces |> List.rev |> String.concat ""
+      | Seq.Cons (character, rest) ->
+          let matched = advance table matched character in
+          let next = index + 1 in
+          if matched = size then
+            let prefix = segment |> Seq.take (next - size - start) |> String.of_seq in
+            search next next 0 (replacement :: prefix :: pieces) rest rest
+          else search next start matched pieces segment rest in
+    let bytes = String.to_seq text in search 0 0 0 [] bytes bytes
 
 (** Decimal parsing shares the kernel's checked arbitrary-precision boundary. *)
 let to_nat text = Bignum.of_decimal text
