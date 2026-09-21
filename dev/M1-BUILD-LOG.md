@@ -4999,3 +4999,62 @@ unchecked_needle and unchecked_replacement OK (1088-1093) and
 restored (1094), STAGE-M1-TEXT-REPLACE OK (1102). The baseline
 ladder on the unfixed kit copy was GREEN 2026-09-21T11:00:23Z
 stage_rc=0. Pins ok=97 mismatch=0.
+## M1 text repetition (2026-09-21)
+
+Added `Text.repeat` through the checked text specialization path. The adapter
+retains separate byte-list and Nat argument representations, evaluates both
+arguments once in source order, validates complete text even at count zero,
+and checks the output size before narrowing arbitrary natural counts.
+
+The interpreter assembles immutable doubled chunks. Generated Rust checks
+machine arithmetic and the compiler host's string-size bound, then reserves
+storage fallibly. Empty input accepts arbitrary counts without narrowing.
+The schema declares a synchronous error effect. The catalog now contains
+39 proposed declarations, with updated signature hashes and axiom snapshots.
+Dependency revisions and trust allowances retain their existing status.
+
+Focused checks passed: a warning-free Dune build, 96 interpreter checks,
+78 native observations, CLI byte comparisons, compiler refusals and four
+compiled mutations with named sentinels. The database fixture makes argument
+order and repeated calls observable; compiled producers cover ordinary,
+discarded and failing results. House checks passed.
+
+The cumulative `M1-text-repeat` gate retains `M1-text-replace`, including
+HTTP, serving and database restart checks. The final gate result, complete
+captures and source hashes are recorded under
+`dev/validation/stage-m1-text-repeat/`. Trust and milestone exits remain
+pending.
+
+## M1 Stage TEXT-REPEAT review fixes (tag LSM1TP, 2026-09-21)
+
+A staged-slice review of the stage M1-text-repeat found four findings,
+all low, and the fix applied all four. The fixes touch `README.md`,
+`dev/STAGE-M1-TEXT-REPEAT.md` and `test/lan_text_repeat.ml`. One row
+per finding follows.
+
+F-1, low, README.md:495. Claim: the README stated 43 foreign constants, but the staged axiom snapshot (corpus/m0/axioms.txt:52) and test/lan_axioms.py:61 state 44 after this slice added Text.repeat. Fix: the row now states 44 foreign constants; the row width is the same and no other line changes.
+F-2, low, dev/STAGE-M1-TEXT-REPEAT.md:20-25. Claim: the stage document promised an interpreter error for each size failure, but the only interpreter bound (rust/text_ops.ml:216-217) is the host string limit, so a count inside the bound can exhaust memory and stop the interpreter with the OCaml runtime `Out_of_memory` exception. Fix: four sentences now say that the bound is the host string limit and not available memory, how the interpreter stops, and that generated Rust returns `Arithmetic` only when the allocator refuses the reservation; the code does not change, because frozen capture rows pin the line count of rust/text_ops.ml.
+F-3, low, dev/STAGE-M1-TEXT-REPEAT.md:25-27. Claim: the native size failures (rust/text_ops.ml:234-239) return `Error::Arithmetic`, whose display text `natural limb invariant failed` (rust/emit.ml:440 and 458) names a failure that did not occur. Fix: two sentences now say that the error keeps this display text and that callers must match the variant and not the text; the emitted programs do not change.
+F-4, low, test/lan_text_repeat.ml:26-27, 62 and 66. Claim: the rows "metadata arity" and "metadata print" changed the row but not the operation list, so both rows stopped at the row-identity lookup (rust/text_ops.ml:89-90) and did not reach the arity guard or the print rule guard. Fix: the helper `metadata` now applies the same row change to the Text.repeat operation, and the two rows require the needle `schema metadata`, which only the guard at rust/text_ops.ml:102 prints; the suite keeps 96 checks.
+
+The Workflow run wf_47135e22-92f ran 3 finders by lens, 3 verifiers and
+1 judge; 4 findings were upheld and 10 refuted.
+
+Repins. `README.md`, `dev/STAGE-M1-TEXT-REPEAT.md`,
+`test/lan_text_repeat.ml` and this log take new hashes in
+`dev/validation/stage-m1-text-repeat/source-sha256.json`. The map
+keeps its 103 entries. The dune build reports `OK build: 0 errors, 0
+warnings`, the interpreter suite prints `LAN-TEXT-REPEAT OK checks=96`,
+the house script prints `HOUSE OK` and the Python suite parses. The
+review did not compile the F-4 change, so the fix built the suite and
+ran it to confirm the 96 checks.
+The close recomputes the receipt digest validated_staged_diff_sha256 over the fixed staged diff.
+
+Proof: zsh dev/gates.sh --stage M1-text-repeat GREEN on the fixed tree
+(GATE-END 2026-09-21T20:42:53Z, stage_rc=0, load averages 10.47 14.04
+14.94): LAN-TEXT-REPEAT OK checks=96 (1104), CLI OK (1105), NATIVE OK
+observations=78 twice (1106, 1107), MUT OK clean (1108), four named
+mutants once, short, empty and narrow OK (1109-1112) and restored
+(1113), STAGE-M1-TEXT-REPEAT OK (1121). The baseline ladder on the
+unfixed kit copy was GREEN 2026-09-21T20:13:11Z stage_rc=0. Pins ok=103
+mismatch=0.

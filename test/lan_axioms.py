@@ -58,7 +58,7 @@ def main():
         return text, names
 
     todo = ROOT / "corpus/m0/todo.lan"
-    text, names = report(todo, 43, 3)
+    text, names = report(todo, 44, 3)
     require(text == (ROOT / "corpus/m0/axioms.txt").read_text(), "Todo report golden drift")
     require("Todo_create" in names and "Todo_get_by_id" in names
             and "Todo_delete_by_id" in names and "Todo_update" in names and "Todo_all" in names and "Todo" not in names,
@@ -74,7 +74,7 @@ def main():
                 "Db", "Deferred", "toasty_Error", "Cx", "Uri", "Response", "SeeOther",
                 "Form", "topcoat_Error", "Db_connect", "Db_push_schema", "Model_create",
                 "Model_get_by_id", "Model_delete_by_id", "Model_update", "Model_all", "topcoat_db", "topcoat_see_other",
-                "Text_trim", "Text_is_empty", "Text_equal", "Text_contains", "Text_starts_with", "Text_ends_with", "Text_replace", "Text_length", "Text_concat", "Text_from_nat", "Text_to_nat", "Uri_from_text", "Uri_to_text", "Uri_path", "Uri_query", "Form_field", "Form_has", "Response_text",
+                "Text_trim", "Text_is_empty", "Text_equal", "Text_contains", "Text_starts_with", "Text_ends_with", "Text_replace", "Text_repeat", "Text_length", "Text_concat", "Text_from_nat", "Text_to_nat", "Uri_from_text", "Uri_to_text", "Uri_path", "Uri_query", "Form_field", "Form_has", "Response_text",
                 "Html_text", "Response_html",
                 "Todo_create", "Todo_get_by_id", "Todo_delete_by_id", "Todo_update", "Todo_all"],
             "legacy names or declaration order differ")
@@ -83,15 +83,15 @@ def main():
     with tempfile.TemporaryDirectory(prefix="lanyard-axioms-") as directory:
         source = Path(directory) / "module.lan"
         for content, foreign, definitions in [
-            ("", 38, 0),
-            ("def main : Nat := 1\n", 38, 1),
+            ("", 39, 0),
+            ("def main : Nat := 1\n", 39, 1),
             ("model Zed with | id : Nat end\nmodel Alpha with | id : Nat end\n"
-             "def Alias : Type 0 := Zed\n", 48, 3),
-            ("def ghost_create : Nat := 7\ndef propext : Nat := 9\n", 38, 2),
-            ("signature Ops : Nat with | Ping : Nat end\n", 38, 0),
+             "def Alias : Type 0 := Zed\n", 49, 3),
+            ("def ghost_create : Nat := 7\ndef propext : Nat := 9\n", 39, 2),
+            ("signature Ops : Nat with | Ping : Nat end\n", 39, 0),
             ("mu Tree : Type 0 := | leaf : Tree\n"
              "def rec size : Tree -> Nat := fun (t : Tree) => "
-             "match t as self in Tree return Nat with | leaf => 1\n", 38, 1),
+             "match t as self in Tree return Nat with | leaf => 1\n", 39, 1),
         ]:
             source.write_text(content)
             report(source, foreign, definitions)

@@ -1,0 +1,25 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+model Piece with
+| id : Nat
+| text : Bytes
+end
+
+def first : Db -> Bytes := fun (db : Db) =>
+  let created : Piece := Piece.create (tuple (1, b"ab")) db in created.1
+
+def second : Db -> Nat := fun (db : Db) =>
+  let fetched : Piece := Piece.get_by_id 1 db in
+  let recorded : Piece := Piece.create (tuple (2, fetched.1)) db in
+  let deleted : prod () := Piece.delete_by_id 1 db in Text.length Bytes recorded.1
+
+def main : Cx -> Uri -> Response := fun (cx : Cx) (uri : Uri) =>
+  let db : Db := Db.connect Piece Bytes b"sqlite::memory:" in
+  let ready : prod () := Db.push_schema db in
+  let changed : Bytes := Text.repeat Bytes (first db) (second db) in
+  let one : Piece := Piece.create (tuple (1, b"once")) db in
+  let two : Piece := Piece.get_by_id 2 db in
+  Response.text Bytes (Text.concat Bytes changed (Text.concat Bytes b":"
+    (Text.concat Bytes one.1 (Text.concat Bytes b":" two.1))))

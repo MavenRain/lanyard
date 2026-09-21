@@ -261,6 +261,15 @@ _build/default/bin/lanyard.exe run --request / --form 'text=banana&needle=na&rep
 zsh dev/gates.sh --stage M1-text-replace
 ```
 
+The [M1 repetition adapter](dev/STAGE-M1-TEXT-REPEAT.md) adds
+`Text.repeat Bytes text count` with checked natural counts and output sizes.
+Text is validated even at count zero, and Unicode bytes are preserved.
+
+```sh
+_build/default/bin/lanyard.exe run --request / --form 'text=ab&count=3' test/fixtures/text-repeat.lan
+zsh dev/gates.sh --stage M1-text-repeat
+```
+
 The [M1 URI text adapter](dev/STAGE-M1-URI-TEXT.md) exposes the full checked
 request URI as a byte list with `Uri.to_text Bytes uri`. Handlers can use
 `Text.equal` to choose a response from the URI:
@@ -483,7 +492,7 @@ _build/default/bin/lanyard.exe axioms --names examples/m0-todo.lan
 
 The report lists Framework, Foreign, Classical and Div, sorted by class
 and name, with class totals and the compiled target catalog's SHA-256.
-Todo reports 43 foreign constants and 3 definitions of the checked
+Todo reports 44 foreign constants and 3 definitions of the checked
 module (Bool, Todo and main). These are informational inputs, with no
 ratio bound. The scope is the whole checked module, including unused
 catalog rows and model operations.

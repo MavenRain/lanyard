@@ -1,0 +1,9 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def main : Cx -> Uri -> Bytes -> Response :=
+  fun (cx : Cx) (uri : Uri) (body : Bytes) =>
+  Response.text Bytes (Text.repeat Bytes
+    (Form.field Bytes body b"text")
+    (Text.to_nat Bytes (Form.field Bytes body b"count")))

@@ -913,3 +913,20 @@ were killed. Clean and restored baselines matched all 461 rows. The
 frozen capture `dev/validation/stage-m1-text-replace/stage-0001.stdout`
 holds `LAN-TEXT-REPLACE MUT OK clean`, the six mutation rows and
 `LAN-TEXT-REPLACE MUT OK restored` at rows 874 to 881.
+## M1 text repetition (2026-09-21)
+
+The compiled suite in `test/lan_text_repeat.py --mutations` checks four
+deliberately wrong repetition implementations:
+
+- `once` ignores the count and appends one copy. `CASE7 false` witnesses
+  nonempty input at count zero.
+- `short` appends one fewer copy. `CASE9 false` witnesses count two.
+- `empty` rejects empty input. `CASE0 false` witnesses empty input at zero.
+- `narrow` reads only the low count byte. `ERROR huge false` witnesses a
+  129-bit count that must fail before allocation for nonempty text.
+
+Every mutant must compile and produce all 78 observations, including its
+named false sentinel. A compiler failure or an unrelated output difference
+does not count as a kill. The unchanged and restored programs must match
+every expected row. All four mutations passed the kill checks in the focused
+run. The cumulative gate repeats them and retains the earlier mutation sets.
