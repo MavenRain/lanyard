@@ -4859,3 +4859,78 @@ and on the trusted inventory rows that follow the fixed file: text_ops
 14535, inventory sha256 ecb4b05d to 752f7950. The baseline ladder on
 the unfixed kit copy was GREEN 2026-09-20T20:03:53Z
 stage_rc=0. Pins ok=47 mismatch=0.
+
+## M1 Stage TEXT-BOUNDARIES (2026-09-20)
+
+Added `Text.starts_with` and `Text.ends_with` through the existing checked
+text specialization path. Both operations validate complete byte lists,
+preserve UTF-8 bytes and embedded NULs, and accept empty needles. The
+interpreter uses OCaml string boundary checks; emitted Rust uses the
+corresponding `str` methods after checked conversion. Arguments retain
+source-order, single evaluation, including when the Boolean result is unused.
+
+The target catalog now has 37 proposed declarations. The Topcoat signature
+digest, axiom golden and catalog assertions reflect the two additions.
+Library revisions and dependencies are unchanged. The routing fixture
+combines both operations with `Uri.path` to recognize static stylesheets.
+
+Focused validation passed: a warning-free Dune build, 142 interpreter
+checks, 18 CLI/native test groups, and 560 native observations. Ten compiled
+mutations were killed, with clean and restored baselines for each operation.
+The first cumulative attempt exposed two stale axiom-total assertions;
+both expectations were corrected before repeating validation.
+
+The cumulative `M1-text-boundaries` gate retains `M1-text-contains`, including
+native sessions, HTTP, serve and database restart checks. Its capture,
+result and source hashes are recorded under
+`dev/validation/stage-m1-text-boundaries/`. Trust allowances and milestone
+exits remain pending.
+
+## M1 Stage TEXT-BOUNDARIES review fixes (tag LSM1TB, 2026-09-20)
+
+A staged-slice review of the stage M1-text-boundaries found three
+findings, two low and one nit, and the fix applied all three. The
+fixes touch `README.md`, `test/lan_text_boundaries.py` and
+`test/lan_text_boundaries.ml`. One row per finding follows.
+
+F-1, low, README.md:476. Claim: the README said the Todo axiom report shows 37 foreign constants while the frozen capture and the golden `corpus/m0/axioms.txt` show 42. Fix: the sentence now says 42 foreign constants and 3 definitions, and the catalog count of 37 proposed declarations stays as a different fact.
+F-2, low, test/lan_text_boundaries.py:281-282 and 67. Claim: the --mutations relaunch used a 300 s wrapper while the child may spend seven native compiles at 180 s each, and a wrapper expiry killed the child with its temp directories left behind. Fix: the wrapper budget is derived from the child budget (seven compiles at CALL_BUDGET plus a margin of two budgets, 1620 s), a wrapper timeout prints one FAIL row and exits nonzero, and the leaked directories with the two temp prefixes that this run created are removed; the success rows are unchanged.
+F-3, nit, test/lan_text_boundaries.ml:80-81. Claim: the representations case used a three-condition if expression where the house rule asks for a `match ()` guard block. Fix: the case now reads a `match ()` block with one guarded arm and a default arm, with the checked values, the count of checks and the messages unchanged.
+
+The Workflow run wf_5abc96dd-c2f ran 3 finders by lens, 3 verifiers and
+1 judge; 3 findings were upheld and 0 refuted.
+
+Repins. `README.md`, `test/lan_text_boundaries.py`,
+`test/lan_text_boundaries.ml` and this log take new hashes in
+`dev/validation/stage-m1-text-boundaries/source-sha256.json`. The map
+keeps its 91 entries. The dune build reports `OK build: 0 errors, 0
+warnings`, the interpreter suite prints `LAN-TEXT-BOUNDARIES OK
+checks=142`, the house script prints `HOUSE OK` and the Python suite
+parses.
+The receipt digest validated_staged_diff_sha256 is recomputed over the fixed staged diff.
+
+Proof: zsh dev/gates.sh --stage M1-text-boundaries GREEN on the fixed
+tree (GATE-END 2026-09-21T00:32:04Z, stage_rc=0, load averages
+8.76 16.91 27.45): LAN-TEXT-BOUNDARIES OK checks=142 (1040), NATIVE OK
+observations=280 (1047, 1054), MUT OK clean (1056, 1064) and restored
+(1062, 1070), STAGE-M1-TEXT-BOUNDARIES OK (1078). The baseline ladder on
+the unfixed kit copy was GREEN 2026-09-20T23:49:41Z stage_rc=0.
+Pins ok=91 mismatch=0.
+
+Review round 2 (tag LSM1TB, second pass over the fixed slice, 2026-09-20 21:31 PDT).
+F-1, low, dev/validation/stage-m1-text-boundaries/receipt.json:12. The digest now matches the diff.
+F-2, low, test/lan_text_boundaries.py:69-74. The comment now calls the budget a ceiling, not a sum.
+F-3, low, test/lan_text_boundaries.py:264 and 297. Mutation dir and sweep now use ROOT/.gatework.
+F-4, nit, test/lan_text_boundaries.py:311-312. The FAIL timeout row now counts only removed dirs.
+Repins. test/lan_text_boundaries.py and this log take new hashes in
+dev/validation/stage-m1-text-boundaries/source-sha256.json; the receipt digest
+validated_staged_diff_sha256 is recomputed over the fixed staged diff.
+Proof: zsh dev/gates.sh --stage M1-text-boundaries GREEN on the fixed
+tree after the round-2 fixes (fix-2 ladder, GATE-END
+2026-09-21T05:12:53Z, stage_rc=0, load averages 20.92 27.55 25.07):
+LAN-TEXT-BOUNDARIES OK checks=142 (1040), NATIVE OK observations=280
+(1047, 1054), MUT OK clean (1056, 1064) and restored (1062, 1070),
+STAGE-M1-TEXT-BOUNDARIES OK (1078). The round-1 ladders were GREEN:
+baseline on the kit copy (GATE-END 2026-09-20T23:49:41Z), fix-1
+(GATE-END 2026-09-21T00:32:04Z) and close (GATE-END
+2026-09-21T00:46:28Z) on ROOT, stage_rc=0. Pins ok=91 mismatch=0.

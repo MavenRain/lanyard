@@ -1,0 +1,12 @@
+mu Bytes : Type 0 :=
+| bytesNil : Bytes
+| bytesCons (head : Nat) (tail : Bytes) : Bytes
+
+def main : Cx -> Uri -> Response := fun (cx : Cx) (uri : Uri) =>
+  let path : Bytes := Uri.path Bytes uri in
+  case (Text.starts_with Bytes path b"/static/") with
+  | 0 (u : prod ()) => Response.text Bytes b"other"
+  | 1 (u : prod ()) =>
+    case (Text.ends_with Bytes path b".css") with
+    | 0 (u : prod ()) => Response.text Bytes b"asset"
+    | 1 (u : prod ()) => Response.text Bytes b"stylesheet"

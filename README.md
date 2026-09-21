@@ -241,6 +241,16 @@ _build/default/bin/lanyard.exe run --request /search --form 'action=autosave' te
 zsh dev/gates.sh --stage M1-text-contains
 ```
 
+The [M1 prefix and suffix adapters](dev/STAGE-M1-TEXT-BOUNDARIES.md) add
+`Text.starts_with Bytes text needle` and `Text.ends_with Bytes text needle`.
+They match exact boundaries, validate both complete byte lists as UTF-8,
+and accept empty needles. The fixture classifies a path using both adapters:
+
+```sh
+_build/default/bin/lanyard.exe run --request '/static/main.css?v=1' test/fixtures/text-boundaries.lan
+zsh dev/gates.sh --stage M1-text-boundaries
+```
+
 The [M1 URI text adapter](dev/STAGE-M1-URI-TEXT.md) exposes the full checked
 request URI as a byte list with `Uri.to_text Bytes uri`. Handlers can use
 `Text.equal` to choose a response from the URI:
@@ -463,7 +473,7 @@ _build/default/bin/lanyard.exe axioms --names examples/m0-todo.lan
 
 The report lists Framework, Foreign, Classical and Div, sorted by class
 and name, with class totals and the compiled target catalog's SHA-256.
-Todo reports 37 foreign constants and 3 definitions of the checked
+Todo reports 42 foreign constants and 3 definitions of the checked
 module (Bool, Todo and main). These are informational inputs, with no
 ratio bound. The scope is the whole checked module, including unused
 catalog rows and model operations.

@@ -1,0 +1,63 @@
+{
+  "stage": "M1-text-boundaries",
+  "recorded_at": "2026-09-20T21:51:19.407526+00:00",
+  "base_commit": "d95dfc59e492b5ddbe91a326a1663f830e636f22",
+  "validated_root": "/Users/oobi/Documents/gpt2/lanyard-text-boundaries",
+  "command": [
+    "zsh",
+    "dev/gates.sh",
+    "--stage",
+    "M1-text-boundaries"
+  ],
+  "validated_staged_diff_sha256": "97ee2e067be26fdc565ae426cf6c933b58881eafd3e90af52585aa452a33ef2f",
+  "diff_scope_excludes": [
+    "dev/validation/stage-m1-text-boundaries"
+  ],
+  "capture": "stage-capture.json",
+  "stdout": "stage-0001.stdout",
+  "stderr": "stage-0001.stderr",
+  "exit_code": 0,
+  "source_hashes": "source-sha256.json",
+  "environment": {
+    "LANYARD_TOASTY": "/Users/oobi/Documents/toasty",
+    "LANYARD_TOPCOAT": "/Users/oobi/Documents/topcoat",
+    "RUSTUP_TOOLCHAIN": "1.98",
+    "RUSTC_WRAPPER": "",
+    "CARGO_INCREMENTAL": "0",
+    "CARGO_HOME": "/Users/oobi/Documents/gpt2/lanyard-delete/.gatework/delete-cargo-home",
+    "CARGO_TARGET_DIR": "/Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target"
+  },
+  "passing_rows": [
+    "STAGE-M1-HTTP OK",
+    "STAGE-M1-SERVE OK",
+    "STAGE-M1-DATABASE OK",
+    "STAGE-M1-TEXT-CONTAINS OK",
+    "LAN-TEXT-BOUNDARIES OK checks=142",
+    "LAN-TEXT-BOUNDARIES operation=starts_with",
+    "LAN-TEXT-BOUNDARIES NATIVE OK operation=starts_with observations=280",
+    "LAN-TEXT-BOUNDARIES operation=ends_with",
+    "LAN-TEXT-BOUNDARIES NATIVE OK operation=ends_with observations=280",
+    "LAN-TEXT-BOUNDARIES operation=starts_with",
+    "LAN-TEXT-BOUNDARIES-MUT OK clean",
+    "LAN-TEXT-BOUNDARIES-MUT KILLED substring observations=13",
+    "LAN-TEXT-BOUNDARIES-MUT KILLED opposite observations=13",
+    "LAN-TEXT-BOUNDARIES-MUT KILLED reversed observations=41",
+    "LAN-TEXT-BOUNDARIES-MUT KILLED nonempty observations=16",
+    "LAN-TEXT-BOUNDARIES-MUT KILLED unchecked_needle observations=4",
+    "LAN-TEXT-BOUNDARIES-MUT OK restored",
+    "LAN-TEXT-BOUNDARIES operation=ends_with",
+    "LAN-TEXT-BOUNDARIES-MUT OK clean",
+    "LAN-TEXT-BOUNDARIES-MUT KILLED substring observations=12",
+    "LAN-TEXT-BOUNDARIES-MUT KILLED opposite observations=13",
+    "LAN-TEXT-BOUNDARIES-MUT KILLED reversed observations=39",
+    "LAN-TEXT-BOUNDARIES-MUT KILLED nonempty observations=16",
+    "LAN-TEXT-BOUNDARIES-MUT KILLED unchecked_needle observations=4",
+    "LAN-TEXT-BOUNDARIES-MUT OK restored",
+    "STAGE-M1-TEXT-BOUNDARIES OK"
+  ],
+  "notes": [
+    "The cumulative gate passed with loopback access and offline Cargo.",
+    "Ten compiled boundary mutations were killed; both clean and restored controls passed.",
+    "Trust allowances and milestone exits remain pending."
+  ]
+}

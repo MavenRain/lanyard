@@ -1,6 +1,6 @@
 (tests
  (names main sl_surface lan_surface lan_erase lan_axioms_report)
- (modules (:standard \ target_catalog lan_emit lan_recursive_emit lan_foreign_emit lan_async_emit lan_foreign_types_emit lan_models_emit lan_connections_emit lan_run lan_request lan_delete lan_update lan_all lan_text_ops lan_uri lan_form lan_response lan_html lan_concat lan_nat_text lan_text_nat lan_text_equal lan_text_contains lan_text_length lan_uri_text lan_uri_parts lan_form_has lan_session))
+ (modules (:standard \ target_catalog lan_emit lan_recursive_emit lan_foreign_emit lan_async_emit lan_foreign_types_emit lan_models_emit lan_connections_emit lan_run lan_request lan_delete lan_update lan_all lan_text_ops lan_uri lan_form lan_response lan_html lan_concat lan_nat_text lan_text_nat lan_text_equal lan_text_contains lan_text_boundaries lan_text_length lan_uri_text lan_uri_parts lan_form_has lan_session))
  (libraries kanon_kernel kanon_surface)
  (deps (source_tree fixtures) (source_tree golden) (source_tree neg)
        (source_tree erase-neg) erase-neg/.gitkeep)
@@ -144,4 +144,9 @@
 (test
  (name lan_text_contains)
  (modules lan_text_contains)
+ (libraries kanon_kernel kanon_surface lanyard_rust lanyard_target))
+
+(test
+ (name lan_text_boundaries)
+ (modules lan_text_boundaries)
  (libraries kanon_kernel kanon_surface lanyard_rust lanyard_target))

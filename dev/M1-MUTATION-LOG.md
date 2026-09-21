@@ -873,3 +873,23 @@ a clean process exit, a complete observation set and at least one false
 observation. All five were killed. Clean and restored baselines matched
 every expected row. Interpreter checks also compare all 16,129 pairs of
 binary strings through length six with an independent substring oracle.
+
+## M1 Stage TEXT-BOUNDARIES (2026-09-20)
+
+`python3 -P test/lan_text_boundaries.py --mutations` compiles five changes
+to the emitted Rust for each boundary operation:
+
+| Mutation | Prefix mismatches | Suffix mismatches |
+| --- | ---: | ---: |
+| Replace boundary matching with substring search | 13 | 12 |
+| Use the opposite boundary | 13 | 13 |
+| Reverse text and needle | 41 | 39 |
+| Reject empty needles | 16 | 16 |
+| Replace needle conversion errors with empty text | 4 | 4 |
+
+All ten mutations were killed. Each requires exactly one emission site,
+successful compilation, a clean process exit, a complete observation set,
+and at least one false observation. Clean and restored baselines match
+all 280 observations for each operation. The interpreter and CLI checks
+also cover malformed UTF-8 beyond a matching boundary, aliases, alternate
+families, source-order effects, unused results and URI path classification.
