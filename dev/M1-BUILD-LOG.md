@@ -5134,3 +5134,67 @@ end-identity (1128-1131), MUTATIONS OK killed=4 restored=ok
 (1132), STAGE-M1-TEXT-TRIM OK (1140). The baseline ladder on the
 unfixed kit copy was GREEN 2026-09-21T23:44:11Z stage_rc=0. Pins
 ok=108 mismatch=0.
+
+## M1 Stage TEXT-ASCII (2026-09-21)
+
+Adds `Text.to_ascii_lowercase` and `Text.to_ascii_uppercase` through checked
+specialization, interpretation and Rust emission. Conversion changes only
+ASCII letters and preserves all other UTF-8 bytes. The complete input is
+validated before conversion, arguments run once, and discarded results
+retain argument evaluation and conversion errors.
+
+The catalog now contains 43 proposed declarations. Catalog counts,
+declaration-order assertions, the signature digest and the Todo axiom
+snapshot were updated. Todo reports 48 foreign constants and 3 definitions.
+Dependency commits, source anchors and trust-policy allowances are unchanged.
+
+The Dune suite and axiom CLI checks pass. Focused coverage includes 100
+interpreter and metadata checks, 296 successful CLI cases, 14 conversion
+errors and 310 compiled native observations. Every ASCII byte is checked
+in both execution paths. Unicode case pairs, combining marks, NUL,
+alternate families, aliases, captures, sharing, unsupported layouts and
+open type parameters have explicit coverage. Six native mutations fail
+their named sentinels, with matching clean and restored baselines.
+
+The cumulative `zsh dev/gates.sh --stage M1-text-ascii` passes, retaining
+all predecessor stages. The run uses the existing pinned Toasty and
+Topcoat checkouts, Rust 1.98 and the shared Cargo cache. Local HTTP listener
+tests run outside the sandbox. Complete output, the capture manifest,
+source hashes and the staged-diff receipt are under
+`dev/validation/stage-m1-text-ascii/`. The M0 exit stamp remains pending.
+
+Work was validated in `/Users/oobi/Documents/gpt2/lanyard-text-ascii`
+against the committed TEXT-TRIM review fixes before transfer to the source
+repository and staging. Regression failures during development identified
+catalog totals and declaration-order expectations that needed updating;
+the assertions retain their original strictness.
+
+## M1 Stage TEXT-ASCII review fixes (tag LSM1TA, 2026-09-21)
+
+A staged-slice review of the stage M1-text-ascii found one finding,
+one nit, and the fix applied it. The fix touches
+`test/target_catalog.ml`. One row per finding follows.
+
+F-1, nit, test/target_catalog.ml:15-28. Claim: the catalog check used a five-condition && chain in one if, and the counts 43 and 9 appeared as bare numerals at the conditions and again inside the OK row literal. Fix: the counts are the bindings rows and foreign_types, the conditions are one match () with guard rows that each return false, the create_schema call is the final arm, and the OK row prints the two bindings with Printf, so the printed row stays byte-identical to the frozen capture.
+
+The Workflow run wf_e5d69d57-e2d ran 3 finders by lens, 3 verifiers and
+1 judge; 1 finding was upheld and 4 refuted.
+
+Repins. `test/target_catalog.ml` and this log take new hashes in
+`dev/validation/stage-m1-text-ascii/source-sha256.json`. The map keeps
+its 113 entries. The dune build reports `OK build: 0 errors, 0
+warnings`, the interpreter suite prints `LAN-TEXT-ASCII OK checks=100`,
+the catalog suite prints `TARGET-CATALOG OK rows=43 foreign_types=9`,
+the house script prints `HOUSE OK` and the Python suite parses.
+The close recomputes the receipt digest validated_staged_diff_sha256 over the fixed staged diff.
+
+Proof: zsh dev/gates.sh --stage M1-text-ascii GREEN on the fixed
+tree (GATE-END 2026-09-22T04:37:10Z, stage_rc=0, load averages
+176.25 85.30 47.46): LAN-TEXT-ASCII OK checks=100 (1143), CLI OK
+(1144), NATIVE OK observations=310 twice (1145, 1146), six
+MUTATION KILLED rows lower-opposite, lower-identity,
+lower-unicode, upper-opposite, upper-identity and upper-unicode
+(1147-1152), MUTATIONS OK killed=6 restored=ok (1153),
+STAGE-M1-TEXT-ASCII OK (1161). The baseline ladder on the unfixed
+kit copy was GREEN 2026-09-22T02:57:00Z stage_rc=0. Pins ok=113
+mismatch=0.

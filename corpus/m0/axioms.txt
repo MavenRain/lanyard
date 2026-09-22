@@ -1,4 +1,4 @@
-AXIOMS scope=checked-module target-sha256=357083638835ee25e7153189752054f2287d5d1bae80499233e98336159a1526
+AXIOMS scope=checked-module target-sha256=3b80e2ba19a33036591d6cf55e27fc780a5df00967eba96a43348c4a6de7a73b
 Framework imax_zero : imax l zero = zero
 Foreign Cx : Type 1 [schema=Cx]
 Foreign Db : Type 1 [schema=Db]
@@ -28,6 +28,8 @@ Foreign Text_length : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Nat)) [schema=
 Foreign Text_repeat : (Ran SPi 0 Text Type 1 (Ran SPi w text Text (Ran SPi w count Nat Text))) [schema=Text.repeat]
 Foreign Text_replace : (Ran SPi 0 Text Type 1 (Ran SPi w text Text (Ran SPi w needle Text (Ran SPi w replacement Text Text)))) [schema=Text.replace]
 Foreign Text_starts_with : (Ran SPi 0 Text Type 1 (Ran SPi w text Text (Ran SPi w needle Text (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))))) [schema=Text.starts_with]
+Foreign Text_to_ascii_lowercase : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Text)) [schema=Text.to_ascii_lowercase]
+Foreign Text_to_ascii_uppercase : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Text)) [schema=Text.to_ascii_uppercase]
 Foreign Text_to_nat : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Nat)) [schema=Text.to_nat]
 Foreign Text_trim : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Text)) [schema=Text.trim]
 Foreign Text_trim_end : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Text)) [schema=Text.trim_end]
@@ -47,8 +49,8 @@ Foreign topcoat_Error : Type 1 [schema=topcoat::Error]
 Foreign topcoat_db : (Ran SPi w cx Cx Db) [schema=topcoat.db]
 Foreign topcoat_see_other : (Ran SPi w uri Uri SeeOther) [schema=topcoat.see_other]
 COUNT Framework=1
-COUNT Foreign=46
+COUNT Foreign=48
 COUNT Classical=0
 COUNT Div=0
-AXIOMS total=47
-AXIOM-RATIO constants=46 definitions=3 status=REPORTED
+AXIOMS total=49
+AXIOM-RATIO constants=48 definitions=3 status=REPORTED

@@ -942,3 +942,18 @@ all 205 observations and print a false result for its `start_edge` or
 row, including producer traces and conversion errors. All four mutations
 were killed. The final cumulative capture is recorded in
 `dev/validation/stage-m1-text-trim/`.
+
+## M1 Stage TEXT-ASCII (2026-09-21)
+
+`test/lan_text_ascii.py --mutations` compiles six mutations of the emitted
+Rust: opposite ASCII case, identity and full Unicode conversion for each
+operation. The opposite and identity mutations must fail the corresponding
+`lower_edge` or `upper_edge` case. Unicode conversion must fail the
+corresponding `lower_unicode` or `upper_unicode` case. Each mutant must
+retain the complete native observation count.
+
+The cumulative gate kills all six mutations. Clean and restored baselines
+agree on all 310 native observations, including producer traces for
+ordinary, discarded and failing calls. The final result is
+`LAN-TEXT-ASCII MUTATIONS OK killed=6 restored=ok`. Captures and source
+hashes are stored in `dev/validation/stage-m1-text-ascii/`.

@@ -12,6 +12,8 @@ let text_arguments = function
       Option.map (fun schema -> schema, text)
         (List.assoc_opt name ["Text_trim", "Text.trim";
           "Text_trim_start", "Text.trim_start"; "Text_trim_end", "Text.trim_end";
+          "Text_to_ascii_lowercase", "Text.to_ascii_lowercase";
+          "Text_to_ascii_uppercase", "Text.to_ascii_uppercase";
           "Text_is_empty", "Text.is_empty";
           "Text_equal", "Text.equal"; "Text_contains", "Text.contains"; "Text_length", "Text.length";
           "Text_starts_with", "Text.starts_with"; "Text_ends_with", "Text.ends_with";

@@ -12,11 +12,17 @@ let create_schema () =
             | Target.Schema -> true
             | Target.Type_constant | Target.Constant -> false)
 
+let rows = 43
+let foreign_types = 9
+
 let () =
-  if List.length Target.entries = 41
-     && List.length Target.foreign_types = 9
-     && Option.is_none (Target.find "streaming_ssr")
-     && Option.is_none (Target.find "missing")
-     && create_schema ()
-  then print_endline "TARGET-CATALOG OK rows=41 foreign_types=9"
+  let ok =
+    match () with
+    | () when List.length Target.entries <> rows -> false
+    | () when List.length Target.foreign_types <> foreign_types -> false
+    | () when Option.is_some (Target.find "streaming_ssr") -> false
+    | () when Option.is_some (Target.find "missing") -> false
+    | () -> create_schema ()
+  in
+  if ok then Printf.printf "TARGET-CATALOG OK rows=%d foreign_types=%d\n" rows foreign_types
   else (prerr_endline "TARGET-CATALOG FAIL"; exit 1)

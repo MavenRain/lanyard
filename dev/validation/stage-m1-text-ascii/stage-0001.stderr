@@ -1,0 +1,210 @@
+............................
+----------------------------------------------------------------------
+Ran 28 tests in 1.535s
+
+OK
+.......................
+----------------------------------------------------------------------
+Ran 23 tests in 10.406s
+
+OK
+..................
+----------------------------------------------------------------------
+Ran 18 tests in 2.909s
+
+OK
+.................
+----------------------------------------------------------------------
+Ran 17 tests in 2.932s
+
+OK
+....................................
+----------------------------------------------------------------------
+Ran 36 tests in 2.354s
+
+OK
+...................
+----------------------------------------------------------------------
+Ran 19 tests in 0.815s
+
+OK
+................
+----------------------------------------------------------------------
+Ran 16 tests in 2.075s
+
+OK
+..........................
+----------------------------------------------------------------------
+Ran 26 tests in 0.464s
+
+OK
+..................
+----------------------------------------------------------------------
+Ran 18 tests in 0.333s
+
+OK
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 0.084s
+
+OK
+...........
+----------------------------------------------------------------------
+Ran 11 tests in 0.113s
+
+OK
+............
+----------------------------------------------------------------------
+Ran 12 tests in 0.148s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 2.207s
+
+OK
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.113s
+
+OK
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.113s
+
+OK
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.135s
+
+OK
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.169s
+
+OK
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 0.191s
+
+OK
+.......
+----------------------------------------------------------------------
+Ran 7 tests in 4.603s
+
+OK
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 4.099s
+
+OK
+........
+----------------------------------------------------------------------
+Ran 8 tests in 3.056s
+
+OK
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.243s
+
+OK
+............
+----------------------------------------------------------------------
+Ran 12 tests in 0.298s
+
+OK
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.365s
+
+OK
+gateledger: MISS d1c9850f: cargocho build -- --offline --locked --bins --manifest-path /Users/oobi/Documents/gpt2/lanyard-text-ascii/.gatework/native-session.Yaf0NT/crates/Cargo.toml --target-dir /Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target --jobs 2
+gateledger: recorded green d1c9850f (18s)
+test_addresses_before_source_io (__main__.Cli.test_addresses_before_source_io) ... ok
+test_build_flags_and_existing_destination (__main__.Cli.test_build_flags_and_existing_destination) ... ok
+test_checked_entry_before_publication (__main__.Cli.test_checked_entry_before_publication) ... ok
+test_conflicting_options (__main__.Cli.test_conflicting_options) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.394s
+
+OK
+gateledger: MISS b2ec998d: cargocho build -- --offline --locked --bins --manifest-path /Users/oobi/Documents/gpt2/lanyard-text-ascii/.gatework/http.lSDHIc/crates/Cargo.toml --target-dir /Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target --jobs 2
+gateledger: recorded green b2ec998d (15s)
+test_body_timeout (__main__.Http.test_body_timeout) ... ok
+test_concurrent_handlers_and_panics (__main__.Http.test_concurrent_handlers_and_panics) ... ok
+test_form_boundaries_and_recovery (__main__.Http.test_form_boundaries_and_recovery) ... ok
+test_mutation_controls (__main__.Http.test_mutation_controls) ... ok
+test_todo_lifecycle_and_restart (__main__.Http.test_todo_lifecycle_and_restart) ... ok
+test_uri_parts_and_query_fields (__main__.Http.test_uri_parts_and_query_fields) ... ok
+test_uri_redirect_and_methods (__main__.Http.test_uri_redirect_and_methods) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 11.849s
+
+OK
+........
+----------------------------------------------------------------------
+Ran 8 tests in 1.529s
+
+OK
+gateledger: MISS 5b28f22b: python3 -P test/lan_serve_native.py --seed /Users/oobi/Documents/gpt2/lanyard-text-ascii/.gatework/serve.Ke3Lce/seed --target /Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target
+test_todo_requests_shutdown_and_fresh_restart (__main__.NativeServe.test_todo_requests_shutdown_and_fresh_restart) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 7.224s
+
+OK
+gateledger: recorded green 5b28f22b (7s)
+test_emit_build_and_serve_embed_the_same_invocation_path (__main__.DatabaseCli.test_emit_build_and_serve_embed_the_same_invocation_path) ... ok
+test_in_memory_default_has_no_file_driver_dependency (__main__.DatabaseCli.test_in_memory_default_has_no_file_driver_dependency) ... ok
+test_invalid_options_precede_source_and_output_io (__main__.DatabaseCli.test_invalid_options_precede_source_and_output_io) ... ok
+test_non_utf8_path_is_a_usage_error (__main__.DatabaseCli.test_non_utf8_path_is_a_usage_error) ... ok
+test_source_failure_preserves_database_and_existing_output (__main__.DatabaseCli.test_source_failure_preserves_database_and_existing_output) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.942s
+
+OK
+gateledger: MISS f2f330f9: python3 -P test/lan_database_native.py --target /Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target --toasty /Users/oobi/Documents/toasty --topcoat /Users/oobi/Documents/topcoat
+test_restart_crud_paths_failures_and_memory_control (__main__.NativeDatabase.test_restart_crud_paths_failures_and_memory_control) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 12.441s
+
+OK
+gateledger: recorded green f2f330f9 (12s)
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.330s
+
+OK
+gateledger: MISS fdb9ae44: cargocho build -- --offline --locked --bins --manifest-path /Users/oobi/Documents/gpt2/lanyard-text-ascii/.gatework/uri-parts.PNKAJW/native/Cargo.toml --target-dir /Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target --jobs 2
+gateledger: recorded green fdb9ae44 (0s)
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.059s
+
+OK
+gateledger: MISS 49901fb1: cargocho build -- --offline --locked --bins --manifest-path /Users/oobi/Documents/gpt2/lanyard-text-ascii/.gatework/form-has.XLIUDT/native/Cargo.toml --target-dir /Users/oobi/Documents/gpt2/lanyard-all/.gatework/all-cargo-target --jobs 2
+gateledger: recorded green 49901fb1 (0s)
+........
+----------------------------------------------------------------------
+Ran 8 tests in 3.169s
+
+OK
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 5.129s
+
+OK
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 3.249s
+
+OK
+......
+----------------------------------------------------------------------
+Ran 6 tests in 4.506s
+
+OK
