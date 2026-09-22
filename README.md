@@ -270,6 +270,16 @@ _build/default/bin/lanyard.exe run --request / --form 'text=ab&count=3' test/fix
 zsh dev/gates.sh --stage M1-text-repeat
 ```
 
+The [M1 directional trimming adapters](dev/STAGE-M1-TEXT-TRIM.md) add
+`Text.trim_start` and `Text.trim_end`. They remove Unicode whitespace from
+one end and preserve the other end, interior bytes, NULs and combining
+characters. Both validate the complete input and evaluate it once.
+
+```sh
+_build/default/bin/lanyard.exe run --request / --form 'start=++left+&end=+right++' test/fixtures/text-trim.lan
+zsh dev/gates.sh --stage M1-text-trim
+```
+
 The [M1 URI text adapter](dev/STAGE-M1-URI-TEXT.md) exposes the full checked
 request URI as a byte list with `Uri.to_text Bytes uri`. Handlers can use
 `Text.equal` to choose a response from the URI:
@@ -492,7 +502,7 @@ _build/default/bin/lanyard.exe axioms --names examples/m0-todo.lan
 
 The report lists Framework, Foreign, Classical and Div, sorted by class
 and name, with class totals and the compiled target catalog's SHA-256.
-Todo reports 44 foreign constants and 3 definitions of the checked
+Todo reports 46 foreign constants and 3 definitions of the checked
 module (Bool, Todo and main). These are informational inputs, with no
 ratio bound. The scope is the whole checked module, including unused
 catalog rows and model operations.

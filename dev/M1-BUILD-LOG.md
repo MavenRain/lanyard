@@ -5058,3 +5058,79 @@ mutants once, short, empty and narrow OK (1109-1112) and restored
 (1113), STAGE-M1-TEXT-REPEAT OK (1121). The baseline ladder on the
 unfixed kit copy was GREEN 2026-09-21T20:13:11Z stage_rc=0. Pins ok=103
 mismatch=0.
+
+## M1 Stage TEXT-TRIM (2026-09-21)
+
+The directional trimming slice adds `Text.trim_start` and `Text.trim_end`
+across checked target metadata, specialization, the interpreter and generated
+Rust. The interpreter shares the existing Unicode scanner with `Text.trim`.
+The complete input is validated, the argument runs once, and the untouched
+end retains its original bytes. All 25 Unicode White_Space characters are
+recognized; NUL, combining characters, zero-width spaces, byte-order marks
+and control separators are preserved.
+
+The catalog contains 41 proposed declarations. The signature digest and
+catalog, axiom-count and Todo-report expectations were updated. Dependency
+commits, source anchors, trust allowances and milestone rulings were not
+changed. The complete Dune suite passes. Focused coverage comprises 100
+interpreter checks, 191 successful CLI cases, 14 conversion errors and 205
+compiled native observations. Producer traces cover ordinary, discarded
+and failing calls. Four compiled mutations fail their named sentinel, with
+matching clean and restored baselines.
+
+Validation exposed missing exhaustive enum arms, a reserved-word name in
+the new test fixture and old catalog totals in existing assertions. These
+were corrected. The Python harness uses the repository's exit-based failure
+convention. A sandboxed cumulative attempt reached the old Todo axiom-count
+expectation; that expectation and its golden were corrected and the focused
+axiom suite passed. A later sandboxed run was stopped after a loopback probe
+confirmed that the HTTP tests require execution outside the sandbox.
+
+The first run outside the sandbox passed through interpreted sessions, then
+native preparation refused the scratch directory's default Toasty path.
+The final run supplies the existing clean pinned Toasty and Topcoat checkouts
+explicitly, selects Rust 1.98 and reuses the shared Cargo cache. Older scratch
+Dune build caches were reclaimed after the disk-space guard blocked a rerun.
+
+The final cumulative `zsh dev/gates.sh --stage M1-text-trim` passed outside
+the sandbox, preserving all predecessor stages. Its complete output,
+capture manifest, source hashes and staged-diff receipt are under
+`dev/validation/stage-m1-text-trim/`. Work was validated in
+`/Users/oobi/Documents/gpt2/lanyard-text-trim` against base
+`abbe342bf6d529f1e125284a47d3274077c2235f` before transfer to the source
+repository and staging.
+
+## M1 Stage TEXT-TRIM review fixes (tag LSM1TT, 2026-09-21)
+
+A staged-slice review of the stage M1-text-trim found four findings,
+two low and two nit, and the fix applied all four. The fixes touch
+`README.md`, `target/README.md` and `test/lan_text_trim.ml`. One row
+per finding follows.
+
+F-1, low, README.md:505. Claim: the README stated 44 foreign constants, but the staged axiom snapshot (corpus/m0/axioms.txt:54) and test/lan_axioms.py:61 state 46 after this slice added Text.trim_start and Text.trim_end. Fix: the row now states 46 foreign constants; the row width is the same and no other line changes.
+F-2, low, test/lan_text_trim.ml:19-29 and 67. Claim: the row "arity" changed the call row but not the operation list, so the row stopped at the row-identity lookup (rust/text_ops.ml:91-92) and did not reach the arity guard (rust/text_ops.ml:101-104). Fix: the helper `metadata` takes an optional `catalog_row` change that it applies to the operation with the same schema, and the row "arity" drifts both rows and requires the needle `schema metadata`, which only that guard prints; the row "type arguments" keeps the default, because the lookup is the only guard on type arguments; the suite keeps 100 checks.
+F-3, nit, target/README.md:101-105. Claim: the target README stated 206 generated lines and 102 lines above the allowance, but the frozen capture states 260 generated lines and dev/STAGE-F-POLICY.md:16 sets the allowance to 104, so the excess is 156. Fix: the two rows now state 260 generated lines after the directional trimming adapters and 156 measured lines above the allowance.
+F-4, nit, test/lan_text_trim.ml:58. Claim: the row "compose" used none of the edge values, so the two edges ran the same program twice and the reverse composition never ran. Fix: the row now applies the edge operation to the result of the other edge operation, so Leading evaluates Text.trim_start over Text.trim_end and Trailing evaluates Text.trim_end over Text.trim_start; both expect "x" and the suite keeps 100 checks.
+
+The Workflow run wf_7b7bd417-035 ran 3 finders by lens, 3 verifiers and
+1 judge; 4 findings were upheld and 5 refuted.
+
+Repins. `README.md`, `target/README.md`, `test/lan_text_trim.ml` and
+this log take new hashes in
+`dev/validation/stage-m1-text-trim/source-sha256.json`. The map keeps
+its 108 entries. The dune build reports `OK build: 0 errors, 0
+warnings`, the interpreter suite prints `LAN-TEXT-TRIM OK checks=100`,
+the house script prints `HOUSE OK` and the Python suite parses. The
+review did not compile the F-2 and F-4 changes, so the fix built the
+suite and ran it to confirm the 100 checks.
+The close recomputes the receipt digest validated_staged_diff_sha256 over the fixed staged diff.
+
+Proof: zsh dev/gates.sh --stage M1-text-trim GREEN on the fixed
+tree (GATE-END 2026-09-22T00:42:03Z, stage_rc=0, load averages
+77.13 38.80 24.32): LAN-TEXT-TRIM OK checks=100 (1124), CLI OK
+(1125), NATIVE OK observations=205 twice (1126, 1127), four
+MUTATION KILLED rows start-both, start-identity, end-both and
+end-identity (1128-1131), MUTATIONS OK killed=4 restored=ok
+(1132), STAGE-M1-TEXT-TRIM OK (1140). The baseline ladder on the
+unfixed kit copy was GREEN 2026-09-21T23:44:11Z stage_rc=0. Pins
+ok=108 mismatch=0.

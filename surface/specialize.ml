@@ -10,7 +10,9 @@ let arguments = function
 let text_arguments = function
   | Term.Out (_, Term.APt (Quantity.Zero, text), Term.Global name) ->
       Option.map (fun schema -> schema, text)
-        (List.assoc_opt name ["Text_trim", "Text.trim"; "Text_is_empty", "Text.is_empty";
+        (List.assoc_opt name ["Text_trim", "Text.trim";
+          "Text_trim_start", "Text.trim_start"; "Text_trim_end", "Text.trim_end";
+          "Text_is_empty", "Text.is_empty";
           "Text_equal", "Text.equal"; "Text_contains", "Text.contains"; "Text_length", "Text.length";
           "Text_starts_with", "Text.starts_with"; "Text_ends_with", "Text.ends_with";
           "Text_replace", "Text.replace"; "Text_repeat", "Text.repeat";

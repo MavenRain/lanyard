@@ -6,9 +6,11 @@ module Catalog = Lanyard_target.Target_generated
 module Printer = Foreign.Printer
 let ( let* ) = Result.bind
 let invalid text = Error (Error.Mismatch ("Rust emission: " ^ text))
-type operation = Trim | Is_empty | Equal | Contains | Starts_with | Ends_with | Replace | Repeat | Length | Concat | From_nat | To_nat | Uri_from_text | Uri_to_text | Uri_path | Uri_query | Form_field | Form_has | Response_text | Html_text | Response_html
+type operation = Trim | Trim_start | Trim_end | Is_empty | Equal | Contains | Starts_with | Ends_with | Replace | Repeat | Length | Concat | From_nat | To_nat | Uri_from_text | Uri_to_text | Uri_path | Uri_query | Form_field | Form_has | Response_text | Html_text | Response_html
 let operation name = match () with
   | () when String.equal name "Text.trim" -> Ok Trim
+  | () when String.equal name "Text.trim_start" -> Ok Trim_start
+  | () when String.equal name "Text.trim_end" -> Ok Trim_end
   | () when String.equal name "Text.is_empty" -> Ok Is_empty
   | () when String.equal name "Text.equal" -> Ok Equal
   | () when String.equal name "Text.contains" -> Ok Contains
@@ -54,7 +56,7 @@ let catalog (checked : Elab.lan_program) (instances : Lower.text_operation list)
     Ok { row = instance.row; operation; family = family.family_name; repr; data }) instances)
 
 let specification = function
-  | Trim | Html_text -> "(0 Text : Type 0) -> (text : Text) -> Text"
+  | Trim | Trim_start | Trim_end | Html_text -> "(0 Text : Type 0) -> (text : Text) -> Text"
   | Concat -> "(0 Text : Type 0) -> (left : Text) -> (right : Text) -> Text"
   | Replace -> "(0 Text : Type 0) -> (text : Text) -> (needle : Text) -> (replacement : Text) -> Text"
   | Repeat -> "(0 Text : Type 0) -> (text : Text) -> (count : Nat) -> Text"
@@ -68,9 +70,9 @@ let specification = function
   | Form_field -> "(0 Text : Type 0) -> (text : Text) -> (field : Text) -> Text"
   | Form_has -> "(0 Text : Type 0) -> (text : Text) -> (field : Text) -> sum ((prod () : Type 0), (prod () : Type 0))"
   | Response_text | Response_html -> "(0 Text : Type 0) -> (text : Text) -> Response"
-let effects = function Trim | Is_empty | Equal | Contains | Starts_with | Ends_with | Replace | Length | Concat | From_nat | Uri_to_text | Uri_path | Uri_query | Response_text | Html_text | Response_html -> []
+let effects = function Trim | Trim_start | Trim_end | Is_empty | Equal | Contains | Starts_with | Ends_with | Replace | Length | Concat | From_nat | Uri_to_text | Uri_path | Uri_query | Response_text | Html_text | Response_html -> []
   | Repeat | To_nat | Uri_from_text | Form_field | Form_has -> ["topcoat::Error"]
-let parameters = function Trim | Is_empty | Length | To_nat | Uri_from_text | Response_text | Html_text | Response_html -> ["text"]
+let parameters = function Trim | Trim_start | Trim_end | Is_empty | Length | To_nat | Uri_from_text | Response_text | Html_text | Response_html -> ["text"]
   | Equal | Concat -> ["left"; "right"]
   | Contains | Starts_with | Ends_with -> ["text"; "needle"]
   | Replace -> ["text"; "needle"; "replacement"]
@@ -82,7 +84,7 @@ type input = Byte_list | Natural | Request_uri
 let input = function
   | From_nat -> Natural
   | Uri_to_text | Uri_path | Uri_query -> Request_uri
-  | Trim | Is_empty | Equal | Contains | Starts_with | Ends_with | Replace | Repeat | Length | Concat | To_nat | Uri_from_text | Form_field | Form_has | Response_text | Html_text | Response_html -> Byte_list
+  | Trim | Trim_start | Trim_end | Is_empty | Equal | Contains | Starts_with | Ends_with | Replace | Repeat | Length | Concat | To_nat | Uri_from_text | Form_field | Form_has | Response_text | Html_text | Response_html -> Byte_list
 let argument_input operation name =
   if operation = Repeat && String.equal name "count" then Natural else input operation
 let foreign_call entries operations (row : Rir.foreign) =
@@ -108,7 +110,7 @@ let foreign_call entries operations (row : Rir.foreign) =
         let bindings = List.map (fun name -> name, "__lan_" ^ name) parameters in
         let* call = Template.render template bindings in
         let converted = match operation with
-          | Trim | Concat | Replace | Repeat | From_nat | Form_field | Html_text -> Printer.identifier "lan_model_text_from_" text.family ^ "(" ^ call ^ ")"
+          | Trim | Trim_start | Trim_end | Concat | Replace | Repeat | From_nat | Form_field | Html_text -> Printer.identifier "lan_model_text_from_" text.family ^ "(" ^ call ^ ")"
           | Is_empty | Equal | Contains | Starts_with | Ends_with | Form_has ->
               let ty = Printer.rust_type (Printer.Sum [Printer.Unit; Printer.Unit]) in
               "if " ^ call ^ " { " ^ ty ^ "::V1(()) } else { " ^ ty ^ "::V0(()) }"
@@ -131,7 +133,7 @@ let foreign_call entries operations (row : Rir.foreign) =
   let uri_foreign () = let* _uri_type = Foreign.foreign_type entries "Uri" [] in
     Ok (Rir.TyForeign ("Uri", [])) in
   let* result = match operation with
-    | Trim | Concat | Replace | Repeat | From_nat | Uri_to_text | Uri_path | Uri_query | Form_field | Html_text -> Ok text.repr | Is_empty | Equal | Contains | Starts_with | Ends_with | Form_has -> Ok bool_repr
+    | Trim | Trim_start | Trim_end | Concat | Replace | Repeat | From_nat | Uri_to_text | Uri_path | Uri_query | Form_field | Html_text -> Ok text.repr | Is_empty | Equal | Contains | Starts_with | Ends_with | Form_has -> Ok bool_repr
     | Length | To_nat -> Ok (Rir.TyUnion (Rir.Tid "nat"))
     | Uri_from_text -> uri_foreign ()
     | Response_text | Response_html ->
@@ -151,7 +153,7 @@ let uri_text operation uri =
   | Uri_to_text -> Ok uri
   | Uri_path -> Ok (String.to_seq uri |> Seq.take_while before_query |> String.of_seq)
   | Uri_query -> Ok (String.to_seq uri |> Seq.drop_while before_query |> Seq.drop 1 |> String.of_seq)
-  | Trim | Is_empty | Equal | Contains | Starts_with | Ends_with | Replace | Repeat | Length | Concat | From_nat | To_nat | Uri_from_text
+  | Trim | Trim_start | Trim_end | Is_empty | Equal | Contains | Starts_with | Ends_with | Replace | Repeat | Length | Concat | From_nat | To_nat | Uri_from_text
   | Form_field | Form_has | Response_text | Html_text | Response_html -> invalid "expected a URI text operation"
 
 module Text_positions = Map.Make (Int)
@@ -326,11 +328,16 @@ fn lan_uri_validate(value: &str) -> Result<(), Error> {
 let whitespace scalar = (scalar >= 0x09 && scalar <= 0x0d)
   || (scalar >= 0x2000 && scalar <= 0x200a)
   || List.mem scalar [0x20; 0x85; 0xa0; 0x1680; 0x2028; 0x2029; 0x202f; 0x205f; 0x3000]
-let trim text =
+type edge = Both | Leading | Trailing
+let trim_edge edge text =
   if not (String.is_valid_utf_8 text) then Error (Error.Mismatch "invalid UTF-8 in text operation") else
   let rec scan offset bounds =
     if offset = String.length text then
       Ok (Option.fold ~none:"" ~some:(fun (first, last) ->
+        let first, last = match edge with
+          | Both -> first, last
+          | Leading -> first, String.length text
+          | Trailing -> 0, last in
         String.to_seq text |> Seq.drop first |> Seq.take (last - first) |> String.of_seq) bounds)
     else
       let decoded = String.get_utf_8_uchar text offset in
@@ -339,3 +346,6 @@ let trim text =
         else Some (Option.fold ~none:offset ~some:fst bounds, next) in
       scan next bounds in
   scan 0 None
+let trim text = trim_edge Both text
+let trim_start text = trim_edge Leading text
+let trim_end text = trim_edge Trailing text

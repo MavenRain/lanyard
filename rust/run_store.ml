@@ -156,6 +156,8 @@ let foreign catalog (row : Rir.foreign) arguments store = match () with
            let* text = text ~what:"text operation" operation.family value in
            let* value = match operation.operation with
              | Text_ops.Trim -> Text_ops.trim text |> Result.map (of_text operation.family)
+             | Text_ops.Trim_start -> Text_ops.trim_start text |> Result.map (of_text operation.family)
+             | Text_ops.Trim_end -> Text_ops.trim_end text |> Result.map (of_text operation.family)
              | Text_ops.To_nat -> Text_ops.to_nat text |> Result.map (fun number -> Nat number)
              | Text_ops.Length -> Ok (Nat (Bignum.of_int (String.length text)))
              | Text_ops.Is_empty ->

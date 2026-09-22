@@ -1,12 +1,12 @@
 # Target signatures
 
-The target catalog provides 39 proposed foreign declarations: nine type
-constants and thirty constant or schema declarations. M1 adds
+The target catalog provides 41 proposed foreign declarations: nine type
+constants and thirty-two constant or schema declarations. M1 adds
 `Model.delete_by_id`, `Model.update`, `Model.all`, `Text.trim`,
 `Text.is_empty`, `Uri.from_text`, `Form.field`, `Response.text`,
 `Html.text`, `Response.html`, `Text.concat`, `Text.from_nat`, `Text.to_nat`,
 `Text.equal`, `Text.length`, `Text.contains`, `Text.starts_with`, `Text.ends_with`, `Text.replace`,
-`Text.repeat`, `Uri.to_text`, `Uri.path`, `Uri.query` and
+`Text.repeat`, `Text.trim_start`, `Text.trim_end`, `Uri.to_text`, `Uri.path`, `Uri.query` and
 `Form.has` to the catalog. The target layer builds as
 `lanyard_target`;
 its `Target_generated` module exposes immutable
@@ -98,11 +98,11 @@ files and `dev/gen-target.py`. It is deterministic, records a semantic digest,
 and carries no absolute source paths. It is compiled into an OCaml library,
 so a consumer does not parse signature files at runtime.
 
-The generated module has 206 lines after adding URI path and query adapters.
+The generated module has 260 lines after adding the directional trimming adapters.
 The [trust policy](../dev/STAGE-F-POLICY.md) records proposed source
 groups and budgets. S0-D1 requires the user to rule the numeric `A_sig`
 allowance. The proposed allowance is exactly 104, without margin, and
-the additional 102 measured lines exceed that proposed allowance, which
+the additional 156 measured lines exceed that proposed allowance, which
 this adapter does not change.
 `dev/trusted-lines.sh` reports the measurement and keeps the ruled formula
 `5481 + A_rir + A_emit + A_sig`. It does not claim an approved total.

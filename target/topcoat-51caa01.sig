@@ -14,6 +14,8 @@
 {"name":"topcoat.db","type":"(cx : Cx) -> Db","quantities":["w"],"effects":[],"print":"topcoat::context::app_context::<toasty::Db>(#{cx}).clone()","kind":"constant","status":"PROPOSED"}
 {"name":"topcoat.see_other","type":"(uri : Uri) -> SeeOther","quantities":["w"],"effects":[],"print":"topcoat::router::error::see_other(#{uri}.to_string())","kind":"constant","status":"PROPOSED"}
 {"name":"Text.trim","type":"(0 Text : Type 0) -> (text : Text) -> Text","quantities":["0","w"],"effects":[],"print":"#{text}.trim().to_owned()","kind":"schema","status":"PROPOSED"}
+{"name":"Text.trim_start","type":"(0 Text : Type 0) -> (text : Text) -> Text","quantities":["0","w"],"effects":[],"print":"#{text}.trim_start().to_owned()","kind":"schema","status":"PROPOSED"}
+{"name":"Text.trim_end","type":"(0 Text : Type 0) -> (text : Text) -> Text","quantities":["0","w"],"effects":[],"print":"#{text}.trim_end().to_owned()","kind":"schema","status":"PROPOSED"}
 {"name":"Text.is_empty","type":"(0 Text : Type 0) -> (text : Text) -> sum ((prod () : Type 0), (prod () : Type 0))","quantities":["0","w"],"effects":[],"print":"#{text}.is_empty()","kind":"schema","status":"PROPOSED"}
 {"name":"Text.equal","type":"(0 Text : Type 0) -> (left : Text) -> (right : Text) -> sum ((prod () : Type 0), (prod () : Type 0))","quantities":["0","w","w"],"effects":[],"print":"#{left} == #{right}","kind":"schema","status":"PROPOSED"}
 {"name":"Text.contains","type":"(0 Text : Type 0) -> (text : Text) -> (needle : Text) -> sum ((prod () : Type 0), (prod () : Type 0))","quantities":["0","w","w"],"effects":[],"print":"#{text}.contains(#{needle}.as_str())","kind":"schema","status":"PROPOSED"}

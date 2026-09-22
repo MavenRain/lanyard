@@ -930,3 +930,15 @@ named false sentinel. A compiler failure or an unrelated output difference
 does not count as a kill. The unchanged and restored programs must match
 every expected row. All four mutations passed the kill checks in the focused
 run. The cumulative gate repeats them and retains the earlier mutation sets.
+
+## M1 Stage TEXT-TRIM (2026-09-21)
+
+The `M1-text-trim` gate compiles four generated-Rust mutations:
+`start-both`, `start-identity`, `end-both` and `end-identity`. The first and
+third replace directional trimming with full trimming; the other two
+preserve the input without trimming. Each mutant must compile, complete
+all 205 observations and print a false result for its `start_edge` or
+`end_edge` sentinel. Clean and restored binaries must match every expected
+row, including producer traces and conversion errors. All four mutations
+were killed. The final cumulative capture is recorded in
+`dev/validation/stage-m1-text-trim/`.

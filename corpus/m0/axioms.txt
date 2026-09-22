@@ -1,4 +1,4 @@
-AXIOMS scope=checked-module target-sha256=89f1318e92083d8a007a919be88cc35c2326199832858628e8915c3ec5858265
+AXIOMS scope=checked-module target-sha256=357083638835ee25e7153189752054f2287d5d1bae80499233e98336159a1526
 Framework imax_zero : imax l zero = zero
 Foreign Cx : Type 1 [schema=Cx]
 Foreign Db : Type 1 [schema=Db]
@@ -30,6 +30,8 @@ Foreign Text_replace : (Ran SPi 0 Text Type 1 (Ran SPi w text Text (Ran SPi w ne
 Foreign Text_starts_with : (Ran SPi 0 Text Type 1 (Ran SPi w text Text (Ran SPi w needle Text (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))))) [schema=Text.starts_with]
 Foreign Text_to_nat : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Nat)) [schema=Text.to_nat]
 Foreign Text_trim : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Text)) [schema=Text.trim]
+Foreign Text_trim_end : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Text)) [schema=Text.trim_end]
+Foreign Text_trim_start : (Ran SPi 0 Text Type 1 (Ran SPi w text Text Text)) [schema=Text.trim_start]
 Foreign Todo_all : (Ran SPi w db Db (Lan SMu Todo_rows [] (Sec SColl 0 []))) [schema=Model.all]
 Foreign Todo_create : (Ran SPi w fields (Ran SColl 3 (Sec SColl 3 [ => Nat;  => (Lan SMu Bytes [] (Sec SColl 0 []));  => (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))])) (Ran SPi w db Db (Ran SColl 3 (Sec SColl 3 [ => Nat;  => (Lan SMu Bytes [] (Sec SColl 0 []));  => (Lan SColl 2 (Sec SColl 2 [ => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1);  => ((Ran SColl 0 (Sec SColl 0 [])) : Type 1)]))])))) [schema=Model.create]
 Foreign Todo_delete_by_id : (Ran SPi w key Nat (Ran SPi w db Db (Ran SColl 0 (Sec SColl 0 [])))) [schema=Model.delete_by_id]
@@ -45,8 +47,8 @@ Foreign topcoat_Error : Type 1 [schema=topcoat::Error]
 Foreign topcoat_db : (Ran SPi w cx Cx Db) [schema=topcoat.db]
 Foreign topcoat_see_other : (Ran SPi w uri Uri SeeOther) [schema=topcoat.see_other]
 COUNT Framework=1
-COUNT Foreign=44
+COUNT Foreign=46
 COUNT Classical=0
 COUNT Div=0
-AXIOMS total=45
-AXIOM-RATIO constants=44 definitions=3 status=REPORTED
+AXIOMS total=47
+AXIOM-RATIO constants=46 definitions=3 status=REPORTED
